@@ -68,7 +68,6 @@ export default function NavigationSection({
               <NavigationItem
                 key={`${item.href}-${item.title}-${index}`}
                 item={item}
-                depth={0}
                 {...(hasChildren && {
                   isExpanded: expandedItem === item.title,
                   onToggle: () => handleItemToggle(item.title),
@@ -86,7 +85,7 @@ function NavigationItem({
   item,
   isExpanded,
   onToggle,
-  depth = 0
+  depth = 0,
 }: {
   item: NavigationItem;
   isExpanded?: boolean;
@@ -108,9 +107,6 @@ function NavigationItem({
   };
 
   if (hasChildren) {
-    const marginLeft = depth > 0 ? `ml-${Math.min(depth * 2 + 3, 8)}` : 'ml-3';
-    const iconSize = depth > 0 ? 'w-2.5 h-2.5' : 'w-3 h-3';
-    
     return (
       <li>
         <button
@@ -119,11 +115,11 @@ function NavigationItem({
             isExpanded
               ? "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30"
               : "text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
-          } ${depth > 0 ? 'text-xs' : ''}`}
+          }`}
         >
           {item.title}
           <svg
-            className={`${iconSize} transition-transform duration-200 ${
+            className={`w-3 h-3 transition-transform duration-200 ${
               isExpanded ? "rotate-180" : ""
             }`}
             fill="none"
@@ -144,12 +140,13 @@ function NavigationItem({
           }`}
         >
           <ul
-            className={`space-y-1 mt-1 ${marginLeft} border-gray-200 dark:border-gray-700 border-l ${
+            className={`space-y-1 mt-1 ml-3 border-gray-200 dark:border-gray-700 border-l ${
               isExpanded ? "pb-2" : ""
             }`}
           >
             {item.children!.map((child, childIndex) => {
-              const childHasChildren = child.children && child.children.length > 0;
+              const childHasChildren =
+                child.children && child.children.length > 0;
               return (
                 <NavigationItem
                   key={`${child.href}-${child.title}-${childIndex}`}
@@ -157,7 +154,7 @@ function NavigationItem({
                   depth={depth + 1}
                   {...(childHasChildren && {
                     isExpanded: expandedChild === child.title,
-                    onToggle: () => handleChildToggle(child.title)
+                    onToggle: () => handleChildToggle(child.title),
                   })}
                 />
               );
@@ -172,9 +169,7 @@ function NavigationItem({
     <li>
       <Link
         href={item.href}
-        className={`block hover:bg-gray-100 dark:hover:bg-gray-800 px-3 py-2 rounded-md text-gray-700 dark:text-gray-300 transition-colors hover:border-emerald-500 border-transparent border-l-2 ${
-          depth > 0 ? 'text-xs hover:bg-gray-50 dark:hover:bg-gray-800/50' : 'text-sm'
-        }`}
+        className="block hover:bg-gray-100 dark:hover:bg-gray-800 px-3 py-2 rounded-md text-gray-700 text-sm dark:text-gray-300 transition-colors"
       >
         {item.title}
       </Link>

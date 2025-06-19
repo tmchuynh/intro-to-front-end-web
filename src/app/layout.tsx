@@ -1,4 +1,4 @@
-import Navigation from "@/components/Navigation";
+import LayoutWrapper from "@/components/LayoutWrapper";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -14,9 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Intro to Web - MDX Demo",
-  description:
-    "A Next.js project with MDX support for web development learning",
+  title: "Intro to Web Development",
 };
 
 export default function RootLayout({
@@ -29,8 +27,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navigation />
-        <main className="mx-auto px-4 py-8 container">{children}</main>
+        <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>
   );

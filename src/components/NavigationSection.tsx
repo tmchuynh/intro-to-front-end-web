@@ -172,7 +172,9 @@ function NavigationItem({
     <li>
       <Link
         href={item.href}
-        className="block hover:bg-gray-100 dark:hover:bg-gray-800 px-3 py-2 rounded-md text-gray-700 text-sm dark:text-gray-300 transition-colors"
+        className={`block hover:bg-gray-100 dark:hover:bg-gray-800 px-3 py-2 rounded-md text-gray-700 dark:text-gray-300 transition-colors hover:border-emerald-500 border-transparent border-l-2 ${
+          depth > 0 ? 'text-xs hover:bg-gray-50 dark:hover:bg-gray-800/50' : 'text-sm'
+        }`}
       >
         {item.title}
       </Link>

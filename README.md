@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Beginner's Guide to Front-End Development
 
-## Getting Started
+This folder contains the organized chapters and content from the complete Front-End Development guide.
 
-First, run the development server:
+## Structure
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**front-matter/**: Contains introductory content
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`preface.md` Introduction and overview
+`abbreviations.md` Technical abbreviations and meanings
+`scope.md` Book scope and conventions
+`about-author.md` Author information
+`about-reviewers.md` Reviewer information
+`acknowledgments.md` Acknowledgments and credits
+`coming-soon.md` Upcoming content preview
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**chapters/**: Contains all 16 chapters
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`chapter-01-introduction.md` Introduction to Web Development
+`chapter-02-seo-accessibility.md` SEO and Accessibility
+`chapter-03-frontend-essentials.md` Front-End Development Essentials
+`chapter-04-html.md` HTML: The Backbone of Web Pages
+`chapter-05-css.md` CSS: Styling and Layout
+`chapter-06-javascript.md` JavaScript Fundamentals
+`chapter-07-dom.md` Document Object Model (DOM)
+`chapter-08-form-validation.md` Form Handling and Validation
+`chapter-09-jquery.md` jQuery Essentials
+`chapter-10-advanced-topics.md` Advanced JavaScript Topics
+`chapter-11-quiz-app.md` Building a Quiz Application
+`chapter-12-frameworks-libraries.md` Frameworks and Libraries
+`chapter-13-typescript.md` TypeScript Essentials
+`chapter-14-react.md` React Framework
+`chapter-15-nextjs.md` Next.js Framework
+`chapter-16-portfolio.md` Building Your Portfolio
 
-## Learn More
+**appendices/**: Contains additional reference materials
 
-To learn more about Next.js, take a look at the following resources:
+`html-conventions.md` HTML Best Practices and Conventions
+`css-conventions.md` CSS Best Practices and Conventions
+`javascript-conventions.md` JavaScript Best Practices and Conventions
+`resources.md` Additional Learning Resources
+`credits.md` Attribution and Credits
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## About
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This guide provides a comprehensive introduction to front-end development, covering all essential concepts for becoming a proficient front-end developer. It includes the key languages, frameworks, and libraries used in modern web development.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Front-End Developers Create Engaging, User-Friendly Interfaces That Bring Digital Experiences to Life**

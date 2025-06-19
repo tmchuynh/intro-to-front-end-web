@@ -29,12 +29,12 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       return <span className="mb-4 leading-relaxed">{children}</span>;
     },
     ul: ({ children }) => (
-      <ul className="space-y-2 mb-4 list-disc list-inside">{children}</ul>
+      <ul className="space-y-2 my-4 list-disc list-outside">{children}</ul>
     ),
     ol: ({ children }) => (
-      <ol className="space-y-2 mb-4 list-decimal list-inside">{children}</ol>
+      <ol className="space-y-2 my-4 list-decimal list-outside">{children}</ol>
     ),
-    li: ({ children }) => <li className="ml-4">{children}</li>,
+    li: ({ children }) => <li className="ml-9">{children}</li>,
     blockquote: ({ children }) => (
       <blockquote className="my-4 pl-4 border-gray-300 border-l-4 italic">
         {children}

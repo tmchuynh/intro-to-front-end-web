@@ -1,6 +1,6 @@
 import type { NavigationItem } from "@/utils/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface NavigationSectionProps {
   title: string;
@@ -16,6 +16,13 @@ export default function NavigationSection({
   onToggle,
 }: NavigationSectionProps) {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
+
+  // Reset expanded item when section is closed
+  useEffect(() => {
+    if (!isOpen) {
+      setExpandedItem(null);
+    }
+  }, [isOpen]);
 
   const handleItemToggle = (itemTitle: string) => {
     setExpandedItem(expandedItem === itemTitle ? null : itemTitle);
@@ -55,29 +62,55 @@ export default function NavigationSection({
         }`}
       >
         <ul className={`space-y-1 ${isOpen ? "pb-2" : ""}`}>
-          {items.map((item, index) => (
-            <NavigationItem
-              key={`${item.href}-${item.title}-${index}`}
-              item={item}
-              isExpanded={expandedItem === item.title}
-              onToggle={() => handleItemToggle(item.title)}
-            />
-          ))}
+          {items.map((item, index) => {
+            const hasChildren = item.children && item.children.length > 0;
+            return (
+              <NavigationItem
+                key={`${item.href}-${item.title}-${index}`}
+                item={item}
+                {...(hasChildren && {
+                  isExpanded: expandedItem === item.title,
+                  onToggle: () => handleItemToggle(item.title),
+                })}
+              />
+            );
+          })}
         </ul>
       </div>
     </div>
   );
 }
 
-function NavigationItem({ item }: { item: NavigationItem }) {
+function NavigationItem({
+  item,
+  isExpanded,
+  onToggle,
+  depth = 0
+}: {
+  item: NavigationItem;
+  isExpanded?: boolean;
+  onToggle?: () => void;
+  depth?: number;
+}) {
   const hasChildren = item.children && item.children.length > 0;
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [expandedChild, setExpandedChild] = useState<string | null>(null);
+
+  // Reset expanded child when this item is collapsed
+  useEffect(() => {
+    if (!isExpanded) {
+      setExpandedChild(null);
+    }
+  }, [isExpanded]);
+
+  const handleChildToggle = (childTitle: string) => {
+    setExpandedChild(expandedChild === childTitle ? null : childTitle);
+  };
 
   if (hasChildren) {
     return (
       <li>
         <button
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={onToggle}
           className={`flex justify-between items-center px-3 py-2 w-full font-medium text-left text-sm transition-colors rounded-md ${
             isExpanded
               ? "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30"
@@ -111,16 +144,20 @@ function NavigationItem({ item }: { item: NavigationItem }) {
               isExpanded ? "pb-2" : ""
             }`}
           >
-            {item.children!.map((child, childIndex) => (
-              <li key={`${child.href}-${child.title}-${childIndex}`}>
-                <Link
-                  href={child.href}
-                  className="block hover:bg-gray-50 dark:hover:bg-gray-800/50 px-3 py-1.5 hover:border-emerald-500 border-transparent border-l-2 rounded-r-md text-gray-600 text-sm hover:text-gray-900 dark:hover:text-white dark:text-gray-400 transition-colors"
-                >
-                  {child.title}
-                </Link>
-              </li>
-            ))}
+            {item.children!.map((child, childIndex) => {
+              const childHasChildren = child.children && child.children.length > 0;
+              return (
+                <NavigationItem
+                  key={`${child.href}-${child.title}-${childIndex}`}
+                  item={child}
+                  depth={depth + 1}
+                  {...(childHasChildren && {
+                    isExpanded: expandedChild === child.title,
+                    onToggle: () => handleChildToggle(child.title)
+                  })}
+                />
+              );
+            })}
           </ul>
         </div>
       </li>

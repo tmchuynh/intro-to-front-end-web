@@ -1,6 +1,7 @@
 import { useNavigation } from "@/hooks/useNavigation";
 import Link from "next/link";
 import NavigationSection from "./NavigationSection";
+import { useState, useEffect } from "react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -9,6 +10,18 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { navigation, loading } = useNavigation();
+  const [openSection, setOpenSection] = useState<string | null>(null);
+
+  // Set the first section as open by default when navigation loads
+  useEffect(() => {
+    if (navigation.length > 0 && openSection === null) {
+      setOpenSection(navigation[0].title);
+    }
+  }, [navigation, openSection]);
+
+  const handleSectionToggle = (sectionTitle: string) => {
+    setOpenSection(openSection === sectionTitle ? null : sectionTitle);
+  };
 
   return (
     <>
@@ -78,6 +91,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     key={section.title}
                     title={section.title}
                     items={section.items}
+                    isOpen={openSection === section.title}
+                    onToggle={() => handleSectionToggle(section.title)}
                   />
                 ))
               )}

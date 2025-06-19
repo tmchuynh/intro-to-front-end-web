@@ -7,11 +7,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     // Allows customizing built-in components, e.g. to add styling.
     h1: ({ children }) => (
-      <h1 className="my-6 font-bold text-4xl">{children}</h1>
+      <h1 className="my-6 font-bold text-4xl text-brand-primary">{children}</h1>
     ),
-    h2: ({ children }) => (
-      <h2 className="my-4 font-semibold text-3xl">{children}</h2>
-    ),
+    h2: ({ children }) => <h2 className="my-4 text-3xl">{children}</h2>,
     h3: ({ children }) => (
       <h3 className="my-3 font-medium text-2xl">{children}</h3>
     ),
@@ -54,9 +52,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     code: ({ children }) => (
       <code className="my-5 py-1 font-mono text-sm">{children}</code>
     ),
+
     pre: ({ children }) => (
-      <div className="bg-zinc-800 dark:bg-transparent my-5 px-4 border-zinc-700 dark:border-zinc-800 rounded-2xl overflow-hidden">
-        <pre className="my-4 p-4 text-gray-100">{children}</pre>
+      <div className="bg-zinc-800 dark:bg-transparent my-5 px-4 border-zinc-700 dark:border-zinc-800 rounded-2xl overflow-y-auto">
+        <pre className="my-4 p-4">{children}</pre>
       </div>
     ),
     a: ({ href, children }) => (

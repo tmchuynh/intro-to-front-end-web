@@ -70,7 +70,11 @@ function NavigationItem({ item }: { item: NavigationItem }) {
       <li>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="flex justify-between items-center px-3 py-2 w-full font-medium text-gray-900 text-left text-sm dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+          className={`flex justify-between items-center px-3 py-2 w-full font-medium text-left text-sm transition-colors rounded-md ${
+            isExpanded
+              ? "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30"
+              : "text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+          }`}
         >
           {item.title}
           <svg

@@ -4,25 +4,57 @@ import Link from "next/link";
 interface NavigationSectionProps {
   title: string;
   items: NavigationItem[];
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
 export default function NavigationSection({
   title,
   items,
+  isOpen,
+  onToggle,
 }: NavigationSectionProps) {
   return (
     <div>
-      <h3 className="mb-3 font-semibold text-gray-500 text-xs dark:text-gray-400 uppercase tracking-wider">
+      <button
+        onClick={onToggle}
+        className={`flex justify-between items-center mb-3 w-full font-semibold text-left text-xs uppercase tracking-wider transition-colors ${
+          isOpen 
+            ? 'text-emerald-600 dark:text-emerald-400' 
+            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+        }`}
+      >
         {title}
-      </h3>
-      <ul className="space-y-1">
-        {items.map((item, index) => (
-          <NavigationItem
-            key={`${item.href}-${item.title}-${index}`}
-            item={item}
+        <svg
+          className={`w-4 h-4 transition-transform duration-200 ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
           />
-        ))}
-      </ul>
+        </svg>
+      </button>
+      <div
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          isOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <ul className={`space-y-1 ${isOpen ? 'pb-2' : ''}`}>
+          {items.map((item, index) => (
+            <NavigationItem
+              key={`${item.href}-${item.title}-${index}`}
+              item={item}
+            />
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

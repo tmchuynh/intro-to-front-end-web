@@ -28,7 +28,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="z-40 fixed inset-0 lg:hidden bg-black bg-opacity-50"
+          className="z-40 fixed inset-0 lg:hidden overlay"
           onClick={onClose}
         />
       )}
@@ -36,7 +36,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={`
-        fixed top-0 left-0 z-50 w-64 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700
+        sidebar-section fixed top-0 left-0 z-50 w-64 h-full border-r
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0 lg:static lg:z-auto
@@ -44,18 +44,25 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex justify-between items-center p-4 border-gray-200 dark:border-gray-700 border-b">
+          <div
+            className="flex justify-between items-center p-4 border-b"
+            style={{ borderColor: "var(--sidebar-border)" }}
+          >
             <Link href="/" className="flex items-center space-x-2">
-              <div className="flex justify-center items-center bg-emerald-500 rounded-lg w-8 h-8">
+              <div className="flex justify-center items-center w-8 h-8 brand-logo">
                 <span className="font-bold text-lg text-white">W</span>
               </div>
-              <span className="font-bold text-gray-900 text-xl dark:text-white">
+              <span
+                className="font-bold text-xl"
+                style={{ color: "var(--sidebar-text)" }}
+              >
                 Web Intro
               </span>
             </Link>
             <button
               onClick={onClose}
-              className="lg:hidden p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="lg:hidden p-1 rounded-md"
+              style={{ color: "var(--sidebar-text-secondary)" }}
             >
               <svg
                 className="w-5 h-5"
@@ -78,11 +85,23 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div className="space-y-6">
               {loading ? (
                 <div className="animate-pulse">
-                  <div className="bg-gray-200 dark:bg-gray-700 mb-3 rounded h-4"></div>
+                  <div
+                    className="mb-3 rounded h-4"
+                    style={{ backgroundColor: "var(--sidebar-hover-bg)" }}
+                  ></div>
                   <div className="space-y-2">
-                    <div className="bg-gray-200 dark:bg-gray-700 rounded h-3"></div>
-                    <div className="bg-gray-200 dark:bg-gray-700 rounded h-3"></div>
-                    <div className="bg-gray-200 dark:bg-gray-700 rounded h-3"></div>
+                    <div
+                      className="rounded h-3"
+                      style={{ backgroundColor: "var(--sidebar-hover-bg)" }}
+                    ></div>
+                    <div
+                      className="rounded h-3"
+                      style={{ backgroundColor: "var(--sidebar-hover-bg)" }}
+                    ></div>
+                    <div
+                      className="rounded h-3"
+                      style={{ backgroundColor: "var(--sidebar-hover-bg)" }}
+                    ></div>
                   </div>
                 </div>
               ) : (

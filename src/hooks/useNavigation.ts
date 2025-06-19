@@ -37,7 +37,7 @@ export function useNavigation() {
 function getStaticNavigation(): NavigationSection[] {
   return [
     {
-      title: "Fundamentals",
+      title: "Overview",
       items: [
         {
           title: "Overview",
@@ -57,6 +57,11 @@ function getStaticNavigation(): NavigationSection[] {
             },
           ],
         },
+      ],
+    },
+    {
+      title: "Getting Started",
+      items: [
         {
           title: "HTML",
           href: "/html",

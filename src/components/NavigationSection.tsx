@@ -16,8 +16,11 @@ export default function NavigationSection({
         {title}
       </h3>
       <ul className="space-y-1">
-        {items.map((item) => (
-          <NavigationItem key={item.href} item={item} />
+        {items.map((item, index) => (
+          <NavigationItem
+            key={`${item.href}-${item.title}-${index}`}
+            item={item}
+          />
         ))}
       </ul>
     </div>
@@ -34,8 +37,8 @@ function NavigationItem({ item }: { item: NavigationItem }) {
           {item.title}
         </div>
         <ul className="space-y-1 mt-1 ml-3 border-gray-200 dark:border-gray-700 border-l">
-          {item.children!.map((child) => (
-            <li key={child.href}>
+          {item.children!.map((child, childIndex) => (
+            <li key={`${child.href}-${child.title}-${childIndex}`}>
               <Link
                 href={child.href}
                 className="block px-3 py-1 hover:border-emerald-500 border-transparent border-l-2 text-gray-600 text-sm hover:text-gray-900 dark:hover:text-white dark:text-gray-400 transition-colors"

@@ -57,7 +57,7 @@ export async function readMDXMetadata(
     }
 
     return metadata;
-  } catch (error) {
+  } catch {
     return {};
   }
 }
@@ -67,6 +67,7 @@ function categorizeNavigationItems(
   items: NavigationItem[]
 ): NavigationSection[] {
   const categories = {
+    getting_started: [] as NavigationItem[],
     fundamentals: [] as NavigationItem[],
     projects: [] as NavigationItem[],
     advanced: [] as NavigationItem[],
@@ -84,19 +85,14 @@ function categorizeNavigationItems(
       path.includes("introduction")
     ) {
       categories.fundamentals.push(item);
+    } else if (path.includes("forms") || path.includes("intro")) {
+      categories.getting_started.push(item);
     } else if (
-      path.includes("html") ||
-      path.includes("css") ||
-      path.includes("javascript")
-    ) {
-      categories.fundamentals.push(item);
-    } else if (
-      path.includes("forms") ||
       path.includes("seo-accessibility") ||
       path.includes("document-object-model") ||
       path.includes("jquery")
     ) {
-      categories.fundamentals.push(item);
+      categories.getting_started.push(item);
     } else if (
       path.includes("quiz-app") ||
       path.includes("website-portfolio")
@@ -105,12 +101,10 @@ function categorizeNavigationItems(
     } else if (
       path.includes("react") ||
       path.includes("frameworks") ||
-      path.includes("more-advanced-concepts") ||
+      path.includes("interface") ||
       path.includes("typescript") ||
-      path.includes("api") ||
       path.includes("storage") ||
-      path.includes("libraries") ||
-      path.includes("application-programming-interface")
+      path.includes("libraries")
     ) {
       categories.advanced.push(item);
     } else if (path.includes("ux-ui") || path.includes("design")) {
@@ -131,6 +125,13 @@ function categorizeNavigationItems(
     });
   }
 
+  if (categories.getting_started.length > 0) {
+    sections.push({
+      title: "Getting Started",
+      items: categories.getting_started,
+    });
+  }
+
   if (categories.projects.length > 0) {
     sections.push({
       title: "Projects",
@@ -138,17 +139,17 @@ function categorizeNavigationItems(
     });
   }
 
-  if (categories.advanced.length > 0) {
-    sections.push({
-      title: "Advanced Topics",
-      items: categories.advanced,
-    });
-  }
-
   if (categories.design.length > 0) {
     sections.push({
       title: "Design",
       items: categories.design,
+    });
+  }
+
+  if (categories.advanced.length > 0) {
+    sections.push({
+      title: "Advanced Topics",
+      items: categories.advanced,
     });
   }
 

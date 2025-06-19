@@ -1,0 +1,269 @@
+## 4.1 Understanding Semantic HTML
+
+The term "**semantic**" refers to **"relating to meaning"**. HTML5 introduces a range of semantic tags, which are HTML tags that convey additional meaning through their descriptive names. While they don't impact the visual presentation, using them offers other advantages:
+
+- **Accessibility Boost**: Screen readers love semantic tags! They use them as markers, helping visually impaired users navigate web pages more efficiently.
+
+- **Consistent Naming**: Semantic naming fits nicely with proper custom element or component naming conventions, keeping everything neat and tidy in your code.
+
+- **Content Clarity**: Semantic tags provide a clear indication of what type of content is included, giving developers a quick understanding of the structure.
+
+- **Easier Navigation**: Using semantic tags makes it way simpler to find meaningful sections of code, rather than digging through a sea of `<div>` elements, whether they have fancy classes or not.
+
+- **SEO Benefits**: Search engines may treat content within semantic tags as relevant keywords, potentially boosting the page's search rankings – like giving your site a little extra SEO magic.
+
+Some semantic elements include:
+
+`<article>`
+`<aside>`
+`<figcaption>`
+`<figure>`
+`<header>`
+`<main>`
+`<nav>`
+`<section>`
+`<table>`
+`<time>`
+
+_Table 2: Semantic HTML Elements_
+
+**NOTE**
+
+You can find a list of more semantic HTML elements at the back of the book in the Appendix HTML Elements as well as a chart with date/time formats to apply to the `datetime=""` attribute of the `<time>`, `<del>` & `<ins>` elements.
+
+To enhance accessibility even further, utilizing **Accessible Rich Internet Applications (ARIA)** roles, states, and properties ensures that assistive technologies can clearly understand and interact with semantic HTML elements.
+
+However, challenges may arise because different browsers can interpret these tags inconsistently, especially older versions of Internet Explorer. Fortunately, you can use CSS to instruct the browser to recognize and style these tags appropriately, enhancing both accessibility and aesthetics. This approach clarifies your code and ensures that all users can engage with the content effectively.
+
+To enable support for these new tags in older browsers, embed the following script in the `<head>` section of your markup:
+
+```html
+{/*<!--[if lt IE 9
+  ]>*/}
+  <script src="bower_components/html5shiv/dist/html5shiv.js"></script>
+  {/*<!
+[endif]-->*/}
+```
+
+_Code courtesy of Temy Sharp's HTML Shiv Project_
+
+When selecting the right markup for your content, align the HTML elements with the type of data you're presenting. For example, decide if a list should be ordered (like steps in a recipe) or unordered (like a shopping list).
+
+If your content includes sections, use `<section>` tags, and for sidebars with related info, wrap them in `<aside>` tags. Definitions can be emphasized using `<dfn>` tags.
+
+Consider captions for images using `<figure>` and `<figcaption>`, and use additional headers to break up content for better readability.
+
+Choosing the right markup reflects your content's structure and meaning, enhancing accessibility and user experience. Think of good markup like a well-organized closet: everything is in its place, making it easy to find what you need. Properly structured HTML improves navigation for users and helps search engines index your content more effectively.
+
+### Tips and Best Practices For Semantic HTML
+
+#### Don't Use Semantic HTML Tags for Styling
+
+While web browsers like to give semantic tags their own stylish flair (think blue and underlined text for `<a>` tags), it doesn't mean you should misuse HTML tags just to make your text look snazzy.
+
+In other words, just as you wouldn't slap an `<a>` tag on a random word to make it blue and underlined (unless it actually links to something), you shouldn't use other semantic tags purely for their looks.
+
+Here are some classic examples of tag misuse:
+
+- Using `<h1>` to `<h6>` tags for non-heading text just to change the font size—those tags are for headings, not for turning your grocery list into a headline!
+
+- Wrapping text in `<blockquote>` just to indent it when it's not even a quotation—unless you're quoting your cat, that's a no-go.
+
+- Using `<strong>` or `<em>` just to add bold or italics to text that doesn't need emphasis—unless you're trying to yell at someone, that's what CSS is for!
+
+So, for all your styling needs, remember: leave it to CSS and keep your HTML tags in their rightful places!
+
+#### Nest the Heading Tags with Semantics in Mind
+
+Always organize header elements by importance—think of it like building a well-structured sandwich!
+
+For instance, all the `<h3>` headings that follow a certain `<h2>` should be subtopics of that `<h2>`. This creates a logical hierarchy, helping both readers and search engines navigate your content like pros.
+
+To ensure you're not missing any important headings, use Semrush's Site Audit tool. It'll help you spot issues with your H1 headings and other HTML or on-page SEO errors your site might have—like finding that one missing pickle!
+
+And remember, the same nesting principle applies to all other semantic HTML tags. Keep things organized by meaning, and you'll have a content structure that's as satisfying as a perfectly layered sandwich!
+
+#### Don't Just Copy Your Visual Layout
+
+Your HTML implementation shouldn't just be a visual copy of your layout; it should embrace the semantic structure of the page, like a well-organized bookshelf rather than a jumbled pile of books!
+
+Using HTML tags like those on the left is a no-go because it suggests the page contains four different topics, instead of one main topic with three subtopics, as shown on the right.
+
+On the right-hand side, we have a well-constructed page using semantic HTML. Even though the visual layout displays four separate sections, the HTML tags are nested according to the content's semantics. This approach not only makes your content clearer for readers but also helps search engines understand your message—like giving them a map to find what they're looking for!
+
+_Figure 5: HTML Visual Layout_
+
+## 4.2 Document Structure
+
+An HTML skeleton is the basic structure of an HTML document. It lays the foundation for building a web page and consists of several essential components.
+
+### `<!DOCTYPE html>`
+
+This declaration defines the document type and version of HTML being used. It tells the browser how to interpret and render the webpage, instructing it to display the page in standards mode. This is important for ensuring consistent layout and functionality across different browsers and devices. Without this declaration, browsers might switch to quirks mode, leading to unexpected rendering issues.
+
+### `<html>`
+
+This element wraps all the content on the page and indicates that everything inside is part of an HTML document. It also includes the language code, and optionally, the country code, helping browsers understand the primary language of the content for proper rendering and accessibility.
+
+**NOTE**
+
+`<html lang="en">` means that the page is in English while `<html lang="en-US">` means the page is in the US style of English and `<html lang="en-GB">` would mean the page is in the United Kingdom style of English. Specifying the country code can be useful for search engines, screen readers, etc. that might read and try to interpret the page.
+
+The golden rule when creating language tags is to keep the tag as short as possible. Avoid region, script or other subtags except where they add useful distinguishing information.
+
+_Figure 6: HTML Skeleton_
+
+### `<head>`
+
+The head section contains meta-information about the document, such as:
+
+- **Title**: `<title>Your Page Title</title>` sets the title that appears in the browser tab.
+
+- **Meta tags**: These provide information like character set (`<meta charset="UTF-8">`) and viewport settings for responsive design (`<meta name="viewport" content="width=device-width, initial-scale=1.0">`).
+
+- **Links to stylesheets**: `<link rel="stylesheet" href="styles.css">` connects external CSS files.
+
+- **Scripts**: You can also include JavaScript files here using `<script src="script.js"></script>`.
+
+**NOTE**
+
+Always declare the character encoding of your document to ensure content is interpreted correctly. Use the HTTP header if possible, and always include an in-document declaration like:
+
+```html
+<meta charset="utf-8" />
+```
+
+When working with style sheets, only declare the encoding using @charset or HTTP headers if your styles contain non-ASCII characters and can't rely on the HTML's encoding. For HTML or XML pages, specifying the correct encoding is crucial to avoid confusion for both users and machines – just make sure you're not declaring conflicting encodings in different places.
+
+Avoid using the byte-order mark (BOM) in UTF-8, and save your HTML in Unicode normalization form C (NFC) to prevent unexpected issues. The BOM can sometimes create problems, so be mindful. In certain situations, it needs to be removed, while in others, it may need to be included.
+
+Use character escapes only for invisible or ambiguous characters, and opt for markup over Unicode control characters whenever you can for better clarity and consistency.
+
+### `<body>`
+
+This is where all the visible content of the web page lives. It includes everything that users see, such as:
+
+- **Headings**: `<h1>`, `<h2>`, etc., for different levels of headings.
+
+- **Paragraphs**: `<p>` for blocks of text.
+
+- **Images**: `<img src="image.jpg" alt="Description">` for displaying images.
+
+- **Links**: `<a href="https://example.com">Click here</a>` for hyperlinks.
+
+- **Lists**: `<ul>` for unordered lists and `<ol>` for ordered lists.
+
+```html
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="" />
+    <title>Document</title>
+  </head>
+  <body></body>
+</html>
+```
+
+Other meta-information that can be added include description, keywords, and copyright but you won't see these used as commonly.
+
+#### `<meta name="description" content="...">`
+
+Provides a brief summary of a web page's content. This description often appears in search engine results under the page title, helping users understand what the page is about before clicking. A well-written description can improve click-through rates.
+
+#### `<meta name="keywords" content="...">`
+
+Used to specify a list of keywords related to the content of the web page. These keywords help search engines understand what topics the page covers, although most modern search engines no longer prioritize this tag for ranking. It's still occasionally used for informational purposes.
+
+#### `<meta name="copyright" content="...">`
+
+Used to specify the copyright information for the web page. It typically includes the name of the owner and the year, helping to protect intellectual property and inform users about the content's legal ownership.
+
+### Essential HTML Tags and Their Functions
+
+#### Header and Footer
+
+The `<header>` element serves as the main navigation area of a webpage, providing a place for common links like "About Us" and "Contact." It helps guide users through your site smoothly, much like a GPS prevents getting lost.
+
+On the other hand, the `<footer>` isn't always necessary, but when used, it can contain important information such as copyright notices, links to less-visited pages, and even a search bar. Think of it as the basement of your webpage – functional and sometimes overlooked, but always available when needed.
+
+#### Main
+
+The `<main>` tag is a container for the web page's unique content. This will be the largest outermost container in the website body.
+
+#### Headings
+
+HTML offers six heading tags, from `<h1>` (the most important) to `<h6>` (the least significant). Each tag signifies a different level of importance and comes with its own font size, serving as indicators for both users and search engines about the relevance of the content.
+
+Proper use of headings not only organizes your content effectively but also enhances readability, allowing users to quickly scan and locate the information they need. Think of headings as a well-structured map, guiding readers to the most crucial points on your webpage.
+
+#### Paragraphs
+
+Paragraphs are the comfy chairs of your content, breaking it into readable chunks that are easy to digest. In HTML, the trusty `<p>` tag is your best friend for creating these sections, and you'll use it often. By organizing your text, you'll make your website more inviting, ensuring a smooth reading experience for everyone.
+
+#### Span
+
+Spans are the unsung heroes of HTML, serving as inline containers that blend seamlessly into text. Need to make a word bold or red? The `<span>` tag is ideal for that! It lets you style specific text without disrupting the rest, making it essential for quick design tweaks.
+
+#### Links
+
+Links are the tour guides of your website, smoothly guiding users from one page to another or even off to distant internet lands. Whether you're pointing them to internal content or an external resource, links keep the journey seamless. Just wrap your destination in an `<a>` tag, and voilà – you've created a clickable path that makes exploring your site easier and more engaging.
+
+#### Anchors
+
+The `<a>` element with an anchor (#) acts like a teleportation device for users, allowing them to jump directly to specific sections on the same page or across your site. Whether guiding visitors to your FAQ or a particular paragraph, anchors make navigating long pages effortless—just click, and you're there—no scrolling required!
+
+#### Sections
+
+The `<section>` tag is like the chapters of a book, organizing related content into neat, thematic segments. It enhances readability and structure, benefiting both users and search engines. By using `<section>`, you improve user experience while boosting SEO and accessibility, making your content easier to navigate and understand.
+
+#### Dividers
+
+Dividers, represented by the `<div>` tag, act as the blank canvas of HTML—a generic container without any inherent meaning. Unlike more descriptive tags like `<section>`, which provide specific structure, the `<div>` tag is used solely for grouping elements, making it ideal for applying styles or arranging layouts with CSS.
+
+While the versatility of `<div>` is beneficial for creating flexible designs, overusing it can lead to "divitis," cluttering your code and making it harder to read and maintain. This can also negatively impact accessibility, as excessive generic containers may confuse assistive technologies.
+
+To keep your HTML clean and meaningful, it's best to use more semantic elements like `<header>`, `<footer>`, and `<article>` whenever possible. This not only improves readability but also enhances SEO and accessibility. In short, while the `<div>` tag is useful, balance its use with semantic elements for a well-structured HTML document.
+
+**NOTE**
+
+Sections are semantic elements that group related content around a specific topic or context, usually accompanied by a heading. Think of them as self-contained parts of your document that could stand alone as meaningful units – like a blog article with a title and relevant content.
+
+Dividers (`<div>`), on the other hand, are non-semantic elements, used solely for grouping content without adding any inherent meaning. They're often employed for layout or styling purposes when no specific semantic element fits. While `<div>` is handy for design, it doesn't provide the same clarity to search engines or assistive technologies as a `<section>` does.
+
+#### Forms
+
+An HTML form is a tool for gathering user input, which is then typically sent to a server for processing. The `<form>` element serves as a container for various input types – like text fields, checkboxes, sliders, and buttons – allowing users to easily interact and submit data. By organizing these inputs within a form, developers can create user-friendly interfaces for collecting information. Well-structured forms not only improve user experience but are also vital for ensuring data validation and seamless server-side processing.
+
+#### Images
+
+Images are inline elements, meaning they can be placed within paragraphs without causing a line break. They seamlessly blend with the surrounding text, making them great for adding visuals without disrupting the flow of your content. Just remember to include alt text for accessibility, so everyone, including screen reader users, can understand what the image represents!
+
+The `<img>` tag allows you to include images in your web page and does not have a closing tag. Unlike the regular HTML element, it requires attributes to define the information it needs.
+
+```html
+<img src="" alt="" title="" />
+```
+
+#### What Do The Attributes Mean?
+
+- `src` (source) specifies the path/URL of the image, whether relative to the HTML document or absolute.
+
+- `alt` (alternative text) is the description of the image that will appear if the image doesn't load and is essential for accessibility alongside search engine optimization.
+
+- The `title` attribute on an `<img>` tag adds a tooltip with title text to the image.
+
+#### Deciding on the Alternative Text
+
+Alternative text, often called **alt text**, is a descriptive text used to convey the meaning of an image in digital content. Its main purpose is to make visual content accessible to people with vision disabilities by providing a text-based description of what the image represents. When writing alt text, keep these guidelines in mind:
+
+- **Be concise**: Alt text should be brief and clear
+
+- **Convey the meaning**: It should describe the essential information that the image provides, rather than just what the image looks like.
+
+- **Focus on relevance**: Provide information that is directly related to the content of the image, avoiding unnecessary details.
+
+- **Avoid redundancy**: Don't include extra information or repeat details that are already mentioned in the surrounding text.
+
+- **Match the language**: Alt text must be written in the same language as the main content. For instance, if you translate a document into another language, translate the alt text as well.

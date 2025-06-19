@@ -7,26 +7,34 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     // Allows customizing built-in components, e.g. to add styling.
     h1: ({ children }) => (
-      <h1 className="mb-6 font-bold text-4xl">{children}</h1>
+      <h1 className="my-6 font-bold text-4xl">{children}</h1>
     ),
     h2: ({ children }) => (
-      <h2 className="mb-4 font-semibold text-3xl">{children}</h2>
+      <h2 className="my-4 font-semibold text-3xl">{children}</h2>
     ),
     h3: ({ children }) => (
-      <h3 className="mb-3 font-medium text-2xl">{children}</h3>
+      <h3 className="my-3 font-medium text-2xl">{children}</h3>
+    ),
+    h4: ({ children }) => (
+      <h4 className="my-3 font-medium text-xl underline underline-offset-2">
+        {children}:
+      </h4>
+    ),
+    h5: ({ children }) => (
+      <h5 className="font-bold text-sm uppercase">{children}:</h5>
     ),
     p: ({ children, className, ...props }) => {
       // If className is provided, it's likely an explicit JSX <p> element
       // So we return it as-is to avoid wrapping issues
       if (className) {
         return (
-          <span className={className} {...props}>
+          <p className={className} {...props}>
             {children}
-          </span>
+          </p>
         );
       }
       // For markdown-generated paragraphs, use our styled div
-      return <span className="mb-4 leading-relaxed">{children}</span>;
+      return <p className="mb-4 leading-relaxed">{children}</p>;
     },
     ul: ({ children }) => (
       <ul className="space-y-2 my-4 list-disc list-outside">{children}</ul>
@@ -35,20 +43,21 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <ol className="space-y-2 my-4 list-decimal list-outside">{children}</ol>
     ),
     li: ({ children }) => <li className="ml-9">{children}</li>,
+    strong: ({ children }) => (
+      <strong className="font-extrabold">{children}</strong>
+    ),
     blockquote: ({ children }) => (
       <blockquote className="my-4 pl-4 border-gray-300 border-l-4 italic">
         {children}
       </blockquote>
     ),
     code: ({ children }) => (
-      <code className="bg-gray-100 px-2 py-1 rounded font-mono text-sm">
-        {children}
-      </code>
+      <code className="my-5 py-1 font-mono text-sm">{children}</code>
     ),
     pre: ({ children }) => (
-      <pre className="bg-gray-100 mb-4 p-4 rounded-lg overflow-x-auto">
-        {children}
-      </pre>
+      <div className="bg-zinc-800 dark:bg-transparent my-5 px-4 border-zinc-700 dark:border-zinc-800 rounded-2xl overflow-hidden">
+        <pre className="my-4 p-4 text-gray-100">{children}</pre>
+      </div>
     ),
     a: ({ href, children }) => (
       <a
@@ -77,12 +86,12 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       </tbody>
     ),
     tr: ({ children }) => (
-      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700 text-left transition-colors">
         {children}
       </tr>
     ),
     th: ({ children }) => (
-      <th className="px-6 py-3 border-gray-200 dark:border-gray-600 border-b font-medium text-gray-500 text-left text-xs dark:text-gray-300 uppercase tracking-wider">
+      <th className="px-6 py-3 border-gray-200 dark:border-gray-600 border-b font-medium text-center text-gray-500 text-xs dark:text-gray-300 uppercase tracking-wider">
         {children}
       </th>
     ),

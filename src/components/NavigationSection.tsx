@@ -108,6 +108,9 @@ function NavigationItem({
   };
 
   if (hasChildren) {
+    const marginLeft = depth > 0 ? `ml-${Math.min(depth * 2 + 3, 8)}` : 'ml-3';
+    const iconSize = depth > 0 ? 'w-2.5 h-2.5' : 'w-3 h-3';
+    
     return (
       <li>
         <button
@@ -116,11 +119,11 @@ function NavigationItem({
             isExpanded
               ? "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30"
               : "text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
-          }`}
+          } ${depth > 0 ? 'text-xs' : ''}`}
         >
           {item.title}
           <svg
-            className={`w-3 h-3 transition-transform duration-200 ${
+            className={`${iconSize} transition-transform duration-200 ${
               isExpanded ? "rotate-180" : ""
             }`}
             fill="none"
@@ -141,7 +144,7 @@ function NavigationItem({
           }`}
         >
           <ul
-            className={`space-y-1 mt-1 ml-3 border-gray-200 dark:border-gray-700 border-l ${
+            className={`space-y-1 mt-1 ${marginLeft} border-gray-200 dark:border-gray-700 border-l ${
               isExpanded ? "pb-2" : ""
             }`}
           >

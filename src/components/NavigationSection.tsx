@@ -140,9 +140,9 @@ function NavigationItem({
           }`}
         >
           <ul
-            className={`space-y-1 mt-1 ml-3 border-gray-200 dark:border-gray-700 border-l ${
+            className={`space-y-1 mt-1 ml-3 border-gray-200 dark:border-gray-700 ${
               isExpanded ? "pb-2" : ""
-            }`}
+            } ${depth === 0 ? "border-l" : ""}`}
           >
             {item.children!.map((child, childIndex) => {
               const childHasChildren =

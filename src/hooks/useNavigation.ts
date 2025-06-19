@@ -37,7 +37,7 @@ export function useNavigation() {
 function getStaticNavigation(): NavigationSection[] {
   return [
     {
-      title: "Guides",
+      title: "Fundamentals",
       items: [
         {
           title: "Overview",
@@ -58,8 +58,74 @@ function getStaticNavigation(): NavigationSection[] {
           ],
         },
         {
+          title: "HTML",
+          href: "/html",
+        },
+        {
+          title: "CSS",
+          href: "/css",
+        },
+        {
+          title: "JavaScript",
+          href: "/javascript",
+        },
+        {
+          title: "Forms",
+          href: "/forms",
+        },
+        {
           title: "SEO & Accessibility",
           href: "/seo-accessibility",
+        },
+        {
+          title: "Document Object Model",
+          href: "/document-object-model",
+        },
+        {
+          title: "jQuery",
+          href: "/jquery",
+        },
+      ],
+    },
+    {
+      title: "Projects",
+      items: [
+        {
+          title: "Quiz App",
+          href: "/quiz-app",
+        },
+        {
+          title: "Website Portfolio",
+          href: "/website-portfolio",
+        },
+      ],
+    },
+    {
+      title: "Advanced Topics",
+      items: [
+        {
+          title: "React",
+          href: "/react",
+        },
+        {
+          title: "Frameworks",
+          href: "/frameworks",
+        },
+        {
+          title: "TypeScript",
+          href: "/typescript",
+        },
+        {
+          title: "Application Programming Interface",
+          href: "/api",
+        },
+        {
+          title: "Storage Solutions",
+          href: "/storage",
+        },
+        {
+          title: "Libraries",
+          href: "/libraries",
         },
       ],
     },

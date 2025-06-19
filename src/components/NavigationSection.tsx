@@ -68,6 +68,7 @@ export default function NavigationSection({
               <NavigationItem
                 key={`${item.href}-${item.title}-${index}`}
                 item={item}
+                depth={0}
                 {...(hasChildren && {
                   isExpanded: expandedItem === item.title,
                   onToggle: () => handleItemToggle(item.title),

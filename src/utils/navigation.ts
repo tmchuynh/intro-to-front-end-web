@@ -67,57 +67,85 @@ function categorizeNavigationItems(
   items: NavigationItem[]
 ): NavigationSection[] {
   const categories = {
-    getting_started: [] as NavigationItem[],
     fundamentals: [] as NavigationItem[],
+    developer_tools: [] as NavigationItem[],
+    core_technologies: [] as NavigationItem[],
+    design: [] as NavigationItem[],
     projects: [] as NavigationItem[],
     advanced: [] as NavigationItem[],
-    design: [] as NavigationItem[],
   };
 
   items.forEach((item) => {
     const path = item.href.toLowerCase();
+    const title = item.title.toLowerCase();
 
     // Categorize based on path and title
     if (
       path === "/" ||
       path.includes("overview") ||
-      path.includes("setting-up") ||
-      path.includes("introduction")
+      path.includes("getting-started") ||
+      path.includes("vocabulary") ||
+      path.includes("abbreviations")
     ) {
       categories.fundamentals.push(item);
     } else if (
-      path.includes("application-programming-interface") ||
-      path.includes("api") ||
-      item.title.toLowerCase().includes("application programming interface") ||
-      item.title.toLowerCase().includes("api")
+      path.includes("developer-tools-and-resources") ||
+      title.includes("developer tools")
     ) {
-      categories.advanced.push(item);
-    } else if (
-      path.includes("forms") ||
-      item.title.toLowerCase().includes("intro")
-    ) {
-      categories.getting_started.push(item);
+      categories.developer_tools.push(item);
     } else if (
       path.includes("seo-accessibility") ||
+      path.includes("intro-to-html") ||
+      path.includes("intro-to-css") ||
+      path.includes("intro-to-javascript") ||
       path.includes("document-object-model") ||
-      path.includes("jquery")
+      path.includes("forms") ||
+      path.includes("jquery") ||
+      title.includes("html") ||
+      title.includes("css") ||
+      title.includes("javascript") ||
+      title.includes("seo") ||
+      title.includes("accessibility") ||
+      title.includes("dom") ||
+      title.includes("forms") ||
+      title.includes("jquery")
     ) {
-      categories.getting_started.push(item);
+      categories.core_technologies.push(item);
+    } else if (
+      path.includes("ux-ui-design") ||
+      path.includes("design") ||
+      title.includes("design") ||
+      title.includes("ux") ||
+      title.includes("ui")
+    ) {
+      categories.design.push(item);
     } else if (
       path.includes("quiz-app") ||
-      path.includes("website-portfolio")
+      path.includes("website-portfolio") ||
+      title.includes("quiz") ||
+      title.includes("portfolio")
     ) {
       categories.projects.push(item);
     } else if (
-      path.includes("react") ||
+      path.includes("performance") ||
+      path.includes("security") ||
+      path.includes("storage-solutions") ||
+      path.includes("application-programming-interface") ||
       path.includes("frameworks") ||
+      path.includes("libraries") ||
       path.includes("typescript") ||
-      path.includes("storage") ||
-      path.includes("libraries")
+      path.includes("react") ||
+      title.includes("performance") ||
+      title.includes("security") ||
+      title.includes("storage") ||
+      title.includes("api") ||
+      title.includes("framework") ||
+      title.includes("library") ||
+      title.includes("typescript") ||
+      title.includes("react") ||
+      title.includes("advanced")
     ) {
       categories.advanced.push(item);
-    } else if (path.includes("ux-ui") || path.includes("design")) {
-      categories.design.push(item);
     } else {
       // Default to fundamentals for uncategorized items
       categories.fundamentals.push(item);
@@ -134,17 +162,17 @@ function categorizeNavigationItems(
     });
   }
 
-  if (categories.getting_started.length > 0) {
+  if (categories.developer_tools.length > 0) {
     sections.push({
-      title: "Getting Started",
-      items: categories.getting_started,
+      title: "Developer Tools & Resources",
+      items: categories.developer_tools,
     });
   }
 
-  if (categories.projects.length > 0) {
+  if (categories.core_technologies.length > 0) {
     sections.push({
-      title: "Projects",
-      items: categories.projects,
+      title: "Core Technologies",
+      items: categories.core_technologies,
     });
   }
 
@@ -152,6 +180,13 @@ function categorizeNavigationItems(
     sections.push({
       title: "Design",
       items: categories.design,
+    });
+  }
+
+  if (categories.projects.length > 0) {
+    sections.push({
+      title: "Projects",
+      items: categories.projects,
     });
   }
 
@@ -307,46 +342,189 @@ function getClientSideNavigation(): NavigationSection[] {
           href: "/",
         },
         {
-          title: "Setting Up",
-          href: "/setting-up",
-        },
-        {
-          title: "Introduction",
-          href: "/introduction",
+          title: "Getting Started",
+          href: "/getting-started",
           children: [
             {
-              title: "Vocabulary",
-              href: "/introduction/vocabulary",
+              title: "Need To Knows",
+              href: "/getting-started/need-to-knows",
+            },
+            {
+              title: "Best Coding Practices",
+              href: "/getting-started/best-coding-practices",
+            },
+            {
+              title: "Accessibility Fundamentals",
+              href: "/getting-started/accessibility-fundamentals",
             },
           ],
         },
         {
+          title: "Vocabulary",
+          href: "/vocabulary",
+        },
+        {
+          title: "Abbreviations",
+          href: "/abbreviations",
+        },
+      ],
+    },
+    {
+      title: "Developer Tools & Resources",
+      items: [
+        {
+          title: "Developer Tools & Resources",
+          href: "/developer-tools-and-resources",
+          children: [
+            {
+              title: "Browser Developer Tools",
+              href: "/developer-tools-and-resources/browser-developer-tools",
+            },
+            {
+              title: "Command Line Interface",
+              href: "/developer-tools-and-resources/command-line-interface",
+            },
+            {
+              title: "Git and Github",
+              href: "/developer-tools-and-resources/git-and-github",
+            },
+            {
+              title: "Hosting and Deployment",
+              href: "/developer-tools-and-resources/hosting-and-deployment",
+            },
+            {
+              title: "Package Managers",
+              href: "/developer-tools-and-resources/package-managers",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      title: "Core Technologies",
+      items: [
+        {
+          title: "SEO & Accessibility",
+          href: "/seo-accessibility",
+        },
+        {
           title: "HTML",
-          href: "/html",
+          href: "/intro-to-html",
+          children: [
+            {
+              title: "Overview",
+              href: "/intro-to-html/overview",
+            },
+            {
+              title: "Semantic HTML",
+              href: "/intro-to-html/semantic-html",
+            },
+            {
+              title: "HTML Templates",
+              href: "/intro-to-html/html-templates",
+            },
+            {
+              title: "Element Hierarchy",
+              href: "/intro-to-html/element-hierarchy",
+            },
+            {
+              title: "Elements and Attributes",
+              href: "/intro-to-html/elements-and-attributes",
+            },
+            {
+              title: "Style Elements",
+              href: "/intro-to-html/style-elements",
+            },
+          ],
         },
         {
           title: "CSS",
-          href: "/css",
+          href: "/intro-to-css",
+          children: [
+            {
+              title: "Selectors",
+              href: "/intro-to-css/selectors",
+            },
+            {
+              title: "Responsive Design",
+              href: "/intro-to-css/responsive-design",
+            },
+            {
+              title: "Frameworks",
+              href: "/intro-to-css/frameworks",
+            },
+            {
+              title: "Debugging",
+              href: "/intro-to-css/debugging",
+            },
+          ],
         },
         {
           title: "JavaScript",
-          href: "/javascript",
+          href: "/intro-to-javascript",
+          children: [
+            {
+              title: "Data Types",
+              href: "/intro-to-javascript/data-types",
+            },
+            {
+              title: "Functions Objects",
+              href: "/intro-to-javascript/functions-objects",
+            },
+            {
+              title: "ES6 Features",
+              href: "/intro-to-javascript/es6-features",
+            },
+            {
+              title: "Browser APIs",
+              href: "/intro-to-javascript/browser-apis",
+            },
+          ],
+        },
+        {
+          title: "Document Object Model",
+          href: "/document-object-model",
+          children: [
+            {
+              title: "Manipulation",
+              href: "/document-object-model/manipulation",
+            },
+            {
+              title: "Events",
+              href: "/document-object-model/events",
+            },
+          ],
         },
         {
           title: "Forms",
           href: "/forms",
         },
         {
-          title: "SEO & Accessibility",
-          href: "/seo-accessibility",
-        },
-        {
-          title: "Document Object Model",
-          href: "/document-object-model",
-        },
-        {
           title: "jQuery",
-          href: "/jquery",
+          href: "/jQuery",
+        },
+      ],
+    },
+    {
+      title: "Design",
+      items: [
+        {
+          title: "UX/UI Design",
+          href: "/UX-UI-Design",
+          children: [
+            {
+              title: "Wireframing",
+              href: "/UX-UI-Design/wireframing",
+            },
+            {
+              title: "Design Trends",
+              href: "/UX-UI-Design/design-trends",
+            },
+            {
+              title: "Typography",
+              href: "/UX-UI-Design/typography",
+            },
+          ],
         },
       ],
     },
@@ -379,6 +557,10 @@ function getClientSideNavigation(): NavigationSection[] {
               title: "Part 1",
               href: "/website-portfolio/part-1",
             },
+            {
+              title: "Part 2",
+              href: "/website-portfolio/part-2",
+            },
           ],
         },
       ],
@@ -387,16 +569,28 @@ function getClientSideNavigation(): NavigationSection[] {
       title: "Advanced Topics",
       items: [
         {
-          title: "React",
-          href: "/react",
+          title: "Performance",
+          href: "/performance",
+        },
+        {
+          title: "Security",
+          href: "/security",
+        },
+        {
+          title: "Storage Solutions",
+          href: "/storage-solutions",
+        },
+        {
+          title: "Application Programming Interface",
+          href: "/application-programming-interface",
           children: [
             {
-              title: "Next.js",
-              href: "/react/nextjs",
+              title: "APIs",
+              href: "/application-programming-interface/APIs",
             },
             {
-              title: "Remix",
-              href: "/react/remix",
+              title: "Content Delivery Networks",
+              href: "/application-programming-interface/content-delivery-networks",
             },
           ],
         },
@@ -405,33 +599,38 @@ function getClientSideNavigation(): NavigationSection[] {
           href: "/frameworks",
         },
         {
-          title: "TypeScript",
-          href: "/typescript",
-        },
-        {
-          title: "Application Programming Interface",
-          href: "/api",
-        },
-        {
-          title: "Storage Solutions",
-          href: "/storage",
-        },
-        {
           title: "Libraries",
           href: "/libraries",
         },
         {
-          title: "More Advanced Concepts",
-          href: "/more-advanced-concepts",
+          title: "TypeScript",
+          href: "/typescript",
         },
-      ],
-    },
-    {
-      title: "Design",
-      items: [
         {
-          title: "UX/UI Design",
-          href: "/UX-UI-Design",
+          title: "React",
+          href: "/react",
+          children: [
+            {
+              title: "Overview",
+              href: "/react/overview",
+            },
+            {
+              title: "Next.js Overview",
+              href: "/react/nextjs/overview",
+            },
+            {
+              title: "Next.js Components",
+              href: "/react/nextjs/components",
+            },
+            {
+              title: "Next.js Routing",
+              href: "/react/nextjs/routing",
+            },
+            {
+              title: "Remix",
+              href: "/react/remix",
+            },
+          ],
         },
       ],
     },

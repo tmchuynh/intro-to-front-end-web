@@ -1,7 +1,7 @@
 import { useNavigation } from "@/hooks/useNavigation";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import NavigationSection from "./NavigationSection";
-import { useState, useEffect } from "react";
 
 interface SidebarProps {
   isOpen: boolean;

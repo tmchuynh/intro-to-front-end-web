@@ -15,6 +15,12 @@ export default function NavigationSection({
   isOpen,
   onToggle,
 }: NavigationSectionProps) {
+  const [expandedItem, setExpandedItem] = useState<string | null>(null);
+
+  const handleItemToggle = (itemTitle: string) => {
+    setExpandedItem(expandedItem === itemTitle ? null : itemTitle);
+  };
+
   return (
     <div>
       <button
@@ -53,6 +59,8 @@ export default function NavigationSection({
             <NavigationItem
               key={`${item.href}-${item.title}-${index}`}
               item={item}
+              isExpanded={expandedItem === item.title}
+              onToggle={() => handleItemToggle(item.title)}
             />
           ))}
         </ul>
@@ -98,12 +106,16 @@ function NavigationItem({ item }: { item: NavigationItem }) {
             isExpanded ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <ul className={`space-y-1 mt-1 ml-3 border-gray-200 dark:border-gray-700 border-l ${isExpanded ? "pb-1" : ""}`}>
+          <ul
+            className={`space-y-1 mt-1 ml-3 border-gray-200 dark:border-gray-700 border-l ${
+              isExpanded ? "pb-2" : ""
+            }`}
+          >
             {item.children!.map((child, childIndex) => (
               <li key={`${child.href}-${child.title}-${childIndex}`}>
                 <Link
                   href={child.href}
-                  className="block px-3 py-1 hover:border-emerald-500 border-transparent border-l-2 text-gray-600 text-sm hover:text-gray-900 dark:hover:text-white dark:text-gray-400 transition-colors"
+                  className="block hover:bg-gray-50 dark:hover:bg-gray-800/50 px-3 py-1.5 hover:border-emerald-500 border-transparent border-l-2 rounded-r-md text-gray-600 text-sm hover:text-gray-900 dark:hover:text-white dark:text-gray-400 transition-colors"
                 >
                   {child.title}
                 </Link>

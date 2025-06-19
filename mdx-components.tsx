@@ -60,6 +60,37 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {children}
       </a>
     ),
+    // Table components
+    table: ({ children }) => (
+      <div className="mb-6 overflow-x-auto">
+        <table className="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 rounded-lg min-w-full">
+          {children}
+        </table>
+      </div>
+    ),
+    thead: ({ children }) => (
+      <thead className="bg-gray-50 dark:bg-gray-700">{children}</thead>
+    ),
+    tbody: ({ children }) => (
+      <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
+        {children}
+      </tbody>
+    ),
+    tr: ({ children }) => (
+      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+        {children}
+      </tr>
+    ),
+    th: ({ children }) => (
+      <th className="px-6 py-3 border-gray-200 dark:border-gray-600 border-b font-medium text-gray-500 text-left text-xs dark:text-gray-300 uppercase tracking-wider">
+        {children}
+      </th>
+    ),
+    td: ({ children }) => (
+      <td className="px-6 py-4 border-gray-200 dark:border-gray-600 border-b text-gray-900 text-sm dark:text-gray-100">
+        {children}
+      </td>
+    ),
     // Custom components
     Button,
     Guides,

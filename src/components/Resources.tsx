@@ -3,27 +3,52 @@ import Link from "next/link";
 export default function Resources() {
   const resources = [
     {
-      title: "Next.js Documentation",
-      description: "Learn about the React framework for production.",
-      href: "https://nextjs.org/docs",
+      title: "MDN Web Docs",
+      description: "The authoritative guide for HTML, CSS, and JavaScript.",
+      href: "https://developer.mozilla.org/",
       external: true,
     },
     {
-      title: "MDX Documentation",
-      description: "Markdown for the component era.",
-      href: "https://mdxjs.com",
+      title: "Can I Use",
+      description: "Check browser compatibility for web technologies.",
+      href: "https://caniuse.com/",
       external: true,
     },
     {
-      title: "Tailwind CSS",
-      description: "A utility-first CSS framework for rapid UI development.",
-      href: "https://tailwindcss.com",
+      title: "CSS-Tricks",
+      description: "Articles, guides, and snippets for modern CSS techniques.",
+      href: "https://css-tricks.com/",
       external: true,
     },
     {
-      title: "About This Project",
-      description: "Learn more about how this demo was built.",
-      href: "/about",
+      title: "JavaScript.info",
+      description: "In-depth JavaScript tutorials from beginner to advanced.",
+      href: "https://javascript.info/",
+      external: true,
+    },
+    {
+      title: "freeCodeCamp",
+      description: "Free coding bootcamp with hands-on projects.",
+      href: "https://www.freecodecamp.org/",
+      external: true,
+    },
+    {
+      title: "Web Accessibility Guidelines",
+      description: "WCAG guidelines for building accessible websites.",
+      href: "https://www.w3.org/WAI/WCAG21/quickref/",
+      external: true,
+    },
+    {
+      title: "Course Vocabulary",
+      description: "Essential web development terms and definitions.",
+      href: "/vocabulary",
+      external: false,
+    },
+    {
+      title: "Developer Resources",
+      description:
+        "Tools, hosting, and deployment resources for web developers.",
+      href: "/developer-tools-and-resources",
       external: false,
     },
   ];
@@ -31,32 +56,22 @@ export default function Resources() {
   return (
     <div className="my-12 not-prose">
       <div className="mx-auto max-w-6xl">
-        <h2 className="mb-8 font-bold text-2xl text-gray-900">Resources</h2>
-        <div className="gap-6 grid grid-cols-1 sm:grid-cols-2">
+        <h2 className="mb-8 font-bold text-2xl text-gray-900">
+          Essential Resources
+        </h2>
+        <div className="gap-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {resources.map((resource) => (
-            <div key={resource.href} className="group relative">
+            <Link
+              key={resource.href}
+              href={resource.href}
+              className="group relative"
+            >
               <div className="absolute -inset-2 bg-gradient-to-r from-green-50 to-blue-50 opacity-25 group-hover:opacity-100 blur rounded-xl transition duration-1000 group-hover:duration-200"></div>
-              <div className="relative bg-white p-6 rounded-xl ring-1 ring-gray-900/5">
+              <div className="relative bg-white p-6 rounded-xl ring-1 ring-gray-900/5 w-full h-full">
                 <div>
                   <span className="inline-flex items-center space-x-1">
                     <h3 className="font-medium text-gray-900 text-lg">
-                      {resource.external ? (
-                        <a
-                          href={resource.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:text-blue-600 transition-colors"
-                        >
-                          {resource.title}
-                        </a>
-                      ) : (
-                        <Link
-                          href={resource.href}
-                          className="hover:text-blue-600 transition-colors"
-                        >
-                          {resource.title}
-                        </Link>
-                      )}
+                      {resource.title}
                     </h3>
                     {resource.external && (
                       <svg
@@ -79,7 +94,7 @@ export default function Resources() {
                   {resource.description}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

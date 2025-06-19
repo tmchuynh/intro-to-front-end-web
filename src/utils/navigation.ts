@@ -85,7 +85,17 @@ function categorizeNavigationItems(
       path.includes("introduction")
     ) {
       categories.fundamentals.push(item);
-    } else if (path.includes("forms") || path.includes("intro")) {
+    } else if (
+      path.includes("application-programming-interface") ||
+      path.includes("api") ||
+      item.title.toLowerCase().includes("application programming interface") ||
+      item.title.toLowerCase().includes("api")
+    ) {
+      categories.advanced.push(item);
+    } else if (
+      path.includes("forms") ||
+      item.title.toLowerCase().includes("intro")
+    ) {
       categories.getting_started.push(item);
     } else if (
       path.includes("seo-accessibility") ||
@@ -101,7 +111,6 @@ function categorizeNavigationItems(
     } else if (
       path.includes("react") ||
       path.includes("frameworks") ||
-      path.includes("interface") ||
       path.includes("typescript") ||
       path.includes("storage") ||
       path.includes("libraries")

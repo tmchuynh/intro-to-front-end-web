@@ -35,6 +35,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
       {/* Sidebar */}
       <aside
+        id="sidebar"
         className={`
         sidebar-section fixed top-0 left-0 z-50 w-64 h-full border-r
         transform transition-transform duration-300 ease-in-out

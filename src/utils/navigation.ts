@@ -258,6 +258,48 @@ export async function buildNavigationFromFileSystem(): Promise<
   }
 }
 
+// Helper function to determine priority for sorting navigation items
+function getPriority(title: string): number {
+  const normalizedTitle = title.toLowerCase();
+  if (normalizedTitle.includes("overview")) return 1;
+  if (
+    normalizedTitle.includes("setting up") ||
+    normalizedTitle.includes("setup")
+  )
+    return 2;
+  if (normalizedTitle.includes("getting started")) return 3;
+  if (
+    normalizedTitle.includes("introduction") ||
+    normalizedTitle.includes("intro")
+  )
+    return 4;
+  if (normalizedTitle.includes("fundamentals")) return 5;
+  if (normalizedTitle.includes("vocabulary")) return 6;
+  if (normalizedTitle.includes("bonus")) return 9999; // Always at the bottom
+  return 999; // Default priority for other items
+}
+
+// Helper function to sort navigation items with priority logic
+function sortNavigationItems(items: NavigationItem[]): NavigationItem[] {
+  return items.sort((a, b) => {
+    const priorityA = getPriority(a.title);
+    const priorityB = getPriority(b.title);
+
+    // If both have priorities, sort by priority (lower number = higher priority)
+    if (priorityA !== 999 || priorityB !== 999) {
+      return priorityA - priorityB;
+    }
+
+    // Both items have default priority (999), use existing logic
+    if (a.order !== undefined && b.order !== undefined) {
+      return a.order - b.order;
+    }
+    if (a.order !== undefined) return -1;
+    if (b.order !== undefined) return 1;
+    return a.title.localeCompare(b.title);
+  });
+}
+
 async function scanDirectory(
   dirPath: string,
   basePath: string
@@ -304,7 +346,7 @@ async function scanDirectory(
           // Check for children
           const children = await scanDirectory(fullPath, routePath);
           if (children.length > 0) {
-            item.children = children;
+            item.children = sortNavigationItems(children);
           }
 
           items.push(item);
@@ -315,7 +357,7 @@ async function scanDirectory(
             items.push({
               title: formatTitle(entry.name),
               href: "#",
-              children,
+              children: sortNavigationItems(children),
             });
           }
         }
@@ -325,50 +367,10 @@ async function scanDirectory(
       }
     }
 
-    // Sort items with special handling for Overview and Setting Up
-    items.sort((a, b) => {
-      // Define priority order for special items
-      const getPriority = (title: string): number => {
-        const normalizedTitle = title.toLowerCase();
-        if (normalizedTitle.includes("overview")) return 1;
-        if (
-          normalizedTitle.includes("setting up") ||
-          normalizedTitle.includes("setup")
-        )
-          return 2;
-        if (normalizedTitle.includes("getting started")) return 3;
-        if (normalizedTitle.includes("fundamentals")) return 5;
-        if (
-          normalizedTitle.includes("introduction") ||
-          normalizedTitle.includes("intro")
-        )
-          return 4;
-        if (normalizedTitle.includes("vocabulary")) return 6;
-        return 999; // Default priority for other items
-      };
+    // Sort items using the helper function
+    const sortedItems = sortNavigationItems(items);
 
-      const priorityA = getPriority(a.title);
-      const priorityB = getPriority(b.title);
-
-      // If both have special priorities, sort by priority
-      if (priorityA !== 999 && priorityB !== 999) {
-        return priorityA - priorityB;
-      }
-
-      // If only one has special priority, it comes first
-      if (priorityA !== 999) return -1;
-      if (priorityB !== 999) return 1;
-
-      // For regular items, use existing logic
-      if (a.order !== undefined && b.order !== undefined) {
-        return a.order - b.order;
-      }
-      if (a.order !== undefined) return -1;
-      if (b.order !== undefined) return 1;
-      return a.title.localeCompare(b.title);
-    });
-
-    return items;
+    return sortedItems;
   } catch (error) {
     console.error("Error scanning directory:", dirPath, error);
     return [];

@@ -1,0 +1,258 @@
+import BackToTop from "@/components/BackToTop";
+
+# Functions
+
+## Table of Contents
+
+## What are Functions?
+
+Functions in TypeScript are reusable blocks of code that perform a specific task. They can take inputs (parameters) and return an output (return value). Functions help organize code, promote reusability, and improve maintainability.
+
+### Example Usage
+
+```typescript
+function greet(name: string): string {
+  return `Hello, ${name}!`;
+}
+function add(a: number, b: number): number {
+  return a + b;
+}
+function multiply(a: number, b: number): number {
+  return a * b;
+}
+function logMessage(message: string): void {
+  console.log(message);
+}
+```
+
+<BackToTop />
+
+## Return Types
+
+In TypeScript, you can specify the return type of a function to ensure that it returns a value of the expected type. This helps catch errors at compile time.
+
+```typescript
+function getFullName(firstName: string, lastName: string): string {
+  return `${firstName} ${lastName}`;
+}
+function calculateArea(radius: number): number {
+  return Math.PI * radius * radius;
+}
+function isEven(num: number): boolean {
+  return num % 2 === 0;
+}
+```
+
+<BackToTop />
+
+## Function Overloading
+
+Function overloading allows you to define multiple function signatures for the same function name, enabling it to handle different types or numbers of parameters.
+
+```typescript
+function display(value: string): void;
+function display(value: number): void;
+function display(value: boolean): void;
+function display(value: string | number | boolean): void {
+  console.log(value);
+}
+function calculate(x: number, y: number): number;
+function calculate(x: string, y: string): string;
+function calculate(x: number | string, y: number | string): number | string {
+  if (typeof x === "number" && typeof y === "number") {
+    return x + y;
+  } else if (typeof x === "string" && typeof y === "string") {
+    return x + y;
+  }
+  throw new Error("Invalid types for calculation");
+}
+```
+
+<BackToTop />
+
+## Arrow Functions
+
+Arrow functions provide a concise syntax for writing functions in TypeScript. They are particularly useful for writing short, inline functions and maintaining the `this` context.
+
+```typescript
+const square = (x: number): number => x * x;
+const sum = (a: number, b: number): number => a + b;
+const isPositive = (num: number): boolean => num > 0;
+const greetUser = (name: string): void => {
+  console.log(`Hello, ${name}!`);
+};
+```
+
+## Different Types of Parameters
+
+In TypeScript, functions can accept different types of parameters, including optional parameters, default parameters, and rest parameters.
+
+<BackToTop />
+
+### Optional Parameters
+
+Optional parameters allow you to define parameters that may or may not be provided when calling a function. This is useful for functions that can work with varying numbers of arguments.
+
+```typescript
+function greetUser(name: string, age?: number): void {
+  if (age) {
+    console.log(`Hello, ${name}! You are ${age} years old.`);
+  } else {
+    console.log(`Hello, ${name}!`);
+  }
+}
+function logMessage(message: string, level: string = "info"): void {
+  console.log(`[${level.toUpperCase()}] ${message}`);
+}
+function calculateTotal(price: number, tax: number = 0.1): number {
+  return price + price * tax;
+}
+function formatDate(date: Date, format: string = "YYYY-MM-DD"): string {
+  // Simple date formatting logic
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  };
+  return date.toLocaleDateString("en-US", options).replace(/\//g, "-");
+}
+```
+
+<BackToTop />
+
+### Default Parameters
+
+Default parameters allow you to specify a default value for a parameter if no value is provided when the function is called. This can simplify function calls and provide sensible defaults.
+
+```typescript
+function greet(name: string, greeting: string = "Hello"): void {
+  console.log(`${greeting}, ${name}!`);
+}
+function calculatePrice(price: number, discount: number = 0): number {
+  return price - price * discount;
+}
+function createUser(
+  name: string,
+  age: number = 18,
+  isAdmin: boolean = false
+): void {
+  console.log(`User created: ${name}, Age: ${age}, Admin: ${isAdmin}`);
+}
+function logError(message: string, code: number = 500): void {
+  console.error(`Error ${code}: ${message}`);
+}
+```
+
+<BackToTop />
+
+### Named Parameters
+
+Named parameters allow you to pass arguments to a function using an object, making it easier to understand and maintain the code, especially when dealing with multiple parameters.
+
+```typescript
+function createUser({
+  name,
+  age,
+  email,
+}: {
+  name: string;
+  age: number;
+  email: string;
+}): void {
+  console.log(`User created: ${name}, Age: ${age}, Email: ${email}`);
+}
+function updateProfile({
+  username,
+  bio,
+  isActive,
+}: {
+  username: string;
+  bio?: string;
+  isActive?: boolean;
+}): void {
+  console.log(
+    `Profile updated: ${username}, Bio: ${bio ?? "N/A"}, Active: ${isActive ?? false}`
+  );
+}
+function sendEmail({
+  to,
+  subject,
+  body,
+}: {
+  to: string;
+  subject: string;
+  body: string;
+}): void {
+  console.log(
+    `Email sent to ${to} with subject "${subject}" and body "${body}"`
+  );
+}
+```
+
+#### Benefits of Named Parameters
+
+Named parameters improve code readability by clearly indicating what each argument represents. They also allow for optional parameters, making functions more flexible and easier to use.
+
+```typescript
+interface User {
+  name: string;
+  age: number;
+  email: string;
+}
+function createUser({ name, age, email }: User): void {
+  console.log(`User created: ${name}, Age: ${age}, Email: ${email}`);
+}
+createUser({ name: "Alice", age: 30, email: "alice18378@sample.com" });
+createUser({ name: "Bob", age: 25, email: "bob29382@sample.com" });
+```
+
+<BackToTop />
+
+### Rest Parameters
+
+Rest parameters allow you to pass a variable number of arguments to a function. This is useful when you want to handle an unknown number of inputs without explicitly defining each parameter.
+
+```typescript
+function sumAll(...numbers: number[]): number {
+  return numbers.reduce((acc, num) => acc + num, 0);
+}
+function concatenateStrings(...strings: string[]): string {
+  return strings.join(" ");
+}
+function logMessages(...messages: string[]): void {
+  messages.forEach((msg) => console.log(msg));
+}
+function findMax(...values: number[]): number {
+  return Math.max(...values);
+}
+```
+
+#### Benefits of Rest Parameters
+
+Rest parameters provide flexibility in function calls, allowing you to handle varying numbers of arguments without needing to define each one explicitly. This can simplify code and make functions more adaptable.
+
+By using the rest parameter syntax (`...paramName`), you can collect all remaining arguments into an array, which can then be processed within the function.
+
+<BackToTop />
+
+### Type Aliases for Function Types
+
+Type aliases can also be used to define function types, making it easier to work with functions as first-class citizens in TypeScript. This allows you to create reusable function signatures.
+
+```typescript
+type StringFunction = (input: string) => string;
+type NumberFunction = (input: number) => number;
+type CallbackFunction = (error: Error | null, result?: string) => void;
+type MathOperation = (a: number, b: number) => number;
+type UserCallback = (user: { name: string; age: number }) => void;
+type EventHandler = (event: MouseEvent) => void;
+type FilterFunction<T> = (item: T) => boolean;
+type TransformFunction<T, U> = (item: T) => U;
+type LoggerFunction = (message: string, level?: string) => void;
+```
+
+**NOTE**
+
+> Here you can notice for `FilterFunction<T>` and `TransformFunction<T, U>`, we are using generics to allow the function to work with any type of data, making it more flexible and reusable.
+
+<BackToTop />

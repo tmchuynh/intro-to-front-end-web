@@ -1,0 +1,397 @@
+import BackToTop from "@/components/BackToTop";
+
+# Overview
+
+CSS, or **Cascading Style Sheets**, is like the fashion consultant for your website, making sure it looks fabulous! It manages everything from layout and colors to fonts and spacing, ensuring your site doesn’t just function but struts its stuff.
+
+Stylesheets are essential for controlling the presentation of web pages. They allow developers to separate content from design, making it easier to maintain and update websites. This page provides an overview of stylesheets, their types, and how they are used in web development.
+
+## Table of Contents
+
+## Overview of CSS Stylesheets
+
+**CSS** revolves around two key components:
+
+- **Properties**: These are the names that define what aspect of the element you want to style, like `font-size`, `width`, or `background-color`.
+- **Values**: Each property is paired with a value that determines how the style is applied, such as `16px`, `100%`, or `blue`.
+
+When you combine a property with a value, you create a **CSS declaration** – a stylish instruction for your elements. These declarations are grouped into **declaration blocks** and paired with **selectors** to form **CSS rulesets**. It’s like pairing the perfect shoes with your favorite outfit! The CSS engine then steps in, deciding which declarations apply to each element, making sure your webpage is polished and ready to impress.
+
+Imagine CSS as the fashion designer for your webpage, deciding whether elements should sport bold colors or sleek layouts. But just like you’d want your outfit to look good no matter where you wear it, your design should shine in all browsers, not just one. To avoid any surprises, checking browser compatibility ensures your site looks sharp and consistent everywhere. A browser compatibility table may look like this:
+
+| Feature        | Chrome | Firefox | Safari | Edge | Opera | IE  |
+| -------------- | ------ | ------- | ------ | ---- | ----- | --- |
+| ExampleFeature | 60     | 55      | 11     | 16   | 47    | No  |
+
+## Types of Stylesheets
+
+### Internal stylesheets
+
+An internal stylesheet lives right inside your HTML document, like a personal stylist tucked into the `<head>` section. You can write your CSS directly within a `<style>` tag, and voilà – instant style makeover for your page! While it’s usually best to keep your styling separate, there are times when internal stylesheets come to the rescue. Imagine you’re working with a content management system that locks you out of external CSS files – no worries! You can still get creative with an internal stylesheet, keeping things fresh and functional.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Internal Stylesheet Example</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        margin: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Welcome to My Website</h1>
+    <p>
+      This is an example of using an internal stylesheet to style elements on a
+      webpage.
+    </p>
+  </body>
+</html>
+```
+
+### External Stylesheets
+
+External stylesheets serve as the refined blueprint for your website's design. Instead of embedding CSS within the HTML, styles are placed in a dedicated `.css` file, linked through a `<link>` element in the `<head>`. This approach offers both elegance and efficiency, enabling consistent styling across multiple pages.
+
+Updating your design becomes effortless – modify the external CSS file once, and the entire site is seamlessly transformed.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Page Title</title>
+    <link rel="stylesheet" href="link/to/stylesheet" />
+    <!-- Additional stylesheet links go here -->
+  </head>
+  <body>
+    <!-- Visible elements go here -->
+  </body>
+</html>
+```
+
+To link `styles.css` to HTML, add the following line somewhere inside the `<head>` of the HTML document. The `href` attribute, or hypertext reference, of the `<link>` element should specify the location of your CSS file on your file system.
+
+### Inline styles
+
+Inline styles are like giving one element its own personalized styling instructions, right inside the HTML tag.
+
+By using the `style` attribute, you can directly apply CSS rules to a single element, letting you tweak its appearance without touching anything else on the page. It’s a quick way to give that one piece of content its own unique flair, while leaving the rest of the design untouched.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inline Style Example</title>
+  </head>
+  <body>
+    <h1 style="color: blue; font-weight: bold; text-align: center">
+      Welcome to Inline Styling
+    </h1>
+    <p style="color: red; padding: 20px">
+      Inline styles apply CSS directly to the HTML elements using the style
+      attribute.
+    </p>
+  </body>
+</html>
+```
+
+**CAUTION**
+
+<blockquote>
+### **AVOID USING INLINE CSS** whenever you can! 
+While inline CSS can be convenient for quick styling changes or testing, relying on it excessively can lead to several issues. First, it makes your HTML cluttered and difficult to read, as style rules are mixed with content. This can hinder maintainability, especially in larger projects, since updating styles requires editing multiple elements individually.
+
+Inline styles also make it harder to reuse styles across different elements, leading to code duplication and inconsistency. If you need to change a style, you must find and update every instance of that inline style, which can be time-consuming and error-prone.
+
+Moreover, inline styles do not benefit from the cascading nature of CSS, which can lead to unexpected results when trying to override styles. This can create confusion and make debugging more challenging.
+
+Inline styles also increase the size of your HTML files, which can negatively impact page load times and overall performance. This is especially problematic for larger websites where multiple inline styles can accumulate, leading to bloated HTML files and slower rendering times.
+
+Additionally, inline styles override external CSS, making it challenging to implement consistent design changes across your website. For better organization, maintainability, and scalability, it's recommended to use external or internal CSS stylesheets for your styling needs. This approach promotes a cleaner separation of content and presentation, ultimately leading to a more manageable codebase.
+
+</blockquote>
+<BackToTop />
+
+### Pros and Cons of Stylesheets
+
+**Internal Stylesheets**
+| Pros | Cons |
+| ---- | ---- |
+| Easy to implement for small projects | Not reusable across multiple pages |
+| Useful for quick styling changes | Can lead to code duplication if used extensively |
+| Good for testing and prototyping | Increases page load time if used excessively |
+| Overrides external styles | Makes HTML cluttered and difficult to read |
+| Allows for quick adjustments without external files | Not suitable for large projects with multiple pages |
+| Ideal for single-page applications | Difficult to maintain as the project grows |
+| Can be used for specific page styles | Limited to the page where it is defined |
+
+<br />
+
+---
+
+<br />
+
+**External Stylesheets**
+| Pros | Cons |
+| ---- | ---- |
+| Reusable across multiple pages | Requires an additional HTTP request |
+| Easy to maintain and update | Changes require reloading the page |
+| Promotes separation of concerns | Can lead to conflicts if not managed properly |
+| Reduces HTML clutter | May not be suitable for small projects |
+| Allows for consistent styling across the site | Requires careful organization to avoid confusion |
+
+<br />
+
+---
+
+<br />
+
+**Inline Styles**
+| Pros | Cons |
+| ---- | ---- |
+| Quick and easy for single elements | Not reusable across multiple elements |
+| Useful for testing and prototyping | Makes HTML cluttered and difficult to read |
+| Overrides external styles | Increases page load time if used excessively |
+| Allows for quick adjustments without external files | Difficult to maintain as the project grows |
+| Ideal for specific element styles | Not suitable for large projects with multiple pages |
+| Can be used for dynamic styles | Limited to the element where it is defined |
+
+<BackToTop />
+
+## Understanding How to Use `:root`
+
+### What are CSS Variables?
+
+CSS variables, also known as **custom properties**, allow you to store values (like colors, sizes, or fonts) that you can reuse throughout your stylesheet. This makes it easier to manage and update styles in one place without searching through your entire CSS.
+
+### What is `:root` in CSS?
+
+The `:root` pseudo-class in CSS is a **special selector** that targets the highest-level parent in the document tree, which is typically the `<html>` element in an HTML document. It plays a crucial role in defining global styles, particularly when working with CSS variables (custom properties) and other foundational styles.
+
+### The Importance of `:root`
+
+The `:root` pseudo-class defines CSS variables accessible throughout the entire stylesheet, ensuring consistent design and easier maintenance. With higher specificity than regular selectors, styles in `:root` take precedence.
+
+It’s ideal for setting foundational styles like fonts, colors, and spacing across the document, and simplifies theming or responsive design by allowing you to adjust variables in one place for different themes or screen sizes.
+
+```css
+`:root` {
+  --primary-color: #3498db;
+  --padding-size: 15px;
+}
+
+body {
+  background-color: var(--primary-color);
+  padding: var(--padding-size);
+}
+```
+
+### Overriding CSS Variables
+
+CSS variables can be overridden at various levels in your stylesheet, allowing for flexibility and customization based on different contexts or components. You can redefine a variable in a specific scope, which takes precedence over the global definition.
+
+```css
+:root {
+  --main-color: blue;
+}
+
+/* uses blue */
+.header {
+  background-color: var(--main-color);
+}
+
+/* override for this specific scope */
+/* uses red */
+.button {
+  --main-color: red;
+  background-color: var(--main-color);
+}
+```
+
+### Fallback Values
+
+When using the `var()` function, you can specify a fallback value that will be used if the CSS variable is not defined or cannot be resolved. This is especially useful for ensuring that your styles do not break in scenarios where a variable might be missing.
+
+```css
+:root {
+  --primary-color: #3498db;
+}
+
+/* uses gray if --button-color is undefined */
+.button {
+  background-color: var(--button-color, gray);
+}
+```
+
+<BackToTop />
+
+## Example CSS Properties
+
+| Property                            | Description                           | Values                                |
+| ----------------------------------- | ------------------------------------- | ------------------------------------- | ----------------------------------- | ----------------------------------- |
+| animation                           | applies an animation between          | styles                                |
+| aspect-ratio                        | specify the desired width-to-height   | 1/1, 1, 3/4, 8/16, etc.               |
+| ratio of an element’s box           | background-color                      | set the background color of an        | hex value, rgba or named color      |
+| HTML element                        | background-image                      | add a background image to an          | url                                 |
+| HTML element                        | border                                | sets all the border properties        | border-width, border-style, border- |
+| color                               | border-radius                         | add rounded corners of a HTML         | a number followed by a length       |
+| elements                            | unit, such as 10px, 2em, etc.         | color                                 | sets the color of a text            | rgb, hex, keyword                   |
+| columns                             | sets the number of columns            | cursor                                | sets the mouse cursor, if any, to   | wait, help, crosshair, not-allowed, |
+| show when the mouse pointer is      | zoom-in, grab, pointer, auto, etc.    |
+| over an element.                    | direction                             | sets the direction of text, table     | ltr or rtl                          |
+| columns, and horiztonal overflow    | display                               | sets whether an element is treated    | block, inline-block, none, flex,    |
+| as a block or inline box and the    | inline-flex, grid, inline-grid, flow- |
+| layout used for its children, such  | root, contents, etc.                  |
+| as flow layout, grid or flex.       | float                                 | set the alignment of an element on    | left or right                       |
+| the page                            | font-family                           | specifies the font family for text    | family-name, generic-               |
+| family, inherit                     | font-size                             | specifies the font size of text       | xx-small, x-small, small, medium,   |
+| large, x-large, xx-large, smaller,  |
+| larger, length, %, inherit          | font-style                            | specifies the font style for text     | normal, italic, oblique, inherit    |
+| font-variant                        | specifies whether or not a text       | normal, small-caps, inherit           |
+| should be displayed in a small-     | caps font                             |
+| font-weight                         | specifies the weight of a font        | normal, bold, bolder, lighter, 100,   |
+| 200, 300, 400, 500, 600, 700, 800,  |
+| 900, inherit                        | _Careful, many of these are not _     | _supported! _                         |
+| height/width                        | specify the height and width of a     | a number followed by a length         |
+| HTML element respectively           | unit, such as 10px, 2em, etc.         | letter-spacing                        | increase or decrease the space      | normal, length                      |
+| between characters                  | line-height                           | sets the distance between lines       | normal, number, length, %           |
+| list-style                          | sets all the properties for a list in | list-style-type, list-style-position, |
+| one declaration                     | list-style-image, inherit             |
+| margin                              | adds space between the border and     | a number followed by a length         |
+| other HTML elements.                | unit, such as 10px, 2em, etc.         |
+| transparent                         | padding                               | in-between the border and content     | a number followed by a length       |
+| of an element.                      | is transparent.                       |
+| unit, such as 10px, 2em, etc.       |
+| text-align                          | aligns the text in an element         | left, right, center, justify          |
+| text-decoration                     | adds decoration to text               | none, underline, overline, line-      |
+| through                             |
+| text-indent                         | indents the first line of text in an  | length, %                             |
+| element                             | text-transform                        | controls the letters in an element    | none, capitalize, uppercase,        |
+| lowercase                           |
+| visibility                          | shows or hides an element without     | visible, hidden, collapse             |
+| changing the layout of the          |
+| document                            | z-index                               | sets the z-order of a positioned      | auto, 1, 2, etc.                    |
+| element and its descendants of flex |
+| and grid items                      |
+
+<BackToTop />
+
+## CSS Shorthands
+
+Certain CSS properties act like Swiss Army knives, consolidating multiple values into one shorthand declaration. Properties like `font`, `background`, `padding`, and `margin` simplify your code by reducing the need for individual declarations. This shorthand approach not only saves typing but also keeps your stylesheets more concise and easier to manage.
+
+```css
+margin: 20px 10px;
+
+border: 2px solid #333;
+
+background: #f0f0f0 url("image.png") no-repeat center;
+
+transition: all s ease-in-out;
+```
+
+```css
+margin-top: 20px;
+
+margin-right: 10px;
+
+margin-bottom: 20px;
+
+margin-left: 10px;
+
+border-width: 2px;
+
+border-style: solid;
+
+border-color: #333;
+
+background-color: #f0f0f0;
+
+background-image: url("image.png");
+
+background-repeat: no-repeat;
+
+background-position: center;
+
+transition-property: all;
+
+transition-duration: s;
+
+transition-timing-function: ease-in-out;
+```
+
+<BackToTop />
+
+## Using CSS Functions
+
+While most CSS values are simple keywords or numbers, some values showcase functional elegance, providing dynamic styling options and greater design flexibility.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Using calc() Example</title>
+    <link rel="stylesheet" href="CSS" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">Header</header>
+      <main class="content">Main Content</main>
+      <footer class="footer">Footer</footer>
+    </div>
+  </body>
+</html>
+```
+
+```css
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  /* Full viewport height */
+  height: 100vh;
+}
+
+.header {
+  background-color: #4caf50;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Takes up remaining space */
+.content {
+  flex: 1;
+  padding: 20px;
+  background-color: #f0f0f0;
+  margin: 20px;
+  border: 1px solid #ccc;
+  /* Using calc() to set a dynamic width */
+  width: calc(100% - 40px);
+}
+
+.footer {
+  background-color: #333;
+  color: white;
+  padding: 10px;
+  text-align: center;
+}
+```
+
+<BackToTop />

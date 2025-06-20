@@ -24,7 +24,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     // Allows customizing built-in components, e.g. to add styling.
     h1: ({ children, ...props }) => (
       <CustomHeading
-        className="my-6 font-bold text-4xl text-brand-primary"
+        className="my-6 font-bold text-4xl"
         level={1}
         id={props.id}
       >
@@ -85,11 +85,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     li: ({ children }) => <li className="ml-9">{children}</li>,
     strong: ({ children }) => (
       <strong className="font-extrabold">{children}</strong>
-    ),
-    blockquote: ({ children }) => (
-      <blockquote className="my-4 pl-4 border-gray-300 border-l-4 italic">
-        {children}
-      </blockquote>
     ),
     code: ({ children }) => (
       <code className="my-5 py-1 font-mono text-sm">{children}</code>

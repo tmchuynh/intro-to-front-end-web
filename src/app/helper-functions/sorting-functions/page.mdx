@@ -1,0 +1,203 @@
+import BackToTop from "@/components/BackToTop";
+
+# Sorting Functions
+
+## Table of Contents
+
+## Sort Array of Objects by Key
+
+```javascript
+function sortByKey(array, key) {
+  return array.sort((a, b) => {
+    if (a[key] < b[key]) return -1;
+    if (a[key] > b[key]) return 1;
+    return 0;
+  });
+}
+```
+
+**Use Case**: This function is useful for sorting an array of objects based on a specific key, such as sorting a list of users by their names or ages.
+
+### Example Usage
+
+```javascript
+const users = [
+  { name: "Alice", age: 30 },
+  { name: "Bob", age: 25 },
+  { name: "Charlie", age: 35 },
+];
+const sortedUsers = sortByKey(users, "age");
+console.log(sortedUsers);
+// Output: [{ name: "Bob", age: 25 }, { name: "Alice", age: 30 }, { name: "Charlie", age: 35 }]
+```
+
+## Sort Array of Numbers
+
+```javascript
+function sortNumbers(array) {
+  return array.sort((a, b) => a - b);
+}
+```
+
+**Use Case**: This function is useful for sorting an array of numbers in ascending order, such as sorting a list of scores or prices.
+
+### Example Usage
+
+```javascript
+const scores = [90, 70, 85, 95, 80];
+const sortedScores = sortNumbers(scores);
+console.log(sortedScores);
+// Output: [70, 80, 85, 90, 95]
+```
+
+## Sort Array of Strings
+
+```javascript
+function sortStrings(array) {
+  return array.sort((a, b) => a.localeCompare(b));
+}
+```
+
+**Use Case**: This function is useful for sorting an array of strings in alphabetical order, such as sorting a list of names or titles.
+
+### Example Usage
+
+```javascript
+const names = ["Charlie", "Alice", "Bob"];
+const sortedNames = sortStrings(names);
+console.log(sortedNames);
+// Output: ["Alice", "Bob", "Charlie"]
+```
+
+## Sort Array of Objects by Multiple Keys
+
+```javascript
+function sortByMultipleKeys(array, keys) {
+  return array.sort((a, b) => {
+    for (let key of keys) {
+      if (a[key] < b[key]) return -1;
+      if (a[key] > b[key]) return 1;
+    }
+    return 0;
+  });
+}
+```
+
+**Use Case**: This function is useful for sorting an array of objects by multiple keys, such as sorting a list of products by category and then by price.
+
+### Example Usage
+
+```javascript
+const products = [
+  { name: "Laptop", category: "Electronics", price: 1000 },
+  { name: "Phone", category: "Electronics", price: 500 },
+  { name: "Shirt", category: "Clothing", price: 30 },
+  { name: "Pants", category: "Clothing", price: 40 },
+];
+const sortedProducts = sortByMultipleKeys(products, ["category", "price"]);
+console.log(sortedProducts);
+// Output: [
+//   { name: "Shirt", category: "Clothing", price: 30 },
+//   { name: "Pants", category: "Clothing", price: 40 },
+//   { name: "Phone", category: "Electronics", price: 500 },
+//   { name: "Laptop", category: "Electronics", price: 1000 }
+// ]
+```
+
+<BackToTop />
+
+## Sort Array of Objects by Nested Key
+
+```javascript
+function sortByNestedKey(array, key) {
+  return array.sort((a, b) => {
+    const aValue = key.split(".").reduce((obj, k) => obj && obj[k], a);
+    const bValue = key.split(".").reduce((obj, k) => obj && obj[k], b);
+    if (aValue < bValue) return -1;
+    if (aValue > bValue) return 1;
+    return 0;
+  });
+}
+```
+
+**Use Case**: This function is useful for sorting an array of objects by a nested key, such as sorting a list of users by their address city.
+
+### Example Usage
+
+```javascript
+const users = [
+  { name: "Alice", address: { city: "New York" } },
+  { name: "Bob", address: { city: "Los Angeles" } },
+  { name: "Charlie", address: { city: "Chicago" } },
+];
+const sortedUsers = sortByNestedKey(users, "address.city");
+console.log(sortedUsers);
+// Output: [
+//   { name: "Charlie", address: { city: "Chicago" } },
+//   { name: "Bob", address: { city: "Los Angeles" } },
+//   { name: "Alice", address: { city: "New York" } }
+// ]
+```
+
+## Sort Array of Objects by Date
+
+```javascript
+function sortByDate(array, key) {
+  return array.sort((a, b) => {
+    const dateA = new Date(a[key]);
+    const dateB = new Date(b[key]);
+    return dateA - dateB;
+  });
+}
+```
+
+**Use Case**: This function is useful for sorting an array of objects by a date key, such as sorting a list of events by their start date.
+
+### Example Usage
+
+```javascript
+const events = [
+  { name: "Event A", date: "2023-10-01" },
+  { name: "Event B", date: "2023-09-15" },
+  { name: "Event C", date: "2023-11-05" },
+];
+const sortedEvents = sortByDate(events, "date");
+console.log(sortedEvents);
+// Output: [
+//   { name: "Event B", date: "2023-09-15" },
+//   { name: "Event A", date: "2023-10-01" },
+//   { name: "Event C", date: "2023-11-05" }
+// ]
+```
+
+## Sort Array of Objects by Boolean Value
+
+```javascript
+function sortByBoolean(array, key) {
+  return array.sort((a, b) => {
+    if (a[key] === b[key]) return 0;
+    return a[key] ? -1 : 1;
+  });
+}
+```
+
+**Use Case**: This function is useful for sorting an array of objects by a boolean key, such as sorting a list of tasks by whether they are completed or not.
+
+### Example Usage
+
+```javascript
+const tasks = [
+  { name: "Task 1", completed: true },
+  { name: "Task 2", completed: false },
+  { name: "Task 3", completed: true },
+];
+const sortedTasks = sortByBoolean(tasks, "completed");
+console.log(sortedTasks);
+// Output: [
+  { name: "Task 2", completed: false },
+  { name: "Task 1", completed: true },
+  { name: "Task 3", completed: true }
+// ]
+```
+
+<BackToTop />

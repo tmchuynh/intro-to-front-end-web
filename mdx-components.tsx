@@ -5,6 +5,23 @@ import Guides from "./src/components/Guides";
 import Resources from "./src/components/Resources";
 import CopyButton from "./src/components/CopyToClipboard";
 
+// Utility function to extract text content from React children
+function extractTextContent(children: React.ReactNode): string {
+  if (typeof children === 'string') {
+    return children;
+  }
+  if (typeof children === 'number') {
+    return children.toString();
+  }
+  if (Array.isArray(children)) {
+    return children.map(extractTextContent).join('');
+  }
+  if (children && typeof children === 'object' && 'props' in children) {
+    return extractTextContent(children.props.children);
+  }
+  return '';
+}
+
 interface Props {
   children: React.ReactNode;
   level: number;
@@ -90,12 +107,15 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     code: ({ children }) => (
       <code className="my-5 py-1 font-mono text-sm">{children}</code>
     ),
-    pre: ({ children }) => (
-      <div className="relative bg-zinc-800 dark:bg-transparent my-5 px-4 border-zinc-700 dark:border-zinc-800 rounded-2xl overflow-y-auto">
-        <CopyButton textToCopy={children as string} />
-        <pre className="my-4 p-4">{children}</pre>
-      </div>
-    ),
+    pre: ({ children }) => {
+      const textContent = extractTextContent(children);
+      return (
+        <div className="relative bg-zinc-800 dark:bg-transparent my-5 px-4 border-zinc-700 dark:border-zinc-800 rounded-2xl overflow-y-auto">
+          <CopyButton textToCopy={textContent} />
+          <pre className="my-4 p-4">{children}</pre>
+        </div>
+      );
+    },
     a: ({ href, children }) => (
       <a
         href={href}

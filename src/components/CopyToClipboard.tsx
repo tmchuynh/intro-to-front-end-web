@@ -12,14 +12,44 @@ function CopyButton({ textToCopy }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(textToCopy);
-      setCopied(true);
-      // Reset the "copied" state after a short delay
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy text: ", err);
+    let copySuccessful = false;
+
+    // Try modern clipboard API first
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(textToCopy);
+        copySuccessful = true;
+      } catch (err) {
+        console.warn("Clipboard API failed, trying fallback method:", err);
+      }
     }
+
+    // Fallback method if modern API failed or isn't available
+    if (!copySuccessful) {
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = textToCopy;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        const successful = document.execCommand("copy");
+        document.body.removeChild(textArea);
+
+        if (!successful) {
+          throw new Error("execCommand failed");
+        }
+        copySuccessful = true;
+      } catch (err) {
+        console.error("Both clipboard methods failed:", err);
+      }
+    }
+
+    // Show feedback regardless of success/failure
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (

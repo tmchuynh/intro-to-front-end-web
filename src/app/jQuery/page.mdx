@@ -1,0 +1,536 @@
+import BackToTop from "@/components/BackToTop";
+
+# jQuery
+
+## Table of Contents
+
+## Getting Started
+
+To use jQuery, you can include it in your project via a `<script>` tag from a CDN or by downloading it locally. For example, including jQuery from a CDN:
+
+```html
+<script
+  src="https://code.jquery.com/jquery-.1.min.js"
+  integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+  crossorigin="anonymous"
+></script>
+```
+
+**NOTE**
+
+> While jQuery simplifies DOM manipulation and event handling, over-relying on it can lead to unnecessarily heavy code, especially in smaller projects. Each jQuery function adds to the overall size of your application, which can negatively impact load times and performance. In many cases, vanilla JavaScript offers similar functionality with less overhead, particularly with modern browsers supporting standard APIs. Assess the complexity of your project to determine if jQuery is truly necessary; for lightweight tasks, sticking to pure JavaScript may be more efficient.
+
+## The jQuery $
+
+The `$` is a shorthand for the jQuery function, which selects elements and performs various operations.
+
+### Waiting for the Document Object Model
+
+jQuery's `$(document).ready()` method ensures that the DOM is loaded before executing any script. This avoids errors related to trying to manipulate elements that don't exist yet.
+
+```javascript
+$(document).ready(function () {
+  // Your code here
+});
+```
+
+### Using the Alternative Notation
+
+In addition to `$(document).ready()`, jQuery also allows you to pass a function directly into the `$` function as shorthand:
+
+```javascript
+$(function () {
+  // Your code here
+});
+```
+
+### Using the ready event
+
+The `.ready()` event is used to ensure that the document is fully loaded before executing a script, which can be helpful for older jQuery versions.
+
+## Selecting Elements
+
+You can select elements in jQuery using CSS selectors. For example:
+
+```javascript
+$("p").css("color", "blue");
+// Selects all paragraphs and changes their color
+```
+
+### Selecting with a Context
+
+You can narrow down selections by specifying a context:
+
+```javascript
+$("span", "#content");
+// Selects all spans inside the element with the id "content"
+```
+
+### Determining the Context
+
+The context in jQuery refers to a specific area of the document where the selector should search for elements. This is particularly useful when working with complex or deeply nested DOM structures, as it allows for more efficient and optimized queries.
+
+```javascript
+// Searches for all <p> elements inside a specific section with the ID 'content'
+var paragraphs = $("p", "#content");
+```
+
+**CAUTION**
+
+> jQuery's powerful selectors simplify element targeting but can be a double-edged sword. Complex selectors may cause performance issues in large DOM structures since jQuery must traverse the DOM tree to find matches. To improve performance, use simpler selectors and cache results. Also, be aware of specific selectors that may lead to unexpected results or slowdowns.
+
+## DOM Objects
+
+In jQuery, elements are wrapped in jQuery objects to give them additional functionality, such as chaining and access to jQuery methods like `.addClass()`, `.fadeIn()`, and more.
+
+### Working with DOM Elements
+
+jQuery wraps DOM elements in a jQuery object to extend their functionality. However, if needed, you can access the raw DOM element using either dot notation or bracket notation:
+
+```javascript
+var rawDOMElement = $("#myElement").get(0);
+var rawDOMElement = $("#myElement")[0];
+```
+
+### Creating jQuery Objects from DOM Objects
+
+If you have a DOM object, you can convert it into a jQuery object:
+
+```javascript
+var domElement = document.getElementById("myDiv");
+var $element = $(domElement);
+```
+
+### Treating jQuery Objects as an Array
+
+Although jQuery objects provide additional functionality, they are also array-like structures, meaning you can access elements within them using index notation or iterate over them using loops.
+
+Example of accessing by index:
+
+```javascript
+// Gets the first <div> element
+var firstDiv = $("div")[0];
+```
+
+Example of iterating over jQuery objects:
+
+```javascript
+$("div").each(function (index, element) {
+  // Your code here for each div
+});
+```
+
+### Iterating Over DOM Objects
+
+Use `.each()` to loop through selected elements and perform actions on each:
+
+```javascript
+$("p").each(function () {
+  $(this).css("color", "green");
+});
+```
+
+### Finding Specific Elements
+
+The `.find()` method in jQuery allows you to search for descendants of a selected element, making it a powerful tool for navigating the DOM when you need to locate specific nested elements.
+
+```javascript
+// Finds all paragraph elements inside #container
+$("#container").find("p");
+```
+
+In this example, jQuery only searches for `<p>` elements inside the `#container` element, narrowing down the search scope for better performance and accuracy.
+
+## Manipulating the DOM
+
+### Creating New Elements
+
+In jQuery, you can easily create new HTML elements using the jQuery object constructor, which allows you to generate elements dynamically. This is particularly useful for adding content to a page in response to user actions or loading data asynchronously.
+
+```javascript
+var $newElement = $("<div></div>").text("Hello, World!");
+$("body").append($newElement);
+```
+
+In this example:
+
+1. `$(HTMLString)` allows you to create a new `<div>` element
+2. The `.text()` method is used to set the text content of the new element to "Hello, World!"
+3. Finally, the new element is appended to the `<body>` of the document using `.append()`, making it part of the visible DOM
+
+This method is especially useful when you need to generate elements based on user input or responses from APIs, allowing for a flexible and interactive user interface.
+
+### Cloning Existing Elements
+
+jQuery provides the `.clone()` method to create a copy of existing DOM elements. This method duplicates the selected element(s), including all attributes and data, allowing you to replicate elements easily without manually creating new ones.
+
+```javascript
+var $clone = $("#element").clone();
+$("body").append($clone);
+```
+
+In this example:
+
+- `$("#element")` selects an existing element by its ID
+- `.clone()` creates a copy of the selected element
+- The cloned element is then appended to the `<body>`, effectively duplicating the original element on the page
+
+Cloning elements is particularly useful in scenarios where you want to maintain consistent styling and structure, such as dynamically adding multiple entries to a list or replicating form fields in response to user interactions.
+
+### Inserting Child and Descendant Elements
+
+jQuery provides a variety of methods for inserting elements as children or descendants of existing elements, giving you plenty of flexibility in shaping the DOM.
+
+#### Inserting Child Elements
+
+**`.append()`**: Adds content as the last child of the selected element
+
+```javascript
+$("#container").append("<p>This is a new paragraph added as a child.</p>");
+```
+
+**`.prepend()`**: Adds content as the first child of the selected element
+
+```javascript
+$("#container").prepend("<p>This paragraph is added at the beginning.</p>");
+```
+
+**`.appendTo()`**: Adds the selected element as the last child of the target element
+
+```javascript
+$("<p>New content</p>").appendTo("#container");
+```
+
+**`.prependTo()`**: Adds the selected element as the first child of the target element
+
+```javascript
+$("<p>New content</p>").prependTo("#container");
+```
+
+**TIP**
+
+> When manipulating the DOM frequently, consider caching jQuery objects and using document fragments to improve performance. This reduces the number of DOM operations and helps maintain smooth page interactions.
+
+#### Inserting Descendant Elements
+
+You can also insert elements deeper into the DOM hierarchy using methods like `.append()`, `.prepend()`, `.before()`, and `.after()`.
+
+```javascript
+// Insert a new paragraph inside a specific div
+$("#container")
+  .find(".specificDiv")
+  .append("<p>New paragraph inside specific div</p>");
+// Insert a new paragraph before a specific element
+$("#container")
+  .find(".specificElement")
+  .before("<p>New paragraph before specific element</p>");
+```
+
+### Inserting the Same Elements in Different Positions
+
+jQuery allows you to reuse the same element in multiple locations:
+
+```javascript
+var $newElement = $("<p>New content</p>");
+$("#container1").append($newElement);
+$("#container2").append($newElement.clone()); // Cloning to reuse
+```
+
+### Inserting Parent and Ancestor Elements
+
+You can use jQuery's `.wrap()` method to insert new parent or ancestor elements around existing elements. This is handy when you want to dynamically add extra structure or apply styling to elements without altering the existing content.
+
+```javascript
+$("p").wrap("<div class='newParent'></div>");
+```
+
+This wraps every `<p>` element inside a newly created `<div>` with the class `newParent`.
+
+#### Wrapping Elements Together
+
+When you need to wrap multiple elements inside a single parent container, you can use the `.wrapAll()` method:
+
+```javascript
+$("p").wrapAll("<div class='wrapper'></div>");
+```
+
+This example takes all `<p>` elements and wraps them in a single `<div>` with the class `wrapper`.
+
+#### Wrapping Inner Content
+
+The `.wrapInner()` method wraps only the inner content of an element with a new tag or element:
+
+```javascript
+$("div").wrapInner("<span class='inner'></span>");
+```
+
+### Inserting Sibling Elements
+
+In jQuery, you can easily insert sibling elements relative to an existing element using the `.before()` or `.after()` methods:
+
+```javascript
+$("h1").before("<p>Before the heading</p>");
+$("h1").after("<p>After the heading</p>");
+```
+
+#### Working with jQuery Objects
+
+You can insert content from a jQuery object directly into another element:
+
+```javascript
+var $newElement = $("<div>New div</div>");
+$("#container").before($newElement);
+```
+
+### Modifying Elements
+
+#### Replacing Elements
+
+Use the `.replaceWith()` method to replace elements with new content:
+
+```javascript
+$("p").replaceWith("<div>Replaced content</div>");
+```
+
+#### Removing Elements
+
+To remove elements completely from the DOM:
+
+```javascript
+$("#element").remove(); // Removes element and all event handlers
+```
+
+#### Detaching Elements
+
+Use `.detach()` to temporarily remove elements while preserving their data and event handlers:
+
+```javascript
+var $detached = $("#element").detach();
+// Later...
+$("body").append($detached); // Element is reinserted with handlers intact
+```
+
+#### Emptying Elements
+
+To remove all child elements while keeping the parent:
+
+```javascript
+$("#container").empty();
+```
+
+## Common Use Cases for jQuery
+
+jQuery excels in several common web development scenarios:
+
+### Event Handling
+
+jQuery makes it easy to attach event handlers to elements:
+
+```javascript
+$("#button").click(function () {
+  alert("Button clicked!");
+});
+
+// Or using the on() method for more flexibility
+$("#button").on("click", function () {
+  alert("Button clicked!");
+});
+```
+
+### Form Handling
+
+jQuery simplifies form validation and submission:
+
+```javascript
+$("#myForm").submit(function (e) {
+  e.preventDefault(); // Prevent default form submission
+
+  // Validate form
+  var isValid = true;
+  $(this)
+    .find("input[required]")
+    .each(function () {
+      if (!$(this).val()) {
+        isValid = false;
+        $(this).addClass("error");
+      }
+    });
+
+  if (isValid) {
+    // Process form data
+    $.ajax({
+      url: $(this).attr("action"),
+      method: "POST",
+      data: $(this).serialize(),
+    });
+  }
+});
+```
+
+### Smooth Scrolling
+
+```javascript
+$("a[href^='#']").click(function (event) {
+  event.preventDefault();
+  var target = $(this.getAttribute("href"));
+  if (target.length) {
+    $("html, body").animate(
+      {
+        scrollTop: target.offset().top,
+      },
+      1000
+    );
+  }
+});
+```
+
+### Handling Multiple Events with a Single Handler
+
+```javascript
+$("#element").on("click mouseenter", function (event) {
+  if (event.type === "click") {
+    alert("Element clicked!");
+  } else if (event.type === "mouseenter") {
+    $(this).css("background-color", "yellow");
+  }
+});
+```
+
+### Toggling Visibility
+
+```javascript
+$("#toggleButton").click(function () {
+  $("#content").toggle(500);
+});
+```
+
+### Event Delegation for Dynamic Elements
+
+```javascript
+$("body").on("click", ".dynamicItem", function () {
+  alert($(this).text());
+});
+
+// Add a new dynamic item
+$("#addItem").click(function () {
+  $("#itemList").append('<li class="dynamicItem">New Item</li>');
+});
+```
+
+### Animations and Effects
+
+jQuery provides simple ways to add animations to your web pages:
+
+```javascript
+// Basic fade effects
+$("#element").fadeIn(1000); // Fade in over 1 second
+$("#element").fadeOut(500); // Fade out over  seconds
+$("#element").fadeToggle(800); // Toggle fade state
+
+// Slide effects
+$("#element").slideDown(1000); // Slide down to show
+$("#element").slideUp(500); // Slide up to hide
+$("#element").slideToggle(800); // Toggle slide state
+
+// Custom animations
+$("#element").animate(
+  {
+    opacity: ,
+    left: "+=50",
+    height: "toggle",
+  },
+  1000
+);
+```
+
+## AJAX/Fetch
+
+jQuery provides a powerful AJAX API for making HTTP requests. While modern JavaScript has the Fetch API, jQuery's AJAX methods are still useful for their simplicity and cross-browser compatibility.
+
+### Basic AJAX Request
+
+```javascript
+$.ajax({
+  url: "https://api.example.com/data",
+  method: "GET",
+  dataType: "json",
+  success: function (response) {
+    console.log("Data received:", response);
+  },
+  error: function (xhr, status, error) {
+    console.error("Error:", error);
+  },
+});
+```
+
+### Shorthand Methods
+
+jQuery provides convenient shorthand methods for common request types:
+
+```javascript
+// GET request
+$.get("https://api.example.com/data", function (response) {
+  console.log("Data:", response);
+});
+
+// POST request
+$.post(
+  "https://api.example.com/data",
+  {
+    name: "John",
+    age: 30,
+  },
+  function (response) {
+    console.log("Response:", response);
+  }
+);
+
+// GET JSON data
+$.getJSON("https://api.example.com/data.json", function (data) {
+  console.log("JSON data:", data);
+});
+```
+
+### Working with Forms
+
+jQuery makes it easy to submit form data via AJAX:
+
+```javascript
+$("#myForm").submit(function (e) {
+  e.preventDefault();
+
+  $.ajax({
+    url: $(this).attr("action"),
+    method: "POST",
+    data: $(this).serialize(),
+    success: function (response) {
+      console.log("Form submitted successfully");
+    },
+    error: function (xhr, status, error) {
+      console.error("Form submission failed");
+    },
+  });
+});
+```
+
+### Handling Multiple AJAX Requests
+
+You can use jQuery's Promises to handle multiple AJAX requests:
+
+```javascript
+$.when(
+  $.get("https://api.example.com/users"),
+  $.get("https://api.example.com/posts")
+)
+  .done(function (usersResponse, postsResponse) {
+    console.log("Users:", usersResponse[0]);
+    console.log("Posts:", postsResponse[0]);
+  })
+  .fail(function (error) {
+    console.error("Error fetching data:", error);
+  });
+```
+
+**NOTE**
+
+> While jQuery's AJAX methods are convenient, modern web development often favors the native Fetch API or more modern HTTP clients. Consider using these alternatives for new projects, especially if you don't need to support older browsers.

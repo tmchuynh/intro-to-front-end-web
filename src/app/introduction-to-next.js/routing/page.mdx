@@ -1,0 +1,169 @@
+import BackToTop from "@/components/BackToTop";
+
+# Routing
+
+## Table of Contents
+
+## Overview
+
+Routing in Next.js is a powerful feature that allows developers to create dynamic and static routes for their applications. It enables the creation of pages and navigation between them, making it easy to build complex web applications. Next.js uses a file-based routing system, where the file structure in the `app` directory determines the routes of the application. Each file in the `app` directory corresponds to a route in the application, and Next.js automatically handles the routing logic.
+
+## Nested Routes
+
+Nested routes allow developers to create a hierarchy of pages within their application. This is useful for organizing related pages and creating a more structured navigation system. In Next.js, nested routes can be created by creating subdirectories within the `app` directory. Each subdirectory represents a nested route, and the files within that subdirectory correspond to the pages under that route.
+
+For example, if you have a directory structure like this:
+
+```plaintext
+app/
+ ├── about/
+    └──  page.js
+ ├── blog/
+    ├── index.js
+    └──  [slug]/
+        └──  page.js
+ └──  contact/
+     └──  page.js
+```
+
+In this example, the `about` route corresponds to the `/about` URL, the `blog` route corresponds to the `/blog` URL, and the `contact` route corresponds to the `/contact` URL. The `blog` route has a nested route for individual blog posts, where the `[slug]` directory represents a dynamic route that can match any blog post slug. For example, if you access `/blog/my-first-post`, Next.js will render the `page.js` file inside the `[slug]` directory, allowing you to display the content for that specific blog post.
+
+**CAUTION**
+
+<blockquote>
+In the `app` directory, nested folders are used to create nested routes, and the `page.js` file inside each folder represents the content for that route. The `index.js` file is used to define the default page for a route, such as the main blog page in this example.
+
+Though, this also means, a route can only have one `page.js` file and is only accessible by that `page.js` file. If you need to create multiple pages under the same route, you can use dynamic routes or nested directories to achieve that.
+
+For example, if you have a directory structure like this:
+
+```plaintext
+app/
+ ├── products/
+    ├── index.js
+    └──  [id]/
+        └──  page.js
+ └──   dashboard/
+     └──  settings/
+```
+
+The `dashboard` and `settings` directories will not be accessible directly as routes. Instead, you would need to create a `page.js` file inside the `dashboard` directory to make it accessible as a route. The `settings` directory can be used for nested routes under the `dashboard` route, but it will not be accessible directly unless you create a `page.js` file inside it.
+
+```plaintext
+app/
+ ├── products/
+    ├── index.js
+    └──  [id]/
+        └──  page.js
+ ├── dashboard/
+    └──  settings/
+        └──  page.js
+     └──  page.js
+```
+
+</blockquote>
+
+<BackToTop />
+## Dynamic Routes
+
+Dynamic routes in Next.js allow developers to create pages that can match multiple URLs based on certain parameters. This is particularly useful for applications that need to display content based on user input or data from an API. Dynamic routes are created by using square brackets in the file name, indicating that the route can accept a variable parameter.
+
+For example, if you have a file named `[id].js` in the `app/products` directory, it will match any URL that follows the pattern `/products/{id}`, where `{id}` can be any value. This allows you to create pages for individual products based on their unique identifiers. Inside the `[id].js` file, you can access the `id` parameter using the `useRouter` hook from Next.js, allowing you to fetch and display the relevant product data based on the `id` parameter.
+
+For example:
+
+```javascript
+import { useRouter } from "next/router";
+import React from "react";
+const ProductPage = () => {
+  const router = useRouter();
+  const { id } = router.query;
+
+  return (
+    <div>
+      <h1>Product ID: {id}</h1>
+      {/* Fetch and display product data based on the id */}
+    </div>
+  );
+};
+export default ProductPage;
+```
+
+<BackToTop />
+
+## Catch-All Routes
+
+Catch-all routes in Next.js allow developers to create a single route that can match multiple segments of a URL. This is useful for applications that need to handle complex routing scenarios, such as nested resources or dynamic content. Catch-all routes are created by using double square brackets in the file name, indicating that the route can accept multiple segments.
+
+For example, if you have a file named `[[...slug]].js` in the `app/blog` directory, it will match any URL that starts with `/blog/`, regardless of how many segments follow it. This allows you to create a single page that can handle various blog post URLs, such as `/blog/post-1`, `/blog/category/post-2`, or even `/blog/category/subcategory/post-3`. Inside the `[[...slug]].js` file, you can access the `slug` parameter, which will be an array containing all the segments of the URL that matched the catch-all route.
+
+For example:
+
+```javascript
+import { useRouter } from "next/router";
+import React from "react";
+const BlogPage = () => {
+  const router = useRouter();
+  const { slug } = router.query;
+  return (
+    <div>
+      <h1>Blog Post: {slug ? slug.join("/") : "Home"}</h1>
+      {/* Fetch and display blog content based on the slug */}
+    </div>
+  );
+};
+export default BlogPage;
+```
+
+<BackToTop />
+
+## Route Groups
+
+Route groups in Next.js allow developers to group related routes together without affecting the URL structure. This is useful for organizing routes that share common functionality or components, such as authentication or layout. Route groups are created by using parentheses in the directory name, indicating that the routes within that group should be treated as a single logical unit.
+
+For example, if you have a directory structure like this:
+
+```plaintext
+app/
+ ├── (auth)/
+    ├── login/
+       └──  page.js
+    └──  register/
+        └──  page.js
+ ├── (dashboard)/
+    ├── index.js
+    └──  settings/
+        └──  page.js
+ └──  (public)/
+     ├── index.js
+     └──  about/
+         └──  page.js
+```
+
+In this example, the `(auth)` route group contains routes related to authentication, such as login and registration. The `(dashboard)` route group contains routes related to the user dashboard, such as the dashboard index and settings page. The `(public)` route group contains public routes, such as the home page and about page. The URL structure remains the same, but the routes are organized into logical groups, making it easier to manage and maintain the application.
+
+<BackToTop />
+
+## Parallel and Intercepting Routes
+
+Parallel and intercepting routes in Next.js allow developers to create multiple routes that can be rendered simultaneously or intercept the rendering of a route to provide additional functionality. This is useful for applications that require complex routing scenarios, such as displaying multiple components on the same page or providing custom behavior for specific routes.
+
+Parallel routes are created by defining multiple routes that can be rendered at the same time, while intercepting routes allow developers to intercept the rendering of a route and provide custom behavior or components. For example, you can create a parallel route for a sidebar component that should always be displayed alongside the main content of a page, or an intercepting route that provides a custom loading spinner while the main content is being fetched.
+
+For example, you can create a parallel route for a sidebar component that should always be displayed alongside the main content of a page:
+
+```javascript
+// app/(dashboard)/layout.js
+import Sidebar from "./Sidebar";
+import MainContent from "./MainContent";
+export default function DashboardLayout({ children }) {
+  return (
+    <div className="dashboard-layout">
+      <Sidebar />
+      <MainContent>{children}</MainContent>
+    </div>
+  );
+}
+```
+
+<BackToTop />

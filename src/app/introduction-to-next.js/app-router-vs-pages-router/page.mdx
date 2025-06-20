@@ -1,0 +1,140 @@
+import BackToTop from "@/components/BackToTop";
+
+# App Router vs Pages Router
+
+## Table of Contents
+
+## Overview
+
+The App Router and Pages Router are two different routing systems in Next.js that allow developers to create and manage routes in their applications. Understanding the differences between these two routers is essential for choosing the right approach for your Next.js project.
+
+## App Router
+
+The App Router is a new routing system introduced in Next.js 13 that provides a more flexible and powerful way to manage routes in your application. It allows developers to create nested routes, dynamic routes, and catch-all routes with ease. The App Router uses a file-based routing system, where the file structure in the `app` directory determines the routes of the application.
+
+### Key Features of the App Router
+
+- **Nested Routes**: The App Router allows developers to create nested routes by organizing files in subdirectories within the `app` directory. This enables a hierarchical structure for routes, making it easier to manage complex applications.
+- **Dynamic Routes**: The App Router supports dynamic routes, allowing developers to create pages that can match multiple URLs based on certain parameters. This is particularly useful for applications that need to display content based on user input or data from an API.
+- **Catch-All Routes**: The App Router allows developers to create catch-all routes that can match multiple segments of a URL. This is useful for handling complex routing scenarios, such as nested resources or dynamic content.
+
+### Example of App Router
+
+```javascript
+import { useRouter } from "next/router";
+import React from "react";
+export default function AppRouterExample() {
+  const router = useRouter();
+  const { slug } = router.query;
+
+  return (
+    <div>
+      <h1>App Router Example</h1>
+      <p>Current Route: {slug ? slug.join("/") : "Loading..."}</p>
+    </div>
+  );
+}
+```
+
+This example demonstrates how to use the App Router to create a dynamic route that can match multiple segments of a URL. The `slug` parameter is accessed using the `useRouter` hook, allowing you to display the current route dynamically.
+
+### File Structure for App Router
+
+```text
+app/
+├── about/
+  └──  page.js
+├── blog/
+  ├── index.js
+  └──  [slug]/
+      └──  page.js
+└── contact/
+   └──  page.js
+```
+
+This file structure shows how the App Router organizes routes in the `app` directory. Each subdirectory represents a route, and files within those directories correspond to pages under that route. The `[slug]` directory indicates a dynamic route that can match any blog post slug, allowing for flexible routing in the application.
+
+<BackToTop />
+## Pages Router
+
+The Pages Router is the traditional routing system in Next.js that has been used since the early versions of the framework. It is based on a file-based routing system, where each file in the `pages` directory corresponds to a route in the application. The Pages Router is simple and straightforward, making it easy to create static and dynamic routes.
+
+### Key Features of the Pages Router
+
+- **File-Based Routing**: The Pages Router uses a file-based routing system, where each file in the `pages` directory corresponds to a route in the application. This makes it easy to create and manage routes without additional configuration.
+- **Static and Dynamic Routes**: The Pages Router supports both static and dynamic routes, allowing developers to create pages that can match specific URLs or accept parameters.
+
+### Example of Pages Router
+
+```javascript
+import { useRouter } from "next/router";
+import React from "react";
+export default function PagesRouterExample() {
+  const router = useRouter();
+  const { id } = router.query;
+
+  return (
+    <div>
+      <h1>Pages Router Example</h1>
+      <p>Current ID: {id ? id : "Loading..."}</p>
+    </div>
+  );
+}
+```
+
+This example demonstrates how to use the Pages Router to create a dynamic route that matches a specific URL pattern. The `id` parameter is accessed using the `useRouter` hook, allowing you to display the current ID dynamically.
+
+### File Structure for Pages Router
+
+```plaintext
+pages/
+ ├── about.js
+ ├── blog/
+    ├── index.js
+    └──  [slug].js
+ └──  contact.js
+```
+
+This file structure shows how the Pages Router organizes routes in the `pages` directory. Each file corresponds to a route, and the `[slug].js` file indicates a dynamic route that can match any blog post slug.
+
+<BackToTop />
+
+## Comparison of App Router and Pages Router
+
+| Feature            | App Router                      | Pages Router               |
+| ------------------ | ------------------------------- | -------------------------- |
+| Nested Routes      | Yes                             | No                         |
+| Dynamic Routes     | Yes                             | Yes                        |
+| Catch-All Routes   | Yes                             | No                         |
+| File-Based Routing | Yes (in `app` directory)        | Yes (in `pages` directory) |
+| Simplicity         | More complex due to flexibility | Simple and straightforward |
+
+### Choosing the Right Router
+
+Choosing between the App Router and Pages Router depends on the specific needs of your Next.js application. If you require advanced routing features such as nested routes, dynamic routes, and catch-all routes, the App Router is the better choice. However, if your application is simpler and does not require these features, the Pages Router may be sufficient.
+
+### Pros and Cons
+
+There are pros and cons to both routing systems, which can help you decide which one to use for your Next.js project. Here is a comparison of the two routers:
+
+#### App Router
+
+| Pros                                            | Cons                                            |
+| ----------------------------------------------- | ----------------------------------------------- |
+| More flexible and powerful routing system       | More complex to set up and manage               |
+| Supports nested, dynamic, and catch-all routes  | Requires understanding of new routing concepts  |
+| Better suited for complex applications          | May have a steeper learning curve for beginners |
+| Improved performance with server-side rendering | Not as widely adopted as Pages Router           |
+| Allows for better organization of routes        | Requires Next.js 13 or later                    |
+
+#### Pages Router
+
+| Pros                                      | Cons                                                    |
+| ----------------------------------------- | ------------------------------------------------------- |
+| Simple and straightforward routing system | Limited routing features compared to App Router         |
+| Easy to set up and manage                 | Not suitable for complex routing scenarios              |
+| Widely adopted and well-documented        | Less flexible for advanced routing needs                |
+| Good for simple applications              | May require additional configuration for dynamic routes |
+| Compatible with older versions of Next.js |                                                         |
+
+<BackToTop />

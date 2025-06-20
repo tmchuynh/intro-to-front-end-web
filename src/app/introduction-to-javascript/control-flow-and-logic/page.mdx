@@ -1,0 +1,274 @@
+import BackToTop from "@/components/BackToTop";
+
+# Control Flow and Logic in JavaScript
+
+## Table of Contents
+
+## Conditional Statements
+
+Conditional statements allow you to execute different blocks of code based on certain conditions. They are essential for controlling the flow of your program.
+
+```javascript
+let number = 10;
+
+if (number > 5) {
+  console.log("The number is greater than 5.");
+} else {
+  console.log("The number is 5 or less.");
+}
+```
+
+- `if (number > 5)` checks if the value of number is greater than 5
+- If true, it executes the code block within the if statement
+- If false, it executes the code block within the else statement
+
+## Loops
+
+Loops allow you to execute a block of code repeatedly until a specified condition is met. They are useful for iterating over arrays, objects, or performing repetitive tasks.
+
+**Use Cases of Loops**
+
+- **Iterating Over Arrays**: Loops are commonly used to process each element in an array, such as calculating sums, filtering values, or transforming data.
+- **Repetitive Tasks**: Loops are useful for performing repetitive tasks, such as generating a series of numbers, creating patterns, or executing a function multiple times.
+- **Data Processing**: Loops can be used to process large datasets, such as reading files line by line, parsing JSON objects, or iterating over collections of data.
+
+### For Loop
+
+`for` loops are used when you know the number of iterations in advance. They consist of three parts: initialization, condition, and increment/decrement.
+
+```javascript
+for (let i = 0; i < 5; i++) {
+  console.log("i =", i);
+}
+```
+
+- `for` loop initializes i to 0, checks if i is less than 5, and increments i by 1 in each iteration
+- The loop executes the console.log statement as long as i is less than 5
+
+### For...of Loop
+
+`for...of` loops are used to iterate over iterable objects like arrays, strings, and other collections. They provide a simpler syntax compared to traditional for loops.
+
+```javascript
+let fruits = ["apple", "banana", "cherry"];
+for (let fruit of fruits) {
+  console.log("Fruit:", fruit);
+}
+```
+
+- `for (let fruit of fruits)` iterates over each element in the fruits array
+- The loop executes the console.log statement for each fruit in the array
+
+**`for...of` vs `for` Loop**
+
+- Use `for...of` when you want to iterate over iterable objects like arrays or strings
+- Use `for` loops when you need more control over the iteration, such as accessing the index or modifying the loop variable
+
+### While Loop
+
+```javascript
+let count = 0;
+while (count < 5) {
+  console.log("count =", count);
+  count++;
+}
+```
+
+- `while (count < 5)` repeatedly executes the loop body as long as count is less than 5
+- `count++` increments the count variable by 1 after each iteration
+
+**Use Cases of While Loops**
+
+- **User Input**: Continuously prompt the user for input until a valid response is received, such as asking for a password or confirmation.
+- **Polling**: Repeatedly check a condition or state until it changes, such as waiting for a server response or checking for updates in a data source.
+- **Game Loops**: In game development, `while` loops are often used to keep the game running, updating the game state, and rendering frames until the game is exited.
+
+### Do...while Loop
+
+`do...while` loops are similar to `while` loops, but they guarantee that the loop body is executed at least once before checking the condition.
+
+```javascript
+let count = 0;
+do {
+  console.log("count =", count);
+  count++;
+} while (count < 5);
+```
+
+- The loop executes the console.log statement first, then checks if count is less than 5
+- This ensures that the loop body runs at least once, even if the condition is false initially
+
+**`do...while` vs `while` Loop**
+
+- The `do...while` loop guarantees at least one execution of the loop body, while the `while` loop may not execute at all if the condition is false initially.
+- Use `do...while` when you need to ensure that the loop body runs at least once, such as when prompting for user input or performing an action that must occur before checking a condition.
+
+### Nested Loops
+
+Nested loops are loops inside other loops. They are useful for iterating over multi-dimensional data structures like arrays of arrays.
+
+```javascript
+let matrix = [
+  [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9],
+];
+for (let i = 0; i < matrix.length; i++) {
+  for (let j = 0; j < matrix[i].length; j++) {
+    console.log("Element at matrix[" + i + "][" + j + "] =", matrix[i][j]);
+  }
+}
+```
+
+- The outer loop iterates over each row of the matrix
+- The inner loop iterates over each element in the current row
+- This allows you to access each element in a two-dimensional array
+
+**Use Cases of Nested Loops**
+
+- **Matrix Operations**: Performing calculations on multi-dimensional arrays, such as matrix multiplication or transposition.
+- **Grid-Based Games**: Iterating over a grid or board in games to check for collisions, render tiles, or manage game logic.
+- **Data Processing**: Analyzing complex data structures, such as JSON objects or nested arrays, to extract or manipulate information.
+
+### Infinite Loops
+
+An infinite loop occurs when the loop condition is always true, causing the loop to run indefinitely. This can lead to performance issues or crashes if not handled properly.
+
+```javascript
+let i = 0;
+while (true) {
+  console.log("This will run forever");
+  i++;
+  if (i === 10) {
+    break; // Exits the loop after 10 iterations
+  }
+}
+```
+
+- The `while (true)` condition creates an infinite loop
+- The `break` statement is used to exit the loop after 10 iterations to prevent it from running indefinitely
+
+**Use Cases of Infinite Loops**
+
+- **Server Listening**: In server applications, an infinite loop is often used to keep the server running and listening for incoming requests.
+- **Game Loops**: In game development, an infinite loop is used to continuously update the game state and render frames until the game is exited.
+- **Event Listeners**: In event-driven programming, an infinite loop can be used to keep the application responsive by waiting for user input or events.
+
+**Caution**:
+
+> Infinite loops can cause your program to become unresponsive or crash if not handled properly. Always ensure there is a condition to exit the loop, or use mechanisms like `setTimeout` or `setInterval` to control the execution flow.
+
+## Break and Continue Statements
+
+`break` and `continue` statements are used to control the flow of loops.
+
+- `break` exits the loop immediately, while `continue` skips the current iteration and moves to the next one.
+
+```javascript
+for (let i = 0; i < 10; i++) {
+  if (i === 5) {
+    break; // Exits the loop when i is 5
+  }
+  console.log("i =", i);
+}
+```
+
+```javascript
+for (let i = 0; i < 10; i++) {
+  if (i % 2 === 0) {
+    continue; // Skips the current iteration if i is even
+  }
+  console.log("i =", i); // Only prints odd numbers
+}
+```
+
+## Operators
+
+Operators are symbols that perform operations on variables and values. They can be categorized into arithmetic, assignment, comparison, logical, etc.
+
+```javascript
+let sum = 5 + 10; // Arithmetic operator
+let isTrue = 5 > 3 && 10 < 15; // Logical operator
+```
+
+### Equality Operator vs Identity Operator
+
+**Equality Operator** (`==`): Compares two values for equality, performing type coercion if necessary. Use when you want to compare values without worrying about their types. However, be cautious with type coercion, as it can lead to unexpected results:
+
+```javascript
+console.log(5 == "5"); // Outputs: true
+```
+
+**Identity Operator** (`===`): Compares both value and type without type coercion. Prefer this operator when you want to ensure both the value and type are exactly the same. This is generally considered best practice in JavaScript, as it avoids potential pitfalls associated with type coercion:
+
+```javascript
+console.log(5 === "5"); // Outputs: false
+```
+
+**CAUTION**
+
+> JavaScript automatically converts types in certain situations, which can lead to unexpected results. Using `==` allows type coercion, where values are converted before comparison, causing confusion. To avoid this, use `===` for strict equality, as it checks both value and type without coercion. Understanding type coercion helps prevent errors and ensures accurate comparisons.
+
+### Logical Operators
+
+Logical operators are used to combine or invert boolean values. The most common logical operators are `AND` (`&&`), `OR` (`||`), and `NOT` (`!`).
+
+```javascript
+let a = true;
+let b = false;
+let resultAnd = a && b; // false, both must be true
+let resultOr = a || b; // true, at least one must be true
+let resultNot = !a; // false, negates the value
+```
+
+### Ternary Operator
+
+The ternary operator is a shorthand way to write an `if-else` statement. It takes three operands: a condition, a value if true, and a value if false.
+
+```javascript
+let age = 18;
+let canVote = age >= 18 ? "Yes" : "No"; // If age is 18 or more, canVote is "Yes", otherwise "No"
+console.log(canVote); // Outputs: "Yes"
+```
+
+## Switch Statements
+
+The `switch` statement is used to execute one block of code among many based on the value of a variable or expression. It is often used as an alternative to multiple `if-else`
+statements.
+
+```javascript
+let day = 3;
+switch (day) {
+  case 1:
+    console.log("Monday");
+    break;
+  case 2:
+    console.log("Tuesday");
+    break;
+  case 3:
+    console.log("Wednesday");
+    break;
+  case 4:
+    console.log("Thursday");
+    break;
+  case 5:
+    console.log("Friday");
+    break;
+  case 6:
+    console.log("Saturday");
+    break;
+  case 7:
+    console.log("Sunday");
+    break;
+  default:
+    console.log("Invalid day");
+}
+```
+
+- The `switch` statement evaluates the value of `day`
+- It matches the value against each `case`
+- If a match is found, it executes the corresponding block of code
+- The `break` statement exits the switch block, preventing fall-through to subsequent cases
+- If no match is found, the `default` case is executed
+
+<BackToTop />

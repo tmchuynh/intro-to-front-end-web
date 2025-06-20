@@ -1,0 +1,310 @@
+import BackToTop from "@/components/BackToTop";
+
+# Form Validations
+
+## Table of Contents
+
+<BackToTop />
+
+## Form Validation
+
+Form validation is crucial for ensuring that the data submitted by users meets specific criteria. HTML5 provides built-in validation features that can be used to enforce rules on form inputs.
+
+### Built-in Validation
+
+HTML5 includes several attributes that can be used for validation:
+| Attribute | Description |
+|-----------|-------------|
+| `required` | Specifies that an input must be filled out before submitting the form. |
+| `minlength` | Sets the minimum number of characters required in an input field. |
+| `maxlength` | Sets the maximum number of characters allowed in an input field. |
+| `pattern` | Specifies a regular expression that the input value must match. |
+| `type` | Defines the type of input (e.g., `email`, `number`, `url`) which automatically applies validation rules. |
+
+<BackToTop />
+
+### Custom Validation
+
+For more complex validation, you can use JavaScript to create custom validation logic. This allows you to check conditions that are not covered by HTML5 attributes, such as cross-field validation or asynchronous checks.
+
+```javascript
+document.querySelector("form").addEventListener("submit", function (event) {
+  const nameInput = document.getElementById("name");
+  if (nameInput.value.trim() === "") {
+    event.preventDefault(); // Prevent form submission
+    alert("Name is required.");
+  }
+});
+```
+
+### Example of Form Validation
+
+```html
+<form id="myForm" action="/submit" method="post">
+  <label for="username">Username:</label>
+  <input
+    type="text"
+    id="username"
+    name="username"
+    required
+    minlength="3"
+    maxlength="20"
+    pattern="[a-zA-Z0-9]+"
+  />
+  <span class="error" id="usernameError"></span>
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email" required />
+  <span class="error" id="emailError"></span>
+  <input type="submit" value="Submit" />
+</form>
+
+<script>
+  document
+    .getElementById("myForm")
+    .addEventListener("submit", function (event) {
+      let valid = true;
+
+      const username = document.getElementById("username");
+      const usernameError = document.getElementById("usernameError");
+      if (!username.checkValidity()) {
+        usernameError.textContent =
+          "Username must be 3-20 characters long and contain only letters and numbers.";
+        valid = false;
+      } else {
+        usernameError.textContent = "";
+      }
+
+      const email = document.getElementById("email");
+      const emailError = document.getElementById("emailError");
+      if (!email.checkValidity()) {
+        emailError.textContent = "Please enter a valid email address.";
+        valid = false;
+      } else {
+        emailError.textContent = "";
+      }
+
+      if (!valid) {
+        event.preventDefault(); // Prevent form submission if validation fails
+      }
+    });
+</script>
+```
+
+## Regex
+
+Regular expressions (regex) are pattern-hunting tools for strings. They consist of sequences of characters that define specific search patterns, making them perfect for tasks like finding, matching, or manipulating strings. Whether you're searching for a specific word or cleaning up data, regex is your go-to Swiss Army knife for all things text-related!
+
+Regex serves several key functions in text processing, including:
+
+- **Searching for Specific Patterns**: Regex allows you to find particular sequences of characters within larger texts. For example, you can search for email addresses, phone numbers, or specific words within a document.
+
+- **Extracting Submatch Information**: Regex can be used to extract specific parts of a string that match defined patterns. This is particularly useful in data processing where you may want to isolate specific elements from a larger dataset.
+
+- **Testing for Matches**: You can use regex to check if a given string conforms to a particular pattern. This is often used in form validation to ensure user inputs follow expected formats (like checking if an email address is valid).
+
+- **Replacing Patterns**: Regex can also be used to search for patterns and replace them with other strings. This is useful in data cleaning or formatting tasks.
+
+Regex is like the Swiss Army knife of text – it's everywhere, from coding to data wrangling:
+
+- **Programming Languages**: In JavaScript, Python, and others, regex is your go-to for wrestling with strings and patterns.
+- **Web Development**: Think of it as your bouncer, making sure emails and passwords behave before entering the party (aka your form).
+- **Data Science**: Regex is like the mop that cleans up messy text data, helping data scientists tidy up and make sense of it all.
+- **NLP**: In natural language processing, regex is the detective, spotting patterns in unstructured text and making sense of the chaos.
+- **Text Analytics**: It's like Ctrl+F on steroids, finding insights and trends in oceans of text with surgical precision.
+
+**Example: Splitting Full Names**
+
+Suppose you want to split a column of full names into title, first name, and surname columns in a dataset. You can define a regex pattern to separate the columns whenever it encounters a space character. Here's how you might do it:
+
+```javascript
+const names = "Mr. John Doe, Mrs. Jane Smith, Dr. Emily Johnson";
+
+const regex = /(Mr\.|Mrs\.|Dr\.)\s([A-Za-z]+)\s([A-Za-z]+)/g;
+
+let match;
+while ((match = regex.exec(names)) !== null) {
+  console.log(
+    `Title: ${match[1]}, First Name: ${match[2]}, Last Name: ${match[3]}`
+  );
+}
+```
+
+Output:
+
+```plaintext
+Title: Mr., First Name: John, Last Name: Doe
+Title: Mrs., First Name: Jane, Last Name: Smith
+Title: Dr., First Name: Emily, Last Name: Johnson
+```
+
+Regex, or Regular Expressions, operates like a highly skilled filter that processes strings according to a defined pattern. Think of it as a discerning bouncer at an exclusive club, accepting only those who meet specific criteria while politely turning away the rest. By matching strings that conform to a specified format, regex ensures that only the right data gets through.
+
+To fully appreciate how regex works, it's essential to understand the following key components:
+
+- **Literals**: Characters that match themselves. For example, `cat` matches "cat" in a string – straightforward!
+
+- **Meta-characters**: These are special characters with superpowers:
+
+  - `.` (dot) matches any character (except newline).
+  - `*` matches zero or more of the previous element.
+  - `+` matches one or more of the previous element.
+  - `?` makes the previous element optional.
+
+- **Character Classes**: Use square brackets to match any one character from a set. For example, `[aeiou]` matches any vowel.
+
+- **Anchors**: These pin your search to specific positions: `^` for the start of a string, `$` for the end.
+
+- **Groups**: Use parentheses to group patterns together, so you can apply actions to the whole set. For example, `(abc)+` matches "abc" one or more times.
+
+### Regex Patterns
+
+Crafting regex is like building a map to find treasure – spot the patterns, build the right path, and test it out!
+
+1. **Spot the Patterns**: Look at your data. What do they have in common? For example, names like "Mr. John Doe" follow a pattern: Title, Firstname, Lastname.
+
+2. **Build the Pattern**: Use regex magic to capture those parts. For a name like "Mr. John Doe," you’d use something like: `(Mr\.|Mrs\.|Dr\.)\s([A-Za-z]+)\s([A-Za-z]+)`
+
+3. **Test It**: Now, test your pattern using a handy tool like Regex101. Make sure it catches the right stuff!
+
+4. **Tweak and Perfect**: Fine-tune your regex to handle tricky cases or avoid matching the wrong things.
+
+Regex is a powerful tool – once you master it, you can tackle everything from data validation to text search like a regex wizard!
+
+### Regex Tools
+
+There are numerous online tools and resources available for generating, testing, and learning about regular expressions (regex). These platforms serve as handy companions on your regex journey, making it easier to craft and validate your patterns.
+
+- **[Regex101](https://regex101.com/)**: This site provides a regex tester with a detailed explanation of each part of your regex pattern. It supports multiple flavors of regex (PCRE, JavaScript, Python, etc.) and allows you to save your regex for future use.
+
+- **[RegExr](https://regexr.com/)**: RegExr is an interactive tool that allows you to test regex patterns, view community examples, and access a library of common regex patterns. It also provides explanations for different regex constructs.
+
+- **[RegexPlanet](https://www.regexplanet.com/)**: A comprehensive resource for testing and generating regex patterns in various programming languages, RegexPlanet allows you to switch between languages and see how your regex works in different contexts.
+
+- **[Regex Pal](https://www.regexpal.com/)**: Regex Pal is a simple tool for testing regex patterns against sample text. It provides immediate feedback on matches and is user-friendly.
+
+- **[RegexLib](https://regexlib.com/)**: A library of community-contributed regex patterns that you can browse and use in your projects. It's a treasure trove of pre-built expressions for various use cases.
+
+- **[RegExr Cheat Sheet from regexr](https://regexr.com/cheatsheet)**: A handy reference guide that summarizes common regex patterns, syntax, and modifiers. It's a quick way to refresh your memory while working with regex.
+
+- **[Regex Tutorial](https://www.regular-expressions.info/tutorial.html)**: A comprehensive tutorial that covers the basics of regex, advanced techniques, and practical examples. It's a great resource for both beginners and experienced users.
+
+- **[Regex Crossword](https://regexcrossword.com/)**: A fun way to practice regex skills by solving crossword puzzles that require regex patterns to complete. It's a playful approach to learning and mastering regex.
+
+- **[Regex Cheat Sheet from rexegg](https://www.rexegg.com/regex-quickstart.html)**: A quick reference guide that summarizes regex syntax, common patterns, and modifiers. It's a handy tool for quick lookups while working with regex.
+
+- **[Regex Generator](https://regex-generator.olafneumann.org/)**: This tool helps you generate regex patterns based on your input. You can specify the type of data you want to match, and it will create a regex pattern for you.
+
+- **[Regex Visualizer](https://regexvisualizer.com/)**: A visual tool that helps you understand regex patterns by showing how they match against sample text. It provides a graphical representation of your regex, making it easier to grasp complex patterns.
+
+## Validation Examples
+
+Form validation is essential for ensuring that user input meets specific criteria before submission. This section covers various validation techniques, including regex, length validation, required field validation, file type and size validation, data type validation, and password validation. Each technique is explained with examples to illustrate its usage.
+
+### Length Validation
+
+Length validation ensures that input meets specified minimum and maximum length requirements. It's especially handy for fields like usernames or passwords, where you want to maintain a balance between complexity and usability. Think of it like setting the perfect recipe: too little, and it's not secure; too much, and it's hard to remember!
+
+```javascript
+function validateLength(input, minLength, maxLength) {
+  return input.length >= minLength && input.length <= maxLength;
+}
+```
+
+### Required Field Validation
+
+Required field validation ensures that specific fields are filled out before submitting a form. It's like checking if all the must-have ingredients are in your recipe—without them, the dish (or form) can't be completed!
+
+```javascript
+function validateRequiredField(input) {
+  return input.trim() !== "";
+}
+```
+
+### File Type and Size Validation
+
+When dealing with file uploads, it's important to validate both the file type and size to ensure users submit acceptable files. This helps maintain security and prevents server overload. It's like checking if the ingredients are fresh and within the right quantity before adding them to your dish!
+
+```javascript
+function validateFile(file) {
+  const allowedTypes = ["image/jpeg", "image/png"];
+  const maxSize = 2 * 1024 * 1024; // 2 MB
+
+  if (!allowedTypes.includes(file.type)) {
+    console.log("Invalid file type");
+    return false;
+  }
+
+  if (file.size > maxSize) {
+    console.log("File size exceeds the limit");
+    return false;
+  }
+
+  return true;
+}
+```
+
+### Data Type Validation
+
+Data type validation ensures that input matches the expected type, like confirming if a value is a number, a string, or any other data type. It's like making sure the right ingredients go into a recipe—no mixing up sugar with salt!
+
+```javascript
+function validateNumber(input) {
+  return !isNaN(input);
+}
+```
+
+### Password Validation
+
+Password validation is crucial for ensuring that users create strong and secure passwords. This can include checking for minimum length, complexity (like requiring uppercase letters, numbers, and special characters), and confirming that the password matches a confirmation field. It's like setting the right security measures for your recipe book—strong enough to keep it safe!
+
+```javascript
+function validatePassword(password, confirmPassword) {
+  return password === confirmPassword;
+}
+```
+
+### Credit Card Validation
+
+Credit card validation ensures that the input matches the format of a valid credit card number. This can include checking the length, format (like only allowing digits), and using algorithms like the Luhn algorithm to verify the number's validity. It's like checking if your credit card is valid before making a purchase—ensuring everything is in order before proceeding!
+
+```javascript
+function validateCreditCard(cardNumber) {
+  const regex = /^\d{16}$/; // Example for a 16-digit card number
+  return regex.test(cardNumber);
+}
+```
+
+### Email Validation
+
+Email validation ensures that the input matches the format of a valid email address. This can include checking for the presence of an "@" symbol, a domain name, and a valid top-level domain (TLD). It's like making sure your email address is correctly formatted before sending a message—ensuring it reaches the right destination!
+
+```javascript
+function validateEmail(email) {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+}
+```
+
+### URL Validation
+
+URL validation ensures that the input matches the format of a valid URL. This can include checking for the presence of a protocol (like "http://" or "https://"), a domain name, and an optional path or query string. It's like making sure your website address is correctly formatted before sharing it—ensuring it leads to the right place!
+
+```javascript
+function validateURL(url) {
+  const regex = /^(https?:\/\/)?[^\s/$.?#].[^\s]*$/;
+  return regex.test(url);
+}
+```
+
+### Phone Number Validation
+
+Phone number validation ensures that the input matches the format of a valid phone number. This can include checking for the presence of digits, optional country codes, and specific formats (like parentheses or dashes). It's like making sure your phone number is correctly formatted before sharing it—ensuring it can be dialed correctly!
+
+```javascript
+function validatePhoneNumber(phoneNumber) {
+  const regex = /^\+?[1-9]\d{1,14}$/; // Example for E.164 format
+  return regex.test(phoneNumber);
+}
+```
+
+<BackToTop />

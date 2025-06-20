@@ -1,0 +1,1497 @@
+import BackToTop from "@/components/BackToTop";
+
+# Overview
+
+## Table of Contents
+
+## What is the DOM?
+
+The **Document Object Model (DOM)** is one of the most important concepts in web development. It's the bridge between your HTML documents and JavaScript code, allowing you to create dynamic, interactive web pages.
+
+Think of the DOM as a live, interactive representation of your HTML document that JavaScript can read, modify, and respond to in real-time.
+
+The DOM is a programming interface for HTML and XML documents. It represents the page as a tree-like structure where each HTML element becomes a "node" that can be accessed and manipulated with JavaScript.
+
+When a web browser loads an HTML page, it creates a DOM representation that looks like this:
+
+```
+Document
+├── html
+    ├── head
+    │   ├── title
+    │   ├── meta
+    │   └── link
+    └── body
+        ├── header
+        │   ├── nav
+        │   └── h1
+        ├── main
+        │   ├── section
+        │   │   ├── h2
+        │   │   └── p
+        │   └── article
+        │       ├── h3
+        │       ├── p
+        │       └── img
+        └── footer
+            ├── p
+            └── ul
+                ├── li
+                └── li
+```
+
+Each element in this tree is called a **node**, and JavaScript can access, modify, or interact with any of these nodes.
+
+<BackToTop />
+
+## DOM Tree Structure
+
+The DOM represents your HTML document as a hierarchical tree structure. Understanding this structure is crucial for effective DOM manipulation.
+
+### Node Relationships
+
+In the DOM tree, nodes have family-like relationships:
+
+```javascript
+// Consider this HTML:
+// <div id="parent">
+//   <p id="child1">First paragraph</p>
+//   <p id="child2">Second paragraph</p>
+// </div>
+
+const parent = document.getElementById("parent");
+const child1 = document.getElementById("child1");
+
+// Parent-child relationships
+console.log(child1.parentNode === parent); // true
+console.log(parent.children[0] === child1); // true
+
+// Sibling relationships
+console.log(child1.nextElementSibling.id); // "child2"
+console.log(child2.previousElementSibling.id); // "child1"
+```
+
+### Document Structure
+
+```javascript
+// The document object is the root of the DOM tree
+console.log(document.documentElement); // <html> element
+console.log(document.head); // <head> element
+console.log(document.body); // <body> element
+console.log(document.title); // Page title
+console.log(document.URL); // Current page URL
+```
+
+<BackToTop />
+
+## Why is the DOM Important?
+
+| Feature                     | Description                                              |
+| --------------------------- | -------------------------------------------------------- |
+| Dynamic Content             | Update page content without reloading                    |
+| User Interaction            | Respond to user actions like clicks and form submissions |
+| Real-time Updates           | Create live features like chat applications              |
+| Modern Web Apps             | Build single-page applications (SPAs)                    |
+| Animation and Effects       | Create smooth transitions and visual effects             |
+| Cross-Browser Compatibility | Ensure consistent behavior across different browsers     |
+
+The DOM is crucial for web development because it allows developers to interact with the structure and content of web pages programmatically. By manipulating the DOM, you can change the appearance and behavior of a page in response to user actions or other events. It allows developers to:
+
+- **Manipulate HTML Elements**: Change content, structure, and styles dynamically.
+- **Handle Events**: Respond to user interactions like clicks, key presses, and form submissions.
+- **Create Interactive Features**: Build features like dropdown menus, modals, and real-time updates.
+- **Build Single-Page Applications (SPAs)**: Load content dynamically without full page reloads, improving user experience.
+
+<BackToTop />
+
+## DOM Node Types
+
+The DOM consists of different types of nodes, each serving a specific purpose:
+
+### 1. Element Nodes (nodeType: 1)
+
+These represent HTML elements like `<div>`, `<p>`, `<img>`, etc.
+
+```javascript
+const div = document.createElement("div");
+console.log(div.nodeType); // 1
+console.log(div.nodeName); // "DIV"
+```
+
+### 2. Text Nodes (nodeType: 3)
+
+These contain the text content within elements.
+
+```javascript
+const paragraph = document.querySelector("p");
+const textNode = paragraph.firstChild;
+console.log(textNode.nodeType); // 3
+console.log(textNode.textContent); // The actual text
+```
+
+### 3. Comment Nodes (nodeType: 8)
+
+These represent HTML comments.
+
+```javascript
+// <!-- This is a comment -->
+const comment = document.createComment("This is a comment");
+console.log(comment.nodeType); // 8
+```
+
+### 4. Document Node (nodeType: 9)
+
+The root document object.
+
+```javascript
+console.log(document.nodeType); // 9
+console.log(document.nodeName); // "#document"
+```
+
+### Node Type Constants
+
+```javascript
+// You can use these constants for better readability
+if (node.nodeType === Node.ELEMENT_NODE) {
+  // Handle element node
+} else if (node.nodeType === Node.TEXT_NODE) {
+  // Handle text node
+}
+```
+
+<BackToTop />
+
+## Selecting DOM Elements
+
+Mastering element selection is fundamental to DOM manipulation. Here are all the methods you need to know:
+
+### Basic Selection Methods
+
+```javascript
+// Select by ID (returns single element or null)
+const header = document.getElementById("main-header");
+
+// Select by class name (returns HTMLCollection)
+const buttons = document.getElementsByClassName("btn");
+
+// Select by tag name (returns HTMLCollection)
+const paragraphs = document.getElementsByTagName("p");
+
+// Select by name attribute (returns NodeList)
+const inputs = document.getElementsByName("username");
+```
+
+### Modern Query Selectors
+
+```javascript
+// Select first matching element (returns Element or null)
+const firstButton = document.querySelector(".btn");
+const specificElement = document.querySelector("#header .nav-item:first-child");
+
+// Select all matching elements (returns NodeList)
+const allButtons = document.querySelectorAll(".btn");
+const complexSelection = document.querySelectorAll("div > p.highlight");
+
+// More advanced selectors
+const evenRows = document.querySelectorAll("tr:nth-child(even)");
+const lastChild = document.querySelector(".container :last-child");
+const notSelected = document.querySelectorAll("input:not([disabled])");
+```
+
+### Selector Performance Tips
+
+```javascript
+// Fast - ID selection
+const fast = document.getElementById("myId");
+
+// Faster than querySelectorAll for simple selections
+const faster = document.getElementsByClassName("myClass");
+
+// Use specific selectors to improve performance
+const specific = document.querySelector("#container .item"); // Good
+const vague = document.querySelector(".item"); // Less efficient
+
+// Cache selections when used multiple times
+const expensiveSelection = document.querySelectorAll(".complex-selector");
+// Use expensiveSelection multiple times instead of re-querying
+```
+
+### Selecting Within Elements
+
+```javascript
+const container = document.getElementById("container");
+
+// Search within a specific element
+const childButton = container.querySelector(".btn");
+const allChildInputs = container.querySelectorAll("input");
+
+// This is more efficient than searching the entire document
+```
+
+<BackToTop />
+
+## Modifying DOM Elements
+
+Once you've selected elements, you can modify their content, attributes, and styles in various ways.
+
+### Changing Content
+
+```javascript
+const element = document.getElementById("myElement");
+
+// Change text content (safer, escapes HTML)
+element.textContent = "New text content";
+
+// Change HTML content (can insert HTML)
+element.innerHTML = "<strong>Bold text</strong>";
+
+// Get the current content
+const currentText = element.textContent;
+const currentHTML = element.innerHTML;
+
+// Append to existing content
+element.textContent += " Additional text";
+element.innerHTML += "<span>Additional HTML</span>";
+```
+
+### Working with Attributes
+
+```javascript
+const img = document.querySelector("img");
+
+// Set attributes
+img.setAttribute("src", "new-image.jpg");
+img.setAttribute("alt", "A beautiful landscape");
+img.setAttribute("data-category", "nature");
+
+// Get attributes
+const source = img.getAttribute("src");
+const altText = img.getAttribute("alt");
+
+// Check if attribute exists
+if (img.hasAttribute("data-category")) {
+  console.log("Category:", img.getAttribute("data-category"));
+}
+
+// Remove attributes
+img.removeAttribute("data-category");
+
+// Working with boolean attributes
+const checkbox = document.querySelector("#myCheckbox");
+checkbox.checked = true; // Set checked
+checkbox.disabled = false; // Enable the checkbox
+```
+
+### Modifying Styles
+
+```javascript
+const element = document.querySelector(".my-element");
+
+// Direct style manipulation
+element.style.color = "red";
+element.style.backgroundColor = "blue";
+element.style.fontSize = "16px";
+element.style.display = "none"; // Hide element
+element.style.display = "block"; // Show element
+
+// Using CSS custom properties
+element.style.setProperty("--custom-color", "#ff6b6b");
+
+// Getting computed styles
+const computedStyle = window.getComputedStyle(element);
+const currentColor = computedStyle.color;
+const currentWidth = computedStyle.width;
+```
+
+### Working with CSS Classes
+
+```javascript
+const element = document.querySelector(".my-element");
+
+// Add classes
+element.classList.add("active");
+element.classList.add("highlighted", "selected"); // Add multiple
+
+// Remove classes
+element.classList.remove("inactive");
+element.classList.remove("old-class", "another-class"); // Remove multiple
+
+// Toggle classes (add if not present, remove if present)
+element.classList.toggle("visible");
+element.classList.toggle("active", true); // Force add
+element.classList.toggle("active", false); // Force remove
+
+// Check if class exists
+if (element.classList.contains("active")) {
+  console.log("Element is active");
+}
+
+// Replace a class
+element.classList.replace("old-class", "new-class");
+
+// Get all classes as a string
+const allClasses = element.className;
+```
+
+<BackToTop />
+
+## Creating and Removing Elements
+
+Dynamic element creation and removal are essential for building interactive applications.
+
+### Creating Elements
+
+```javascript
+// Create a new element
+const newDiv = document.createElement("div");
+const newParagraph = document.createElement("p");
+const newImage = document.createElement("img");
+
+// Set properties and content
+newDiv.className = "container";
+newDiv.id = "dynamic-content";
+newParagraph.textContent = "This paragraph was created dynamically";
+newImage.src = "dynamic-image.jpg";
+newImage.alt = "Dynamic image";
+
+// Create text nodes
+const textNode = document.createTextNode("Plain text content");
+
+// Create elements with attributes in one go
+function createElement(tag, attributes = {}, textContent = "") {
+  const element = document.createElement(tag);
+
+  Object.keys(attributes).forEach((key) => {
+    element.setAttribute(key, attributes[key]);
+  });
+
+  if (textContent) {
+    element.textContent = textContent;
+  }
+
+  return element;
+}
+
+// Usage
+const button = createElement(
+  "button",
+  {
+    class: "btn btn-primary",
+    "data-action": "submit",
+    type: "button",
+  },
+  "Click me!"
+);
+```
+
+### Adding Elements to the DOM
+
+```javascript
+const container = document.getElementById("container");
+const newElement = document.createElement("div");
+
+// Append as last child
+container.appendChild(newElement);
+
+// Insert before a specific element
+const referenceElement = container.firstElementChild;
+container.insertBefore(newElement, referenceElement);
+
+// Modern insertion methods
+container.append(newElement); // Can append multiple nodes and strings
+container.prepend(newElement); // Insert at the beginning
+
+// Insert adjacent to an element
+const targetElement = document.querySelector(".target");
+targetElement.insertAdjacentElement("beforebegin", newElement); // Before the element
+targetElement.insertAdjacentElement("afterbegin", newElement); // First child
+targetElement.insertAdjacentElement("beforeend", newElement); // Last child
+targetElement.insertAdjacentElement("afterend", newElement); // After the element
+
+// Insert HTML strings
+targetElement.insertAdjacentHTML("beforeend", "<p>New paragraph</p>");
+```
+
+### Removing Elements
+
+```javascript
+const elementToRemove = document.querySelector(".remove-me");
+
+// Modern removal (IE11+)
+elementToRemove.remove();
+
+// Legacy removal (older browsers)
+elementToRemove.parentNode.removeChild(elementToRemove);
+
+// Remove all children
+const container = document.querySelector(".container");
+while (container.firstChild) {
+  container.removeChild(container.firstChild);
+}
+
+// Or more efficiently:
+container.innerHTML = "";
+
+// Remove multiple elements
+const elementsToRemove = document.querySelectorAll(".temporary");
+elementsToRemove.forEach((element) => element.remove());
+```
+
+### Cloning Elements
+
+```javascript
+const original = document.querySelector(".template");
+
+// Shallow clone (element only, no children)
+const shallowClone = original.cloneNode(false);
+
+// Deep clone (element and all children)
+const deepClone = original.cloneNode(true);
+
+// Clone and modify
+const clone = original.cloneNode(true);
+clone.id = "cloned-element"; // Change ID to avoid duplicates
+clone.textContent = "This is a clone";
+
+// Append clone to the DOM
+document.body.appendChild(clone);
+```
+
+<BackToTop />
+
+## DOM Traversal
+
+Navigating the DOM tree is essential for finding related elements and understanding document structure.
+
+### Parent and Child Navigation
+
+```javascript
+const element = document.querySelector(".child-element");
+
+// Parent navigation
+console.log(element.parentNode); // Direct parent (includes text nodes)
+console.log(element.parentElement); // Parent element (elements only)
+console.log(element.closest(".container")); // Nearest ancestor matching selector
+
+// Child navigation
+const parent = document.querySelector(".parent");
+console.log(parent.children); // HTMLCollection of child elements
+console.log(parent.childNodes); // NodeList including text nodes
+console.log(parent.firstElementChild); // First child element
+console.log(parent.lastElementChild); // Last child element
+console.log(parent.childElementCount); // Number of child elements
+
+// Check if element has children
+if (parent.hasChildNodes()) {
+  console.log("Parent has children");
+}
+```
+
+### Sibling Navigation
+
+```javascript
+const element = document.querySelector(".current-element");
+
+// Next siblings
+console.log(element.nextElementSibling); // Next element sibling
+console.log(element.nextSibling); // Next sibling node (may be text)
+
+// Previous siblings
+console.log(element.previousElementSibling); // Previous element sibling
+console.log(element.previousSibling); // Previous sibling node (may be text)
+
+// Get all siblings
+function getAllSiblings(element) {
+  const siblings = [];
+  let sibling = element.parentElement.firstElementChild;
+
+  while (sibling) {
+    if (sibling !== element) {
+      siblings.push(sibling);
+    }
+    sibling = sibling.nextElementSibling;
+  }
+
+  return siblings;
+}
+```
+
+### Tree Walking
+
+```javascript
+// Walk through all elements in a tree
+function walkDOM(element, callback) {
+  callback(element);
+
+  element = element.firstElementChild;
+  while (element) {
+    walkDOM(element, callback);
+    element = element.nextElementSibling;
+  }
+}
+
+// Usage
+walkDOM(document.body, function (element) {
+  console.log("Element:", element.tagName, element.className);
+});
+
+// Find all elements matching a condition
+function findElements(root, condition) {
+  const results = [];
+
+  function traverse(element) {
+    if (condition(element)) {
+      results.push(element);
+    }
+
+    for (let child of element.children) {
+      traverse(child);
+    }
+  }
+
+  traverse(root);
+  return results;
+}
+
+// Find all elements with a specific attribute
+const elementsWithDataId = findElements(document.body, (element) =>
+  element.hasAttribute("data-id")
+);
+```
+
+<BackToTop />
+
+## Working with Forms
+
+Forms are a crucial part of web applications. The DOM provides powerful methods for form manipulation.
+
+### Form Selection and Properties
+
+```javascript
+// Select forms
+const form = document.querySelector("#myForm");
+const formByName = document.forms["registrationForm"];
+const firstForm = document.forms[0];
+
+// Form properties
+console.log(form.elements); // HTMLFormControlsCollection of form controls
+console.log(form.length); // Number of form controls
+console.log(form.name); // Form name attribute
+console.log(form.method); // Form method (GET/POST)
+console.log(form.action); // Form action URL
+```
+
+### Working with Form Controls
+
+```javascript
+// Access form elements
+const usernameInput = form.elements["username"];
+const emailInput = form.elements.email;
+const submitButton = form.elements["submit-btn"];
+
+// Or use querySelector
+const passwordInput = form.querySelector('input[name="password"]');
+
+// Get/set values
+console.log(usernameInput.value);
+usernameInput.value = "new_username";
+
+// Checkbox and radio buttons
+const checkbox = form.querySelector('input[type="checkbox"]');
+console.log(checkbox.checked); // true/false
+checkbox.checked = true;
+
+const radioButtons = form.querySelectorAll('input[name="gender"]');
+radioButtons.forEach((radio) => {
+  if (radio.checked) {
+    console.log("Selected gender:", radio.value);
+  }
+});
+
+// Select elements
+const selectElement = form.querySelector('select[name="country"]');
+console.log(selectElement.value); // Selected value
+console.log(selectElement.selectedIndex); // Index of selected option
+console.log(selectElement.options[selectElement.selectedIndex].text); // Selected text
+
+// Multiple select
+const multiSelect = form.querySelector("select[multiple]");
+const selectedValues = Array.from(multiSelect.selectedOptions).map(
+  (option) => option.value
+);
+```
+
+### Form Validation
+
+```javascript
+// HTML5 validation
+const input = form.querySelector("input[required]");
+
+// Check validity
+console.log(input.validity.valid); // true/false
+console.log(input.validity.valueMissing); // true if required field is empty
+console.log(input.validity.typeMismatch); // true if type doesn't match (e.g., email)
+console.log(input.validity.patternMismatch); // true if pattern doesn't match
+
+// Custom validation
+input.setCustomValidity("Username must be at least 3 characters");
+input.reportValidity(); // Shows validation message
+
+// Clear custom validation
+input.setCustomValidity("");
+
+// Form-level validation
+form.addEventListener("submit", function (event) {
+  event.preventDefault(); // Prevent default submission
+
+  // Custom validation logic
+  const username = form.elements.username.value;
+  const email = form.elements.email.value;
+
+  if (username.length < 3) {
+    alert("Username must be at least 3 characters");
+    return;
+  }
+
+  if (!email.includes("@")) {
+    alert("Please enter a valid email");
+    return;
+  }
+
+  // If validation passes, submit the form
+  console.log("Form is valid, submitting...");
+  // form.submit(); // Programmatic submission
+});
+```
+
+### Form Data Handling
+
+```javascript
+// Get all form data as FormData object
+const formData = new FormData(form);
+
+// Iterate through form data
+for (let [name, value] of formData.entries()) {
+  console.log(name, value);
+}
+
+// Get specific values
+const username = formData.get("username");
+const files = formData.getAll("attachments"); // For multiple files
+
+// Convert to URL search params
+const params = new URLSearchParams(formData);
+console.log(params.toString()); // "username=john&email=john@example.com"
+
+// Convert to object
+function formDataToObject(formData) {
+  const object = {};
+  for (let [key, value] of formData.entries()) {
+    object[key] = value;
+  }
+  return object;
+}
+
+const formObject = formDataToObject(new FormData(form));
+
+// Reset form
+form.reset();
+
+// Programmatic form submission
+form.submit();
+```
+
+<BackToTop />
+
+## DOM Best Practices
+
+Following best practices ensures your DOM manipulation is efficient, maintainable, and performant.
+
+### Performance Best Practices
+
+```javascript
+// 1. Cache DOM selections
+// Bad: Repeated selections
+function updateElements() {
+  document.querySelector(".status").textContent = "Loading...";
+  document.querySelector(".status").style.color = "orange";
+  document.querySelector(".status").classList.add("loading");
+}
+
+// Good: Cache the selection
+function updateElements() {
+  const statusElement = document.querySelector(".status");
+  statusElement.textContent = "Loading...";
+  statusElement.style.color = "orange";
+  statusElement.classList.add("loading");
+}
+
+// 2. Batch DOM modifications
+// Bad: Multiple reflows
+function addItems(items) {
+  const list = document.querySelector("#list");
+  items.forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    list.appendChild(li); // Triggers reflow each time
+  });
+}
+
+// Good: Use document fragment
+function addItems(items) {
+  const list = document.querySelector("#list");
+  const fragment = document.createDocumentFragment();
+
+  items.forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    fragment.appendChild(li);
+  });
+
+  list.appendChild(fragment); // Single reflow
+}
+
+// 3. Use efficient selectors
+// Slow: Complex selectors
+const elements = document.querySelectorAll("div > p.highlight + span");
+
+// Faster: Simple selectors with context
+const container = document.getElementById("content");
+const elements = container.querySelectorAll(".highlight-span");
+```
+
+### Security Best Practices
+
+```javascript
+// 1. Avoid innerHTML with user input
+// Dangerous: XSS vulnerability
+const userInput = '<script>alert("XSS")</script>';
+element.innerHTML = userInput; // DON'T DO THIS
+
+// Safe: Use textContent
+element.textContent = userInput; // Safe, treats as text
+
+// 2. Sanitize HTML if you must use innerHTML
+function sanitizeHTML(html) {
+  const temp = document.createElement("div");
+  temp.textContent = html;
+  return temp.innerHTML;
+}
+
+// Or use a library like DOMPurify
+// element.innerHTML = DOMPurify.sanitize(userInput);
+
+// 3. Validate data attributes
+function setDataAttribute(element, key, value) {
+  // Validate key format
+  if (!/^[a-z]+(-[a-z]+)*$/.test(key)) {
+    throw new Error("Invalid data attribute key");
+  }
+  element.setAttribute(`data-${key}`, value);
+}
+```
+
+### Code Organization
+
+```javascript
+// 1. Use modules for DOM manipulation
+const DOMUtils = {
+  createElement(tag, attributes = {}, textContent = "") {
+    const element = document.createElement(tag);
+
+    Object.entries(attributes).forEach(([key, value]) => {
+      element.setAttribute(key, value);
+    });
+
+    if (textContent) {
+      element.textContent = textContent;
+    }
+
+    return element;
+  },
+
+  removeAllChildren(element) {
+    while (element.firstChild) {
+      element.removeChild(element.firstChild);
+    }
+  },
+
+  toggleClass(element, className, force) {
+    return element.classList.toggle(className, force);
+  },
+};
+
+// 2. Use event delegation for dynamic content
+class ComponentManager {
+  constructor(container) {
+    this.container = container;
+    this.setupEventListeners();
+  }
+
+  setupEventListeners() {
+    this.container.addEventListener("click", this.handleClick.bind(this));
+    this.container.addEventListener("input", this.handleInput.bind(this));
+  }
+
+  handleClick(event) {
+    const target = event.target;
+
+    if (target.classList.contains("delete-btn")) {
+      this.deleteItem(target.closest(".item"));
+    } else if (target.classList.contains("edit-btn")) {
+      this.editItem(target.closest(".item"));
+    }
+  }
+
+  handleInput(event) {
+    if (event.target.classList.contains("search-input")) {
+      this.filterItems(event.target.value);
+    }
+  }
+}
+```
+
+<BackToTop />
+
+## Common DOM Patterns
+
+These patterns solve common web development challenges using DOM manipulation.
+
+### 1. Modal Dialog
+
+```javascript
+class Modal {
+  constructor(modalId) {
+    this.modal = document.getElementById(modalId);
+    this.overlay = this.modal.querySelector(".modal-overlay");
+    this.closeBtn = this.modal.querySelector(".modal-close");
+
+    this.setupEventListeners();
+  }
+
+  setupEventListeners() {
+    this.closeBtn.addEventListener("click", () => this.close());
+    this.overlay.addEventListener("click", () => this.close());
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && this.isOpen()) {
+        this.close();
+      }
+    });
+  }
+
+  open() {
+    this.modal.classList.add("modal-open");
+    document.body.style.overflow = "hidden";
+    this.closeBtn.focus();
+  }
+
+  close() {
+    this.modal.classList.remove("modal-open");
+    document.body.style.overflow = "";
+  }
+
+  isOpen() {
+    return this.modal.classList.contains("modal-open");
+  }
+}
+```
+
+### 2. Infinite Scroll
+
+```javascript
+class InfiniteScroll {
+  constructor(container, loadMore) {
+    this.container = container;
+    this.loadMore = loadMore;
+    this.loading = false;
+    this.threshold = 200; // px from bottom
+
+    this.setupScrollListener();
+  }
+
+  setupScrollListener() {
+    window.addEventListener(
+      "scroll",
+      this.throttle(this.checkScroll.bind(this), 100)
+    );
+  }
+
+  checkScroll() {
+    if (this.loading) return;
+
+    const scrollTop = window.pageYOffset;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.offsetHeight;
+
+    if (scrollTop + windowHeight >= documentHeight - this.threshold) {
+      this.loading = true;
+      this.loadMore().then(() => {
+        this.loading = false;
+      });
+    }
+  }
+
+  throttle(func, delay) {
+    let timeoutId;
+    let lastExecTime = 0;
+    return function (...args) {
+      const currentTime = Date.now();
+
+      if (currentTime - lastExecTime > delay) {
+        func.apply(this, args);
+        lastExecTime = currentTime;
+      } else {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          func.apply(this, args);
+          lastExecTime = Date.now();
+        }, delay - (currentTime - lastExecTime));
+      }
+    };
+  }
+}
+```
+
+### 3. Dynamic Table
+
+```javascript
+class DataTable {
+  constructor(containerId, data = []) {
+    this.container = document.getElementById(containerId);
+    this.data = data;
+    this.sortColumn = null;
+    this.sortDirection = "asc";
+
+    this.render();
+  }
+
+  render() {
+    this.container.innerHTML = "";
+
+    if (this.data.length === 0) {
+      this.container.innerHTML = "<p>No data available</p>";
+      return;
+    }
+
+    const table = document.createElement("table");
+    table.className = "data-table";
+
+    // Create header
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+
+    Object.keys(this.data[0]).forEach((key) => {
+      const th = document.createElement("th");
+      th.textContent = key;
+      th.dataset.column = key;
+      th.addEventListener("click", () => this.sort(key));
+
+      if (this.sortColumn === key) {
+        th.classList.add(`sort-${this.sortDirection}`);
+      }
+
+      headerRow.appendChild(th);
+    });
+
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    // Create body
+    const tbody = document.createElement("tbody");
+    this.data.forEach((row) => {
+      const tr = document.createElement("tr");
+      Object.values(row).forEach((value) => {
+        const td = document.createElement("td");
+        td.textContent = value;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(tbody);
+    this.container.appendChild(table);
+  }
+
+  sort(column) {
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = "asc";
+    }
+
+    this.data.sort((a, b) => {
+      const aVal = a[column];
+      const bVal = b[column];
+
+      if (this.sortDirection === "asc") {
+        return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+      } else {
+        return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+      }
+    });
+
+    this.render();
+  }
+
+  addRow(row) {
+    this.data.push(row);
+    this.render();
+  }
+
+  removeRow(index) {
+    this.data.splice(index, 1);
+    this.render();
+  }
+}
+```
+
+<BackToTop />
+
+## Performance Considerations
+
+Understanding DOM performance is crucial for building fast, responsive web applications.
+
+### Reflow and Repaint
+
+```javascript
+// Causes multiple reflows (expensive)
+function badExample() {
+  const element = document.getElementById("box");
+  element.style.width = "200px"; // Reflow
+  element.style.height = "200px"; // Reflow
+  element.style.margin = "10px"; // Reflow
+}
+
+// Better: Batch style changes
+function goodExample() {
+  const element = document.getElementById("box");
+
+  // Method 1: Use cssText
+  element.style.cssText = "width: 200px; height: 200px; margin: 10px;";
+
+  // Method 2: Use CSS classes
+  element.classList.add("large-box");
+
+  // Method 3: Use transform (doesn't cause reflow)
+  element.style.transform = "translateX(100px) scale(2)";
+}
+
+// Problem: Expensive selector queries
+// Bad: Repeated queries
+function updateElements() {
+  document.querySelectorAll(".item").forEach((item) => {
+    item.style.color = "red";
+  });
+
+  document.querySelectorAll(".item").forEach((item) => {
+    item.classList.add("updated");
+  });
+}
+
+// Good: Cache selections
+function updateElements() {
+  const items = document.querySelectorAll(".item");
+
+  items.forEach((item) => {
+    item.style.color = "red";
+    item.classList.add("updated");
+  });
+}
+```
+
+## Tools for DOM Development
+
+Modern web development provides powerful tools to help you work with the DOM effectively.
+
+### Browser Developer Tools
+
+```javascript
+// Using console for DOM debugging
+console.log(document.querySelector(".my-element"));
+console.dir(document.querySelector(".my-element")); // Shows all properties
+
+// Inspect element from console
+inspect(document.querySelector(".my-element"));
+
+// Monitor events on an element
+monitorEvents(document.querySelector("button"), "click");
+unmonitorEvents(document.querySelector("button"));
+
+// Break on DOM modifications
+// In DevTools: Elements > Right-click element > Break on > Subtree modifications
+```
+
+### Console DOM Utilities
+
+```javascript
+// DevTools console provides helpful shortcuts
+$("#myId"); // Same as document.getElementById('myId')
+$(".myClass"); // Same as document.querySelector('.myClass')
+$$(".myClass"); // Same as document.querySelectorAll('.myClass')
+$x('//div[@class="example"]'); // XPath selector
+
+// Copy element to clipboard
+copy(document.querySelector(".my-element"));
+
+// Get event listeners for an element
+getEventListeners(document.querySelector("button"));
+```
+
+### Performance Monitoring
+
+```javascript
+// Measure DOM operation performance
+performance.mark("dom-start");
+
+// Your DOM operations here
+const elements = document.querySelectorAll(".expensive-selector");
+elements.forEach((el) => {
+  el.style.transform = "translateX(100px)";
+});
+
+performance.mark("dom-end");
+performance.measure("dom-operation", "dom-start", "dom-end");
+
+// Check the measurement
+const measures = performance.getEntriesByType("measure");
+console.log("DOM operation took:", measures[0].duration, "ms");
+
+// Observer for DOM mutations
+const observer = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    console.log("DOM changed:", mutation.type, mutation.target);
+  });
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true,
+  attributes: true,
+});
+```
+
+### Popular DOM Libraries
+
+```javascript
+// jQuery (still popular for DOM manipulation)
+// $('selector').method()
+
+// Modern alternatives:
+// - Cash (jQuery alternative): cash('selector').method()
+// - Zepto: $('selector').method()
+// - Vanilla JS helpers:
+
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => document.querySelectorAll(selector);
+
+// Usage
+const element = $("#myId");
+const elements = $$(".myClass");
+```
+
+### Testing DOM Interactions
+
+```javascript
+// Testing with Jest and jsdom
+const { JSDOM } = require("jsdom");
+
+describe("DOM manipulation", () => {
+  let dom;
+  let document;
+
+  beforeEach(() => {
+    dom = new JSDOM("<!DOCTYPE html><html><body></body></html>");
+    document = dom.window.document;
+    global.document = document;
+    global.window = dom.window;
+  });
+
+  test("should create element with correct attributes", () => {
+    const button = document.createElement("button");
+    button.textContent = "Click me";
+    button.className = "btn";
+
+    expect(button.tagName).toBe("BUTTON");
+    expect(button.textContent).toBe("Click me");
+    expect(button.className).toBe("btn");
+  });
+
+  test("should handle click events", () => {
+    const button = document.createElement("button");
+    const mockHandler = jest.fn();
+
+    button.addEventListener("click", mockHandler);
+    button.click();
+
+    expect(mockHandler).toHaveBeenCalledTimes(1);
+  });
+});
+```
+
+<BackToTop />
+
+## Troubleshooting Common Issues
+
+Here are solutions to frequent DOM-related problems developers encounter.
+
+### 1. Element Not Found
+
+```javascript
+// Problem: querySelector returns null
+const element = document.querySelector(".non-existent");
+console.log(element); // null
+
+// Solutions:
+// 1. Check if element exists before using
+const element = document.querySelector(".my-element");
+if (element) {
+  element.style.color = "red";
+} else {
+  console.warn("Element not found");
+}
+
+// 2. Wait for DOM to be ready
+document.addEventListener("DOMContentLoaded", () => {
+  const element = document.querySelector(".my-element");
+  if (element) {
+    // Safe to manipulate
+  }
+});
+
+// 3. Use optional chaining (modern browsers)
+document.querySelector(".my-element")?.style.setProperty("color", "red");
+
+// 4. Create utility function
+function safeQuery(selector, parent = document) {
+  const element = parent.querySelector(selector);
+  if (!element) {
+    console.warn(`Element not found: ${selector}`);
+  }
+  return element;
+}
+```
+
+### 2. Event Listener Not Working
+
+```javascript
+// Problem: Events not firing on dynamically created elements
+function createButton() {
+  const button = document.createElement("button");
+  button.textContent = "Click me";
+  document.body.appendChild(button);
+
+  // This won't work if added before appendChild
+  button.addEventListener("click", () => console.log("Clicked"));
+}
+
+// Solutions:
+// 1. Add event listener after creating and appending
+function createButton() {
+  const button = document.createElement("button");
+  button.textContent = "Click me";
+  button.addEventListener("click", () => console.log("Clicked"));
+  document.body.appendChild(button);
+}
+
+// 2. Use event delegation
+document.body.addEventListener("click", (event) => {
+  if (event.target.tagName === "BUTTON") {
+    console.log("Button clicked");
+  }
+});
+
+// 3. Check for timing issues
+// Make sure DOM is ready
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", setupEvents);
+} else {
+  setupEvents();
+}
+```
+
+### 3. Memory Leaks
+
+```javascript
+// Problem: Event listeners not cleaned up
+class Component {
+  constructor(element) {
+    this.element = element;
+
+    // This creates a memory leak
+    this.element.addEventListener("click", this.handleClick.bind(this));
+  }
+
+  handleClick() {
+    console.log("Clicked");
+  }
+
+  // No cleanup method
+}
+
+// Solution: Proper cleanup
+class Component {
+  constructor(element) {
+    this.element = element;
+    this.boundHandleClick = this.handleClick.bind(this);
+    this.element.addEventListener("click", this.boundHandleClick);
+  }
+
+  handleClick() {
+    console.log("Clicked");
+  }
+
+  destroy() {
+    this.element.removeEventListener("click", this.boundHandleClick);
+    this.element = null;
+  }
+}
+
+// Or use AbortController (modern browsers)
+class ModernComponent {
+  constructor(element) {
+    this.element = element;
+    this.controller = new AbortController();
+
+    this.element.addEventListener("click", this.handleClick.bind(this), {
+      signal: this.controller.signal,
+    });
+  }
+
+  handleClick() {
+    console.log("Clicked");
+  }
+
+  destroy() {
+    this.controller.abort(); // Removes all listeners
+  }
+}
+```
+
+### 4. Styling Issues
+
+```javascript
+// Problem: CSS not applying correctly
+const element = document.querySelector('.my-element');
+
+// This might not work as expected
+element.style.backgroundColor = 'red';
+element.style.margin-top = '10px'; // Syntax error
+
+// Solutions:
+// 1. Use camelCase for CSS properties
+element.style.backgroundColor = 'red';
+element.style.marginTop = '10px';
+
+// 2. Use CSS custom properties
+element.style.setProperty('--custom-color', 'red');
+
+// 3. Use classList for complex styling
+element.classList.add('highlighted');
+
+// 4. Check computed styles
+const computedStyle = window.getComputedStyle(element);
+console.log('Actual color:', computedStyle.color);
+
+// 5. Handle vendor prefixes
+function setTransform(element, value) {
+    const prefixes = ['', '-webkit-', '-moz-', '-ms-', '-o-'];
+    prefixes.forEach(prefix => {
+        element.style.setProperty(prefix + 'transform', value);
+    });
+}
+```
+
+### 5. Cross-Browser Compatibility
+
+```javascript
+// Problem: Different browser behaviors
+// Solution: Feature detection and polyfills
+
+// Check for feature support
+if ("classList" in document.documentElement) {
+  element.classList.add("active");
+} else {
+  // Fallback for older browsers
+  const classes = element.className.split(" ");
+  if (classes.indexOf("active") === -1) {
+    element.className += " active";
+  }
+}
+
+// Modern event listener check
+if (element.addEventListener) {
+  element.addEventListener("click", handler);
+} else if (element.attachEvent) {
+  element.attachEvent("onclick", handler);
+}
+
+// Use polyfills for missing features
+// Example: closest() polyfill
+if (!Element.prototype.closest) {
+  Element.prototype.closest = function (selector) {
+    let element = this;
+    while (element && element.nodeType === 1) {
+      if (element.matches(selector)) {
+        return element;
+      }
+      element = element.parentNode;
+    }
+    return null;
+  };
+}
+```
+
+### 6. Performance Issues
+
+```javascript
+// Problem: Slow DOM operations
+// Bad: Multiple style changes causing reflows
+function animateElement() {
+  const element = document.querySelector(".animate");
+  element.style.width = "200px"; // Reflow
+  element.style.height = "200px"; // Reflow
+  element.style.left = "100px"; // Reflow
+}
+
+// Good: Batch changes
+function animateElement() {
+  const element = document.querySelector(".animate");
+
+  // Method 1: Use cssText
+  element.style.cssText = "width: 200px; height: 200px; left: 100px;";
+
+  // Method 2: Use CSS classes
+  element.classList.add("animated-state");
+
+  // Method 3: Use transform (doesn't cause reflow)
+  element.style.transform = "translateX(100px) scale(2)";
+}
+
+// Problem: Expensive selector queries
+// Bad: Repeated queries
+function updateElements() {
+  document.querySelectorAll(".item").forEach((item) => {
+    item.style.color = "red";
+  });
+
+  document.querySelectorAll(".item").forEach((item) => {
+    item.classList.add("updated");
+  });
+}
+
+// Good: Cache selections
+function updateElements() {
+  const items = document.querySelectorAll(".item");
+
+  items.forEach((item) => {
+    item.style.color = "red";
+    item.classList.add("updated");
+  });
+}
+```
+
+The DOM is where the magic happens in web development. It's what transforms static HTML pages into dynamic, interactive experiences. Master these concepts and techniques, and you'll be able to create engaging user interfaces that respond to user actions and provide seamless interactions!
+
+<BackToTop />

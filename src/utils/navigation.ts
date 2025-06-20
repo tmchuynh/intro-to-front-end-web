@@ -116,7 +116,7 @@ function categorizeNavigationItems(
       path.includes("libraries") ||
       path.includes("typescript") ||
       path.includes("react") ||
-      path.includes("nextjs") ||
+      path.includes("next.js") ||
       title.includes("performance") ||
       title.includes("security") ||
       title.includes("storage") ||
@@ -125,7 +125,7 @@ function categorizeNavigationItems(
       title.includes("library") ||
       title.includes("typescript") ||
       title.includes("react") ||
-      title.includes("nextjs") ||
+      title.includes("next.js") ||
       title.includes("advanced")
     ) {
       categories.advanced.push(item);

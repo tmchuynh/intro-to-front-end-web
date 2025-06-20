@@ -34,7 +34,7 @@ export default function Button({
     <>
       {arrow === "left" && (
         <svg
-          className="w-4 h-4"
+          className="h-4 w-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -50,7 +50,7 @@ export default function Button({
       {children}
       {arrow === "right" && (
         <svg
-          className="w-4 h-4"
+          className="h-4 w-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

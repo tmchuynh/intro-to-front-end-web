@@ -3,6 +3,7 @@ import { JSX } from "react";
 import Button from "./src/components/Button";
 import Guides from "./src/components/Guides";
 import Resources from "./src/components/Resources";
+import CopyButton from "./src/components/CopyToClipboard";
 
 interface Props {
   children: React.ReactNode;
@@ -89,9 +90,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     code: ({ children }) => (
       <code className="my-5 py-1 font-mono text-sm">{children}</code>
     ),
-
     pre: ({ children }) => (
-      <div className="bg-zinc-800 dark:bg-transparent my-5 px-4 border-zinc-700 dark:border-zinc-800 rounded-2xl overflow-y-auto">
+      <div className="relative bg-zinc-800 dark:bg-transparent my-5 px-4 border-zinc-700 dark:border-zinc-800 rounded-2xl overflow-y-auto">
+        <CopyButton textToCopy={children as string} />
         <pre className="my-4 p-4">{children}</pre>
       </div>
     ),
@@ -114,7 +115,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <thead className="bg-gray-50 dark:bg-gray-700">{children}</thead>
     ),
     tbody: ({ children }) => (
-      <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
+      <tbody className="divide-gray-200 dark:divide-gray-600 divide-y">
         {children}
       </tbody>
     ),
@@ -124,7 +125,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       </tr>
     ),
     th: ({ children }) => (
-      <th className="px-6 py-3 border-gray-200 dark:border-gray-600 border-b font-medium text-center text-gray-500 text-xs dark:text-gray-300 uppercase tracking-wider">
+      <th className="px-6 py-3 border-gray-200 dark:border-gray-600 border-b font-medium text-center text-gray-500 text-xs dark:text-gray-300 tracking-wider uppercase">
         {children}
       </th>
     ),

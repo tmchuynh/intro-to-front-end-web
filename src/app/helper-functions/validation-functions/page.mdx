@@ -1,0 +1,147 @@
+import BackToTop from "@/components/BackToTop";
+
+# Validation Functions
+
+## Table of Contents
+
+## Email Validation
+
+```javascript
+// Function to validate an email address
+function validateEmail(email) {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(String(email).toLowerCase());
+}
+```
+
+## Phone Number Validation
+
+```javascript
+// Function to validate a phone number (simple format)
+function validatePhoneNumber(phone) {
+  const re = /^\d{10}$/; // Adjust regex for different formats
+  return re.test(String(phone));
+}
+```
+
+## URL Validation
+
+```javascript
+// Function to validate a URL
+function validateURL(url) {
+  const re = /^(https?:\/\/)?([\w-]+(\.[\w-]+)+)(:\d+)?(\/[\w- .\/?%&=]*)?$/;
+  return re.test(String(url).toLowerCase());
+}
+```
+
+## Password Strength Validation
+
+```javascript
+// Function to validate password strength
+function validatePassword(password) {
+  const re =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  return re.test(String(password));
+}
+```
+
+## Form Validation Example
+
+```javascript
+// Function to validate a form with multiple fields
+function validateForm(form) {
+  const email = form.email.value;
+  const phone = form.phone.value;
+  const url = form.url.value;
+  const password = form.password.value;
+  let isValid = true;
+  if (!validateEmail(email)) {
+    console.error("Invalid email address");
+    isValid = false;
+  }
+  if (!validatePhoneNumber(phone)) {
+    console.error("Invalid phone number");
+    isValid = false;
+  }
+  if (!validateURL(url)) {
+    console.error("Invalid URL");
+    isValid = false;
+  }
+  if (!validatePassword(password)) {
+    console.error("Weak password");
+    isValid = false;
+  }
+  return isValid;
+}
+```
+
+<BackToTop />
+
+## Usage Example
+
+```html
+<form id="myForm" onsubmit="return validateForm(this);">
+  <input type="email" name="email" placeholder="Email" required />
+  <input type="text" name="phone" placeholder="Phone Number" required />
+  <input type="url" name="url" placeholder="Website URL" required />
+  <input type="password" name="password" placeholder="Password" required />
+  <button type="submit">Submit</button>
+</form>
+<script>
+  document
+    .getElementById("myForm")
+    .addEventListener("submit", function (event) {
+      if (!validateForm(this)) {
+        event.preventDefault(); // Prevent form submission if validation fails
+      }
+    });
+</script>
+```
+
+<BackToTop />
+
+## Credit Card Validation
+
+```javascript
+// Function to validate a credit card number using Luhn's algorithm
+function validateCreditCard(cardNumber) {
+  const re = /^\d{16}$/; // Adjust regex for different formats
+  if (!re.test(cardNumber)) {
+    return false;
+  }
+  let sum = 0;
+  let alternate = false;
+  for (let i = cardNumber.length - 1; i >= 0; i--) {
+    let n = parseInt(cardNumber.charAt(i), 10);
+    if (alternate) {
+      n *= 2;
+      if (n > 9) {
+        n -= 9;
+      }
+    }
+    sum += n;
+    alternate = !alternate;
+  }
+  return sum % 10 === 0;
+}
+```
+
+## Date Validation
+
+```javascript
+// Function to validate a date in YYYY-MM-DD format
+function validateDate(dateString) {
+  const re = /^\d{4}-\d{2}-\d{2}$/;
+  if (!re.test(dateString)) {
+    return false;
+  }
+  const date = new Date(dateString);
+  const timestamp = date.getTime();
+  if (typeof timestamp !== "number" || isNaN(timestamp)) {
+    return false; // Invalid date
+  }
+  return date.toISOString().startsWith(dateString);
+}
+```
+
+<BackToTop />

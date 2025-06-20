@@ -4,27 +4,97 @@ import BackToTop from "@/components/BackToTop";
 
 ## Table of Contents
 
+- [HTML Attributes](#html-attributes)
+- [Common HTML Attributes](#common-html-attributes)
+- [Required vs Optional Attributes](#required-vs-optional-attributes)
+- [Global Attributes](#global-attributes)
+- [HTML IDs and Classes](#html-ids-and-classes)
+- [Attribute Syntax and Rules](#attribute-syntax-and-rules)
+- [Boolean Attributes](#boolean-attributes)
+- [Data Attributes](#data-attributes)
+- [Accessibility Attributes](#accessibility-attributes)
+- [Form Attributes](#form-attributes)
+- [Event Attributes](#event-attributes)
+- [Best Practices for Attributes](#best-practices-for-attributes)
+
 ## HTML Attributes
 
-Attributes are additional information provided within an HTML element's start tag. They modify the behavior or appearance of the element, offering more context or functionality.
+**Attributes** provide additional information about HTML elements and are always specified in the start tag. They come in name-value pairs and modify the behavior, appearance, or provide metadata about elements.
+
+The basic syntax for attributes is:
+```html
+<element attribute="value">Content</element>
+```
+
 For example, the `href` attribute in an anchor (`<a>`) tag specifies the URL to which the link points:
 
 ```html
 <a href="https://example.com">Visit Example.com</a>
 ```
 
+### Key Points About Attributes:
+
+1. **Placement**: Attributes are always placed in the opening tag
+2. **Format**: Most attributes follow the `name="value"` format
+3. **Quotes**: Values should be enclosed in quotes (single or double)
+4. **Case-insensitive**: HTML attribute names are case-insensitive
+5. **Spacing**: Attributes are separated by spaces
+
+```html
+<!-- Multiple attributes example -->
+<img src="photo.jpg" alt="A sunset view" width="300" height="200" class="featured-image">
+```
+
 ### Common HTML Attributes
 
-Here are some common HTML attributes you might encounter:
-| Attribute | Description |
-|-----------|-------------|
-| `id` | A unique identifier for the element, used for styling or scripting. |
-| `class` | A class name for styling multiple elements with the same style. |
-| `style` | Inline CSS styles applied directly to the element. |
-| `src` | The source URL for images or scripts. |
-| `alt` | Alternative text for images, improving accessibility. |
-| `href` | The URL for links, defining where the link points. |
-| `title` | Additional information about the element, displayed as a tooltip on hover. |
+Here are the most frequently used HTML attributes across different elements:
+
+| Attribute | Description | Example |
+|-----------|-------------|---------|
+| `id` | A unique identifier for the element, used for styling or scripting. | `<div id="header">` |
+| `class` | A class name for styling multiple elements with the same style. | `<p class="highlight">` |
+| `style` | Inline CSS styles applied directly to the element. | `<span style="color: red;">` |
+| `src` | The source URL for images, scripts, or media files. | `<img src="photo.jpg">` |
+| `alt` | Alternative text for images, improving accessibility. | `<img alt="Mountain view">` |
+| `href` | The URL for links, defining where the link points. | `<a href="/about">` |
+| `title` | Additional information about the element, displayed as a tooltip on hover. | `<button title="Click to save">` |
+| `name` | A name for the element, often used in forms. | `<input name="email">` |
+| `value` | The value of the element, commonly used in form inputs. | `<input value="Default text">` |
+| `type` | Specifies the type of element, especially for inputs. | `<input type="email">` |
+| `lang` | Specifies the language of the element's content. | `<p lang="es">` |
+| `dir` | Specifies the text direction (ltr or rtl). | `<div dir="rtl">` |
+
+### Element-Specific Attributes
+
+Different HTML elements have their own specific attributes:
+
+**Image Attributes:**
+```html
+<img src="beach.jpg" 
+     alt="Tropical beach at sunset" 
+     width="400" 
+     height="300" 
+     loading="lazy">
+```
+
+**Link Attributes:**
+```html
+<a href="https://example.com" 
+   target="_blank" 
+   rel="noopener" 
+   title="Opens in new window">
+   External Link
+</a>
+```
+
+**Form Input Attributes:**
+```html
+<input type="email" 
+       name="user-email" 
+       placeholder="Enter your email" 
+       required 
+       maxlength="50">
+```
 
 ### Required vs Optional Attributes
 
@@ -168,5 +238,669 @@ When naming an element's ID or class, follow these guidelines for clarity and co
 
 - **SMACSS (Scalable Modular Architecture for CSS)**: - **Base**: Universal styles (e.g., body, a). - **Layout**: Defines the page structure (e.g., .nav, .nav-list). - **Module**: Reusable components (e.g., .nav-link). - **State**: Styles based on state (e.g., .nav-link.is-active).
   <BackToTop />
+
+<BackToTop />
+
+## Attribute Syntax and Rules
+
+Understanding proper attribute syntax is crucial for writing valid HTML:
+
+### Basic Syntax Rules
+
+1. **Attribute names are case-insensitive** (but lowercase is recommended):
+   ```html
+   <!-- All of these are equivalent -->
+   <img SRC="photo.jpg">
+   <img src="photo.jpg">
+   <img Src="photo.jpg">
+   ```
+
+2. **Values should be quoted**:
+   ```html
+   <!-- ✅ Correct -->
+   <div class="container">
+   <img alt="A beautiful sunset">
+   
+   <!-- ❌ Can cause issues -->
+   <div class=container>
+   <img alt=A beautiful sunset>
+   ```
+
+3. **Attributes are separated by whitespace**:
+   ```html
+   <input type="text" name="username" id="user-input" required>
+   ```
+
+4. **Order doesn't matter**:
+   ```html
+   <!-- Both are identical -->
+   <img src="photo.jpg" alt="Photo" width="300">
+   <img width="300" alt="Photo" src="photo.jpg">
+   ```
+
+### Quote Usage
+
+You can use either single or double quotes, but be consistent:
+
+```html
+<!-- Double quotes (recommended) -->
+<div class="main-content" id="content">
+
+<!-- Single quotes (also valid) -->
+<div class='main-content' id='content'>
+
+<!-- Mixed quotes (avoid this) -->
+<div class="main-content" id='content'>
+```
+
+### Special Characters in Attributes
+
+When attribute values contain special characters, proper escaping is important:
+
+```html
+<!-- HTML entities in attributes -->
+<p title="Ben &amp; Jerry&#39;s Ice Cream">Favorite Brand</p>
+
+<!-- Quotes within quotes -->
+<button onclick="alert('Hello World!')">Click me</button>
+<button onclick='alert("Hello World!")'>Click me</button>
+```
+
+<BackToTop />
+
+## Boolean Attributes
+
+**Boolean attributes** are attributes that represent true/false values. Their presence indicates "true," and their absence indicates "false."
+
+### Common Boolean Attributes
+
+```html
+<!-- Form-related boolean attributes -->
+<input type="email" required>
+<input type="checkbox" checked>
+<input type="text" disabled>
+<input type="text" readonly>
+
+<!-- Media-related boolean attributes -->
+<video autoplay loop muted>
+  <source src="video.mp4" type="video/mp4">
+</video>
+
+<!-- Other boolean attributes -->
+<details open>
+  <summary>Click to expand</summary>
+  <p>Hidden content here</p>
+</details>
+
+<script async src="script.js"></script>
+<script defer src="another-script.js"></script>
+```
+
+### Boolean Attribute Syntax
+
+There are several ways to write boolean attributes:
+
+```html
+<!-- All of these are equivalent and valid -->
+<input required>
+<input required="">
+<input required="required">
+<input required="true">
+
+<!-- This is how you make it false -->
+<!-- Simply omit the attribute entirely -->
+<input>
+```
+
+### List of Common Boolean Attributes
+
+| Attribute | Used With | Description |
+|-----------|-----------|-------------|
+| `required` | Form inputs | Makes the field mandatory |
+| `disabled` | Form elements | Disables the element |
+| `readonly` | Input/textarea | Makes the field read-only |
+| `checked` | Checkbox/radio | Pre-selects the input |
+| `selected` | Option elements | Pre-selects the option |
+| `multiple` | Select/input | Allows multiple selections |
+| `hidden` | Any element | Hides the element |
+| `autoplay` | Audio/video | Starts playing automatically |
+| `loop` | Audio/video | Repeats playback |
+| `muted` | Audio/video | Starts muted |
+| `controls` | Audio/video | Shows playback controls |
+| `open` | Details element | Expands the details |
+| `async` | Script element | Loads script asynchronously |
+| `defer` | Script element | Defers script execution |
+
+<BackToTop />
+
+## Data Attributes
+
+**Data attributes** allow you to store custom data directly in HTML elements. They always start with `data-` followed by your custom name.
+
+### Basic Data Attribute Syntax
+
+```html
+<div data-user-id="12345" 
+     data-user-role="admin" 
+     data-last-login="2024-01-15">
+  User Information
+</div>
+
+<button data-action="delete" 
+        data-confirm-message="Are you sure you want to delete this item?">
+  Delete Item
+</button>
+
+<article data-category="technology" 
+         data-published="2024-01-10" 
+         data-author="jane-doe">
+  Article content here
+</article>
+```
+
+### Naming Rules for Data Attributes
+
+1. **Must start with `data-`**
+2. **Use lowercase letters**
+3. **Use hyphens to separate words**
+4. **No uppercase letters after `data-`**
+5. **No special characters except hyphens**
+
+```html
+<!-- ✅ Correct data attribute names -->
+<div data-user-name="John">
+<div data-product-id="abc123">
+<div data-is-premium="true">
+
+<!-- ❌ Incorrect data attribute names -->
+<div data-userName="John">      <!-- No camelCase -->
+<div data-product_id="abc123">  <!-- No underscores -->
+<div data-is.premium="true">    <!-- No dots -->
+```
+
+### Accessing Data Attributes with CSS
+
+You can use data attributes in CSS selectors:
+
+```css
+/* Style elements based on data attributes */
+[data-status="active"] {
+  background-color: green;
+}
+
+[data-priority="high"] {
+  border: 2px solid red;
+}
+
+/* Use attribute values in CSS content */
+.user-card::after {
+  content: attr(data-user-role);
+}
+```
+
+### Accessing Data Attributes with JavaScript
+
+Data attributes are easily accessible through JavaScript:
+
+```html
+<div id="product" 
+     data-product-id="12345" 
+     data-price="29.99" 
+     data-category="electronics">
+  Product Information
+</div>
+
+<script>
+const product = document.getElementById('product');
+
+// Access using dataset
+console.log(product.dataset.productId);  // "12345"
+console.log(product.dataset.price);      // "29.99"
+console.log(product.dataset.category);   // "electronics"
+
+// Set new data attributes
+product.dataset.inStock = "true";
+product.dataset.lastUpdated = "2024-01-15";
+</script>
+```
+
+### Practical Use Cases
+
+**1. Configuration Data:**
+```html
+<div class="carousel" 
+     data-auto-play="true" 
+     data-slide-duration="3000" 
+     data-show-dots="false">
+  <!-- Carousel content -->
+</div>
+```
+
+**2. User Interaction Data:**
+```html
+<button class="vote-btn" 
+        data-post-id="456" 
+        data-current-votes="23" 
+        data-user-voted="false">
+  Vote (23)
+</button>
+```
+
+**3. Styling Hooks:**
+```html
+<div class="progress-bar" data-progress="75">
+  <div class="progress-fill"></div>
+</div>
+```
+
+<BackToTop />
+
+## Accessibility Attributes
+
+**Accessibility attributes** help make web content usable by people with disabilities. These attributes work with assistive technologies like screen readers.
+
+### ARIA Attributes
+
+**ARIA (Accessible Rich Internet Applications)** attributes provide semantic information about elements:
+
+```html
+<!-- aria-label provides accessible name -->
+<button aria-label="Close dialog">×</button>
+
+<!-- aria-describedby references descriptive text -->
+<input type="password" 
+       aria-describedby="pwd-help">
+<div id="pwd-help">Password must be at least 8 characters</div>
+
+<!-- aria-expanded indicates collapsible state -->
+<button aria-expanded="false" 
+        aria-controls="menu">
+  Menu
+</button>
+<ul id="menu" aria-hidden="true">
+  <li>Home</li>
+  <li>About</li>
+  <li>Contact</li>
+</ul>
+```
+
+### Common Accessibility Attributes
+
+| Attribute | Description | Example |
+|-----------|-------------|---------|
+| `alt` | Alternative text for images | `<img alt="Company logo">` |
+| `aria-label` | Accessible name for elements | `<button aria-label="Search">🔍</button>` |
+| `aria-describedby` | References descriptive text | `<input aria-describedby="help-text">` |
+| `aria-labelledby` | References labeling text | `<input aria-labelledby="label-id">` |
+| `aria-hidden` | Hides decorative elements | `<span aria-hidden="true">👍</span>` |
+| `role` | Defines element's purpose | `<div role="button">` |
+| `tabindex` | Controls keyboard navigation | `<div tabindex="0">` |
+| `aria-expanded` | Indicates if collapsible content is open | `<button aria-expanded="true">` |
+| `aria-required` | Indicates required form fields | `<input aria-required="true">` |
+| `aria-invalid` | Indicates form validation state | `<input aria-invalid="true">` |
+
+### Form Accessibility
+
+```html
+<form>
+  <!-- Label association -->
+  <label for="email">Email Address</label>
+  <input type="email" 
+         id="email" 
+         name="email" 
+         required
+         aria-describedby="email-help"
+         aria-invalid="false">
+  <div id="email-help">We'll never share your email</div>
+
+  <!-- Fieldset for grouping -->
+  <fieldset>
+    <legend>Preferred Contact Method</legend>
+    <input type="radio" id="contact-email" name="contact" value="email">
+    <label for="contact-email">Email</label>
+    
+    <input type="radio" id="contact-phone" name="contact" value="phone">
+    <label for="contact-phone">Phone</label>
+  </fieldset>
+
+  <!-- Error state -->
+  <input type="text" 
+         aria-required="true" 
+         aria-invalid="true" 
+         aria-describedby="error-msg">
+  <div id="error-msg" role="alert">This field is required</div>
+</form>
+```
+
+### Navigation Accessibility
+
+```html
+<!-- Skip navigation link -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- Navigation landmarks -->
+<nav aria-label="Main navigation">
+  <ul>
+    <li><a href="/" aria-current="page">Home</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- Main content landmark -->
+<main id="main-content">
+  <h1>Page Title</h1>
+  <!-- Page content -->
+</main>
+```
+
+<BackToTop />
+
+## Form Attributes
+
+**Form attributes** control the behavior and validation of form elements:
+
+### Input Attributes
+
+```html
+<!-- Text input with various attributes -->
+<input type="text" 
+       name="username"
+       id="username"
+       placeholder="Enter username"
+       required
+       minlength="3"
+       maxlength="20"
+       autocomplete="username"
+       spellcheck="false">
+
+<!-- Email input with validation -->
+<input type="email" 
+       name="email"
+       pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+       title="Please enter a valid email address"
+       required>
+
+<!-- Number input with constraints -->
+<input type="number" 
+       name="age"
+       min="18"
+       max="120"
+       step="1"
+       value="25">
+
+<!-- File input with restrictions -->
+<input type="file" 
+       name="avatar"
+       accept="image/*"
+       multiple="false">
+```
+
+### Form Element Attributes
+
+| Attribute | Description | Example |
+|-----------|-------------|---------|
+| `action` | URL where form data is sent | `<form action="/submit">` |
+| `method` | HTTP method (GET or POST) | `<form method="post">` |
+| `enctype` | Encoding type for form data | `<form enctype="multipart/form-data">` |
+| `autocomplete` | Controls form auto-completion | `<form autocomplete="off">` |
+| `novalidate` | Disables HTML5 validation | `<form novalidate>` |
+| `target` | Where to display response | `<form target="_blank">` |
+
+### Input Validation Attributes
+
+```html
+<!-- Password with requirements -->
+<input type="password" 
+       name="password"
+       required
+       minlength="8"
+       pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+       title="Must contain at least one number, one uppercase and lowercase letter, and be 8+ characters">
+
+<!-- Date input with range -->
+<input type="date" 
+       name="birth-date"
+       min="1900-01-01"
+       max="2024-12-31"
+       required>
+
+<!-- URL input -->
+<input type="url" 
+       name="website"
+       placeholder="https://example.com"
+       pattern="https://.*">
+```
+
+### Select and Option Attributes
+
+```html
+<select name="country" required>
+  <option value="">Choose a country</option>
+  <option value="us" selected>United States</option>
+  <option value="ca">Canada</option>
+  <option value="uk" disabled>United Kingdom (Coming Soon)</option>
+</select>
+
+<!-- Multiple selection -->
+<select name="interests" multiple size="4">
+  <option value="coding">Programming</option>
+  <option value="design">Design</option>
+  <option value="music">Music</option>
+  <option value="sports">Sports</option>
+</select>
+```
+
+<BackToTop />
+
+## Event Attributes
+
+**Event attributes** allow you to run JavaScript code when specific events occur:
+
+### Common Event Attributes
+
+```html
+<!-- Click events -->
+<button onclick="alert('Button clicked!')">Click Me</button>
+<div onclick="toggleMenu()" onmouseover="showTooltip()" onmouseout="hideTooltip()">
+  Interactive Element
+</div>
+
+<!-- Form events -->
+<form onsubmit="return validateForm()">
+  <input type="text" 
+         onchange="updatePreview()" 
+         oninput="liveValidation()"
+         onfocus="highlightField()"
+         onblur="validateField()">
+  <button type="submit">Submit</button>
+</form>
+
+<!-- Keyboard events -->
+<input type="text" 
+       onkeydown="handleKeyDown(event)"
+       onkeyup="handleKeyUp(event)"
+       onkeypress="handleKeyPress(event)">
+
+<!-- Window/document events -->
+<body onload="initializePage()" 
+      onresize="handleResize()" 
+      onscroll="handleScroll()">
+```
+
+### Event Attribute Categories
+
+**Mouse Events:**
+- `onclick` - Element is clicked
+- `ondblclick` - Element is double-clicked
+- `onmousedown` - Mouse button is pressed
+- `onmouseup` - Mouse button is released
+- `onmouseover` - Mouse enters element
+- `onmouseout` - Mouse leaves element
+- `onmousemove` - Mouse moves over element
+
+**Keyboard Events:**
+- `onkeydown` - Key is pressed down
+- `onkeyup` - Key is released
+- `onkeypress` - Key is pressed and released
+
+**Form Events:**
+- `onsubmit` - Form is submitted
+- `onreset` - Form is reset
+- `onchange` - Input value changes
+- `oninput` - Input receives user input
+- `onfocus` - Element receives focus
+- `onblur` - Element loses focus
+
+**Window Events:**
+- `onload` - Page finishes loading
+- `onunload` - Page is being unloaded
+- `onresize` - Window is resized
+- `onscroll` - Page is scrolled
+
+### Modern Approach: Avoid Inline Event Handlers
+
+While event attributes work, modern best practice is to use JavaScript event listeners:
+
+```html
+<!-- ❌ Inline event handler -->
+<button onclick="handleClick()">Click Me</button>
+
+<!-- ✅ Better approach -->
+<button id="my-button">Click Me</button>
+<script>
+document.getElementById('my-button').addEventListener('click', function() {
+  // Handle click event
+});
+</script>
+```
+
+<BackToTop />
+
+## Best Practices for Attributes
+
+Following these best practices will help you write clean, maintainable, and accessible HTML:
+
+### 1. Use Semantic and Descriptive Values
+
+Choose attribute values that clearly describe their purpose:
+
+```html
+<!-- ✅ Good: Descriptive IDs and classes -->
+<div id="main-navigation" class="primary-menu">
+<button id="submit-form" class="btn btn-primary">
+<img src="logo.png" alt="Company Logo" class="site-logo">
+
+<!-- ❌ Poor: Non-descriptive values -->
+<div id="div1" class="blue-thing">
+<button id="btn123" class="big">
+<img src="logo.png" alt="image" class="img1">
+```
+
+### 2. Maintain Consistency
+
+Use consistent naming conventions throughout your project:
+
+```html
+<!-- ✅ Consistent kebab-case -->
+<div class="user-profile">
+  <h2 class="user-name">John Doe</h2>
+  <p class="user-bio">Software developer</p>
+  <button class="contact-button">Contact</button>
+</div>
+
+<!-- ❌ Inconsistent naming -->
+<div class="userProfile">
+  <h2 class="user_name">John Doe</h2>
+  <p class="UserBio">Software developer</p>
+  <button class="contactbutton">Contact</button>
+</div>
+```
+
+### 3. Minimize Inline Styles
+
+Avoid using the `style` attribute for styling; use CSS classes instead:
+
+```html
+<!-- ✅ Good: CSS classes -->
+<div class="alert alert-success">
+  Success message
+</div>
+
+<!-- ❌ Poor: Inline styles -->
+<div style="background-color: green; color: white; padding: 10px; border-radius: 4px;">
+  Success message
+</div>
+```
+
+### 4. Always Include Alt Text for Images
+
+Provide meaningful alternative text for all images:
+
+```html
+<!-- ✅ Good: Descriptive alt text -->
+<img src="chart.png" alt="Sales increased by 25% from Q1 to Q2 2024">
+<img src="profile.jpg" alt="Jane Smith, CEO">
+
+<!-- ❌ Poor: Generic or missing alt text -->
+<img src="chart.png" alt="image">
+<img src="profile.jpg" alt="">
+```
+
+### 5. Use Required Attributes Appropriately
+
+Include all necessary attributes for functionality and accessibility:
+
+```html
+<!-- ✅ Complete form input -->
+<label for="email">Email Address</label>
+<input type="email" 
+       id="email" 
+       name="email" 
+       required 
+       autocomplete="email"
+       aria-describedby="email-help">
+<div id="email-help">We'll never share your email address</div>
+
+<!-- ❌ Minimal form input -->
+<input type="email">
+```
+
+### 6. Validate Your HTML
+
+Always validate your HTML to ensure proper attribute usage:
+
+- Use the [W3C HTML Validator](https://validator.w3.org/)
+- Check for typos in attribute names
+- Ensure all required attributes are present
+- Verify proper quote usage
+
+### 7. Quote All Attribute Values
+
+Even when not strictly required, always quote attribute values:
+
+```html
+<!-- ✅ Always quoted -->
+<div class="container" id="main">
+<img src="photo.jpg" width="300" height="200">
+
+<!-- ❌ Inconsistent quoting -->
+<div class=container id="main">
+<img src="photo.jpg" width=300 height=200>
+```
+
+### 8. Order Attributes Logically
+
+Consider using a consistent order for attributes:
+
+```html
+<!-- Suggested order: structural → behavioral → styling -->
+<input type="email" 
+       id="user-email" 
+       name="email" 
+       required 
+       placeholder="Enter your email" 
+       class="form-input">
+```
 
 <BackToTop />

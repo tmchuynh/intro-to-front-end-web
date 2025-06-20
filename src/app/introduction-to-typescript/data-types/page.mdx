@@ -1,0 +1,217 @@
+import BackToTop from "@/components/BackToTop";
+
+# Data Types
+
+## Table of Contents
+
+## What are Data Types?
+
+Data types in TypeScript are a way to define the kind of data that can be stored in a variable. They help ensure that the data being used in your application is of the expected type, which can prevent errors and improve code quality.
+
+## Why Use Data Types?
+
+Using data types in TypeScript provides several benefits:
+
+- **Type Safety**: Ensures that variables are used consistently and correctly.
+- **Code Clarity**: Makes the code more readable and understandable.
+- **Error Prevention**: Catches potential errors at compile time rather than runtime.
+- **Intellisense Support**: Provides better autocompletion and documentation in IDEs.
+
+## Simple Data Types in TypeScript
+
+| Data Type | Description                                                                                                     |
+| --------- | --------------------------------------------------------------------------------------------------------------- |
+| `number`  | Represents both integer and floating-point numbers. Examples: `42`, `3.14`.                                     |
+| `string`  | Represents a sequence of characters. Examples: `"Hello"`, `'World'`.                                            |
+| `boolean` | Represents a logical value, either `true` or `false`. Examples: `true`, `false`.                                |
+| `bigint`  | Represents integers with arbitrary precision. Examples: `9007199254740991n`, `12345678901234567890n`.           |
+| `symbol`  | Represents a unique and immutable value, often used as object property keys. Examples: `Symbol('description')`. |
+
+### Example Usage
+
+```typescript
+let age: number = 30; // number type
+let name: string = "Alice"; // string type
+let isActive: boolean = true; // boolean type
+let bigNumber: bigint = 12345678901234567890n; // bigint type
+let uniqueId: symbol = Symbol("id"); // symbol type
+```
+
+<BackToTop />
+## Special Data Types
+
+| Data Type   | Description                                                                                                                 |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `any`       | Represents any type of value. It can be used when you don't know the type in advance or want to opt-out of type checking.   |
+| `unknown`   | Similar to `any`, but safer. It requires type checking before performing operations on the value.                           |
+| `void`      | Represents the absence of a value, typically used for functions that do not return a value.                                 |
+| `null`      | Represents a deliberate absence of any value. It is often used to indicate that a variable has no value.                    |
+| `undefined` | Represents a variable that has been declared but not assigned a value. It is the default value for uninitialized variables. |
+| `never`     | Represents a value that never occurs, such as a function that always throws an error or never returns.                      |
+
+### Example Usage
+
+```typescript
+let anything: any = "Hello"; // any type
+let unknownValue: unknown = 42; // unknown type
+let voidValue: void = undefined; // void type
+let nullValue: null = null; // null type
+let undefinedValue: undefined; // undefined type
+function throwError(): never {
+  throw new Error("This function always throws an error.");
+}
+```
+
+<BackToTop />
+
+## Arrays
+
+Arrays in TypeScript can hold multiple values of the same type. You can define an array using the `type[]` syntax or the `Array<type>` syntax.
+
+### Example Usage
+
+```typescript
+let numbers: number[] = [1, 2, 3, 4, 5]; // Array of numbers
+let strings: Array<string> = ["apple", "banana", "cherry"]; // Array of strings
+let mixed: (number | string)[] = [1, "two", 3, "four"]; // Array of mixed types
+```
+
+## Tuples
+
+Tuples are a special type of array that can hold values of different types in a fixed order. You can define a tuple using the `[type1, type2, ...]` syntax.
+
+### Example Usage
+
+```typescript
+let person: [string, number] = ["Alice", 30]; // Tuple with a string and a number
+let coordinates: [number, number] = [10.5, 20.3]; // Tuple with two numbers
+let mixedTuple: [string, number, boolean] = ["Bob", 25, true]; // Tuple with mixed types
+```
+
+<BackToTop />
+
+## Objects
+
+Objects in TypeScript are collections of key-value pairs, where keys are strings (or symbols) and values can be of any type. You can define an object using the `{ key: type }` syntax.
+
+### Example Usage
+
+```typescript
+let person: { name: string; age: number; isActive: boolean } = {
+  name: "Alice",
+  age: 30,
+  isActive: true,
+}; // Object with specific properties
+let product: { id: number; name: string; price: number } = {
+  id: 1,
+  name: "Laptop",
+  price: 999.99,
+}; // Object representing a product
+let user: { username: string; email: string; isAdmin?: boolean } = {
+  username: "john_doe",
+  email: "john_doe@sample.com",
+  isAdmin: true, // Optional property
+}; // Object with an optional property
+```
+
+## Enums
+
+Enums are a way to define a set of named constants. They can be numeric or string-based. Enums improve code readability and maintainability by giving meaningful names to values.
+
+### Example Usage
+
+```typescript
+enum Direction {
+  Up = "UP",
+  Down = "DOWN",
+  Left = "LEFT",
+  Right = "RIGHT",
+} // String enum
+enum Status {
+  Active = 1,
+  Inactive = 0,
+  Pending = -1,
+} // Numeric enum
+let currentDirection: Direction = Direction.Up; // Using enum
+let currentStatus: Status = Status.Active; // Using numeric enum
+```
+
+<BackToTop />
+
+## Interfaces
+
+Interfaces in TypeScript are used to define the structure of an object. They allow you to specify the properties and methods that an object should have, providing a way to enforce type checking.
+
+### Example Usage
+
+```typescript
+interface User {
+  username: string;
+  email: string;
+  isAdmin?: boolean; // Optional property
+}
+let user: User = {
+  username: "john_doe",
+  email: "john_doe@sample.com",
+  isAdmin: true, // Optional property
+}; // Object adhering to the User interface
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+}
+let product: Product = {
+  id: 1,
+  name: "Laptop",
+  price: 999.99,
+}; // Object adhering to the Product interface
+```
+
+<BackToTop />
+
+## Type Aliases
+
+Type aliases in TypeScript allow you to create a new name for a type. They can be used to simplify complex types or to create more readable code.
+
+### Example Usage
+
+```typescript
+type Point = { x: number; y: number }; // Type alias for a point
+let point: Point = { x: 10, y: 20 }; // Using the Point type alias
+type StringOrNumber = string | number; // Type alias for a union type
+let value: StringOrNumber = "Hello"; // Using the StringOrNumber type alias
+let anotherValue: StringOrNumber = 42; // Using the StringOrNumber type alias
+```
+
+## Union Types
+
+Union types allow you to define a variable that can hold multiple types. This is useful when a value can be one of several types.
+
+### Example Usage
+
+```typescript
+let value: string | number; // Union type
+value = "Hello"; // Assigning a string
+value = 42; // Assigning a number
+let mixed: (string | number)[] = ["apple", 1, "banana", 2]; // Array with union types
+```
+
+## Casting Types
+
+In TypeScript, you can cast a variable from one type to another using type assertions. This is useful when you know more about the type of a variable than TypeScript does.
+
+### Example Usage
+
+```typescript
+let value: any = "Hello, TypeScript!";
+let strLength: number = (value as string).length; // Casting to string type
+let numValue: any = 42;
+let num: number = <number>numValue; // Casting to number type
+let element = document.getElementById("myElement");
+if (element) {
+  let inputElement = element as HTMLInputElement; // Casting to HTMLInputElement type
+  inputElement.value = "TypeScript is awesome!";
+}
+```
+
+<BackToTop />

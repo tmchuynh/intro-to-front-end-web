@@ -1,0 +1,263 @@
+import BackToTop from "@/components/BackToTop";
+
+# DOM Events
+
+## Table of Contents
+
+## Introduction to DOM Events
+
+The Document Object Model (DOM) Events API provides a structured way to handle user interactions and system-generated events within web applications. This API allows developers to create dynamic, interactive experiences by responding to actions such as clicks, key presses, and other user inputs. Understanding how to effectively utilize DOM events is essential for building responsive and engaging web applications.
+
+## Strategic Importance of DOM Events in Web Development
+
+DOM events are a fundamental aspect of modern web development, enabling developers to create interactive and responsive user interfaces. Mastering DOM events is crucial for several reasons:
+
+- **User Interaction**: DOM events allow developers to respond to user actions, such as clicks, key presses, and mouse movements, creating a dynamic user experience.
+- **Event-Driven Architecture**: The event-driven nature of DOM events enables developers to build applications that react to user inputs and system changes, enhancing responsiveness and interactivity.
+- **Separation of Concerns**: By using event listeners, developers can separate the logic of handling user interactions from the rest of the application code, promoting cleaner and more maintainable code structures.
+- **Cross-Browser Compatibility**: The DOM Events API provides a standardized way to handle events across different browsers, ensuring consistent behavior and reducing compatibility issues.
+
+## Core DOM Events and Their Usage
+
+Understanding the core DOM events and their usage is essential for building interactive web applications. Here are some of the most commonly used DOM events:
+| Event Type | Description |
+| ---------------- | --------------------------------------------------------------------------- |
+| `click` | Triggered when an element is clicked by the user. |
+| `dblclick` | Triggered when an element is double-clicked by the user. |
+| `mouseover` | Triggered when the mouse pointer enters an element. |
+| `mouseout` | Triggered when the mouse pointer leaves an element. |
+| `keydown` | Triggered when a key is pressed down. |
+| `keyup` | Triggered when a key is released. |
+| `submit` | Triggered when a form is submitted. |
+| `change` | Triggered when the value of an input element changes. |
+| `focus` | Triggered when an element receives focus. |
+| `blur` | Triggered when an element loses focus. |
+| `load` | Triggered when a resource, such as an image or script, has finished loading. |
+| `resize` | Triggered when the browser window is resized. |
+| `scroll` | Triggered when an element is scrolled. |
+| `contextmenu` | Triggered when the right mouse button is clicked, opening the context menu. |
+| `drag` | Triggered when an element is being dragged. |
+| `drop` | Triggered when a dragged element is dropped onto a valid drop target. |
+| `touchstart` | Triggered when a touch point is placed on the touch surface. |
+| `touchmove` | Triggered when a touch point is moved along the touch surface. |
+| `touchend` | Triggered when a touch point is removed from the touch surface. |
+| `animationstart` | Triggered when a CSS animation starts. |
+| `animationend` | Triggered when a CSS animation ends. |
+| `transitionend` | Triggered when a CSS transition ends. |
+
+## Example: Adding Event Listeners
+
+```javascript
+// Mouse events
+element.addEventListener("click", handleClick);
+element.addEventListener("dblclick", handleDoubleClick);
+element.addEventListener("mousedown", handleMouseDown);
+element.addEventListener("mouseup", handleMouseUp);
+element.addEventListener("mouseover", handleMouseOver);
+element.addEventListener("mouseout", handleMouseOut);
+element.addEventListener("mousemove", handleMouseMove);
+
+// Keyboard events
+document.addEventListener("keydown", handleKeyDown);
+document.addEventListener("keyup", handleKeyUp);
+document.addEventListener("keypress", handleKeyPress);
+
+// Form events
+form.addEventListener("submit", handleSubmit);
+input.addEventListener("change", handleChange);
+input.addEventListener("input", handleInput); // Fires on every character
+input.addEventListener("focus", handleFocus);
+input.addEventListener("blur", handleBlur);
+
+// Window events
+window.addEventListener("load", handlePageLoad);
+window.addEventListener("resize", handleWindowResize);
+window.addEventListener("scroll", handleScroll);
+window.addEventListener("beforeunload", handleBeforeUnload);
+```
+
+### Event Object Properties
+
+The event object provides essential information about the event that occurred. Here are some key properties:
+
+- `type`: The type of event (e.g., "click", "keydown").
+- `target`: The element that triggered the event.
+- `currentTarget`: The element to which the event listener is attached.
+- `timeStamp`: The time at which the event was created.
+- `bubbles`: Indicates whether the event bubbles up through the DOM.
+- `cancelable`: Indicates whether the event can be canceled.
+- `defaultPrevented`: Indicates whether the default action of the event has been prevented.
+- `composed`: Indicates whether the event can cross the shadow DOM boundary.
+- `clientX` and `clientY`: The mouse position relative to the viewport (for mouse events).
+- `key`: The value of the key pressed (for keyboard events).
+
+These properties allow you to access detailed information about the event, enabling you to implement complex interactions and behaviors in your web applications.
+
+<BackToTop />
+
+## Event Fundamentals
+
+Events are actions or occurrences that happen in the browser, which can be triggered by user interactions or system processes. The DOM Events API provides a way to listen for these events and respond accordingly. Here are some key concepts:
+
+### Event Listeners
+
+Event listeners are functions that are executed in response to specific events. They can be added to any DOM element using the `addEventListener` method. This method takes two arguments: the event type (e.g., "click", "keydown") and the callback function that will be executed when the event occurs.
+
+```javascript
+// Basic event listener
+const button = document.querySelector("#myButton");
+
+button.addEventListener("click", function (event) {
+  console.log("Button clicked!");
+  console.log("Event type:", event.type);
+  console.log("Target element:", event.target);
+});
+
+// Arrow function syntax
+button.addEventListener("click", (event) => {
+  console.log("Button clicked with arrow function!");
+});
+
+// Named function (easier to remove later)
+function handleButtonClick(event) {
+  console.log("Button clicked with named function!");
+}
+
+button.addEventListener("click", handleButtonClick);
+
+// Remove event listener
+button.removeEventListener("click", handleButtonClick);
+```
+
+### Removing Event Listeners
+
+To stop listening for an event, you can remove the event listener using the `removeEventListener` method. This method requires the same event type and callback function that was used to add the listener.
+
+```javascript
+// Remove an event listener
+function handleButtonClick(event) {
+  console.log("Button clicked!", event);
+}
+button.addEventListener("click", handleButtonClick);
+// Later, remove the event listener
+button.removeEventListener("click", handleButtonClick);
+```
+
+### Event Handling
+
+Here's an example of a comprehensive event handler that demonstrates how to access various properties of the event object:
+
+```html
+<button id="myButton">Click Me!</button>
+```
+
+```javascript
+// Comprehensive event handler
+function handleButtonClick(event) {
+  console.log("Button clicked!");
+  console.log("Event type:", event.type);
+  console.log("Target element:", event.target);
+  console.log("Current target:", event.currentTarget);
+  console.log("Event coordinates:", {
+    x: event.clientX,
+    y: event.clientY,
+  });
+  // Prevent default action if necessary
+  event.preventDefault();
+  // Stop propagation if necessary
+  event.stopPropagation();
+}
+const button = document.querySelector("#myButton");
+button.addEventListener("click", handleButtonClick);
+```
+
+### Event Delegation
+
+Event delegation is a powerful technique that allows you to handle events at a higher level in the DOM hierarchy, rather than attaching event listeners to individual elements. This is particularly useful for dynamically generated content or when you have many similar elements. By attaching a single event listener to a parent element, you can manage events for all child elements that match a specific selector.
+
+```html
+<ul id="myList">
+  <li>Item 1</li>
+  <li>Item 2</li>
+  <li>Item 3</li>
+</ul>
+```
+
+```javascript
+// Instead of adding listeners to many child elements,
+// add one listener to the parent and check the target
+const list = document.querySelector("#myList");
+
+list.addEventListener("click", function (event) {
+  // Check if clicked element is a list item
+  if (event.target.tagName === "LI") {
+    console.log("List item clicked:", event.target.textContent);
+    event.target.classList.toggle("selected");
+  }
+
+  // Or use closest() to find the nearest matching ancestor
+  const listItem = event.target.closest("li");
+  if (listItem) {
+    console.log("Clicked on or inside list item:", listItem.textContent);
+  }
+});
+
+// This works even for dynamically added elements!
+const newItem = document.createElement("li");
+newItem.textContent = "New item";
+list.appendChild(newItem); // Will respond to clicks automatically
+```
+
+### Event Propagation
+
+Event propagation refers to the way events travel through the DOM. There are two phases: capturing and bubbling. In the capturing phase, the event starts from the root and goes down to the target element, while in the bubbling phase, the event starts from the target element and goes up to the root. You can control this behavior using the `addEventListener` method's third argument, which specifies whether to use capturing or bubbling.
+
+```javascript
+// Event listener with capturing phase
+button.addEventListener(
+  "click",
+  function (event) {
+    console.log("Button clicked in capturing phase!", event);
+  },
+  true
+); // true for capturing, false for bubbling (default)
+```
+
+### Custom Events
+
+Custom events allow you to create and dispatch your own events, which can be useful for decoupling components or triggering specific actions in response to certain conditions. They can carry additional data through the `detail` property. It is a powerful feature for building modular and reusable components.
+
+```javascript
+// Create a custom event
+const customEvent = new CustomEvent("userLogin", {
+  detail: {
+    username: "john_doe",
+    timestamp: new Date(),
+  },
+});
+
+// Dispatch the custom event
+document.dispatchEvent(customEvent);
+
+// Listen for the custom event
+document.addEventListener("userLogin", function (event) {
+  console.log("User logged in:", event.detail.username);
+  console.log("Login time:", event.detail.timestamp);
+});
+
+// More complex custom event
+function createNotification(message, type = "info") {
+  const event = new CustomEvent("notification", {
+    detail: { message, type },
+    bubbles: true,
+    cancelable: true,
+  });
+
+  document.dispatchEvent(event);
+}
+
+// Usage
+createNotification("User data saved successfully!", "success");
+```
+
+<BackToTop />

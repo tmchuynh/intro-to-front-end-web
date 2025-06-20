@@ -76,6 +76,45 @@ window.addEventListener("scroll", handleScroll);
 window.addEventListener("beforeunload", handleBeforeUnload);
 ```
 
+### Event Types and Objects
+
+```javascript
+// Mouse events
+element.addEventListener("click", handleClick);
+element.addEventListener("dblclick", handleDoubleClick);
+element.addEventListener("mousedown", handleMouseDown);
+element.addEventListener("mouseup", handleMouseUp);
+element.addEventListener("mouseover", handleMouseOver);
+element.addEventListener("mouseout", handleMouseOut);
+element.addEventListener("mousemove", handleMouseMove);
+
+// Keyboard events
+element.addEventListener("keydown", handleKeyDown);
+element.addEventListener("keyup", handleKeyUp);
+element.addEventListener("keypress", handleKeyPress);
+
+// Form events
+form.addEventListener("submit", handleSubmit);
+input.addEventListener("change", handleChange);
+input.addEventListener("input", handleInput);
+input.addEventListener("focus", handleFocus);
+input.addEventListener("blur", handleBlur);
+
+// Event object properties
+function handleEvent(event) {
+  console.log("Event type:", event.type);
+  console.log("Target element:", event.target);
+  console.log("Current target:", event.currentTarget);
+  console.log("Mouse position:", event.clientX, event.clientY);
+  console.log("Key pressed:", event.key);
+  console.log("Modifier keys:", {
+    ctrl: event.ctrlKey,
+    alt: event.altKey,
+    shift: event.shiftKey,
+  });
+}
+```
+
 ### Event Object Properties
 
 The event object provides essential information about the event that occurred. Here are some key properties:
@@ -98,6 +137,35 @@ These properties allow you to access detailed information about the event, enabl
 ## Event Fundamentals
 
 Events are actions or occurrences that happen in the browser, which can be triggered by user interactions or system processes. The DOM Events API provides a way to listen for these events and respond accordingly. Here are some key concepts:
+
+### Basic Event Handling
+
+```javascript
+// Method 1: HTML attribute (not recommended)
+// <button onclick="handleClick()">Click me</button>
+
+// Method 2: DOM property
+const button = document.getElementById("myButton");
+button.onclick = function (event) {
+  console.log("Button clicked!");
+};
+
+// Method 3: addEventListener (recommended)
+button.addEventListener("click", function (event) {
+  console.log("Button clicked with addEventListener!");
+});
+
+// Arrow function syntax
+button.addEventListener("click", (event) => {
+  console.log("Button clicked with arrow function!");
+});
+
+// Named function for reusability
+function handleButtonClick(event) {
+  console.log("Button clicked with named function!");
+}
+button.addEventListener("click", handleButtonClick);
+```
 
 ### Event Listeners
 
@@ -208,19 +276,63 @@ newItem.textContent = "New item";
 list.appendChild(newItem); // Will respond to clicks automatically
 ```
 
-### Event Propagation
-
-Event propagation refers to the way events travel through the DOM. There are two phases: capturing and bubbling. In the capturing phase, the event starts from the root and goes down to the target element, while in the bubbling phase, the event starts from the target element and goes up to the root. You can control this behavior using the `addEventListener` method's third argument, which specifies whether to use capturing or bubbling.
+### Event Propagation and Control
 
 ```javascript
-// Event listener with capturing phase
-button.addEventListener(
+// Event bubbling example
+document.getElementById("parent").addEventListener("click", () => {
+  console.log("Parent clicked");
+});
+
+document.getElementById("child").addEventListener("click", (event) => {
+  console.log("Child clicked");
+  // event.stopPropagation(); // Prevents bubbling to parent
+});
+
+// Event capturing (useCapture = true)
+document.getElementById("parent").addEventListener(
   "click",
-  function (event) {
-    console.log("Button clicked in capturing phase!", event);
+  () => {
+    console.log("Parent clicked (capturing)");
   },
   true
-); // true for capturing, false for bubbling (default)
+);
+
+// Prevent default behavior
+document.getElementById("link").addEventListener("click", (event) => {
+  event.preventDefault(); // Prevents navigation
+  console.log("Link clicked but navigation prevented");
+});
+
+// Once option - listener runs only once
+button.addEventListener("click", handleClick, { once: true });
+
+// Passive option - improves performance for scroll events
+window.addEventListener("scroll", handleScroll, { passive: true });
+```
+
+### Safe Removal with Event Cleanup
+
+```javascript
+function safeRemoveElement(element) {
+  // Remove event listeners before removing element
+  element.removeEventListener("click", handleClick);
+  element.removeEventListener("change", handleChange);
+
+  // Clear any intervals or timeouts
+  if (element.intervalId) {
+    clearInterval(element.intervalId);
+  }
+
+  // Remove the element
+  element.remove();
+}
+
+// Example with cleanup
+const button = document.getElementById("dynamicButton");
+if (button) {
+  safeRemoveElement(button);
+}
 ```
 
 ### Custom Events

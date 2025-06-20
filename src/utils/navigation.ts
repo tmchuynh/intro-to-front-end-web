@@ -16,6 +16,12 @@ export interface NavigationSection {
 
 // Function to convert file/folder names to display titles
 export function formatTitle(name: string): string {
+  if (name === "jQuery") {
+    return "jQuery"; // Keep jQuery as is
+  }
+  if (name === "UX-UI-Design") {
+    return "UX/UI Design"; // Format UX-UI-Design to UX/UI Design
+  }
   return name
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
@@ -72,6 +78,7 @@ function categorizeNavigationItems(
     core_technologies: [] as NavigationItem[],
     design: [] as NavigationItem[],
     projects: [] as NavigationItem[],
+    utilities: [] as NavigationItem[],
     advanced: [] as NavigationItem[],
   };
 
@@ -89,10 +96,39 @@ function categorizeNavigationItems(
     ) {
       categories.fundamentals.push(item);
     } else if (
-      path.includes("developer-tools-and-resources") ||
+      path.includes("browser-developer-tools") ||
+      path.includes("command-line-interface") ||
+      path.includes("tools-and-resources-overview") ||
+      path.includes("development-environment") ||
+      path.includes("git-and-github") ||
+      path.includes("hosting-and-deployment") ||
+      path.includes("package-managers") ||
+      title.includes("development environment") ||
       title.includes("developer tools")
     ) {
       categories.developer_tools.push(item);
+    } else if (
+      path.includes("performance") ||
+      path.includes("security") ||
+      path.includes("storage-solutions") ||
+      path.includes("APIs") ||
+      path.includes("frameworks") ||
+      path.includes("libraries") ||
+      path.includes("typescript") ||
+      path.includes("react") ||
+      path.includes("nextjs") ||
+      title.includes("performance") ||
+      title.includes("security") ||
+      title.includes("storage") ||
+      title.includes("apis") ||
+      title.includes("framework") ||
+      title.includes("library") ||
+      title.includes("typescript") ||
+      title.includes("react") ||
+      title.includes("nextjs") ||
+      title.includes("advanced")
+    ) {
+      categories.advanced.push(item);
     } else if (
       path.includes("seo-accessibility") ||
       path.includes("intro-to-html") ||
@@ -112,6 +148,14 @@ function categorizeNavigationItems(
     ) {
       categories.core_technologies.push(item);
     } else if (
+      path.includes("quiz-app") ||
+      path.includes("project") ||
+      path.includes("website-portfolio") ||
+      title.includes("project") ||
+      title.includes("portfolio")
+    ) {
+      categories.projects.push(item);
+    } else if (
       path.includes("ux-ui-design") ||
       path.includes("design") ||
       title.includes("design") ||
@@ -120,32 +164,17 @@ function categorizeNavigationItems(
     ) {
       categories.design.push(item);
     } else if (
-      path.includes("quiz-app") ||
-      path.includes("website-portfolio") ||
-      title.includes("quiz") ||
-      title.includes("portfolio")
+      path.includes("utilities-tools") ||
+      path.includes("resources-utilities") ||
+      path.includes("helper-functions") ||
+      path.includes("development-tools") ||
+      path.includes("utility-libraries") ||
+      title.includes("utilities") ||
+      title.includes("utility") ||
+      title.includes("helper") ||
+      title.includes("tools")
     ) {
-      categories.projects.push(item);
-    } else if (
-      path.includes("performance") ||
-      path.includes("security") ||
-      path.includes("storage-solutions") ||
-      path.includes("application-programming-interface") ||
-      path.includes("frameworks") ||
-      path.includes("libraries") ||
-      path.includes("typescript") ||
-      path.includes("react") ||
-      title.includes("performance") ||
-      title.includes("security") ||
-      title.includes("storage") ||
-      title.includes("api") ||
-      title.includes("framework") ||
-      title.includes("library") ||
-      title.includes("typescript") ||
-      title.includes("react") ||
-      title.includes("advanced")
-    ) {
-      categories.advanced.push(item);
+      categories.utilities.push(item);
     } else {
       // Default to fundamentals for uncategorized items
       categories.fundamentals.push(item);
@@ -187,6 +216,13 @@ function categorizeNavigationItems(
     sections.push({
       title: "Projects",
       items: categories.projects,
+    });
+  }
+
+  if (categories.utilities.length > 0) {
+    sections.push({
+      title: "Utilities & Tools",
+      items: categories.utilities,
     });
   }
 
@@ -300,6 +336,14 @@ async function scanDirectory(
           normalizedTitle.includes("setup")
         )
           return 2;
+        if (normalizedTitle.includes("getting started")) return 3;
+        if (normalizedTitle.includes("fundamentals")) return 5;
+        if (
+          normalizedTitle.includes("introduction") ||
+          normalizedTitle.includes("intro")
+        )
+          return 4;
+        if (normalizedTitle.includes("vocabulary")) return 6;
         return 999; // Default priority for other items
       };
 
@@ -562,6 +606,27 @@ function getClientSideNavigation(): NavigationSection[] {
               href: "/website-portfolio/part-2",
             },
           ],
+        },
+      ],
+    },
+    {
+      title: "Utilities & Tools",
+      items: [
+        {
+          title: "Resources & Utilities",
+          href: "/resources-utilities",
+        },
+        {
+          title: "Helper Functions",
+          href: "/helper-functions",
+        },
+        {
+          title: "Development Tools",
+          href: "/development-tools",
+        },
+        {
+          title: "Utility Libraries",
+          href: "/utility-libraries",
         },
       ],
     },

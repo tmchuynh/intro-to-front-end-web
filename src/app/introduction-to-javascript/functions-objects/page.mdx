@@ -1,0 +1,519 @@
+import BackToTop from "@/components/BackToTop";
+
+# JavaScript Functions and Objects
+
+## Table of Contents
+
+## Understanding Statements
+
+### Statements
+
+A statement in JavaScript is a single instruction that performs an action. Statements can be simple, like variable assignments or function calls, or complex, such as control structures (if, switch, loops).
+
+```javascript
+let x = 5; // Assignment statement
+console.log(x); // Function call statement
+```
+
+Every line of code you write is typically a statement that contributes to the overall logic of your program.
+Use statements for variable declarations, function calls, condition checks, and other instructions that your program needs to execute sequentially.
+
+```javascript
+console.log("Hello, World!");
+```
+
+`console.log` is a function used to print messages to the console (usually visible in the browser's developer tools or Node.js environment). `"Hello, World!"` is a string literal that gets printed out.
+
+**NOTE**
+
+<blockquote>
+Enabling "strict mode" by adding `"use strict";` at the beginning of your scripts can significantly enhance code quality by catching common mistakes and enforcing stricter parsing and error handling. In strict mode, certain actions are disallowed, such as using undeclared variables, which helps prevent accidental global variable creation. It also prohibits duplicating parameter names and using this in a way that can lead to confusion. By adopting strict mode, developers can write cleaner, more reliable code that adheres to best practices.
+
+```javascript
+"use strict";
+let x = 10; // This will work
+console.log(x);
+y = 20; // This will throw an error because y is not declared
+```
+
+</blockquote>
+
+<BackToTop />
+
+## Understanding Functions
+
+A function is a reusable block of code that performs a specific task. Functions can take inputs (parameters) and return outputs (values). They help organize code into manageable sections, making it easier to read, maintain, and reuse.
+
+```javascript
+function greet(name) {
+  return `Hello, ${name}!`;
+}
+```
+
+In this example, `greet` is a function that takes one parameter, `name`, and returns a greeting string. You can call this function with different names to get personalized greetings.
+
+```javascript
+console.log(greet("Alice")); // Output: Hello, Alice!
+console.log(greet("Bob")); // Output: Hello, Bob!
+```
+
+### Function Scope
+
+Scope refers to the visibility and accessibility of variables and functions in different parts of your code. JavaScript has function scope, meaning variables declared within a function are not accessible outside that function. This helps prevent naming conflicts and keeps your code organized.
+
+```javascript
+function myFunction() {
+  let localVariable = "I am local";
+  console.log(localVariable); // Output: I am local
+}
+myFunction();
+// console.log(localVariable); // This would throw an error because localVariable is not defined outside
+```
+
+### Function Declaration vs. Function Expression
+
+Functions are reusable blocks of code that perform a specific task. They can take inputs, process them, and return outputs. Functions can be defined using function declarations or function expressions.
+
+Use functions when you want to encapsulate a block of code that performs a specific task. This promotes code re-usability and makes your codebase easier to manage. Whenever you find yourself repeating code, consider creating a function.
+
+#### Function Declaration
+
+A function declaration defines a named function that can be called anywhere in the code after its declaration.
+
+```javascript
+function add(a, b) {
+  return a + b;
+}
+console.log(add(2, 3)); // Output: 5
+```
+
+#### Function Hoisting
+
+Function hoisting is a JavaScript mechanism where function declarations are moved to the top of their containing scope during the compilation phase. This means you can call a function before it is defined in the code.
+
+```javascript
+console.log(sayHello()); // Output: Hello!
+function sayHello() {
+  return "Hello!";
+}
+```
+
+#### Arrow Functions
+
+Arrow functions provide a more concise syntax for writing function expressions. They are particularly useful for short functions and can help improve readability.
+
+```javascript
+const add = (a, b) => a + b;
+console.log(add(2, 3)); // Output: 5
+```
+
+#### Function Expression
+
+A function expression defines a function as part of an expression, often assigned to a variable. It can be anonymous or named.
+
+```javascript
+const multiply = function (a, b) {
+  return a * b;
+};
+console.log(multiply(2, 3)); // Output: 6
+```
+
+### Functions with Parameters
+
+When defining a function, you can specify parameters that act as placeholders for the values you will pass when calling the function. These parameters allow you to create flexible functions that can operate on different inputs.
+
+Parameters are variables listed as part of a function's definition. They act as placeholders for the values (arguments) passed to the function when it is called. This is especially useful for functions that need to operate on different inputs without duplicating code.
+
+```javascript
+function greet(name) {
+  return "Hello, " + name + "!";
+}
+
+console.log(greet("Bob")); // Output: Hello, Bob!
+```
+
+#### Default Parameters
+
+Default parameters allow you to specify default values for function parameters. If an argument is not provided when calling the function, the default value will be used.
+
+```javascript
+function greet(name = "Guest") {
+  return `Hello, ${name}!`;
+}
+console.log(greet()); // Output: Hello, Guest!
+console.log(greet("Alice")); // Output: Hello, Alice!
+```
+
+#### Rest Parameters
+
+Rest parameters allow you to represent an indefinite number of arguments as an array. This is useful when you want to create functions that can accept any number of arguments.
+
+```javascript
+function sum(...numbers) {
+  return numbers.reduce((total, num) => total + num, 0);
+}
+console.log(sum(1, 2, 3)); // Output: 6
+console.log(sum(1, 2, 3, 4, 5)); // Output: 15
+```
+
+#### Function Overloading
+
+Function overloading is a concept where multiple functions can have the same name but different parameters. JavaScript does not support function overloading in the traditional sense, but you can achieve similar behavior by checking the number and types of arguments passed to a function.
+
+```javascript
+function display(value) {
+  if (typeof value === "string") {
+    console.log(`String: ${value}`);
+  } else if (typeof value === "number") {
+    console.log(`Number: ${value}`);
+  } else {
+    console.log("Unsupported type");
+  }
+}
+display("Hello"); // Output: String: Hello
+display(42); // Output: Number: 42
+display(true); // Output: Unsupported type
+```
+
+### Function Return Values
+
+Functions can return values using the return statement. The value returned can be used in other parts of the code. If a function performs calculations or processing that you need to use elsewhere in your code, ensure it returns the result.
+
+```javascript
+function multiply(x, y) {
+  return x * y;
+}
+
+let result = multiply(5, 6);
+console.log(result); // Output: 30
+```
+
+## Understanding Function Concepts
+
+Functions in JavaScript are not just blocks of code; they come with various concepts and techniques that enhance their usability and flexibility. Understanding these concepts is crucial for writing efficient and maintainable code.
+
+### Higher-Order Functions
+
+Higher-order functions are functions that can take other functions as arguments or return functions as their result.
+This is a powerful feature in JavaScript that allows for more abstract and flexible code design.
+
+```javascript
+function applyOperation(a, b, operation) {
+  return operation(a, b);
+}
+const sum = (x, y) => x + y;
+const result = applyOperation(5, 3, sum);
+console.log(result); // Output: 8
+```
+
+#### Function Callbacks
+
+A callback is a function passed as an argument to another function. This allows you to execute the callback function at a later time, often after some asynchronous operation or event. Callbacks are a fundamental part of asynchronous programming in JavaScript, allowing you to handle events and operations that take time to complete, such as network requests or user interactions.
+
+```javascript
+function fetchData(callback) {
+  setTimeout(() => {
+    const data = { id: 1, name: "Alice" };
+    callback(data);
+  }, 1000);
+}
+fetchData((data) => {
+  console.log("Data received:", data); // Output: Data received: { id: 1, name: 'Alice' }
+});
+```
+
+**Note**
+
+> A separate section on asynchronous programming, APIs, and more will cover callbacks, promises, and async/await in detail.
+
+### Function Bindings
+
+Function bindings allow you to create a new function with a specific context (the value of `this`). This is useful when you want to ensure that a function operates on a specific object, especially in event handling or when passing methods as callbacks.
+
+```javascript
+const person = {
+  name: "Alice",
+  greet: function () {
+    return `Hello, my name is ${this.name}.`;
+  },
+};
+const greetAlice = person.greet.bind(person);
+console.log(greetAlice()); // Output: Hello, my name is Alice.
+```
+
+### Function Currying
+
+Function currying is a technique where a function is transformed into a sequence of functions, each taking a single argument. This allows you to create specialized functions by partially applying arguments.
+
+```javascript
+function multiply(a) {
+  return function (b) {
+    return a * b;
+  };
+}
+const double = multiply(2);
+console.log(double(5)); // Output: 10
+console.log(multiply(3)(4)); // Output: 12
+```
+
+### Function Recursion
+
+Recursion is a programming technique where a function calls itself to solve a problem. This is useful for problems that can be broken down into smaller, similar subproblems, such as calculating factorials or traversing data structures like trees.
+
+```javascript
+function factorial(n) {
+  if (n === 0) {
+    return 1;
+  }
+  return n * factorial(n - 1);
+}
+console.log(factorial(5)); // Output: 120
+```
+
+### Immediately Invoked Function Expressions (IIFE)
+
+An IIFE is a function that is executed immediately after it is defined. This is useful for creating a private scope and avoiding polluting the global namespace.
+
+```javascript
+(function () {
+  console.log("This is an IIFE!");
+})(); // Output: This is an IIFE!
+```
+
+### Closures
+
+A closure is a function that retains access to its lexical scope, even when the function is executed outside that scope. This allows for data encapsulation and private variables.
+
+```javascript
+function makeCounter() {
+  let count = 0;
+  return function () {
+    count++;
+    return count;
+  };
+}
+const counter = makeCounter();
+console.log(counter()); // Output: 1
+console.log(counter()); // Output: 2
+```
+
+## Understanding Objects in JavaScript
+
+Objects are a fundamental part of JavaScript, allowing you to group related data and functionality together. They are collections of key-value pairs, where keys are strings (or Symbols) and values can be any data type, including other objects and functions.
+
+Objects are used to represent real-world entities, encapsulate data and behavior, and create complex data structures. They are essential for building applications, as they allow you to model and manipulate data in a structured way.
+
+### Object Literals
+
+An object literal is a way to define an object using a simple syntax. Objects are collections of key-value pairs, where keys are strings (or Symbols) and values can be any data type, including functions. This is a fundamental part of JavaScript, allowing you to group related data and functionalitytogether.
+
+```javascript
+const person = {
+  name: "Alice",
+  age: 30,
+  greet: function () {
+    return `Hello, my name is ${this.name}.`;
+  },
+};
+console.log(person.greet()); // Output: Hello, my name is Alice.
+```
+
+### Object Properties and Methods
+
+Objects can have properties (data) and methods (functions). Properties are accessed using dot notation or bracket notation, while methods are functions that belong to the object and can operate on its properties.
+
+```javascript
+const car = {
+  make: "Toyota",
+  model: "Camry",
+  year: 2020,
+  displayInfo: function () {
+    return `${this.year} ${this.make} ${this.model}`;
+  },
+};
+console.log(car.displayInfo()); // Output: 2020 Toyota Camry
+```
+
+### Object Creation
+
+You can create objects in JavaScript using object literals, the `new Object()` syntax, or constructor functions. Object literals are the most common and concise way to create objects.
+
+```javascript
+const book = {
+  title: "1984",
+  author: "George Orwell",
+  year: 1949,
+};
+console.log(book.title); // Output: 1984
+```
+
+### Object Properties
+
+Object properties are key-value pairs that store data within an object. You can access properties using dot notation or bracket notation. Dot notation is more concise, while bracket notation allows for dynamic property access.
+
+```javascript
+const student = {
+  name: "Bob",
+  age: 20,
+  major: "Computer Science",
+};
+console.log(student.name); // Output: Bob
+console.log(student["age"]); // Output: 20
+```
+
+### Object Mutability
+
+Objects in JavaScript are mutable, meaning you can change their properties after they are created. This allows you to update the state of an object dynamically, which is useful for applications that require real-time updates or user interactions.
+
+```javascript
+const user = {
+  username: "john_doe",
+  email: "johnDoe@test.com",
+};
+user.email = "johnDoe@test.com";
+console.log(user.email); // Output: johnDoe@test.com
+```
+
+### Object Keys and Values
+
+You can retrieve the keys and values of an object using `Object.keys()`, `Object.values()`, and `Object.entries()` methods. These methods return arrays containing the keys, values, or key-value pairs of the object, respectively. This is useful for iterating over objects or converting them to other data structures.
+
+```javascript
+const person = { name: "Alice", age: 30, city: "New York" };
+console.log(Object.keys(person)); // Output: ["name", "age", "city"]
+console.log(Object.values(person)); // Output: ["Alice", 30, "New York"]
+console.log(Object.entries(person)); // Output: [["name", "Alice"], ["age", 30], ["city", "New York"]]
+```
+
+### Object Comparison
+
+Comparing objects in JavaScript can be tricky because objects are reference types. Two objects are considered equal only if they reference the same memory location. To compare objects for equality, you can use methods like `JSON.stringify()` to convert them to strings or write custom comparison functions that check each property.
+
+```javascriptconst obj1 = { name: "Alice", age: 30 };
+const obj2 = {  name: "Alice",
+  age: 30
+};
+console.log(obj1 === obj2); // Output: false (different references)
+console.log(JSON.stringify(obj1) === JSON.stringify(obj2)); // Output: true (same content)
+```
+
+### Object Spread Operator
+
+The spread operator (`...`) allows you to create a new object by copying properties from an existing object. This is a concise way to clone objects or merge multiple objects into one. It can also be used to add new properties or override existing ones.
+
+```javascript
+const person = { name: "Alice", age: 30 };
+const updatedPerson = { ...person, city: "New York" };
+console.log(updatedPerson); // Output: { name: "Alice", age: 30, city: "New York" }
+```
+
+### Object Destructuring
+
+Object destructuring allows you to extract properties from an object and assign them to variables in a more concise way. This is particularly useful when you want to work with specific properties of an object without having to access them individually.
+
+```javascript
+const person = { name: "Alice", age: 30, city: "New York" };
+const { name, age } = person;
+console.log(name); // Output: Alice
+console.log(age); // Output: 30
+```
+
+### Object Cloning
+
+Cloning an object creates a new object with the same properties and values as the original. This is useful when you want to create a copy of an object without affecting the original. You can use `Object.assign()` or the spread operator (`...`) to create shallow copies, or use libraries like Lodash for deep cloning.
+
+```javascript
+const original = { name: "Alice", age: 30 };
+const clone = { ...original };
+clone.age = 31; // Modifying the clone does not affect the original
+console.log(original.age); // Output: 30
+```
+
+### Object Shorthand Syntax
+
+When creating objects, you can use shorthand syntax to define properties that have the same name as the variable. This makes your code more concise and readable, especially when dealing with multiple properties.
+
+```javascript
+const name = "Alice";
+const age = 30;
+const person = { name, age }; // Shorthand syntax
+console.log(person); // Output: { name: "Alice", age: 30 }
+```
+
+### Object Destructuring
+
+Object destructuring allows you to extract properties from an object and assign them to variables in a more concise way. This is particularly useful when you want to work with specific properties of an object without having to access them individually.
+
+```javascript
+const person = { name: "Alice", age: 30, city: "New York" };
+const { name, age } = person;
+console.log(name); // Output: Alice
+console.log(age); // Output: 30
+```
+
+### Object Methods
+
+Objects can have methods, which are functions that operate on the object's properties. Methods can be defined directly within the object literal or added later. They allow you to encapsulate behavior related to the object.
+
+```javascript
+const calculator = {
+  add: function (a, b) {
+    return a + b;
+  },
+  subtract: function (a, b) {
+    return a - b;
+  },
+};
+console.log(calculator.add(5, 3)); // Output: 8
+console.log(calculator.subtract(5, 3)); // Output: 2
+```
+
+### Object Prototypes
+
+JavaScript uses prototypes to enable inheritance and shared behavior among objects. Every object has a prototype, which is another object from which it can inherit properties and methods. This allows for efficient memory usage and code reuse.
+
+```javascript
+function Person(name, age) {
+  this.name = name;
+  this.age = age;
+}
+Person.prototype.greet = function () {
+  return `Hello, my name is ${this.name} and I am ${this.age} years old.`;
+};
+const alice = new Person("Alice", 30);
+console.log(alice.greet()); // Output: Hello, my name is Alice and I am 30 years old.
+```
+
+### Object Iteration
+
+You can iterate over the properties of an object using a for...in loop or by using Object.keys(), Object.values(), or Object.entries() methods. This is useful when you want to process or display all properties of an object dynamically.
+
+```javascript
+const person = {
+  name: "Alice",
+  age: 30,
+  city: "New York",
+};
+for (const key in person) {
+  console.log(`${key}: ${person[key]}`);
+}
+// Output:
+// name: Alice
+// age: 30
+// city: New York
+```
+
+### Object Methods and `this`
+
+In JavaScript, the `this` keyword refers to the context in which a function is called. When used inside an object method, `this` refers to the object itself. This allows methods to access and manipulate the object's properties.
+
+```javascriptconst car = {
+  make: "Toyota",
+  model: "Camry",
+  year: 2020,
+  displayInfo: function() {
+    return `${this.year} ${this.make} ${this.model}`;
+  }
+};
+console.log(car.displayInfo()); // Output: 2020 Toyota Camry
+```

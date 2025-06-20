@@ -16,7 +16,15 @@ const withMDX = createMDX({
   extension: /\.mdx?$/,
   // Add markdown plugins here, as desired
   options: {
-    remarkPlugins: [remarkGfm, remarkToc],
+    remarkPlugins: [
+      remarkGfm,
+      [
+        remarkToc,
+        {
+          maxDepth: 2, // Limit TOC depth to 2 levels
+        },
+      ],
+    ],
     rehypePlugins: [
       rehypeSlug,
       [

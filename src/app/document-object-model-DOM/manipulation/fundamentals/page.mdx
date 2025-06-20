@@ -1,0 +1,1802 @@
+import { BackToTop } from "@/components/BackToTop";
+
+# DOM Manipulation Fundamentals
+
+## Table of Contents
+
+## Introduction to DOM Manipulation
+
+The Document Object Model (DOM) serves as a structured representation of HTML documents, enabling developers to programmatically interact with web pages. DOM manipulation involves dynamically altering the content, structure, and style of web pages using JavaScript. This guide explores the fundamental concepts of DOM manipulation, including element selection, modification, and event handling, providing a comprehensive foundation for building interactive web applications.
+
+## Strategic Value of DOM Manipulation for Developers
+
+DOM manipulation is a critical skill for web developers, offering numerous advantages:
+
+- **Dynamic Content Updates**: Enables real-time updates to web page content without requiring full page reloads, enhancing user experience and performance.
+- **Interactive User Interfaces**: Facilitates the creation of responsive and interactive user interfaces by allowing developers to respond to user actions, such as clicks, form submissions, and keyboard inputs.
+- **Efficient Resource Management**: Reduces server load by minimizing the need for server requests, as changes can be made directly in the browser.
+- **Enhanced User Engagement**: Allows for the creation of engaging and dynamic web applications that can adapt to user interactions,
+  leading to increased user satisfaction and retention.
+
+## Understanding the DOM Structure
+
+Before diving into DOM manipulation, it's crucial to understand how the DOM is structured. The DOM represents an HTML document as a tree-like structure where each HTML element becomes a node in the tree.
+
+### DOM Tree Hierarchy
+
+The DOM follows a hierarchical structure:
+
+```
+Document
+└── html
+    ├── head
+    │   ├── title
+    │   ├── meta
+    │   └── link
+    └── body
+        ├── header
+        │   └── nav
+        ├── main
+        │   ├── section
+        │   └── article
+        └── footer
+```
+
+### Node Types
+
+The DOM consists of different types of nodes:
+
+- **Element Nodes**: HTML elements like `<div>`, `<p>`, `<span>`
+- **Text Nodes**: The actual text content within elements
+- **Attribute Nodes**: Element attributes like `class`, `id`, `src`
+- **Comment Nodes**: HTML comments `<!-- -->`
+- **Document Node**: The root document object
+
+```javascript
+// Example of different node types
+const element = document.getElementById("myDiv");
+console.log(element.nodeType); // 1 (Element Node)
+console.log(element.firstChild.nodeType); // 3 (Text Node)
+console.log(element.attributes[0].nodeType); // 2 (Attribute Node)
+```
+
+### The Document Object
+
+The `document` object is your entry point to the DOM. It provides methods and properties to access and manipulate the entire document:
+
+```javascript
+// Document properties
+console.log(document.title); // Page title
+console.log(document.URL); // Current URL
+console.log(document.domain); // Document domain
+console.log(document.readyState); // Document loading state
+
+// Document methods
+document.write("Hello World"); // Write to document
+document.close(); // Close document stream
+```
+
+## Fundamental Concepts of DOM Manipulation
+
+## Attribute Manipulation
+
+Working with element attributes is crucial for dynamic behavior and data management.
+
+### Basic Attribute Operations
+
+```javascript
+const element = document.getElementById("myElement");
+
+// Get attribute value
+const id = element.getAttribute("id");
+const className = element.getAttribute("class");
+const customAttr = element.getAttribute("data-custom");
+
+// Set attribute
+element.setAttribute("title", "This is a tooltip");
+element.setAttribute("data-user-id", "12345");
+element.setAttribute("aria-label", "Close button");
+
+// Check if attribute exists
+if (element.hasAttribute("data-custom")) {
+  console.log("Element has custom data attribute");
+}
+
+// Remove attribute
+element.removeAttribute("hidden");
+element.removeAttribute("data-temp");
+
+// Get all attributes
+const attributes = element.attributes;
+for (let attr of attributes) {
+  console.log(`${attr.name}: ${attr.value}`);
+}
+```
+
+### Data Attributes
+
+### ARIA and Accessibility Attributes
+
+```javascript
+// ARIA attributes for accessibility
+element.setAttribute("aria-label", "Close dialog");
+element.setAttribute("aria-expanded", "false");
+element.setAttribute("aria-hidden", "true");
+element.setAttribute("role", "button");
+
+// Toggle ARIA states
+function toggleExpanded(element) {
+  const isExpanded = element.getAttribute("aria-expanded") === "true";
+  element.setAttribute("aria-expanded", !isExpanded);
+}
+
+// Live regions for screen readers
+const liveRegion = document.getElementById("status");
+liveRegion.setAttribute("aria-live", "polite");
+liveRegion.setAttribute("aria-atomic", "true");
+
+// Update live region
+function updateStatus(message) {
+  liveRegion.textContent = message;
+}
+```
+
+## Form Manipulation
+
+Forms are central to user interaction on the web. Mastering form manipulation enables dynamic validation, data processing, and enhanced user experiences.
+
+### Form Element Access and Manipulation
+
+```javascript
+// Access form and its elements
+const form = document.getElementById("myForm");
+const elements = form.elements; // HTMLFormControlsCollection
+
+// Access elements by name or index
+const nameInput = form.elements["name"];
+const emailInput = form.elements.email;
+const firstElement = form.elements[0];
+
+// Access all inputs of specific type
+const textInputs = form.querySelectorAll("input[type='text']");
+const checkboxes = form.querySelectorAll("input[type='checkbox']");
+const radioButtons = form.querySelectorAll("input[type='radio']");
+
+// Form submission handling
+form.addEventListener("submit", (event) => {
+  event.preventDefault(); // Prevent default form submission
+
+  // Get form data
+  const formData = new FormData(form);
+
+  // Process form data
+  for (let [key, value] of formData.entries()) {
+    console.log(`${key}: ${value}`);
+  }
+});
+```
+
+### Input Value Management
+
+```javascript
+// Text inputs
+const textInput = document.getElementById("textInput");
+textInput.value = "Default value";
+textInput.placeholder = "Enter text here";
+
+// Numeric inputs
+const numberInput = document.getElementById("numberInput");
+numberInput.value = 42;
+numberInput.min = 0;
+numberInput.max = 100;
+numberInput.step = 5;
+
+// Date inputs
+const dateInput = document.getElementById("dateInput");
+dateInput.value = "2024-01-15";
+dateInput.min = "2024-01-01";
+dateInput.max = "2024-12-31";
+
+// Checkbox handling
+const checkbox = document.getElementById("checkbox");
+checkbox.checked = true;
+
+checkbox.addEventListener("change", (event) => {
+  console.log("Checkbox is:", event.target.checked ? "checked" : "unchecked");
+});
+
+// Radio button groups
+const radioButtons = document.querySelectorAll("input[name='size']");
+radioButtons.forEach((radio) => {
+  radio.addEventListener("change", (event) => {
+    if (event.target.checked) {
+      console.log("Selected size:", event.target.value);
+    }
+  });
+});
+
+// Select dropdown
+const select = document.getElementById("selectElement");
+select.value = "option2"; // Set selected value
+
+select.addEventListener("change", (event) => {
+  const selectedOption = event.target.selectedOptions[0];
+  console.log("Selected:", selectedOption.text, selectedOption.value);
+});
+```
+
+### Dynamic Form Generation
+
+```javascript
+// Create form dynamically
+function createContactForm() {
+  const form = document.createElement("form");
+  form.id = "contactForm";
+  form.className = "contact-form";
+
+  // Name field
+  const nameLabel = document.createElement("label");
+  nameLabel.textContent = "Name:";
+  nameLabel.htmlFor = "name";
+
+  const nameInput = document.createElement("input");
+  nameInput.type = "text";
+  nameInput.id = "name";
+  nameInput.name = "name";
+  nameInput.required = true;
+
+  // Email field
+  const emailLabel = document.createElement("label");
+  emailLabel.textContent = "Email:";
+  emailLabel.htmlFor = "email";
+
+  const emailInput = document.createElement("input");
+  emailInput.type = "email";
+  emailInput.id = "email";
+  emailInput.name = "email";
+  emailInput.required = true;
+
+  // Message field
+  const messageLabel = document.createElement("label");
+  messageLabel.textContent = "Message:";
+  messageLabel.htmlFor = "message";
+
+  const messageTextarea = document.createElement("textarea");
+  messageTextarea.id = "message";
+  messageTextarea.name = "message";
+  messageTextarea.rows = 4;
+  messageTextarea.required = true;
+
+  // Submit button
+  const submitButton = document.createElement("button");
+  submitButton.type = "submit";
+  submitButton.textContent = "Send Message";
+
+  // Append all elements
+  form.appendChild(nameLabel);
+  form.appendChild(nameInput);
+  form.appendChild(emailLabel);
+  form.appendChild(emailInput);
+  form.appendChild(messageLabel);
+  form.appendChild(messageTextarea);
+  form.appendChild(submitButton);
+
+  return form;
+}
+
+// Add form to page
+const container = document.getElementById("formContainer");
+container.appendChild(createContactForm());
+```
+
+### Form Validation
+
+```javascript
+// Custom validation functions
+function validateEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+function validatePassword(password) {
+  return (
+    password.length >= 8 &&
+    /[A-Z]/.test(password) &&
+    /[a-z]/.test(password) &&
+    /\d/.test(password)
+  );
+}
+
+// Real-time validation
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+
+emailInput.addEventListener("input", (event) => {
+  const email = event.target.value;
+  const isValid = validateEmail(email);
+
+  event.target.classList.toggle("invalid", !isValid);
+
+  // Show/hide error message
+  const errorElement = document.getElementById("emailError");
+  if (!isValid && email.length > 0) {
+    errorElement.textContent = "Please enter a valid email address";
+    errorElement.style.display = "block";
+  } else {
+    errorElement.style.display = "none";
+  }
+});
+
+// Form submission validation
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  let isValid = true;
+  const errors = [];
+
+  // Validate all fields
+  const formData = new FormData(form);
+
+  if (!validateEmail(formData.get("email"))) {
+    isValid = false;
+    errors.push("Invalid email address");
+  }
+
+  if (!validatePassword(formData.get("password"))) {
+    isValid = false;
+    errors.push(
+      "Password must be at least 8 characters with uppercase, lowercase, and number"
+    );
+  }
+
+  if (isValid) {
+    // Submit form
+    console.log("Form is valid, submitting...");
+    submitForm(formData);
+  } else {
+    // Display errors
+    displayFormErrors(errors);
+  }
+});
+```
+
+### Form Data Serialization
+
+```javascript
+// Serialize form data to object
+function serializeForm(form) {
+  const formData = new FormData(form);
+  const serialized = {};
+
+  for (let [key, value] of formData.entries()) {
+    if (serialized[key]) {
+      // Handle multiple values (checkboxes, multi-select)
+      if (Array.isArray(serialized[key])) {
+        serialized[key].push(value);
+      } else {
+        serialized[key] = [serialized[key], value];
+      }
+    } else {
+      serialized[key] = value;
+    }
+  }
+
+  return serialized;
+}
+
+// Serialize to JSON
+function serializeFormToJSON(form) {
+  return JSON.stringify(serializeForm(form));
+}
+
+// Serialize to URL parameters
+function serializeFormToURL(form) {
+  const formData = new FormData(form);
+  const params = new URLSearchParams();
+
+  for (let [key, value] of formData.entries()) {
+    params.append(key, value);
+  }
+
+  return params.toString();
+}
+
+// Populate form from object
+function populateForm(form, data) {
+  Object.keys(data).forEach((key) => {
+    const element = form.elements[key];
+    if (element) {
+      if (element.type === "checkbox" || element.type === "radio") {
+        if (Array.isArray(data[key])) {
+          data[key].forEach((value) => {
+            const input = form.querySelector(
+              `input[name="${key}"][value="${value}"]`
+            );
+            if (input) input.checked = true;
+          });
+        } else {
+          element.checked = element.value === data[key];
+        }
+      } else {
+        element.value = data[key];
+      }
+    }
+  });
+}
+```
+
+## Animation and CSS Transitions
+
+Creating smooth animations and transitions enhances user experience and provides visual feedback for interactions.
+
+### CSS Class-Based Animations
+
+```javascript
+// Simple show/hide with CSS transitions
+function fadeIn(element, duration = 300) {
+  element.style.opacity = "0";
+  element.style.display = "block";
+  element.style.transition = `opacity ${duration}ms ease-in-out`;
+
+  // Force reflow to ensure transition applies
+  element.offsetHeight;
+
+  element.style.opacity = "1";
+
+  return new Promise((resolve) => {
+    setTimeout(resolve, duration);
+  });
+}
+
+function fadeOut(element, duration = 300) {
+  element.style.transition = `opacity ${duration}ms ease-in-out`;
+  element.style.opacity = "0";
+
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      element.style.display = "none";
+      resolve();
+    }, duration);
+  });
+}
+
+// Slide animations
+function slideDown(element, duration = 300) {
+  element.style.height = "0";
+  element.style.overflow = "hidden";
+  element.style.display = "block";
+  element.style.transition = `height ${duration}ms ease-in-out`;
+
+  const height = element.scrollHeight;
+  element.style.height = height + "px";
+
+  setTimeout(() => {
+    element.style.height = "auto";
+  }, duration);
+}
+
+function slideUp(element, duration = 300) {
+  const height = element.offsetHeight;
+  element.style.height = height + "px";
+  element.style.overflow = "hidden";
+  element.style.transition = `height ${duration}ms ease-in-out`;
+
+  element.offsetHeight; // Force reflow
+  element.style.height = "0";
+
+  setTimeout(() => {
+    element.style.display = "none";
+  }, duration);
+}
+```
+
+### Web Animations API
+
+```javascript
+// Modern animation approach
+function animateElement(element, keyframes, options) {
+  return element.animate(keyframes, options);
+}
+
+// Fade in animation
+const fadeInAnimation = animateElement(
+  element,
+  [
+    { opacity: 0, transform: "translateY(20px)" },
+    { opacity: 1, transform: "translateY(0)" },
+  ],
+  {
+    duration: 500,
+    easing: "ease-out",
+    fill: "forwards",
+  }
+);
+
+// Scale animation
+const scaleAnimation = animateElement(
+  button,
+  [
+    { transform: "scale(1)" },
+    { transform: "scale(1.1)" },
+    { transform: "scale(1)" },
+  ],
+  {
+    duration: 200,
+    easing: "ease-in-out",
+  }
+);
+
+// Color transition
+const colorAnimation = animateElement(
+  element,
+  [
+    { backgroundColor: "#ff0000" },
+    { backgroundColor: "#00ff00" },
+    { backgroundColor: "#0000ff" },
+  ],
+  {
+    duration: 1000,
+    direction: "alternate",
+    iterations: Infinity,
+  }
+);
+
+// Complex keyframe animation
+const complexAnimation = animateElement(
+  element,
+  [
+    {
+      offset: 0,
+      transform: "translateX(0) rotate(0deg)",
+      opacity: 1,
+    },
+    {
+      offset: 0.5,
+      transform: "translateX(100px) rotate(180deg)",
+      opacity: 0.5,
+    },
+    {
+      offset: 1,
+      transform: "translateX(200px) rotate(360deg)",
+      opacity: 1,
+    },
+  ],
+  {
+    duration: 2000,
+    easing: "cubic-bezier(0.4, 0.0, 0.2, 1)",
+  }
+);
+```
+
+### Animation Control and Promises
+
+```javascript
+// Animation with promise handling
+async function sequentialAnimations(element) {
+  // First animation
+  await animateElement(
+    element,
+    [{ transform: "translateX(0)" }, { transform: "translateX(100px)" }],
+    { duration: 500 }
+  ).finished;
+
+  // Second animation
+  await animateElement(
+    element,
+    [{ backgroundColor: "#ff0000" }, { backgroundColor: "#00ff00" }],
+    { duration: 300 }
+  ).finished;
+
+  // Third animation
+  await animateElement(
+    element,
+    [
+      { transform: "scale(1)" },
+      { transform: "scale(1.5)" },
+      { transform: "scale(1)" },
+    ],
+    { duration: 400 }
+  ).finished;
+
+  console.log("All animations completed!");
+}
+
+// Animation controls
+const animation = element.animate(
+  [{ transform: "rotate(0deg)" }, { transform: "rotate(360deg)" }],
+  {
+    duration: 2000,
+    iterations: Infinity,
+  }
+);
+
+// Control playback
+animation.pause();
+animation.play();
+animation.reverse();
+animation.cancel();
+
+// Event listeners
+animation.addEventListener("finish", () => {
+  console.log("Animation finished");
+});
+
+animation.addEventListener("cancel", () => {
+  console.log("Animation cancelled");
+});
+```
+
+### Performance-Optimized Animations
+
+`````javascript
+// Use transform and opacity for better performance
+function optimizedSlide(element, direction = "left", distance = 100) {
+  const keyframes = [
+    { transform: "translateX(0)" },
+    {
+      transform: `translateX(${direction === "left" ? -distance : distance}px)`,
+    },
+  ];
+
+  return element.animate(keyframes, {
+    duration: 300,
+    easing: "ease-out",
+    fill: "forwards",
+  });
+}
+
+// Batch DOM reads and writes
+function animateMultipleElements(elements) {
+  // Read phase - batch all DOM reads
+  const positions = elements.map((el) => ({
+    element: el,
+    rect: el.getBoundingClientRect(),
+  }));
+
+  // Write phase - batch all DOM writes
+  positions.forEach(({ element, rect }) => {
+    element.animate(
+      [
+        { transform: "translateY(0)" },
+        { transform: "translateY(-20px)" },
+        { transform: "translateY(0)" },
+      ],
+      {
+        duration: 600,
+        easing: "ease-in-out",
+      }
+    );
+  });
+}
+
+// Use requestAnimationFrame for smooth animations
+function smoothCountUp(element, start, end, duration) {
+  const startTime = performance.now();
+  const range = end - start;
+
+  function updateCount(currentTime) {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+
+    // Easing function
+    const easeOut = 1 - Math.pow(1 - progress, 3);
+    const currentValue = Math.round(start + range * easeOut);
+
+    element.textContent = currentValue;
+
+    if (progress < 1) {
+      requestAnimationFrame(updateCount);
+    }
+  }
+
+  requestAnimationFrame(updateCount);
+}
+````mdx
+
+## Common DOM Manipulation Patterns
+
+Understanding common patterns helps you write more efficient and maintainable code for frequent DOM manipulation tasks.
+
+### Dynamic List Management
+
+```javascript
+// Add item to list
+function addListItem(listElement, text, data = {}) {
+    const listItem = document.createElement("li");
+    listItem.textContent = text;
+    listItem.className = "list-item";
+
+    // Add data attributes
+    Object.keys(data).forEach(key => {
+        listItem.dataset[key] = data[key];
+    });
+
+    // Add remove button
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "×";
+    removeBtn.className = "remove-btn";
+    removeBtn.addEventListener("click", () => {
+        removeListItem(listItem);
+    });
+
+    listItem.appendChild(removeBtn);
+    listElement.appendChild(listItem);
+
+    return listItem;
+}
+
+// Remove item from list with animation
+function removeListItem(listItem) {
+    listItem.style.transition = "opacity 0.3s ease-out";
+    listItem.style.opacity = "0";
+
+    setTimeout(() => {
+        if (listItem.parentNode) {
+            listItem.parentNode.removeChild(listItem);
+        }
+    }, 300);
+}
+
+// Sort list items
+function sortList(listElement, compareFn) {
+    const items = Array.from(listElement.children);
+    items.sort(compareFn);
+
+    // Re-append in sorted order
+    items.forEach(item => listElement.appendChild(item));
+}
+
+// Filter list items
+function filterList(listElement, predicate) {
+    Array.from(listElement.children).forEach(item => {
+        const shouldShow = predicate(item);
+        item.style.display = shouldShow ? "block" : "none";
+    });
+}
+`````
+
+### Modal Dialog Management
+
+```javascript
+class ModalManager {
+  constructor() {
+    this.activeModal = null;
+    this.setupEventListeners();
+  }
+
+  createModal(content, options = {}) {
+    const modal = document.createElement("div");
+    modal.className = "modal-overlay";
+
+    const modalContent = document.createElement("div");
+    modalContent.className = "modal-content";
+
+    if (typeof content === "string") {
+      modalContent.innerHTML = content;
+    } else {
+      modalContent.appendChild(content);
+    }
+
+    // Add close button if not disabled
+    if (!options.hideCloseButton) {
+      const closeBtn = document.createElement("button");
+      closeBtn.textContent = "×";
+      closeBtn.className = "modal-close";
+      closeBtn.addEventListener("click", () => this.closeModal(modal));
+      modalContent.appendChild(closeBtn);
+    }
+
+    modal.appendChild(modalContent);
+    return modal;
+  }
+
+  openModal(content, options = {}) {
+    if (this.activeModal) {
+      this.closeModal(this.activeModal);
+    }
+
+    const modal = this.createModal(content, options);
+    document.body.appendChild(modal);
+
+    // Animate in
+    modal.style.opacity = "0";
+    modal.offsetHeight; // Force reflow
+    modal.style.transition = "opacity 0.3s ease-out";
+    modal.style.opacity = "1";
+
+    this.activeModal = modal;
+
+    // Focus management
+    modal.focus();
+
+    return modal;
+  }
+
+  closeModal(modal) {
+    if (!modal) return;
+
+    modal.style.opacity = "0";
+
+    setTimeout(() => {
+      if (modal.parentNode) {
+        modal.parentNode.removeChild(modal);
+      }
+      if (this.activeModal === modal) {
+        this.activeModal = null;
+      }
+    }, 300);
+  }
+
+  setupEventListeners() {
+    // Close modal on escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && this.activeModal) {
+        this.closeModal(this.activeModal);
+      }
+    });
+
+    // Close modal on overlay click
+    document.addEventListener("click", (e) => {
+      if (e.target.classList.contains("modal-overlay")) {
+        this.closeModal(e.target);
+      }
+    });
+  }
+}
+
+// Usage
+const modalManager = new ModalManager();
+const modal = modalManager.openModal(
+  "<h2>Hello World</h2><p>This is a modal!</p>"
+);
+```
+
+### Tab Interface Pattern
+
+```javascript
+class TabManager {
+  constructor(container) {
+    this.container = container;
+    this.tabs = container.querySelectorAll(".tab");
+    this.panels = container.querySelectorAll(".tab-panel");
+    this.activeIndex = 0;
+
+    this.init();
+  }
+
+  init() {
+    this.tabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => this.switchTab(index));
+      tab.setAttribute("role", "tab");
+      tab.setAttribute("tabindex", index === 0 ? "0" : "-1");
+    });
+
+    // Keyboard navigation
+    this.container.addEventListener("keydown", (e) => {
+      this.handleKeyNavigation(e);
+    });
+
+    this.switchTab(0);
+  }
+
+  switchTab(index) {
+    // Deactivate current tab
+    this.tabs[this.activeIndex].classList.remove("active");
+    this.panels[this.activeIndex].classList.remove("active");
+    this.tabs[this.activeIndex].setAttribute("tabindex", "-1");
+
+    // Activate new tab
+    this.activeIndex = index;
+    this.tabs[index].classList.add("active");
+    this.panels[index].classList.add("active");
+    this.tabs[index].setAttribute("tabindex", "0");
+    this.tabs[index].focus();
+  }
+
+  handleKeyNavigation(e) {
+    const { key } = e;
+    let newIndex = this.activeIndex;
+
+    switch (key) {
+      case "ArrowLeft":
+        newIndex =
+          this.activeIndex > 0 ? this.activeIndex - 1 : this.tabs.length - 1;
+        break;
+      case "ArrowRight":
+        newIndex =
+          this.activeIndex < this.tabs.length - 1 ? this.activeIndex + 1 : 0;
+        break;
+      case "Home":
+        newIndex = 0;
+        break;
+      case "End":
+        newIndex = this.tabs.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    e.preventDefault();
+    this.switchTab(newIndex);
+  }
+}
+
+// Initialize all tab containers
+document.querySelectorAll(".tab-container").forEach((container) => {
+  new TabManager(container);
+});
+```
+
+### Infinite Scroll Pattern
+
+```javascript
+class InfiniteScroll {
+  constructor(container, loadMoreCallback) {
+    this.container = container;
+    this.loadMoreCallback = loadMoreCallback;
+    this.loading = false;
+    this.threshold = 100; // pixels from bottom
+
+    this.init();
+  }
+
+  init() {
+    this.container.addEventListener(
+      "scroll",
+      this.throttle(this.handleScroll.bind(this), 100)
+    );
+  }
+
+  handleScroll() {
+    if (this.loading) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = this.container;
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+
+    if (distanceFromBottom < this.threshold) {
+      this.loadMore();
+    }
+  }
+
+  async loadMore() {
+    this.loading = true;
+    this.showLoadingIndicator();
+
+    try {
+      const newItems = await this.loadMoreCallback();
+      this.appendItems(newItems);
+    } catch (error) {
+      this.showError(error);
+    } finally {
+      this.loading = false;
+      this.hideLoadingIndicator();
+    }
+  }
+
+  appendItems(items) {
+    const fragment = document.createDocumentFragment();
+
+    items.forEach((item) => {
+      const element = this.createItemElement(item);
+      fragment.appendChild(element);
+    });
+
+    this.container.appendChild(fragment);
+  }
+
+  createItemElement(item) {
+    const element = document.createElement("div");
+    element.className = "scroll-item";
+    element.textContent = item.title || item.text || String(item);
+    return element;
+  }
+
+  showLoadingIndicator() {
+    if (!this.loadingElement) {
+      this.loadingElement = document.createElement("div");
+      this.loadingElement.className = "loading-indicator";
+      this.loadingElement.textContent = "Loading...";
+    }
+    this.container.appendChild(this.loadingElement);
+  }
+
+  hideLoadingIndicator() {
+    if (this.loadingElement && this.loadingElement.parentNode) {
+      this.loadingElement.parentNode.removeChild(this.loadingElement);
+    }
+  }
+
+  throttle(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+}
+
+// Usage
+const scrollContainer = document.getElementById("scrollContainer");
+const infiniteScroll = new InfiniteScroll(scrollContainer, async () => {
+  // Simulate API call
+  const response = await fetch("/api/items?page=" + currentPage++);
+  return response.json();
+});
+```
+
+## Debugging DOM Manipulation
+
+Effective debugging techniques help identify and resolve issues in DOM manipulation code.
+
+### Console Debugging Techniques
+
+```javascript
+// Enhanced element logging
+function logElement(element, label = "Element") {
+  console.group(label);
+  console.log("Element:", element);
+  console.log("Tag:", element.tagName);
+  console.log("ID:", element.id);
+  console.log("Classes:", element.className);
+  console.log("Attributes:", element.attributes);
+  console.log("Content:", element.textContent);
+  console.log("Parent:", element.parentElement);
+  console.log("Children:", element.children);
+  console.groupEnd();
+}
+
+// Debug event listeners
+function debugEventListeners(element) {
+  // Note: getEventListeners only works in Chrome DevTools
+  if (typeof getEventListeners === "function") {
+    console.log("Event listeners:", getEventListeners(element));
+  } else {
+    console.log("getEventListeners not available (use Chrome DevTools)");
+  }
+}
+
+// Monitor DOM changes
+function monitorDOMChanges(targetElement) {
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      console.log("DOM Change:", {
+        type: mutation.type,
+        target: mutation.target,
+        addedNodes: mutation.addedNodes,
+        removedNodes: mutation.removedNodes,
+        attributeName: mutation.attributeName,
+        oldValue: mutation.oldValue,
+      });
+    });
+  });
+
+  observer.observe(targetElement, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeOldValue: true,
+    characterData: true,
+    characterDataOldValue: true,
+  });
+
+  return observer;
+}
+
+// Performance monitoring
+function measureDOMOperation(operation, label = "DOM Operation") {
+  const start = performance.now();
+  const result = operation();
+  const end = performance.now();
+
+  console.log(`${label} took ${end - start} milliseconds`);
+  return result;
+}
+
+// Example usage
+measureDOMOperation(() => {
+  const elements = document.querySelectorAll(".item");
+  elements.forEach((el) => (el.style.color = "red"));
+}, "Styling elements");
+```
+
+### Common Debugging Scenarios
+
+```javascript
+// Check if element exists before manipulation
+function safeManipulation(selector, operation) {
+  const element = document.querySelector(selector);
+
+  if (!element) {
+    console.warn(`Element not found: ${selector}`);
+    return null;
+  }
+
+  try {
+    return operation(element);
+  } catch (error) {
+    console.error(`Error manipulating element ${selector}:`, error);
+    return null;
+  }
+}
+
+// Debug event propagation
+function debugEvent(event) {
+  console.group("Event Debug");
+  console.log("Type:", event.type);
+  console.log("Target:", event.target);
+  console.log("Current Target:", event.currentTarget);
+  console.log("Event Phase:", event.eventPhase);
+  console.log("Bubbles:", event.bubbles);
+  console.log("Cancelable:", event.cancelable);
+  console.log("Default Prevented:", event.defaultPrevented);
+  console.groupEnd();
+}
+
+// Validate DOM structure
+function validateDOMStructure(element) {
+  const issues = [];
+
+  // Check for required attributes
+  if (element.tagName === "IMG" && !element.alt) {
+    issues.push("Image missing alt attribute");
+  }
+
+  if (element.tagName === "A" && !element.href) {
+    issues.push("Link missing href attribute");
+  }
+
+  // Check for accessibility issues
+  if (element.onclick && !element.onkeydown) {
+    issues.push("Element has click handler but no keyboard handler");
+  }
+
+  // Check for duplicate IDs
+  if (element.id) {
+    const duplicates = document.querySelectorAll(`#${element.id}`);
+    if (duplicates.length > 1) {
+      issues.push(`Duplicate ID found: ${element.id}`);
+    }
+  }
+
+  if (issues.length > 0) {
+    console.warn("DOM validation issues:", issues);
+  }
+
+  return issues;
+}
+```
+
+## Security Considerations
+
+DOM manipulation can introduce security vulnerabilities if not handled properly. Understanding these risks is crucial for building secure applications.
+
+### XSS Prevention
+
+```javascript
+// Dangerous - never do this with user input
+function unsafeSetContent(element, userInput) {
+  element.innerHTML = userInput; // Vulnerable to XSS
+}
+
+// Safe approaches
+function safeSetContent(element, userInput) {
+  // Use textContent for plain text
+  element.textContent = userInput;
+
+  // Or sanitize HTML if needed
+  element.innerHTML = sanitizeHTML(userInput);
+}
+
+// HTML sanitization function (basic example)
+function sanitizeHTML(html) {
+  const temp = document.createElement("div");
+  temp.textContent = html;
+  return temp.innerHTML;
+}
+
+// Better: Use a proper sanitization library like DOMPurify
+function safeSanitizeHTML(html) {
+  // This requires including DOMPurify library
+  // return DOMPurify.sanitize(html);
+
+  // Fallback to basic sanitization
+  return sanitizeHTML(html);
+}
+
+// Safe dynamic element creation
+function createSafeElement(tag, content, attributes = {}) {
+  const element = document.createElement(tag);
+
+  // Set text content safely
+  if (content) {
+    element.textContent = content;
+  }
+
+  // Set attributes safely
+  Object.keys(attributes).forEach((key) => {
+    // Validate attribute names
+    if (isValidAttributeName(key)) {
+      element.setAttribute(key, attributes[key]);
+    }
+  });
+
+  return element;
+}
+
+function isValidAttributeName(name) {
+  // Basic validation - extend as needed
+  return /^[a-zA-Z-]+$/.test(name) && !name.startsWith("on");
+}
+```
+
+### Input Validation and Sanitization
+
+```javascript
+// Validate and sanitize form inputs
+function validateAndSanitizeInput(input, type) {
+  let sanitized = input.trim();
+
+  switch (type) {
+    case "email":
+      sanitized = sanitized.toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sanitized)) {
+        throw new Error("Invalid email format");
+      }
+      break;
+
+    case "text":
+      // Remove potentially dangerous characters
+      sanitized = sanitized.replace(
+        /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+        ""
+      );
+      sanitized = sanitized.replace(/javascript:/gi, "");
+      break;
+
+    case "number":
+      sanitized = parseFloat(sanitized);
+      if (isNaN(sanitized)) {
+        throw new Error("Invalid number");
+      }
+      break;
+
+    case "url":
+      try {
+        const url = new URL(sanitized);
+        if (!["http:", "https:"].includes(url.protocol)) {
+          throw new Error("Invalid protocol");
+        }
+        sanitized = url.toString();
+      } catch {
+        throw new Error("Invalid URL");
+      }
+      break;
+  }
+
+  return sanitized;
+}
+
+// Safe attribute setting
+function setSafeAttribute(element, name, value) {
+  // Whitelist of safe attributes
+  const safeAttributes = [
+    "id",
+    "class",
+    "title",
+    "alt",
+    "src",
+    "href",
+    "target",
+    "data-*",
+    "aria-*",
+    "role",
+  ];
+
+  const isDataAttribute = name.startsWith("data-");
+  const isAriaAttribute = name.startsWith("aria-");
+  const isWhitelisted = safeAttributes.includes(name);
+
+  if (isWhitelisted || isDataAttribute || isAriaAttribute) {
+    element.setAttribute(name, String(value));
+  } else {
+    console.warn(`Attribute '${name}' not allowed`);
+  }
+}
+```
+
+### CSP Considerations
+
+```javascript
+// Working with CSP-compliant code
+function addCSPCompliantScript(src, attributes = {}) {
+  const script = document.createElement("script");
+
+  // Set source
+  script.src = src;
+
+  // Add nonce if available (should be provided by server)
+  if (window.CSP_NONCE) {
+    script.nonce = window.CSP_NONCE;
+  }
+
+  // Set other attributes
+  Object.keys(attributes).forEach((key) => {
+    script.setAttribute(key, attributes[key]);
+  });
+
+  document.head.appendChild(script);
+}
+
+// Avoid inline event handlers (CSP violation)
+// Bad:
+// element.onclick = function() { /* code */ };
+
+// Good:
+element.addEventListener("click", function () {
+  // code
+});
+
+// Dynamic style creation (CSP-compliant)
+function addCSPCompliantStyles(css) {
+  const style = document.createElement("style");
+
+  if (window.CSP_NONCE) {
+    style.nonce = window.CSP_NONCE;
+  }
+
+  style.textContent = css;
+  document.head.appendChild(style);
+}
+```
+
+## Real-World Examples
+
+Practical examples demonstrate how DOM manipulation concepts apply to real applications.
+
+### Interactive Shopping Cart
+
+```javascript
+class ShoppingCart {
+  constructor(containerSelector) {
+    this.container = document.querySelector(containerSelector);
+    this.items = [];
+    this.init();
+  }
+
+  init() {
+    this.render();
+    this.attachEventListeners();
+  }
+
+  addItem(product) {
+    const existingItem = this.items.find((item) => item.id === product.id);
+
+    if (existingItem) {
+      existingItem.quantity += 1;
+    } else {
+      this.items.push({ ...product, quantity: 1 });
+    }
+
+    this.updateDisplay();
+    this.animateAddition(product.id);
+  }
+
+  removeItem(productId) {
+    const index = this.items.findIndex((item) => item.id === productId);
+    if (index > -1) {
+      this.items.splice(index, 1);
+      this.updateDisplay();
+    }
+  }
+
+  updateQuantity(productId, quantity) {
+    const item = this.items.find((item) => item.id === productId);
+    if (item) {
+      item.quantity = Math.max(0, quantity);
+      if (item.quantity === 0) {
+        this.removeItem(productId);
+      } else {
+        this.updateDisplay();
+      }
+    }
+  }
+
+  render() {
+    this.container.innerHTML = `
+            <div class="cart-header">
+                <h3>Shopping Cart</h3>
+                <span class="cart-count">0 items</span>
+            </div>
+            <div class="cart-items"></div>
+            <div class="cart-footer">
+                <div class="cart-total">Total: $0.00</div>
+                <button class="checkout-btn">Checkout</button>
+            </div>
+        `;
+  }
+
+  updateDisplay() {
+    const itemsContainer = this.container.querySelector(".cart-items");
+    const countElement = this.container.querySelector(".cart-count");
+    const totalElement = this.container.querySelector(".cart-total");
+
+    // Update items
+    itemsContainer.innerHTML = "";
+    this.items.forEach((item) => {
+      const itemElement = this.createItemElement(item);
+      itemsContainer.appendChild(itemElement);
+    });
+
+    // Update count and total
+    const totalItems = this.items.reduce((sum, item) => sum + item.quantity, 0);
+    const totalPrice = this.items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+
+    countElement.textContent = `${totalItems} items`;
+    totalElement.textContent = `Total: $${totalPrice.toFixed(2)}`;
+  }
+
+  createItemElement(item) {
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "cart-item";
+    itemDiv.dataset.productId = item.id;
+
+    itemDiv.innerHTML = `
+            <img src="${item.image}" alt="${item.name}" class="item-image">
+            <div class="item-details">
+                <h4>${item.name}</h4>
+                <p>$${item.price.toFixed(2)}</p>
+            </div>
+            <div class="item-controls">
+                <button class="quantity-btn minus">-</button>
+                <span class="quantity">${item.quantity}</span>
+                <button class="quantity-btn plus">+</button>
+                <button class="remove-btn">Remove</button>
+            </div>
+        `;
+
+    return itemDiv;
+  }
+
+  attachEventListeners() {
+    this.container.addEventListener("click", (e) => {
+      const productId = e.target.closest(".cart-item")?.dataset.productId;
+
+      if (e.target.classList.contains("plus")) {
+        const item = this.items.find((item) => item.id === productId);
+        this.updateQuantity(productId, item.quantity + 1);
+      } else if (e.target.classList.contains("minus")) {
+        const item = this.items.find((item) => item.id === productId);
+        this.updateQuantity(productId, item.quantity - 1);
+      } else if (e.target.classList.contains("remove-btn")) {
+        this.removeItem(productId);
+      } else if (e.target.classList.contains("checkout-btn")) {
+        this.checkout();
+      }
+    });
+  }
+
+  animateAddition(productId) {
+    const item = this.container.querySelector(
+      `[data-product-id="${productId}"]`
+    );
+    if (item) {
+      item.animate(
+        [
+          { transform: "scale(1)", backgroundColor: "transparent" },
+          { transform: "scale(1.05)", backgroundColor: "#e8f5e8" },
+          { transform: "scale(1)", backgroundColor: "transparent" },
+        ],
+        {
+          duration: 300,
+          easing: "ease-out",
+        }
+      );
+    }
+  }
+
+  checkout() {
+    if (this.items.length === 0) {
+      alert("Cart is empty!");
+      return;
+    }
+
+    // Simulate checkout process
+    const total = this.items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+    alert(`Checkout: $${total.toFixed(2)}`);
+
+    // Clear cart
+    this.items = [];
+    this.updateDisplay();
+  }
+}
+
+// Usage
+const cart = new ShoppingCart("#shopping-cart");
+
+// Add items to cart
+document.querySelectorAll(".add-to-cart-btn").forEach((button) => {
+  button.addEventListener("click", (e) => {
+    const productCard = e.target.closest(".product-card");
+    const product = {
+      id: productCard.dataset.productId,
+      name: productCard.querySelector(".product-name").textContent,
+      price: parseFloat(productCard.dataset.price),
+      image: productCard.querySelector("img").src,
+    };
+    cart.addItem(product);
+  });
+});
+```
+
+### Dynamic Content Filter
+
+```javascript
+class ContentFilter {
+  constructor(containerSelector, itemsSelector) {
+    this.container = document.querySelector(containerSelector);
+    this.items = Array.from(document.querySelectorAll(itemsSelector));
+    this.filters = new Map();
+    this.searchTerm = "";
+
+    this.init();
+  }
+
+  init() {
+    this.createFilterUI();
+    this.attachEventListeners();
+    this.applyFilters();
+  }
+
+  createFilterUI() {
+    const filterContainer = document.createElement("div");
+    filterContainer.className = "filter-container";
+
+    filterContainer.innerHTML = `
+            <div class="search-box">
+                <input type="text" placeholder="Search..." class="search-input">
+                <button class="clear-search">Clear</button>
+            </div>
+            <div class="filter-categories"></div>
+            <div class="filter-results">
+                <span class="results-count">0 results</span>
+                <button class="clear-all-filters">Clear All Filters</button>
+            </div>
+        `;
+
+    this.container.insertBefore(filterContainer, this.container.firstChild);
+    this.filterContainer = filterContainer;
+
+    this.createCategoryFilters();
+  }
+
+  createCategoryFilters() {
+    const categories = this.extractCategories();
+    const categoriesContainer =
+      this.filterContainer.querySelector(".filter-categories");
+
+    categories.forEach((category) => {
+      const categoryDiv = document.createElement("div");
+      categoryDiv.className = "filter-category";
+
+      const categoryTitle = document.createElement("h4");
+      categoryTitle.textContent = category.name;
+      categoryDiv.appendChild(categoryTitle);
+
+      category.values.forEach((value) => {
+        const label = document.createElement("label");
+        label.className = "filter-option";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = value;
+        checkbox.dataset.category = category.name;
+
+        const span = document.createElement("span");
+        span.textContent = value;
+
+        label.appendChild(checkbox);
+        label.appendChild(span);
+        categoryDiv.appendChild(label);
+      });
+
+      categoriesContainer.appendChild(categoryDiv);
+    });
+  }
+
+  extractCategories() {
+    const categories = new Map();
+
+    this.items.forEach((item) => {
+      // Extract categories from data attributes
+      Object.keys(item.dataset).forEach((key) => {
+        if (key.startsWith("filter")) {
+          const categoryName = key.replace("filter", "").toLowerCase();
+          const values = item.dataset[key].split(",").map((v) => v.trim());
+
+          if (!categories.has(categoryName)) {
+            categories.set(categoryName, new Set());
+          }
+
+          values.forEach((value) => {
+            categories.get(categoryName).add(value);
+          });
+        }
+      });
+    });
+
+    return Array.from(categories.entries()).map(([name, values]) => ({
+      name,
+      values: Array.from(values).sort(),
+    }));
+  }
+
+  attachEventListeners() {
+    // Search input
+    const searchInput = this.filterContainer.querySelector(".search-input");
+    searchInput.addEventListener("input", (e) => {
+      this.searchTerm = e.target.value.toLowerCase();
+      this.applyFilters();
+    });
+
+    // Clear search
+    const clearSearch = this.filterContainer.querySelector(".clear-search");
+    clearSearch.addEventListener("click", () => {
+      searchInput.value = "";
+      this.searchTerm = "";
+      this.applyFilters();
+    });
+
+    // Filter checkboxes
+    this.filterContainer.addEventListener("change", (e) => {
+      if (e.target.type === "checkbox") {
+        this.updateFilters(e.target);
+        this.applyFilters();
+      }
+    });
+
+    // Clear all filters
+    const clearAll = this.filterContainer.querySelector(".clear-all-filters");
+    clearAll.addEventListener("click", () => {
+      this.clearAllFilters();
+    });
+  }
+
+  updateFilters(checkbox) {
+    const category = checkbox.dataset.category;
+    const value = checkbox.value;
+
+    if (!this.filters.has(category)) {
+      this.filters.set(category, new Set());
+    }
+
+    if (checkbox.checked) {
+      this.filters.get(category).add(value);
+    } else {
+      this.filters.get(category).delete(value);
+      if (this.filters.get(category).size === 0) {
+        this.filters.delete(category);
+      }
+    }
+  }
+
+  applyFilters() {
+    let visibleCount = 0;
+
+    this.items.forEach((item) => {
+      const isVisible = this.itemMatchesFilters(item);
+
+      if (isVisible) {
+        item.style.display = "block";
+        visibleCount++;
+
+        // Highlight search terms
+        this.highlightSearchTerms(item);
+      } else {
+        item.style.display = "none";
+      }
+    });
+
+    this.updateResultsCount(visibleCount);
+  }
+
+  itemMatchesFilters(item) {
+    // Check search term
+    if (this.searchTerm) {
+      const text = item.textContent.toLowerCase();
+      if (!text.includes(this.searchTerm)) {
+        return false;
+      }
+    }
+
+    // Check category filters
+    for (let [category, selectedValues] of this.filters.entries()) {
+      const itemValues = item.dataset[`filter${category}`];
+      if (!itemValues) continue;
+
+      const itemValuesArray = itemValues.split(",").map((v) => v.trim());
+      const hasMatch = Array.from(selectedValues).some((value) =>
+        itemValuesArray.includes(value)
+      );
+
+      if (!hasMatch) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  highlightSearchTerms(item) {
+    if (!this.searchTerm) return;
+
+    const textNodes = this.getTextNodes(item);
+    textNodes.forEach((node) => {
+      const text = node.textContent;
+      const highlightedText = text.replace(
+        new RegExp(`(${this.searchTerm})`, "gi"),
+        "<mark>$1</mark>"
+      );
+
+      if (highlightedText !== text) {
+        const span = document.createElement("span");
+        span.innerHTML = highlightedText;
+        node.parentNode.replaceChild(span, node);
+      }
+    });
+  }
+
+  getTextNodes(element) {
+    const textNodes = [];
+    const walker = document.createTreeWalker(
+      element,
+      NodeFilter.SHOW_TEXT,
+      null,
+      false
+    );
+
+    let node;
+    while ((node = walker.nextNode())) {
+      if (node.textContent.trim()) {
+        textNodes.push(node);
+      }
+    }
+
+    return textNodes;
+  }
+
+  updateResultsCount(count) {
+    const resultsCount = this.filterContainer.querySelector(".results-count");
+    resultsCount.textContent = `${count} results`;
+  }
+
+  clearAllFilters() {
+    this.filters.clear();
+    this.searchTerm = "";
+
+    // Uncheck all checkboxes
+    this.filterContainer
+      .querySelectorAll("input[type='checkbox']")
+      .forEach((cb) => {
+        cb.checked = false;
+      });
+
+    // Clear search input
+    this.filterContainer.querySelector(".search-input").value = "";
+
+    this.applyFilters();
+  }
+}
+
+// Usage
+const filter = new ContentFilter("#content-container", ".content-item");
+```

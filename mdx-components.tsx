@@ -31,17 +31,37 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {children}
       </CustomHeading>
     ),
-    h2: ({ children }) => <h2 className="my-4 text-3xl">{children}</h2>,
-    h3: ({ children }) => (
-      <h3 className="my-3 font-medium text-2xl">{children}</h3>
+    h2: ({ children, ...props }) => (
+      <CustomHeading level={2} id={props.id} className="my-4 text-3xl">
+        {children}
+      </CustomHeading>
     ),
-    h4: ({ children }) => (
-      <h4 className="my-3 font-medium text-xl underline underline-offset-2">
+    h3: ({ children, ...props }) => (
+      <CustomHeading
+        level={3}
+        id={props.id}
+        className="my-3 font-medium text-2xl"
+      >
+        {children}
+      </CustomHeading>
+    ),
+    h4: ({ children, ...props }) => (
+      <CustomHeading
+        level={4}
+        id={props.id}
+        className="my-3 font-medium text-xl underline underline-offset-2"
+      >
         {children}:
-      </h4>
+      </CustomHeading>
     ),
-    h5: ({ children }) => (
-      <h5 className="font-bold text-sm uppercase">{children}:</h5>
+    h5: ({ children, ...props }) => (
+      <CustomHeading
+        level={5}
+        id={props.id}
+        className="font-bold text-sm uppercase"
+      >
+        {children}:
+      </CustomHeading>
     ),
     p: ({ children, className, ...props }) => {
       // If className is provided, it's likely an explicit JSX <p> element
@@ -83,7 +103,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     a: ({ href, children }) => (
       <a
         href={href}
-        className="text-blue-600 hover:text-blue-800 underline"
         target={href?.startsWith("http") ? "_blank" : undefined}
         rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
       >

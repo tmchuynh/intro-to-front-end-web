@@ -92,7 +92,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         );
       }
       // For markdown-generated paragraphs, use our styled div
-      return <p className="mb-4 leading-relaxed">{children}</p>;
+      return <span className="mb-4 leading-relaxed">{children}</span>;
     },
     ul: ({ children }) => (
       <ul className="space-y-2 my-4 list-disc list-outside">{children}</ul>

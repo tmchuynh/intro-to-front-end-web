@@ -111,7 +111,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     // Table components
     table: ({ children }) => (
-      <div className="mb-6 overflow-x-auto">
+      <div className="my-6 overflow-x-auto">
         <table className="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 rounded-lg min-w-full">
           {children}
         </table>

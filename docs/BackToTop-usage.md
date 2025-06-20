@@ -7,7 +7,7 @@ The `BackToTop` component provides a convenient way to add "Back to Table of Con
 ```jsx
 import BackToTop from "@/components/BackToTop";
 
-<BackToTop />
+<BackToTop />;
 ```
 
 ## Custom TOC ID
@@ -51,7 +51,7 @@ More content...
 
 ## Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `tocId` | `string` | `"table-of-contents"` | The ID of the table of contents element to scroll to |
-| `className` | `string` | `""` | Additional CSS classes for custom styling |
+| Prop        | Type     | Default               | Description                                          |
+| ----------- | -------- | --------------------- | ---------------------------------------------------- |
+| `tocId`     | `string` | `"table-of-contents"` | The ID of the table of contents element to scroll to |
+| `className` | `string` | `""`                  | Additional CSS classes for custom styling            |

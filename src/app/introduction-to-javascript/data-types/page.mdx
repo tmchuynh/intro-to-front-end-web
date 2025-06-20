@@ -1,0 +1,268 @@
+import BackToTop from "@/components/BackToTop";
+
+# JavaScript Data Types
+
+## Table of Contents
+
+## Declaring Variables
+
+In JavaScript, variables store data that your program works with. You can declare them using `var`, `let`, or `const`. Always pick meaningful names to keep your code readable and maintainable. The key difference between `var`, `let`, and `const` is in their scope, hoisting, and re-declaration rules.
+
+- **var**: Function-scoped (or global if outside a function) and hoisted, meaning it's moved to the top of its scope. But you can reference it before it's declared, which will return undefined. You can also re-declare var in the same scope. However, it's best to avoid var in modern JavaScript due to its quirks.
+
+- **let**: Block-scoped, accessible only within its surrounding block, and hoisted like var. However, trying to use let before its declaration causes a ReferenceError (thanks to the "temporal dead zone"). Use let when the variable's value will change, like in loops.
+
+- **const**: Block-scoped and must be initialized at declaration. Unlike let, const can't be reassigned, but you can still modify the contents of objects or arrays declared with const. Use const for variables that shouldn't change after being assigned.
+
+**NOTE**
+
+> Use `const` by default for values that won't change and `let` when reassigning is necessary. This improves code predictability and reduces the risk of bugs, as var's function-scoping and hoisting can lead to unexpected behavior.
+
+## Different Types of Data
+
+### Primitive vs. Non-Primitive Data Types
+
+Primitive data types are the most basic data types in JavaScript. They are not objects and have immutable values, meaning that once a primitive value is created, it cannot be changed.
+Non-primitive data types, on the other hand, are more complex and can hold collections of values or more complex entities. They are mutable, meaning their contents can change.
+
+| Primitive Data Types | Non-Primitive Data Types |
+| -------------------- | ------------------------ |
+| String               | Object                   |
+| Number               | Array                    |
+| Boolean              | Function                 |
+| Undefined            |                          |
+| Null                 |                          |
+| BigInt               |                          |
+| Symbol               |                          |
+
+### Characteristics of Primitive Data Types vs Non-Primitive Data Types
+
+| Feature         | Primitive Data Types                           | Non-Primitive Data Types                                |
+| --------------- | ---------------------------------------------- | ------------------------------------------------------- |
+| Mutability      | Immutable (cannot be changed)                  | Mutable (can be changed)                                |
+| Memory          | Stored directly in the variable                | Stored as a reference to the memory location            |
+| Size            | Fixed size                                     | Variable size                                           |
+| Comparison      | Compared by value                              | Compared by reference                                   |
+| Type            | Can be checked using `typeof`                  | Can be checked using `Array.isArray()` or `instanceof`  |
+| Reference       | Stored directly in the variable                | Stored as a reference to the object or array            |
+| Access          | Accessed directly                              | Accessed through properties or methods                  |
+| Methods         | No methods                                     | Can have methods (e.g., `push`, `pop` for arrays)       |
+| Iteration       | Cannot be iterated                             | Can be iterated using loops or methods like `forEach`   |
+| Type Checking   | `typeof` operator                              | `Array.isArray()`, `instanceof`, or custom checks       |
+| Type Conversion | Can be converted to string, number, or boolean | Can be converted to JSON, string, or other formats      |
+| Type Coercion   | Implicit coercion during operations            | Explicit coercion using methods like `JSON.stringify()` |
+| Type Safety     | Weakly typed (can change type)                 | Strongly typed (type is fixed)                          |
+
+<BackToTop />
+
+## Primitive Data Types
+
+### Strings
+
+Strings represent sequences of text data and are enclosed in either single quotes (`'`) or double quotes (`"`). They can contain letters, numbers, symbols, and spaces. Strings are immutable, meaning that once a string is created, it cannot be changed. However, you can create new strings from existing ones by using various string manipulation methods.
+
+```javascript
+let greeting = "Hello, world!";
+let name = "Alice";
+let combined = greeting + " My name is " + name;
+```
+
+### Numbers
+
+JavaScript's number type can represent both integer and floating-point values. There are no separate data types for integers and decimals, meaning all numeric values are treated as floating-point numbers internally. This allows for a wide range of mathematical operations, but it also means that precision can be lost in some cases, especially with very large or very small numbers.
+
+```javascript
+let integer = 42;
+let float = ;
+```
+
+### Booleans
+
+Booleans are a data type that represents one of two values: `true` or `false`. This type is often used in conditional statements to control the flow of a program. Boolean values can determine whether a block of code runs or not, making them essential for decision-making processes in programming.
+
+```javascript
+let isActive = true;
+let isComplete = false;
+
+if (isActive) {
+  console.log("The item is active.");
+} else {
+  console.log("The item is not active.");
+}
+```
+
+### Undefined
+
+A variable is considered undefined when it has been declared but has not been assigned a value. This is a useful state to check, as it can help you determine whether a variable has been initialized before you attempt to use it. Undefined is also the default value of function arguments that have not been provided.
+
+```javascript
+// declared but not assigned
+let value;
+console.log(value); // undefined
+```
+
+### Null
+
+Null is a special value that represents the intentional absence of any object value. You can assign null to a variable to indicate that it should hold no value. This can be particularly useful during the initialization of variables when you want to signify that they are intentionally empty.
+
+```javascript
+// intentionally no value assigned
+let data = null;
+```
+
+### BigInt
+
+The BigInt data type is used to represent numbers larger than the maximum safe integer in JavaScript (2^53 - 1). BigInt allows you to perform operations on large integers without losing precision. You create a BigInt by appending the letter n to the end of a number.
+
+```javascript
+let bigNumber = 123456789012345678901234567890n;
+console.log(bigNumber);
+```
+
+### Symbol
+
+Symbols are a unique and immutable data type introduced in ES6 (ECMAScript 2015). Each symbol is distinct, which makes them useful for creating unique object property keys that won't conflict with others. Symbols can be created using the Symbol constructor.
+
+```javascript
+// creates a unique symbol
+let uniqueKey = Symbol("description");
+let obj = {
+  [uniqueKey]: "This is a unique value",
+};
+```
+
+## Non-Primitive Data Types
+
+### Arrays
+
+An array in JavaScript is a flexible data structure that stores multiple elements under one name, accessible by their index starting at 0. It can hold values of any type, even other arrays (multidimensional arrays). While adding or removing items at the end is easy, other structures might be faster for manipulating elements elsewhere.
+
+```javascript
+let fruits = ["Apple", "Banana", "Cherry"];
+console.log(fruits[0]); // Output: Apple
+console.log(fruits.length); // Output: 3
+```
+
+#### Array Literals
+
+An array literal is a list of values enclosed in square brackets. Arrays can hold multiple values of different types:
+
+```javascript
+const fruits = ["apple", "banana", "cherry", "date"];
+```
+
+#### Reading and Modifying Array Contents
+
+**Accessing Elements**: Access elements using their index (starting from 0), using bracket notation.
+**Modifying Elements**: You can change elements using their index.
+
+```javascript
+console.log(fruits[1]); // Outputs: banana
+fruits[2] = "cherry"; // Modifying an element
+```
+
+#### Enumerating Array Contents
+
+You can loop through array elements using `for`, `forEach`, or `for...of` loops:
+
+```javascript
+fruits.forEach(function (fruit) {
+  console.log(fruit);
+});
+```
+
+#### Built-in Array Methods
+
+JavaScript provides numerous built-in methods for array manipulation:
+
+```javascript
+fruits.push("elderberry"); // Adds "elderberry"
+fruits.pop(); // Removes and returns "elderberry"
+fruits.shift(); // Removes and returns the first element "apple"
+fruits.unshift("apricot"); // Adds "apricot" to the beginning
+fruits.splice(1, 1, "blueberry"); // Replaces element at index 1 with "blueberry"
+const citrusFruits = fruits.slice(1, 3); // Extracts elements from index 1 to 2
+const allFruits = fruits.concat(["fig", "grape"]); // Combines arrays
+const fruitString = fruits.join(", "); // Joins array elements into a string
+const index = fruits.indexOf("cherry"); // Finds index of "cherry"
+const hasBanana = fruits.includes("banana"); // Checks if "banana" exists
+const lengths = fruits.map((fruit) => fruit.length); // Gets length of each fruit
+const longFruits = fruits.filter((fruit) => fruit.length > 6); // Filters long fruits
+const totalLength = fruits.reduce((acc, fruit) => acc + fruit.length, 0); // Total length of all fruit names
+const foundFruit = fruits.find((fruit) => fruit.startsWith("b")); // Finds first fruit starting with "b"
+const allLong = fruits.every((fruit) => fruit.length > 3); // Checks if all fruits are longer than 3 characters
+const hasShort = fruits.some((fruit) => fruit.length < 5); // Checks if any fruit is shorter than 5 characters
+```
+
+<BackToTop />
+
+### Objects
+
+In JavaScript, an **object** is a collection of key-value pairs, often referred to as a map or dictionary in other languages. Objects are defined using curly braces {}, with each key followed by a colon and its corresponding value. Keys must be unique. Values stored in objects are called **properties**, and if the value is a function, it's called a **method**.
+
+```javascript
+let person = {
+  name: "John",
+  age: 30,
+  greet: function () {
+    return "Hello, " + this.name + "!";
+  },
+};
+
+console.log(person.name);
+console.log(person.greet());
+```
+
+#### Reading and Modifying Property Values
+
+You can access object properties using dot notation or bracket notation:
+
+```javascript
+let car = {
+  make: "Lexus",
+  model: "RX350",
+  year: "2014",
+};
+
+console.log(car.year); // Outputs: 2014
+car.year = 2021; // Modifying a property
+```
+
+#### Enumerating an Object's Properties
+
+Enumerating means looping through an object's properties:
+
+```javascript
+for (let key in car) {
+  console.log(key + ": " + car[key]);
+}
+```
+
+#### Adding and Deleting Properties and Methods
+
+You can add new properties to an object using dot or bracket notation and use the delete operator to remove properties:
+
+```javascript
+// Adding a property
+car.color = "blue";
+
+// Deleting a property
+delete car.model;
+```
+
+#### Functions as Methods
+
+Functions defined within an object are called methods and can access object properties using `this`:
+
+```javascript
+const dog = {
+  name: "Rex",
+  bark: function () {
+    console.log(this.name + " says Woof!");
+  },
+};
+
+dog.bark();
+```
+
+<BackToTop />

@@ -131,9 +131,9 @@ function categorizeNavigationItems(
       categories.advanced.push(item);
     } else if (
       path.includes("seo-accessibility") ||
-      path.includes("intro-to-html") ||
-      path.includes("intro-to-css") ||
-      path.includes("intro-to-javascript") ||
+      path.includes("introduction-to-html") ||
+      path.includes("introduction-to-css") ||
+      path.includes("introduction-to-javascript") ||
       path.includes("document-object-model") ||
       path.includes("forms") ||
       path.includes("jquery") ||
@@ -455,75 +455,75 @@ function getClientSideNavigation(): NavigationSection[] {
         },
         {
           title: "HTML",
-          href: "/intro-to-html",
+          href: "/introduction-to-html",
           children: [
             {
               title: "Overview",
-              href: "/intro-to-html/overview",
+              href: "/introduction-to-html/overview",
             },
             {
               title: "Semantic HTML",
-              href: "/intro-to-html/semantic-html",
+              href: "/introduction-to-html/semantic-html",
             },
             {
               title: "HTML Templates",
-              href: "/intro-to-html/html-templates",
+              href: "/introduction-to-html/html-templates",
             },
             {
               title: "Element Hierarchy",
-              href: "/intro-to-html/element-hierarchy",
+              href: "/introduction-to-html/element-hierarchy",
             },
             {
               title: "Elements and Attributes",
-              href: "/intro-to-html/elements-and-attributes",
+              href: "/introduction-to-html/elements-and-attributes",
             },
             {
               title: "Style Elements",
-              href: "/intro-to-html/style-elements",
+              href: "/introduction-to-html/style-elements",
             },
           ],
         },
         {
           title: "CSS",
-          href: "/intro-to-css",
+          href: "/introduction-to-css",
           children: [
             {
               title: "Selectors",
-              href: "/intro-to-css/selectors",
+              href: "/introduction-to-css/selectors",
             },
             {
               title: "Responsive Design",
-              href: "/intro-to-css/responsive-design",
+              href: "/introduction-to-css/responsive-design",
             },
             {
               title: "Frameworks",
-              href: "/intro-to-css/frameworks",
+              href: "/introduction-to-css/frameworks",
             },
             {
               title: "Debugging",
-              href: "/intro-to-css/debugging",
+              href: "/introduction-to-css/debugging",
             },
           ],
         },
         {
           title: "JavaScript",
-          href: "/intro-to-javascript",
+          href: "/introduction-to-javascript",
           children: [
             {
               title: "Data Types",
-              href: "/intro-to-javascript/data-types",
+              href: "/introduction-to-javascript/data-types",
             },
             {
               title: "Functions Objects",
-              href: "/intro-to-javascript/functions-objects",
+              href: "/introduction-to-javascript/functions-objects",
             },
             {
               title: "ES6 Features",
-              href: "/intro-to-javascript/es6-features",
+              href: "/introduction-to-javascript/es6-features",
             },
             {
               title: "Browser APIs",
-              href: "/intro-to-javascript/browser-apis",
+              href: "/introduction-to-javascript/browser-apis",
             },
           ],
         },

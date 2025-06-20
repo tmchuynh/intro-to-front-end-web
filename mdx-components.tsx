@@ -1,13 +1,35 @@
 import type { MDXComponents } from "mdx/types";
+import { JSX } from "react";
 import Button from "./src/components/Button";
 import Guides from "./src/components/Guides";
 import Resources from "./src/components/Resources";
 
+interface Props {
+  children: React.ReactNode;
+  level: number;
+  id: string;
+  className?: string;
+}
+
+export function CustomHeading({ children, level, id, className }: Props) {
+  const Component = `h${level}` as keyof JSX.IntrinsicElements;
+  return (
+    <Component id={id} className={`scroll-mt-24 ${className}`}>
+      {children}
+    </Component>
+  );
+}
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     // Allows customizing built-in components, e.g. to add styling.
-    h1: ({ children }) => (
-      <h1 className="my-6 font-bold text-4xl text-brand-primary">{children}</h1>
+    h1: ({ children, ...props }) => (
+      <CustomHeading
+        className="my-6 font-bold text-4xl text-brand-primary"
+        level={1}
+        id={props.id}
+      >
+        {children}
+      </CustomHeading>
     ),
     h2: ({ children }) => <h2 className="my-4 text-3xl">{children}</h2>,
     h3: ({ children }) => (

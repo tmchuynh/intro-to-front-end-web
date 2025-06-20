@@ -1,0 +1,443 @@
+import BackToTop from "@/components/BackToTop";
+
+# Classes
+
+## Table of Contents
+
+## Why Are Classes Important?
+
+Classes in TypeScript are essential for object-oriented programming. They allow you to create blueprints for objects, encapsulating data and behavior together. This promotes code organization, reusability, and maintainability.
+
+### Example Usage
+
+```typescript
+class Person {
+  name: string;
+  age: number;
+
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+  }
+
+  greet(): string {
+    return `Hello, my name is ${this.name} and I am ${this.age} years old.`;
+  }
+}
+class Employee extends Person {
+  position: string;
+
+  constructor(name: string, age: number, position: string) {
+    super(name, age);
+    this.position = position;
+  }
+
+  getDetails(): string {
+    return `${this.greet()} I work as a ${this.position}.`;
+  }
+}
+
+class Manager extends Employee {
+  teamSize: number;
+
+  constructor(name: string, age: number, position: string, teamSize: number) {
+    super(name, age, position);
+    this.teamSize = teamSize;
+  }
+
+  getTeamDetails(): string {
+    return `${this.getDetails()} I manage a team of ${this.teamSize} people.`;
+  }
+}
+const person = new Person("Alice", 30);
+const employee = new Employee("Bob", 28, "Software Engineer");
+const manager = new Manager("Charlie", 35, "Project Manager", 5);
+console.log(person.greet());
+console.log(employee.getDetails());
+console.log(manager.getTeamDetails());
+```
+
+<BackToTop />
+
+## Class Members
+
+Classes can have various members, including properties and methods. Properties are variables that hold data, while methods are functions that define behavior.
+
+```typescript
+class Car {
+  make: string;
+  model: string;
+  year: number;
+
+  constructor(make: string, model: string, year: number) {
+    this.make = make;
+    this.model = model;
+    this.year = year;
+  }
+
+  getDetails(): string {
+    return `${this.year} ${this.make} ${this.model}`;
+  }
+}
+const car = new Car("Toyota", "Camry", 2022);
+console.log(car.getDetails());
+```
+
+In this example, the `Car` class has three properties (`make`, `model`, and `year`) and a method (`getDetails`) that returns a string representation of the car.
+
+### Members Types
+
+Class members can have different types, including primitive types, arrays, and even other classes. You can also define methods that return specific types.
+
+```typescript
+class Product {
+  id: number;
+  name: string;
+  price: number;
+
+  constructor(id: number, name: string, price: number) {
+    this.id = id;
+    this.name = name;
+    this.price = price;
+  }
+
+  getPriceWithTax(taxRate: number): number {
+    return this.price + this.price * taxRate;
+  }
+}
+const product = new Product(1, "Laptop", 999.99);
+console.log(
+  `Product: ${product.name}, Price with tax: $${product.getPriceWithTax(0.2)}`
+);
+```
+
+### Members Visibility
+
+Class members can have different visibility levels, which determine how they can be accessed. The most common visibility levels are `public`, `private`, and `protected`.
+
+```typescript
+class User {
+  public username: string;
+  private password: string;
+  protected email: string;
+
+  constructor(username: string, password: string, email: string) {
+    this.username = username;
+    this.password = password;
+    this.email = email;
+  }
+
+  public getUsername(): string {
+    return this.username;
+  }
+
+  private getPassword(): string {
+    return this.password;
+  }
+
+  protected getEmail(): string {
+    return this.email;
+  }
+}
+const user = new User("john_doe", "securePassword", "john_doe@sample.com");
+console.log(`Username: ${user.getUsername()}`);
+// The following lines would cause errors due to visibility restrictions
+// console.log(user.getPassword()); // Error: Property 'getPassword' is private and only accessible within class 'User'.
+// console.log(user.getEmail()); // Error: Property 'getEmail' is protected and only accessible within class 'User' and its subclasses.
+```
+
+### Static Members
+
+Static members belong to the class itself rather than to instances of the class. They can be accessed without creating an instance of the class.
+
+```typescript
+class MathUtils {
+  static PI: number = 3.14159;
+
+  static calculateCircleArea(radius: number): number {
+    return this.PI * radius * radius;
+  }
+}
+const area = MathUtils.calculateCircleArea(5);
+console.log(`Area of circle with radius 5: ${area}`);
+```
+
+In this example, the `MathUtils` class has a static property `PI` and a static method `calculateCircleArea`. You can access these members without creating an instance of the class.
+
+<BackToTop />
+
+## Access Modifiers
+
+Access modifiers control the visibility of class members. TypeScript provides three access modifiers: `public`, `private`, and `protected`.
+
+```typescript
+class BankAccount {
+  private balance: number;
+
+  constructor(initialBalance: number) {
+    this.balance = initialBalance;
+  }
+
+  public deposit(amount: number): void {
+    this.balance += amount;
+  }
+
+  public withdraw(amount: number): void {
+    if (amount <= this.balance) {
+      this.balance -= amount;
+    } else {
+      console.log("Insufficient funds.");
+    }
+  }
+
+  public getBalance(): number {
+    return this.balance;
+  }
+}
+const account = new BankAccount(1000);
+account.deposit(500);
+account.withdraw(200);
+console.log(`Current balance: $${account.getBalance()}`);
+```
+
+In this example, the `balance` property is marked as `private`, meaning it cannot be accessed directly from outside the class. The `deposit`, `withdraw`, and `getBalance` methods are marked as `public`, allowing them to be called from outside the class.
+
+```typescript
+  id: 1,
+  name: "Laptop",
+  price: 999.99,
+}; // Object adhering to the Product interface
+```
+
+**\*Use case**: Access modifiers are useful for controlling access to class members, ensuring that sensitive data is protected and only accessible through defined methods.
+| Access Modifier | Description | Use Case |
+| ---------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `public` | Members are accessible from anywhere, both inside and outside the class. | Use for properties and methods that need to be accessed or modified from outside the class. |
+| `private` | Members are accessible only within the class itself, providing encapsulation. | Use for sensitive data that should not be exposed to the outside world, such as passwords. |
+| `protected` | Members are accessible within the class and its subclasses, allowing controlled inheritance. | Use for properties that should be accessible to subclasses but hidden from external code. |
+| `readonly` | Members can only be assigned a value once, either during declaration or in the constructor. | Use for constants or immutable values that should not change after initialization. |
+
+#### Benefits of Access Modifiers
+
+- Encapsulation: Access modifiers help encapsulate class members, protecting sensitive data and ensuring that it can only be accessed through defined methods.
+- Controlled access: They allow you to control how class members can be accessed, providing a way to enforce rules and maintain the integrity of the class.
+
+### Public Properties
+
+Public properties are accessible from anywhere, both inside and outside the class. They are the default visibility level for class members.
+
+```typescript
+class Person {
+  public name: string;
+  public age: number;
+
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+  }
+
+  introduce(): string {
+    return `Hello, my name is ${this.name} and I am ${this.age} years old.`;
+  }
+}
+const person = new Person("Alice", 30);
+console.log(person.introduce());
+```
+
+**Use case**: Public properties are commonly used for data that needs to be accessed or modified from outside the class, such as user information in a profile class.
+
+#### Benefits of Public Properties
+
+- Easy access: Public properties can be accessed directly from instances of the class, making them convenient for data retrieval and modification.
+- Flexibility: They allow for easy interaction with class instances, enabling straightforward data manipulation.
+
+### Private Properties
+
+Private properties are only accessible within the class itself. They cannot be accessed from outside the class, providing encapsulation and protecting sensitive data.
+
+```typescript
+class BankAccount {
+  private balance: number;
+
+  constructor(initialBalance: number) {
+    this.balance = initialBalance;
+  }
+
+  deposit(amount: number): void {
+    this.balance += amount;
+  }
+
+  withdraw(amount: number): void {
+    if (amount <= this.balance) {
+      this.balance -= amount;
+    } else {
+      console.log("Insufficient funds.");
+    }
+  }
+
+  getBalance(): number {
+    return this.balance;
+  }
+}
+const account = new BankAccount(1000);
+account.deposit(500);
+account.withdraw(200);
+console.log(`Current balance: $${account.getBalance()}`);
+// The following line would cause an error because balance is private
+// console.log(account.balance); // Error: Property 'balance' is private and only accessible within class 'BankAccount'.
+```
+
+**Use case**: Private properties are useful for sensitive data that should not be exposed to the outside world, such as account balances in a banking application.
+
+#### Benefits of Private Properties
+
+- Data protection: Private properties help protect sensitive information by restricting access to the class itself.
+- Encapsulation: They promote encapsulation by ensuring that the internal state of the class cannot be modified directly from outside, allowing for controlled access through methods.
+- Maintainability: Changes to private properties can be made without affecting external code, as they are not exposed outside the class.
+
+### Protected Properties
+
+Protected properties are similar to private properties, but they can also be accessed in subclasses. This allows for controlled inheritance while still protecting the property from outside access.
+
+```typescript
+class Vehicle {
+  protected speed: number;
+
+  constructor(speed: number) {
+    this.speed = speed;
+  }
+
+  protected getSpeed(): number {
+    return this.speed;
+  }
+}
+class Car extends Vehicle {
+  private model: string;
+
+  constructor(speed: number, model: string) {
+    super(speed);
+    this.model = model;
+  }
+
+  getCarDetails(): string {
+    return `Car model: ${this.model}, Speed: ${this.getSpeed()} km/h`;
+  }
+}
+const car = new Car(120, "Toyota Camry");
+console.log(car.getCarDetails());
+// The following line would cause an error because speed is protected
+// console.log(car.speed); // Error: Property 'speed' is protected and only accessible within class 'Vehicle' and its subclasses.
+```
+
+**Use case**: Protected properties are useful when you want to allow subclasses to access certain properties while keeping them hidden from the outside world, such as speed in a vehicle class hierarchy.
+
+#### Benefits of Protected Properties
+
+- Controlled inheritance: Protected properties allow subclasses to access and modify properties while keeping them hidden from external code, promoting encapsulation.
+- Flexibility: They provide a way to share data between a base class and its subclasses without exposing it to the outside world.
+
+<BackToTop />
+### Readonly Properties Readonly properties are properties that can only be
+assigned a value once, either during declaration or in the constructor. They
+cannot be modified afterward.
+
+```typescript
+class Point {
+  readonly x: number;
+  readonly y: number;
+
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+
+  getCoordinates(): string {
+    return `(${this.x}, ${this.y})`;
+  }
+}
+const point = new Point(10, 20);
+console.log(`Point coordinates: ${point.getCoordinates()}`);
+// The following line would cause an error because x is readonly
+// point.x = 15; // Error: Cannot assign to 'x' because it is a read-only property.
+```
+
+**Use case**: Readonly properties are useful for defining constants or immutable values that should not change after initialization, such as coordinates in a point class.
+
+#### Benefits of Readonly Properties
+
+- Immutability: Readonly properties ensure that once a value is assigned, it cannot be changed, providing a guarantee of immutability.
+- Safety: They help prevent accidental modifications to important values, reducing the risk of bugs in the code.
+
+<BackToTop />
+
+### Parameter Properties
+
+Parameter properties allow you to define class properties directly in the constructor parameters, reducing boilerplate code.
+
+```typescript
+class Rectangle {
+  constructor(
+    public width: number,
+    public height: number
+  ) {}
+
+  getArea(): number {
+    return this.width * this.height;
+  }
+}
+const rectangle = new Rectangle(10, 5);
+console.log(`Area of rectangle: ${rectangle.getArea()}`);
+```
+
+In this example, the `width` and `height` properties are defined directly in the constructor parameters, making the code more concise.
+
+**Use case**: Parameter properties are useful for simplifying class definitions, especially when you need to initialize properties directly from constructor parameters, such as dimensions in a rectangle class.
+
+#### Benefits of Parameter Properties
+
+- Conciseness: They reduce boilerplate code by allowing you to define and initialize properties in a single step, making the class definition cleaner and easier to read.
+- Clarity: Parameter properties make it clear which parameters are intended to be class properties, improving code readability and maintainability.
+
+<BackToTop />
+
+## Inheritance
+
+Inheritance allows you to create a new class based on an existing class, inheriting its properties and methods. This promotes code reuse and establishes a parent-child relationship between classes.
+
+```typescript
+class Animal {
+  name: string;
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  speak(): string {
+    return `${this.name} makes a sound.`;
+  }
+}
+class Dog extends Animal {
+  speak(): string {
+    return `${this.name} barks.`;
+  }
+}
+class Cat extends Animal {
+  speak(): string {
+    return `${this.name} meows.`;
+  }
+}
+const dog = new Dog("Buddy");
+const cat = new Cat("Whiskers");
+console.log(dog.speak());
+console.log(cat.speak());
+```
+
+In this example, the `Dog` and `Cat` classes inherit from the `Animal` class. They override the `speak` method to provide specific behavior for each animal type.
+
+**Use case**: Inheritance is useful when you want to create specialized classes that share common behavior and properties, such as different types of animals inheriting from a base `Animal` class.
+
+| Pros of Inheritance                                                                                                                                  | Cons of Inheritance                                                                                                                                                            |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Code reuse: Inheritance allows you to reuse code from a base class, reducing duplication and improving maintainability.                              | Tight coupling: Inheritance creates a strong relationship between the base class and derived classes, making changes in the base class potentially affect all derived classes. |
+| Polymorphism: Inheritance enables polymorphism, allowing you to treat derived class instances as instances of the base class, enhancing flexibility. | Fragile base class problem: Changes in the base class can lead to unexpected behavior in derived classes, making the codebase harder to maintain.                              |
+| Hierarchical structure: Inheritance establishes a clear hierarchy, making it easier to understand the relationships between classes.                 | Limited flexibility: Inheritance can lead to rigid class structures, making it difficult to adapt to changes in requirements or design.                                        |

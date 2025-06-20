@@ -31,7 +31,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
         {/* Main content */}
         <main className="flex-1 overflow-auto">
-          <div className="mx-auto px-4 lg:px-8 py-8 max-w-4xl">{children}</div>
+          <div className="mx-auto px-4 lg:px-8 py-8">{children}</div>
         </main>
       </div>
     </div>

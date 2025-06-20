@@ -1,0 +1,172 @@
+import BackToTop from "@/components/BackToTop";
+
+# Document Object Model (DOM) Essential Functions
+
+## Table of Contents
+
+#### Click Event Example
+
+```html
+<body>
+  <button id="showImageButton">Show Image</button>
+  <img
+    id="myImage"
+    src="https://via.placeholder.com/150"
+    alt="Placeholder"
+    style="display:none;"
+  />
+  <script>
+    document
+      .getElementById("showImageButton")
+      .addEventListener("click", function () {
+        const img = document.getElementById("myImage");
+        // Toggle image visibility
+        img.style.display = img.style.display === "none" ? "block" : "none";
+      });
+  </script>
+</body>
+```
+
+This example toggles the visibility of an image when a button is clicked.
+
+#### DOMContentLoaded
+
+```html
+<body>
+  <div id="mainContent">Welcome!</div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const mainContent = document.getElementById("mainContent");
+      mainContent.textContent = "The DOM is fully loaded!";
+    });
+  </script>
+</body>
+```
+
+The DOMContentLoaded event ensures that your JavaScript runs only after the HTML document has been fully loaded and parsed, making it safe to manipulate the DOM elements.
+
+#### Changing an Element's Style
+
+```html
+<body>
+  <div
+    id="styledDiv"
+    style="width: 100px; height: 100px; background-color: lightgray;"
+  ></div>
+  <button id="changeStyleButton">Change Style</button>
+  <script>
+    document
+      .getElementById("changeStyleButton")
+      .addEventListener("click", function () {
+        const div = document.getElementById("styledDiv");
+        // Change background color
+        div.style.backgroundColor = "lightblue";
+        // Change width
+        div.style.width = "200px";
+      });
+  </script>
+</body>
+```
+
+This example changes the background color and width of a div element when a button is clicked.
+
+#### Creating a Countdown Timer
+
+```html
+<body>
+  <p id="countdown">10</p>
+  <button id="startButton">Start Countdown</button>
+  <script>
+    document
+      .getElementById("startButton")
+      .addEventListener("click", function () {
+        let count = 10;
+        const countdownElement = document.getElementById("countdown");
+        const interval = setInterval(function () {
+          // Update countdown display
+          countdownElement.textContent = count;
+          count--;
+          if (count < 0) {
+            // Stop the countdown
+            clearInterval(interval);
+            countdownElement.textContent = "Time's up!";
+          }
+        }, 1000);
+      });
+  </script>
+</body>
+```
+
+This example creates a simple countdown timer that decrements every second and displays a message when it reaches zero.
+
+#### Simple Dropdown Menu
+
+```html
+<body>
+  <select id="mySelect">
+    <option value="apple">Apple</option>
+    <option value="banana">Banana</option>
+    <option value="cherry">Cherry</option>
+  </select>
+  <button id="showSelected">Show Selected Fruit</button>
+  <p id="selectedFruit"></p>
+  <script>
+    document
+      .getElementById("showSelected")
+      .addEventListener("click", function () {
+        const select = document.getElementById("mySelect");
+        // Get selected value
+        const selectedValue = select.options[select.selectedIndex].value;
+        document.getElementById("selectedFruit").textContent =
+          "You selected: " + selectedValue;
+      });
+  </script>
+</body>
+```
+
+This example creates a dropdown menu that displays the selected fruit in a paragraph when a button is clicked.
+
+#### Input Event
+
+```html
+<body>
+  <input type="text" id="textInput" placeholder="Type and see changes..." />
+  <p id="displayText"></p>
+  <script>
+    const textInput = document.getElementById("textInput");
+    const displayText = document.getElementById("displayText");
+    // Display the input value in real time
+    textInput.addEventListener("input", function () {
+      displayText.textContent = textInput.value;
+    });
+  </script>
+</body>
+```
+
+- **input**: Fires whenever the user types or changes the value of the input field.
+- **displayText**: Shows the current input value in real time as the user types.
+
+#### Color Picker Example
+
+```html
+<body>
+  <input type="color" id="colorPicker" value="#000000" />
+  <div
+    id="colorDisplay"
+    style="width: 100px; height: 100px; background-color: #000;"
+  ></div>
+  <script>
+    document
+      .getElementById("colorPicker")
+      .addEventListener("input", function () {
+        // Get selected color
+        const selectedColor = this.value;
+        // Change display color
+        document.getElementById("colorDisplay").style.backgroundColor =
+          selectedColor;
+      });
+  </script>
+</body>
+```
+
+This example uses a color input to change the background color of a div in real time

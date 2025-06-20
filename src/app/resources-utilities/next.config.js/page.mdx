@@ -1,0 +1,486 @@
+import BackToTop from "@/components/BackToTop";
+
+# next.config.ts
+
+## Table of Contents
+
+## Configuration
+
+```typescript
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  /* config options here */
+};
+
+export default nextConfig;
+```
+
+In Next.js, the `next.config.ts` file is used to configure various aspects of the Next.js application. It allows developers to customize the behavior of the framework, such as enabling experimental features, setting environment variables, and configuring build options.
+
+## Configuration Options Example #1
+
+```typescript
+import type { NextConfig } from "next";
+import path from "path";
+
+const nextConfig: NextConfig = {
+  // === Core Settings ===
+  reactStrictMode: true,
+  swcMinify: true,
+  distDir: "build",
+  basePath: "/my-app",
+  compress: true,
+  poweredByHeader: false,
+  crossOrigin: "anonymous",
+  output: "standalone",
+  trailingSlash: true,
+  generateEtags: false,
+  reactMaxHeadersLength: 1000,
+
+  // === TypeScript ===
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+
+  // === ESLint ===
+  eslint: {
+    ignoreDuringBuilds: false,
+  },
+
+  // === Paths, Aliases & Extensions ===
+  pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
+
+  // === Public & Server Runtime Config ===
+  publicRuntimeConfig: {
+    apiUrl: process.env.API_URL || "https://api.example.com",
+  },
+  serverRuntimeConfig: {
+    secretKey: process.env.SEC,
+  },
+
+  // === Caching ===
+  cacheHandler: require.resolve("./cache-handler.js"),
+  cacheMaxMemorySize: 0,
+  expireTime: 60,
+
+  // === Image Optimization ===
+  images: {
+    domains: ["example.com", "images.example.com"],
+    formats: ["image/avif", "image/webp"],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96],
+    loader: "default",
+  },
+
+  // === Custom Agent, Headers, Rewrites, Redirects ===
+  httpAgentOptions: {
+    keepAlive: false,
+  },
+  headers: async () => [
+    {
+      source: "/:path*",
+      headers: [
+        {
+          key: "X-Custom-Header",
+          value: "my-custom-value",
+        },
+      ],
+    },
+  ],
+  redirects: async () => [
+    {
+      source: "/old-path",
+      destination: "/new-path",
+      permanent: true,
+    },
+  ],
+  rewrites: async () => [
+    {
+      source: "/api/:path*",
+      destination: "https://api.example.com/:path*",
+    },
+  ],
+
+  // === Dev Tools & Indicators ===
+  devIndicators: {
+    buildActivity: true,
+  },
+  allowedDevOrigins: ["https://example.com", "http://localhost:3000"],
+  htmlLimitedBots: /MySpecialBot|MyAnotherSpecialBot|SimpleCrawler/,
+
+  // === Webpack Customization ===
+  webpack: (
+    config,
+    { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }
+  ) => {
+    return config;
+  },
+  transpilePackages: ["package-name"],
+
+  // === Output Tracing ===
+  outputFileTracing: true,
+  outputFileTracingRoot: path.join(__dirname, "../../"),
+  outputFileTracingExcludes: {
+    "/api/hello": ["./un-necessary-folder/**/*"],
+  },
+  outputFileTracingIncludes: {
+    "/api/another": ["./necessary-folder/**/*"],
+    "/api/login/\\[\\[\\.\\.\\.slug\\]\\]": [
+      "./node_modules/aws-crt/dist/bin/**/*",
+    ],
+  },
+
+  // === Internationalization ===
+  i18n: {
+    locales: ["en-US", "fr-FR"],
+    defaultLocale: "en-US",
+  },
+
+  // === Sass Options ===
+  sassOptions: {
+    implementation: "sass-embedded",
+  },
+
+  // === Experimental Features ===
+  experimental: {
+    appDir: true,
+    useCache: true,
+    webVitalsAttribution: ["CLS", "LCP"],
+    useLightningcss: true,
+    viewTransition: true,
+    urlImports: ["https://example.com/assets/", "https://cdn.skypack.dev"],
+    serverComponentsExternalPackages: ["some-package"],
+    serverActionsExternalPackages: ["another-external-package"],
+    optimizePackageImports: ["package-name"],
+    authInterrupts: true,
+    serverComponentsHmrCache: false,
+    reactCompiler: {
+      compilationMode: "annotation",
+    },
+    staleTimes: {
+      dynamic: 30,
+      static: 180,
+    },
+    staticGenerationRetryCount: 1,
+    staticGenerationMaxConcurrency: 8,
+    staticGenerationMinPagesPerWorker: 25,
+    typedRoutes: true,
+    ppr: "incremental",
+    taint: true,
+    mdxRs: true,
+    dynamicIO: true,
+    inlineCss: true,
+    serverActions: {
+      allowedOrigins: ["my-proxy.com", "*.my-proxy.com"],
+      enabled: true,
+      bodySizeLimit: "2mb",
+      maxAge: 60,
+    },
+    serverComponents: {
+      enabled: true,
+      maxAge: 60,
+    },
+  },
+
+  // === Server Performance Tuning ===
+  serverExternalPackages: ["@acme/ui"],
+  onDemandEntries: {
+    maxInactiveAge: 25 * 1000,
+    pagesBufferLength: 2,
+  },
+
+  // === Logging ===
+  logging: {
+    fetches: {
+      fullUrl: true,
+      hmrRefreshes: true,
+    },
+    incomingRequests: {
+      ignore: [/\api\/v1\/health/],
+    },
+  },
+
+  // === CDN Settings ===
+  assetPrefix: "https://cdn.example.com",
+
+  // === Turbopack ===
+  turbopack: {
+    root: path.join(__dirname, ".."),
+    rules: {
+      "*.svg": {
+        loaders: ["@svgr/webpack"],
+        as: "*.js",
+      },
+    },
+    resolveAlias: {
+      underscore: "lodash",
+      mocha: { browser: "mocha/browser-entry.js" },
+    },
+    resolveExtensions: [".mdx", ".tsx", ".ts", ".jsx", ".js", ".mjs", ".json"],
+  },
+};
+
+export default nextConfig;
+```
+
+**NOTE**
+
+<blockquote>
+This configuration file can look overwhelming at first, but it provides a powerful way to customize your Next.js application. Each option serves a specific purpose, allowing you to optimize performance, enhance security, and tailor the behavior of your application to meet your needs.
+
+For a simple Next.js application, you might not need to use all of these options. You can start with a minimal configuration and gradually add options as your application grows in complexity.
+
+A similar configuration file can be found in the [Next.js documentation](https://nextjs.org/docs/api-reference/next.config.js/introduction). There is also a [Next.js configuration playground](https://nextjs.org/docs/api-reference/next.config.js/playground) that allows you to experiment with different configuration options interactively.
+
+Another example will be shown below at the end of this section.
+
+</blockquote>
+<br />
+<BackToTop />
+### Core settings
+
+| Setting                 | Description                                                                                      |
+| ----------------------- | ------------------------------------------------------------------------------------------------ |
+| `reactStrictMode`       | Enables React's Strict Mode, which helps identify potential problems in the application.         |
+| `swcMinify`             | Enables SWC-based minification for faster builds and smaller bundle sizes.                       |
+| `distDir`               | Specifies the directory where the build output will be stored.                                   |
+| `basePath`              | Sets a base path for the application, useful for deploying under a subdirectory.                 |
+| `compress`              | Enables gzip compression for the application, reducing the size of the served files.             |
+| `poweredByHeader`       | Disables the `X-Powered-By` header for security reasons.                                         |
+| `crossOrigin`           | Sets the CORS policy for the application, allowing cross-origin requests.                        |
+| `output`                | Specifies the output format of the application, such as `standalone` for serverless deployments. |
+| `trailingSlash`         | Adds a trailing slash to the end of URLs, which can help with SEO and consistency.               |
+| `generateEtags`         | Enables or disables ETag generation for caching purposes.                                        |
+| `reactMaxHeadersLength` | Sets the maximum length of headers for React components, useful for large headers.               |
+
+<br />
+
+### TypeScript and ESLint
+
+| Setting             | Description                                                                                  |
+| ------------------- | -------------------------------------------------------------------------------------------- |
+| `typescript`        | Configuration options for TypeScript, such as ignoring build errors.                         |
+| `ignoreBuildErrors` | If set to `true`, allows the build to succeed even if there are TypeScript errors.           |
+| `eslint`            | Configuration options for ESLint, such as ignoring linting errors during builds.             |
+| `ignoreBuildErrors` | If set to `true`, allows the build to succeed even if there are TypeScript or ESLint errors. |
+
+<br />
+
+### Paths, Aliases & Extensions
+
+| Setting          | Description                                                                                         |
+| ---------------- | --------------------------------------------------------------------------------------------------- |
+| `pageExtensions` | Specifies the file extensions for pages in the application, allowing custom extensions like `.mdx`. |
+
+<br />
+
+### Public & Server Runtime Config
+
+| Setting               | Description                                                                                   |
+| --------------------- | --------------------------------------------------------------------------------------------- |
+| `publicRuntimeConfig` | Configuration options that are available in the browser, such as API URLs.                    |
+| `apiUrl`              | Specifies the base URL for API requests, allowing for easy configuration across environments. |
+| `serverRuntimeConfig` | Configuration options that are only available on the server, such as secret keys.             |
+| `secretKey`           | Specifies a secret key for server-side operations, such as signing tokens or encrypting data. |
+
+<br />
+
+### Caching
+
+| Setting              | Description                                                                                     |
+| -------------------- | ----------------------------------------------------------------------------------------------- |
+| `cacheHandler`       | Specifies a custom cache handler for the application, allowing for advanced caching strategies. |
+| `cacheMaxMemorySize` | Sets the maximum memory size for caching, useful for controlling memory usage.                  |
+| `expireTime`         | Sets the expiration time for cached data, allowing for automatic cache invalidation.            |
+
+<br />
+
+### Image Optimization
+
+| Setting       | Description                                                                                             |
+| ------------- | ------------------------------------------------------------------------------------------------------- |
+| `images`      | Configuration options for image optimization, such as allowed domains and formats.                      |
+| `domains`     | Specifies the allowed domains for images, enhancing security by restricting external image sources.     |
+| `formats`     | Specifies the image formats to be used for optimization, such as `image/avif` and `image/webp`.         |
+| `deviceSizes` | Specifies the device sizes for responsive images, allowing Next.js to serve appropriately sized images. |
+| `imageSizes`  | Specifies the sizes of images to be optimized, allowing for better performance on different devices.    |
+| `loader`      | Specifies the image loader to be used, such as `default`, `imgix`, or `cloudinary`.                     |
+
+<br />
+
+### Custom Agent, Headers, Rewrites, Redirects
+
+| Setting            | Description                                                                             |
+| ------------------ | --------------------------------------------------------------------------------------- |
+| `httpAgentOptions` | Configuration options for the HTTP agent, such as keep-alive settings.                  |
+| `headers`          | Custom headers to be added to the application, useful for security or caching purposes. |
+| `redirects`        | Configuration for redirects, allowing for URL redirection based on specific rules.      |
+| `rewrites`         | Configuration for URL rewrites, allowing for custom routing without changing the URL.   |
+
+<br />
+
+### Dev Tools & Indicators
+
+| Setting             | Description                                                                                 |
+| ------------------- | ------------------------------------------------------------------------------------------- |
+| `devIndicators`     | Configuration options for development indicators, such as build activity.                   |
+| `buildActivity`     | If set to `true`, enables build activity indicators in the development environment.         |
+| `allowedDevOrigins` | Specifies the allowed origins for development tools, enhancing security during development. |
+| `htmlLimitedBots`   | Specifies the bots that are allowed to access the HTML pages, useful for SEO and security.  |
+
+<br />
+
+### Webpack Customization
+
+| Setting             | Description                                                                                   |
+| ------------------- | --------------------------------------------------------------------------------------------- |
+| `webpack`           | Custom Webpack configuration for the application, allowing for advanced build customization.  |
+| `transpilePackages` | Specifies packages to be transpiled by Webpack, useful for compatibility with older browsers. |
+
+<br />
+
+### Output Tracing
+
+| Setting                     | Description                                                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `outputFileTracing`         | Enables output file tracing, which helps identify dependencies and optimize the build process.                      |
+| `outputFileTracingRoot`     | Specifies the root directory for output file tracing, allowing for better dependency management.                    |
+| `outputFileTracingExcludes` | Specifies files or directories to be excluded from output file tracing, reducing unnecessary dependencies.          |
+| `outputFileTracingIncludes` | Specifies files or directories to be included in output file tracing, ensuring necessary dependencies are included. |
+
+<br />
+
+### Internationalization
+
+| Setting         | Description                                                                                   |
+| --------------- | --------------------------------------------------------------------------------------------- |
+| `i18n`          | Configuration options for internationalization, such as supported locales and default locale. |
+| `locales`       | Specifies the supported locales for the application, allowing for multilingual support.       |
+| `defaultLocale` | Specifies the default locale for the application, used when no locale is specified.           |
+
+<br />
+
+### Sass Options
+
+| Setting          | Description                                                                           |
+| ---------------- | ------------------------------------------------------------------------------------- |
+| `sassOptions`    | Configuration options for Sass, such as the implementation to be used.                |
+| `implementation` | Specifies the Sass implementation to be used, such as `sass-embedded` or `node-sass`. |
+
+<br />
+
+### Experimental Features
+
+| Setting                             | Description                                                                                                              |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `experimental`                      | Configuration options for experimental features in Next.js, allowing for early access to new features.                   |
+| `appDir`                            | Enables the experimental app directory structure, allowing for better organization of application code.                  |
+| `useCache`                          | Enables caching for experimental features, improving performance during development.                                     |
+| `webVitalsAttribution`              | Specifies the web vitals to be attributed, allowing for better performance monitoring.                                   |
+| `useLightningcss`                   | Enables the use of Lightning CSS for faster CSS processing and optimization.                                             |
+| `viewTransition`                    | Enables view transitions for smoother page navigation and animations.                                                    |
+| `urlImports`                        | Specifies allowed URL imports, enhancing security by restricting external resources.                                     |
+| `serverComponentsExternalPackages`  | Specifies external packages to be used in server components, allowing for better integration with third-party libraries. |
+| `serverActionsExternalPackages`     | Specifies external packages to be used in server actions, allowing for better integration with third-party libraries.    |
+| `optimizePackageImports`            | Specifies packages to be optimized during the build process, improving performance.                                      |
+| `authInterrupts`                    | Enables authentication interrupts, allowing for better control over user sessions.                                       |
+| `serverComponentsHmrCache`          | Enables hot module replacement (HMR) caching for server components, improving development experience.                    |
+| `reactCompiler`                     | Configuration options for the React compiler, such as compilation mode.                                                  |
+| `compilationMode`                   | Specifies the compilation mode for React components, such as `annotation` or `transform`.                                |
+| `staleTimes`                        | Specifies the stale times for dynamic and static pages, allowing for better cache management.                            |
+| `dynamic`                           | Specifies the stale time for dynamic pages, allowing for better cache management.                                        |
+| `static`                            | Specifies the stale time for static pages, allowing for better cache management.                                         |
+| `staticGenerationRetryCount`        | Specifies the number of retries for static generation, improving reliability.                                            |
+| `staticGenerationMaxConcurrency`    | Specifies the maximum concurrency for static generation, improving performance.                                          |
+| `staticGenerationMinPagesPerWorker` | Specifies the minimum number of pages per worker for static generation, improving performance.                           |
+| `typedRoutes`                       | Enables typed routes, allowing for better type safety in routing.                                                        |
+| `ppr`                               | Specifies the page pre-rendering strategy, such as `incremental` or `static`.                                            |
+| `taint`                             | Enables taint tracking for better security and data flow analysis.                                                       |
+| `mdxRs`                             | Enables MDX support for React components, allowing for better content authoring.                                         |
+| `dynamicIO`                         | Enables dynamic input/output for server components, allowing for better data handling.                                   |
+| `inlineCss`                         | Enables inline CSS for better performance and reduced network requests.                                                  |
+| `serverActions`                     | Configuration options for server actions, allowing for better control over server-side operations.                       |
+| `allowedOrigins`                    | Specifies the allowed origins for server actions, enhancing security.                                                    |
+| `enabled`                           | Enables server actions, allowing for better control over server-side operations.                                         |
+| `bodySizeLimit`                     | Specifies the maximum body size for server actions, preventing large payloads.                                           |
+| `maxAge`                            | Specifies the maximum age for server actions, allowing for better cache management.                                      |
+| `serverComponents`                  | Configuration options for server components, allowing for better control over server-side rendering.                     |
+| `enabled`                           | Enables server components, allowing for better control over server-side rendering.                                       |
+| `maxAge`                            | Specifies the maximum age for server components, allowing for better cache management.                                   |
+
+<br />
+
+### Server Performance Tuning
+
+| Setting                  | Description                                                                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `serverExternalPackages` | Specifies external packages to be used in server components, allowing for better integration with third-party libraries. |
+| `onDemandEntries`        | Configuration options for on-demand entries, allowing for better performance during development.                         |
+| `maxInactiveAge`         | Specifies the maximum inactive age for on-demand entries, improving performance.                                         |
+| `pagesBufferLength`      | Specifies the buffer length for on-demand entries, improving performance during development.                             |
+
+<br />
+
+### Logging
+
+| Setting            | Description                                                                                     |
+| ------------------ | ----------------------------------------------------------------------------------------------- |
+| `logging`          | Configuration options for logging, allowing for better debugging and monitoring.                |
+| `fetches`          | Configuration options for fetch logging, allowing for better monitoring of API requests.        |
+| `fullUrl`          | If set to `true`, logs the full URL for fetch requests, improving debugging.                    |
+| `hmrRefreshes`     | If set to `true`, logs hot module replacement (HMR) refreshes, improving debugging.             |
+| `incomingRequests` | Configuration options for incoming request logging, allowing for better monitoring of requests. |
+| `ignore`           | Specifies patterns to ignore for incoming request logging, reducing noise in logs.              |
+
+<br />
+
+### CDN Settings
+
+| Setting       | Description                                                                              |
+| ------------- | ---------------------------------------------------------------------------------------- |
+| `assetPrefix` | Specifies the CDN prefix for static assets, allowing for better performance and caching. |
+
+<br />
+### Turbopack
+
+| Setting             | Description                                                                                        |
+| ------------------- | -------------------------------------------------------------------------------------------------- |
+| `turbopack`         | Configuration options for Turbopack, allowing for advanced build customization.                    |
+| `root`              | Specifies the root directory for Turbopack, allowing for better organization of build files.       |
+| `rules`             | Specifies custom rules for Turbopack, allowing for better control over asset processing.           |
+| `*.svg`             | Specifies the loader for SVG files, allowing for better handling of SVG assets.                    |
+| `as`                | Specifies the output format for SVG files, allowing for better compatibility with browsers.        |
+| `loaders`           | Specifies the loaders to be used for specific file types, allowing for better asset processing.    |
+| `resolveAlias`      | Specifies aliases for modules, allowing for better module resolution.                              |
+| `underscore`        | Specifies an alias for the `lodash` package, allowing for better compatibility with existing code. |
+| `mocha`             | Specifies an alias for the `mocha` package, allowing for better compatibility with existing code.  |
+| `resolveExtensions` | Specifies the file extensions to be resolved by Turbopack, allowing for better module resolution.  |
+
+<BackToTop />
+
+## Configuration Options Example #2
+
+```typescript
+import type { NextConfig } from "next";
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  images: {
+    domains: ["example.com", "images.example.com"],
+    formats: ["image/avif", "image/webp"],
+  },
+  i18n: {
+    locales: ["en-US", "fr-FR"],
+    defaultLocale: "en-US",
+  },
+  experimental: {
+    appDir: true,
+    serverComponentsExternalPackages: ["some-package"],
+    serverActionsExternalPackages: ["another-external-package"],
+  },
+};
+export default nextConfig;
+```
+
+<BackToTop />

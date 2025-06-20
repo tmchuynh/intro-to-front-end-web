@@ -1,0 +1,524 @@
+import BackToTop from "@/components/BackToTop";
+
+# Routing Files and Folders
+
+## Table of Contents
+
+## Overview
+
+Routing files in a Next.js application are essential for defining the structure and behavior of the application's routes. These files determine how different pages and components are accessed and rendered, allowing developers to create dynamic and static routes easily. Understanding routing files is crucial for building efficient and organized Next.js applications.
+
+## Key Routing Files
+
+| File/Folder       | Purpose                                                                                                                                  |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `layout.js`       | Defines the layout for a specific route or group of routes, allowing for consistent structure across pages.                              |
+| `page.js`         | Represents the main content of a route, rendering the page's content when accessed.                                                      |
+| `not-found.js`    | Handles cases where a requested route does not exist, providing a custom 404 page for better user experience.                            |
+| `error.js`        | Handles errors that occur within a specific route, providing a custom error page for better user experience.                             |
+| `global-error.js` | Handles unhandled errors in the application, providing a consistent error page for the entire application.                               |
+| `loading.js`      | Displays a loading indicator while data is being fetched for a specific route, improving user experience during data loading operations. |
+| `template.js`     | Defines a reusable template for pages that share similar layouts or functionalities, promoting code reusability.                         |
+| `default.js`      | Defines a fallback route for directories, ensuring that users always have a valid page to access.                                        |
+| `route.js`        | Defines the API endpoint                                                                                                                 |
+
+<br />
+
+**NOTE**
+
+> These files can be `.js` or `.jsx` for JavaScript projects, or `.ts` or `.tsx` for TypeScript projects. The choice of file extension depends on the project's configuration and whether TypeScript is being used.
+
+### Example Directory Structure
+
+```plaintext
+app/
+ ├── about/
+    ├── layout.js
+    ├── page.js
+    ├── error.js
+    └──  loading.js
+ ├── blog/
+    ├── [slug]/
+       ├── page.js
+       └──  not-found.js
+    └──  index.js
+ ├── contact/
+    ├── layout.js
+    └──  page.js
+ ├── global-error.js
+ └──  template.js
+```
+
+### The Importance of Routing Files
+
+Routing files play a crucial role in the organization and functionality of a Next.js application. They allow developers to define the structure of their application, manage navigation between different pages, and handle errors effectively. By understanding and utilizing routing files, developers can create a well-structured application that provides a seamless user experience.
+
+<BackToTop />
+
+## Routing Files Best Practices
+
+- **Organize Routing Files**: Keep routing files organized in a logical structure to make it easier to manage and navigate through the application. Group related routes together and use meaningful names for files and directories.
+- **Use Layouts for Consistency**: Utilize `layout.js` files to create consistent layouts across different pages. This helps maintain a uniform look and feel throughout the application, improving user experience.
+
+```javascript
+import React from "react";
+import { useRouter } from "next/router";
+const ClientSidePage = () => {
+  const router = useRouter();
+  const [data, setData] = React.useState(null);
+
+  React.useEffect(() => {
+    // Simulate fetching data from an API
+    setTimeout(() => {
+      setData("Client-side fetched data");
+    }, 1000);
+  }, []);
+
+  return (
+    <div>
+      <h1>Client-Side Rendered Page</h1>
+      <p>{data ? data : "Loading..."}</p>
+      <button onClick={() => router.push("/")}>Go Home</button>
+    </div>
+  );
+};
+```
+
+- **Handle Errors Gracefully**: Implement custom error pages using `error.js` and `not-found.js` files to provide a better user experience when errors occur. This helps users understand what went wrong and how to navigate back to valid routes.
+
+```javascript
+import React from "react";
+const ErrorPage = ({ error }) => {
+  return (
+    <div>
+      <h1>Error Occurred</h1>
+      <p>{error.message}</p>
+      <a href="/">Go to Home</a>
+    </div>
+  );
+};
+export default ErrorPage;
+```
+
+- **Optimize Loading States**: Use `loading.js` files to display loading indicators while data is being fetched. This improves user experience by providing visual feedback during data loading operations.
+
+```javascript
+import React from "react";
+const LoadingPage = () => {
+  return (
+    <div>
+      <h1>Loading...</h1>
+      <p>Please wait while we fetch the data.</p>
+    </div>
+  );
+};
+export default LoadingPage;
+```
+
+- **Implement Not Found Pages**: Use `not-found.js` files to handle cases where a requested route does not exist. This provides users with a clear message and options to navigate back to valid routes.
+
+```javascript
+import React from "react";
+const NotFoundPage = () => {
+  return (
+    <div>
+      <h1>404 - Page Not Found</h1>
+      <p>The page you are looking for does not exist.</p>
+      <a href="/">Go to Home</a>
+    </div>
+  );
+};
+export default NotFoundPage;
+```
+
+- **Implement Global Error Handling**: Use `global-error.js` files to handle unhandled errors in the application. This ensures that users receive a consistent error message and can report issues if necessary.
+
+```javascript
+import React from "react";
+const GlobalErrorPage = ({ error }) => {
+  return (
+    <div>
+      <h1>Something went wrong</h1>
+      <p>{error.message}</p>
+      <a href="/">Go to Home</a>
+    </div>
+  );
+};
+export default GlobalErrorPage;
+```
+
+- **Utilize Templates for Reusability**: Use `template.js` files to create reusable templates for pages that share similar layouts or functionalities. This promotes code reusability and maintainability, making it easier to manage the application as it grows.
+
+```javascript
+import React from "react";
+const TemplatePage = ({ children }) => {
+  return (
+    <div>
+      <header>
+        <h1>My Application</h1>
+      </header>
+      <main>{children}</main>
+      <footer>
+        <p>&copy; 2023 My Application</p>
+      </footer>
+    </div>
+  );
+};
+export default TemplatePage;
+```
+
+- **Define Default Routes**: Use `default.js` files to define fallback routes for directories. This ensures that users always have a valid page to access, even if no specific route matches their request.
+
+```javascript
+import React from "react";
+const DefaultPage = () => {
+  return (
+    <div>
+      <h1>Welcome to My Application</h1>
+      <p>This is the default landing page.</p>
+      <a href="/about">Learn More About Us</a>
+    </div>
+  );
+};
+export default DefaultPage;
+```
+
+- **Keep Routing Logic Simple**: Avoid complex routing logic that can make the application difficult to maintain. Keep routing files focused on their specific purpose and avoid mixing concerns between different routes.
+- **Test Routing Functionality**: Regularly test routing functionality to ensure that routes are working as expected. This includes checking navigation, error handling, and loading states to provide a smooth user experience.
+- **Document Routing Structure**: Maintain clear documentation for the routing structure of the application. This helps other developers understand the organization of routes and makes it easier to onboard new team members.
+
+<BackToTop />
+
+## Dynamic Routing
+
+Dynamic routing in Next.js allows developers to create routes that can handle dynamic parameters, such as user IDs, blog post slugs, or product IDs. This enables the creation of pages that can display different content based on the parameters passed in the URL. Dynamic routing is essential for building applications that require personalized or context-specific content.
+
+| File/Folder     | Purpose                                                                                                                                                                                                             |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[folder]`      | Defines a dynamic route that can accept a single parameter from the URL, allowing for flexible routing based on user input or other dynamic data.                                                                   |
+| `[...folder]`   | Defines a catch-all route that can handle multiple segments of a URL, allowing for flexible routing that can accommodate varying numbers of parameters.                                                             |
+| `[[...folder]]` | Defines an optional catch-all route that can handle multiple segments of a URL, allowing for flexible routing that can accommodate varying numbers of parameters while also allowing for the absence of parameters. |
+
+### Details
+
+- **`[folder]`**: This syntax is used to create dynamic routes that can accept a single parameter from the URL. The `folder` name in square brackets indicates that this route can match any value for that parameter, allowing developers to create pages that can display content based on the value of the parameter.
+- **`[...folder]`**: This syntax is used to create catch-all routes that can handle multiple segments of a URL. The `...` indicates that this route can match any number of segments, allowing developers to create flexible routes that can handle dynamic content with varying numbers of parameters.
+- **`[[...folder]]`**: This syntax is used to create catch-all routes that can handle multiple segments of a URL, similar to `[...params]`, but it allows for optional segments. This means that the route can match URLs with varying numbers of segments, providing flexibility in handling dynamic content.
+
+The file structure for dynamic routing in Next.js typically looks like this:
+
+```plaintext
+app/
+ ├── blog/
+    ├── [slug]/
+       ├── page.js
+       └──  not-found.js
+    └──  index.js
+ ├── products/
+    ├── [id]/
+       ├── page.js
+       └──  not-found.js
+    └──  index.js
+```
+
+### Example of Dynamic Routing
+
+```javascript
+import React from "react";
+import { useRouter } from "next/router";
+const BlogPost = () => {
+  const router = useRouter();
+  const { slug } = router.query;
+
+  return (
+    <div>
+      <h1>Blog Post: {slug}</h1>
+      <p>This is the content for the blog post with slug: {slug}</p>
+    </div>
+  );
+};
+export default BlogPost;
+```
+
+In this example, the `BlogPost` component uses the `useRouter` hook to access the dynamic `slug` parameter from the URL. When a user navigates to a URL like `/blog/my-first-post`, the `slug` variable will be set to `my-first-post`, allowing the component to display the relevant content for that blog post.
+
+```javascript
+import React from "react";
+import { useRouter } from "next/router";
+const ProductPage = () => {
+  const router = useRouter();
+  const { id } = router.query;
+
+  return (
+    <div>
+      <h1>Product ID: {id}</h1>
+      <p>This is the content for the product with ID: {id}</p>
+    </div>
+  );
+};
+export default ProductPage;
+```
+
+In this example, the `ProductPage` component uses the `useRouter` hook to access the dynamic `id` parameter from the URL. When a user navigates to a URL like `/products/123`, the `id` variable will be set to `123`, allowing the component to display the relevant content for that product.
+
+```javascript
+import React from "react";
+import { useRouter } from "next/router";
+const CatchAllPage = () => {
+  const router = useRouter();
+  const { params } = router.query;
+
+  return (
+    <div>
+      <h1>Catch-All Route</h1>
+      <p>Parameters: {params ? params.join(", ") : "No parameters provided"}</p>
+    </div>
+  );
+};
+export default CatchAllPage;
+```
+
+In this example, the `CatchAllPage` component uses the `useRouter` hook to access the dynamic `params` parameter from the URL. When a user navigates to a URL like `/catch-all/segment1/segment2`, the `params` variable will be an array containing `["segment1", "segment2"]`, allowing the component to display the relevant content based on multiple segments.
+
+## Route Groups and Private Folders
+
+Route groups in Next.js allow developers to group related routes together without affecting the URL structure. This is useful for organizing routes that share common functionality or layout without creating additional directories in the URL path. Route groups can be defined using parentheses in the directory name.
+| File/Folder | Purpose |
+| --- | --- |
+| `(group-name)/` | Defines a route group that can contain related routes without affecting the URL structure, allowing for better organization of code. |
+| `_private/` | Defines private routes that should not be accessible to unauthenticated users, allowing for the creation of protected routes that require authentication. |
+
+### Details
+
+- **`(group-name)/`**: This directory is used to group related routes together. The routes within this group will not affect the URL structure, allowing developers to organize their code without impacting the user experience.
+
+```plaintext
+app/
+ ├── (auth)/
+    ├── login.js
+    ├── register.js
+ ├── (dashboard)/
+    ├── index.js
+    ├── settings.js
+ └──  index.js
+```
+
+When using route groups, the URL structure remains clean and organized, while the codebase can be structured in a way that makes it easier to manage related routes. With route groups, developers can create logical groupings of routes that share common functionality or layout without affecting the URL structure.
+
+Along with being able to keep the URL structure clean, route groups also allows developers to define layouts that can be shared across multiple routes within the group. This promotes code reusability and maintainability, making it easier to manage complex applications. For example, you can create a layout for the authentication routes that includes a common header and footer, while keeping the individual login and registration pages separate.
+
+```plaintext
+app/
+ ├── (auth)/
+    ├── layout.js
+    ├── login.js
+    └──  register.js
+ ├── (dashboard)/
+    ├── layout.js
+    ├── index.js
+    └──  settings.js
+ └──  index.js
+```
+
+Here, the `layout.js` files within each route group define the common structure for the routes in that group. This allows developers to create a consistent user interface across related routes while keeping the code organized.
+
+**NOTE**
+
+> Route groups do not affect the URL structure, meaning that the routes within a group will still be accessible at their original paths. This allows developers to organize their code without impacting how users access the routes. While the layout.js files within route groups define the layout for routes in that group, the layout.js in the root directory will still apply to all routes in the application, providing a consistent structure across the entire application. This means that the layout in the root directory will wrap around all routes, including those in route groups, ensuring a unified user experience.
+
+- **`_private/`**: This directory is used to define private routes that should not be accessible to unauthenticated users. It allows developers to create protected routes that require authentication before accessing the content.
+
+```plaintext
+app/
+ ├── _private/
+    ├── dashboard.js
+    ├── profile.js
+ └──  index.js
+```
+
+```javascript
+import React from "react";
+import { useRouter } from "next/router";
+const PrivatePage = () => {
+  const router = useRouter();
+  const isAuthenticated = false; // Replace with actual authentication logic
+
+  React.useEffect(() => {
+    if (!isAuthenticated) {
+      router.push("/login"); // Redirect to login if not authenticated
+    }
+  }, [isAuthenticated, router]);
+
+  return (
+    <div>
+      <h1>Private Page</h1>
+      <p>This page is only accessible to authenticated users.</p>
+    </div>
+  );
+};
+export default PrivatePage;
+```
+
+Here the `PrivatePage` component checks if the user is authenticated. If not, it redirects the user to the login page. This ensures that only authenticated users can access the content of the private route.
+
+## Parallel and Intercepted Routes
+
+Parallel and intercepted routes in Next.js allow developers to create multiple routes that can be rendered simultaneously or intercept the rendering of a route to provide additional functionality. This is useful for applications that require complex routing scenarios, such as displaying multiple components on the same page or providing custom behavior for specific routes.
+
+| File/Folder      | Purpose                                                                                                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `@folder`        | Defines parallel routes that can be rendered alongside the main route, such as sidebars or headers.                             |
+| `(.)folder`      | Defines intercepted routes that can modify the rendering of a route, such as loading states or error handling.                  |
+| `(..)folder`     | Defines nested parallel routes that can be rendered alongside the main route, such as nested sidebars or additional headers.    |
+| `(..)(..)folder` | Defines nested intercepted routes that can modify the rendering of a route, such as nested loading states or error handling.    |
+| `(...)folder`    | Defines catch-all routes that can handle multiple segments of a URL, allowing for dynamic content based on multiple parameters. |
+
+### Details
+
+- `@folder`: This directory is used to define parallel routes that can be rendered alongside the main route. It allows developers to create components that can be displayed simultaneously with the main content, such as sidebars, headers, or footers.
+
+```plaintext
+app/
+ ├── @sidebar/
+    ├── index.js
+ ├── @header/
+    ├── index.js
+ ├── @footer/
+    ├── index.js
+ └──  index.js
+```
+
+```javascript
+import React from "react";
+import Sidebar from "@sidebar";
+import Header from "@header";
+import Footer from "@footer";
+const MainPage = () => {
+  return (
+    <div>
+      <Header />
+      <Sidebar />
+      <main>
+        <h1>Main Content</h1>
+        <p>This is the main content of the page.</p>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+export default MainPage;
+```
+
+In this example, the `MainPage` component uses parallel routes to render a sidebar, header, and footer alongside the main content. This allows developers to create a consistent layout across different pages while keeping the code organized.
+
+- `(.)folder`: This directory is used to define intercepted routes that can modify the rendering of a route. It allows developers to create components that can intercept the rendering process and provide additional functionality, such as loading states, error handling, or custom behavior.
+
+```plaintext
+app/
+ ├── (loading)/
+    ├── index.js
+ ├── (error)/
+    ├── index.js
+ └──  index.js
+```
+
+```javascript
+import React from "react";
+import Loading from "(loading)";
+import Error from "(error)";
+const MainPage = () => {
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [hasError, setHasError] = React.useState(false);
+
+  React.useEffect(() => {
+    // Simulate data fetching
+    setTimeout(() => {
+      setIsLoading(false);
+      // Uncomment the next line to simulate an error
+      // setHasError(true);
+    }, 2000);
+  }, []);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (hasError) {
+    return <Error />;
+  }
+
+  return (
+    <div>
+      <h1>Main Content</h1>
+      <p>This is the main content of the page.</p>
+    </div>
+  );
+};
+export default MainPage;
+```
+
+In this example, the `MainPage` component uses intercepted routes to handle loading and error states. If the data is still being fetched, it displays the `Loading` component. If an error occurs, it displays the `Error` component. Once the data is successfully fetched, it renders the main content of the page.
+
+- `(..)folder`: This directory is used to define nested parallel routes that can be rendered alongside the main route. It allows developers to create components that can be displayed simultaneously with the main content, such as nested sidebars or additional headers.
+
+```plaintext
+app/
+ ├── (nested-sidebar)/
+    ├── index.js
+ ├── (nested-header)/
+    ├── index.js
+ └──  index.js
+```
+
+```javascript
+import React from "react";
+import NestedSidebar from "(nested-sidebar)";
+import NestedHeader from "(nested-header)";
+const MainPage = () => {
+  return (
+    <div>
+      <NestedHeader />
+      <NestedSidebar />
+      <main>
+        <h1>Main Content</h1>
+        <p>This is the main content of the page with nested components.</p>
+      </main>
+    </div>
+  );
+};
+export default MainPage;
+```
+
+In this example, the `MainPage` component uses nested parallel routes to render a nested sidebar and header alongside the main content. This allows developers to create more complex layouts with multiple levels of components while keeping the code organized.
+
+- `(..)(..)folder`: This directory is used to define nested intercepted routes that can modify the rendering of a route. It allows developers to create components that can intercept the rendering process and provide additional functionality, such as nested loading states or error handling.
+
+- `(...)folder`: This directory is used to define catch-all routes that can handle multiple segments of a URL. It allows developers to create pages that can display content based on multiple parameters, such as blog posts with multiple slugs or products with multiple IDs.
+
+```plaintext
+app/
+ ├── (...params)/
+    ├── index.js
+ └──  index.js
+```
+
+```javascript
+import React from "react";
+import { useRouter } from "next/router";
+const CatchAllPage = () => {
+  const router = useRouter();
+  const { params } = router.query;
+
+  return (
+    <div>
+      <h1>Catch-All Route</h1>
+      <p>Parameters: {params ? params.join(", ") : "No parameters provided"}</p>
+    </div>
+  );
+};
+export default CatchAllPage;
+```
+
+To summarize, parallel and intercepted routes in Next.js provide powerful tools for creating complex routing scenarios. By using these features, developers can create applications that display multiple components simultaneously, handle loading and error states effectively, and manage dynamic content based on multiple parameters. This enhances the user experience and allows for more flexible and maintainable code structures.
+
+<BackToTop />

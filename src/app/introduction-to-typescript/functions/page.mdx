@@ -14,12 +14,15 @@ Functions in TypeScript are reusable blocks of code that perform a specific task
 function greet(name: string): string {
   return `Hello, ${name}!`;
 }
+
 function add(a: number, b: number): number {
   return a + b;
 }
+
 function multiply(a: number, b: number): number {
   return a * b;
 }
+
 function logMessage(message: string): void {
   console.log(message);
 }
@@ -35,9 +38,11 @@ In TypeScript, you can specify the return type of a function to ensure that it r
 function getFullName(firstName: string, lastName: string): string {
   return `${firstName} ${lastName}`;
 }
+
 function calculateArea(radius: number): number {
   return Math.PI * radius * radius;
 }
+
 function isEven(num: number): boolean {
   return num % 2 === 0;
 }
@@ -56,6 +61,7 @@ function display(value: boolean): void;
 function display(value: string | number | boolean): void {
   console.log(value);
 }
+
 function calculate(x: number, y: number): number;
 function calculate(x: string, y: string): string;
 function calculate(x: number | string, y: number | string): number | string {
@@ -83,7 +89,7 @@ const greetUser = (name: string): void => {
 };
 ```
 
-## Different Types of Parameters
+## Parameters
 
 In TypeScript, functions can accept different types of parameters, including optional parameters, default parameters, and rest parameters.
 
@@ -101,12 +107,15 @@ function greetUser(name: string, age?: number): void {
     console.log(`Hello, ${name}!`);
   }
 }
+
 function logMessage(message: string, level: string = "info"): void {
   console.log(`[${level.toUpperCase()}] ${message}`);
 }
+
 function calculateTotal(price: number, tax: number = 0.1): number {
   return price + price * tax;
 }
+
 function formatDate(date: Date, format: string = "YYYY-MM-DD"): string {
   // Simple date formatting logic
   const options: Intl.DateTimeFormatOptions = {
@@ -128,9 +137,11 @@ Default parameters allow you to specify a default value for a parameter if no va
 function greet(name: string, greeting: string = "Hello"): void {
   console.log(`${greeting}, ${name}!`);
 }
+
 function calculatePrice(price: number, discount: number = 0): number {
   return price - price * discount;
 }
+
 function createUser(
   name: string,
   age: number = 18,
@@ -138,6 +149,7 @@ function createUser(
 ): void {
   console.log(`User created: ${name}, Age: ${age}, Admin: ${isAdmin}`);
 }
+
 function logError(message: string, code: number = 500): void {
   console.error(`Error ${code}: ${message}`);
 }
@@ -161,6 +173,7 @@ function createUser({
 }): void {
   console.log(`User created: ${name}, Age: ${age}, Email: ${email}`);
 }
+
 function updateProfile({
   username,
   bio,
@@ -174,6 +187,7 @@ function updateProfile({
     `Profile updated: ${username}, Bio: ${bio ?? "N/A"}, Active: ${isActive ?? false}`
   );
 }
+
 function sendEmail({
   to,
   subject,
@@ -199,6 +213,7 @@ interface User {
   age: number;
   email: string;
 }
+
 function createUser({ name, age, email }: User): void {
   console.log(`User created: ${name}, Age: ${age}, Email: ${email}`);
 }
@@ -216,12 +231,15 @@ Rest parameters allow you to pass a variable number of arguments to a function. 
 function sumAll(...numbers: number[]): number {
   return numbers.reduce((acc, num) => acc + num, 0);
 }
+
 function concatenateStrings(...strings: string[]): string {
   return strings.join(" ");
 }
+
 function logMessages(...messages: string[]): void {
   messages.forEach((msg) => console.log(msg));
 }
+
 function findMax(...values: number[]): number {
   return Math.max(...values);
 }
@@ -233,9 +251,56 @@ Rest parameters provide flexibility in function calls, allowing you to handle va
 
 By using the rest parameter syntax (`...paramName`), you can collect all remaining arguments into an array, which can then be processed within the function.
 
+### `this` Parameters
+
+```typescript
+interface DB {
+  filterUsers(filter: (this: User) => boolean): User[];
+}
+
+interface User {
+  admin: boolean;
+}
+
+declare const db: DB;
+const admins = db.filterUsers(function (this: User) {
+  return this.admin;
+});
+```
+
+#### Benefits of `this` Parameters
+
+Using `this` parameters allows you to specify the type of `this` within a function, ensuring that the function can only be called in a context where `this` is of the specified type. This can help prevent runtime errors and improve code clarity.
+
+## Generic Functions
+
+```typescript
+// Generic function
+function firstElement<Type>(arr: Type[]): Type | undefined {
+  return arr[0];
+}
+
+// Multiple type parameters
+function map<Input, Output>(
+  arr: Input[],
+  func: (arg: Input) => Output
+): Output[] {
+  return arr.map(func);
+}
+
+// Generic constraints
+interface Lengthwise {
+  length: number;
+}
+
+function logLength<Type extends Lengthwise>(arg: Type): number {
+  return arg.length;
+}
+```
+
 <BackToTop />
 
-### Type Aliases for Function Types
+## Type Aliases for Function Types
 
 Type aliases can also be used to define function types, making it easier to work with functions as first-class citizens in TypeScript. This allows you to create reusable function signatures.
 
@@ -255,4 +320,32 @@ type LoggerFunction = (message: string, level?: string) => void;
 
 > Here you can notice for `FilterFunction<T>` and `TransformFunction<T, U>`, we are using generics to allow the function to work with any type of data, making it more flexible and reusable.
 
+<BackToTop />
+
+
+## Async Functions
+
+```typescript
+// Async function returning Promise
+async function fetchData(): Promise<Data> {
+  const response = await fetch("api/data");
+  return response.json();
+}
+
+// Generic async function
+async function fetchById<T>(id: string): Promise<T> {
+  const response = await fetch(`api/${id}`);
+  return response.json();
+}
+```
+
+## Function Composition
+
+```typescript
+type Func<T extends any[], R> = (...a: T) => R;
+
+function compose<A, B, C>(f: Func<[B], C>, g: Func<[A], B>): Func<[A], C> {
+  return (x) => f(g(x));
+}
+```
 <BackToTop />

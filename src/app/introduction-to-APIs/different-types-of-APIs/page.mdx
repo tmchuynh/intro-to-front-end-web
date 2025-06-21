@@ -1,0 +1,371 @@
+import BackToTop from "@/components/BackToTop";
+
+# Different Types of APIs
+
+## Table of Contents
+
+## Credential Management API
+
+The Credential Management API provides a way to store and retrieve user credentials securely. It allows web applications to manage user credentials, such as passwords, in a way that enhances security and user experience.
+
+### Example: Storing and Retrieving Credentials
+
+```javascript
+// Storing a credential
+if ("credentials" in navigator) {
+  const cred = new PasswordCredential({
+    id: "user@example.com",
+    password: "securePassword",
+    name: "John Doe",
+  });
+
+  navigator.credentials.store(cred).then(() => {
+    console.log("Credentials stored.");
+  });
+}
+
+// Retrieving a credential
+navigator.credentials.get({ password: true }).then((credential) => {
+  if (credential) {
+    // Auto-fill login form
+    document.querySelector("#email").value = credential.id;
+    document.querySelector("#password").value = credential.password;
+  }
+});
+```
+
+In this example, the Credential Management API is used to store a user's credentials securely and retrieve them for auto-filling a login form. This enhances user experience by reducing the need for manual input while maintaining security.
+
+**Use Cases:**
+
+- Securely storing user credentials for login forms.
+- Auto-filling login forms to enhance user experience.
+- Managing user sessions securely.
+
+**Benefits:**
+
+- Improved security by storing credentials securely.
+- Enhanced user experience through auto-fill functionality.
+- Simplified credential management for web applications.
+
+<BackToTop />
+
+## Geolocation API
+
+The Geolocation API allows web applications to access the geographical location of a user's device. This can be used for various purposes, such as providing location-based services, displaying maps, or customizing content based on the user's location.
+
+```javascript
+if ("geolocation" in navigator) {
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const { latitude, longitude } = position.coords;
+      console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+      // Use the coordinates (e.g., display on a map)
+    },
+    (error) => {
+      console.error("Error getting location:", error);
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0,
+    }
+  );
+} else {
+  console.log("Geolocation is not supported by this browser.");
+}
+```
+
+In this example, the Geolocation API is used to retrieve the user's current geographical location. The coordinates can be used to display a map or provide location-based services.
+
+**Use Cases:**
+
+- Displaying maps based on the user's location.
+- Providing location-based services, such as nearby restaurants or stores.
+- Customizing content based on the user's geographical location.
+
+**Benefits:**
+
+- Enables location-based services and features.
+- Enhances user experience by providing relevant content based on location.
+- Allows for personalized experiences based on geographical data.
+
+<BackToTop />
+
+## Notifications API
+
+The Notifications API allows web applications to display notifications to users, even when the application is not in focus. This can be used to inform users about important events, updates, or messages.
+
+```javascript
+// Request permission to display notifications
+Notification.requestPermission().then((permission) => {
+  if (permission === "granted") {
+    new Notification("New Message", {
+      body: "You have a new message from Jane.",
+      icon: "message-icon.png",
+    });
+  }
+});
+```
+
+In this example, the Notifications API is used to request permission from the user to display notifications. If granted, a notification is displayed with a message and an icon.
+
+**Use Cases:**
+
+- Informing users about new messages or updates.
+- Alerting users about important events or reminders.
+- Providing real-time updates or notifications from the application.
+
+**Benefits:**
+
+- Keeps users informed about important events, even when the application is not in focus.
+- Enhances user engagement by providing timely notifications.
+- Allows for real-time communication with users through notifications.
+
+<BackToTop />
+
+## Payment Request API and Payment Handler API
+
+The Payment Request API provides a standardized way for web applications to request payment information from users. It simplifies the payment process by allowing users to make payments using their preferred payment methods without leaving the application.
+
+The Payment Handler API extends the Payment Request API, allowing web applications to handle payments using different payment methods, such as credit cards, digital wallets, or bank transfers.
+
+```javascript
+if (window.PaymentRequest) {
+  const supportedInstruments = [
+    {
+      supportedMethods: "basic-card",
+      data: {
+        supportedNetworks: ["visa", "mastercard", "amex"],
+      },
+    },
+  ];
+
+  const details = {
+    total: {
+      label: "Total",
+      amount: { currency: "USD", value: "" },
+    },
+  };
+
+  const request = new PaymentRequest(supportedInstruments, details);
+
+  request.show().then((paymentResponse) => {
+    // Process paymentResponse
+    // Send paymentResponse.details to server
+    return paymentResponse.complete("success");
+  });
+} else {
+  console.log("Payment Request API not supported.");
+}
+```
+
+In this example, the Payment Request API is used to create a payment request with supported payment methods. When the user completes the payment, the response can be processed and sent to the server for further handling.
+
+**Use Cases:**
+
+- Simplifying the payment process for online purchases.
+- Allowing users to pay using their preferred payment methods.
+- Enabling secure and standardized payment handling in web applications.
+
+**Benefits:**
+
+- Streamlines the payment process, reducing friction for users.
+- Enhances security by using standardized payment methods.
+- Provides a consistent user experience across different payment methods.
+
+<BackToTop />
+
+## Performance API
+
+The Performance API provides a way to measure and analyze the performance of web applications. It allows developers to gather metrics related to page load times, resource loading, and user interactions, helping to identify performance bottlenecks and optimize the user experience.
+
+```javascript
+window.addEventListener("load", () => {
+  const [navigationEntry] = performance.getEntriesByType("navigation");
+  console.log("Time to Interactive:", navigationEntry.domInteractive);
+  console.log("Total Load Time:", navigationEntry.loadEventEnd);
+});
+```
+
+In this example, the Performance API is used to measure the time it takes for the page to become interactive and the total load time. This information can be used to optimize the performance of the web application.
+
+**Use Cases:**
+
+- Measuring page load times and user interactions.
+- Analyzing resource loading performance.
+- Identifying performance bottlenecks and optimizing user experience.
+
+**Benefits:**
+
+- Provides insights into the performance of web applications.
+- Helps developers identify and fix performance issues.
+- Enhances user experience by optimizing page load times and interactions.
+
+<BackToTop />
+
+## Web Share API
+
+The Web Share API allows web applications to share content with other applications or services installed on the user's device. This can be used to share text, URLs, images, and other types of content seamlessly.
+
+```javascript
+if (navigator.share) {
+  navigator
+    .share({
+      title: "Check out this awesome website!",
+      text: "I found this great website that I think you will love.",
+      url: "https://example.com",
+    })
+    .then(() => console.log("Content shared successfully!"))
+    .catch((error) => console.error("Error sharing content:", error));
+} else {
+  console.log("Web Share API not supported.");
+}
+```
+
+In this example, the Web Share API is used to share a title, text, and URL with other applications on the user's device. If the sharing is successful, a success message is logged; otherwise, an error message is displayed.
+
+**Use Cases:**
+
+- Sharing content from a web application to social media or messaging apps.
+- Allowing users to share articles, images, or links with friends and family.
+- Enhancing user engagement by enabling easy content sharing.
+
+**Benefits:**
+
+- Simplifies the content sharing process for users.
+- Enhances user experience by allowing seamless sharing of content.
+- Increases user engagement by making it easy to share content with others.
+
+<BackToTop />
+
+## Web Bluetooth API
+
+The Web Bluetooth API allows web applications to communicate with Bluetooth devices directly from the browser. This enables developers to create applications that can interact with various Bluetooth-enabled devices, such as wearables, sensors, and smart home devices.
+
+```javascript
+if (navigator.bluetooth) {
+  navigator.bluetooth
+    .requestDevice({
+      filters: [{ services: ["heart_rate"] }],
+    })
+    .then((device) => {
+      console.log("Connected to device:", device.name);
+      return device.gatt.connect();
+    })
+    .then((server) => {
+      console.log("Connected to GATT server:", server);
+      // Interact with the device's services and characteristics
+    })
+    .catch((error) => {
+      console.error("Error connecting to Bluetooth device:", error);
+    });
+} else {
+  console.log("Web Bluetooth API not supported.");
+}
+```
+
+In this example, the Web Bluetooth API is used to request a Bluetooth device that supports the "heart_rate" service. Once connected, the application can interact with the device's services and characteristics.
+
+**Use Cases:**
+
+- Creating applications that interact with wearable devices, such as fitness trackers or smartwatches.
+- Developing applications that communicate with smart home devices, such as lights or thermostats.
+- Enabling real-time data exchange with Bluetooth sensors, such as temperature or humidity sensors.
+
+**Benefits:**
+
+- Enables direct communication with Bluetooth devices from the browser.
+- Enhances user experience by allowing seamless interaction with Bluetooth-enabled devices.
+- Provides opportunities for innovative applications in health, fitness, and smart home domains.
+
+<BackToTop />
+
+## WebUSB API
+
+The WebUSB API allows web applications to communicate with USB devices directly from the browser. This enables developers to create applications that can interact with various USB devices, such as printers, cameras, and other peripherals.
+
+```javascript
+if (navigator.usb) {
+  navigator.usb
+    .requestDevice({ filters: [{ vendorId: 0x1234 }] })
+    .then((device) => {
+      console.log("Connected to USB device:", device.productName);
+      return device.open();
+    })
+    .then((device) => {
+      console.log("USB device opened:", device);
+      // Interact with the USB device
+    })
+    .catch((error) => {
+      console.error("Error connecting to USB device:", error);
+    });
+} else {
+  console.log("WebUSB API not supported.");
+}
+```
+
+In this example, the WebUSB API is used to request a USB device with a specific vendor ID. Once connected, the application can interact with the USB device.
+
+**Use Cases:**
+
+- Creating applications that interact with USB peripherals, such as printers or cameras.
+- Developing applications that communicate with USB devices for data transfer or control.
+- Enabling real-time data exchange with USB sensors or devices.
+
+**Benefits:**
+
+- Enables direct communication with USB devices from the browser.
+- Enhances user experience by allowing seamless interaction with USB-enabled devices.
+- Provides opportunities for innovative applications in printing, imaging, and data transfer domains.
+
+<BackToTop />
+
+## Network Request APIs
+
+The Network Request APIs provide a standardized way for web applications to make network requests, such as fetching data from APIs or submitting forms. These APIs simplify the process of making HTTP requests and handling responses.
+
+### XMLHttpRequest API
+
+The XMLHttpRequest API is a traditional way to make network requests in web applications. It allows developers to send HTTP requests and handle responses asynchronously.
+
+```javascript
+const xhr = new XMLHttpRequest();
+xhr.open("GET", "https://api.example.com/data", true);
+xhr.onload = function () {
+  if (xhr.status >= 200 && xhr.status < 300) {
+    const response = JSON.parse(xhr.responseText);
+    console.log("Data fetched successfully:", response);
+  } else {
+    console.error("Error fetching data:", xhr.statusText);
+  }
+};
+xhr.onerror = function () {
+  console.error("Network error occurred.");
+};
+xhr.send();
+```
+
+In this example, the XMLHttpRequest API is used to fetch data from an API endpoint. The response is parsed as JSON, and success or error messages are logged accordingly.
+
+### Fetch API
+
+The Fetch API is a modern alternative to the XMLHttpRequest API for making network requests. It provides a more powerful and flexible way to handle HTTP requests and responses using Promises.
+
+```javascript
+fetch("https://api.example.com/data")
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    return response.json();
+  })
+  .then((data) => {
+    console.log("Data fetched successfully:", data);
+  })
+  .catch((error) => {
+    console.error("Error fetching data:", error);
+  });
+```
+
+In this example, the Fetch API is used to fetch data from an API endpoint. The response is checked for success, parsed as JSON, and success or error messages are logged accordingly.

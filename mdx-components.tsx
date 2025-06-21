@@ -132,7 +132,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     table: ({ children }) => (
       <>
         <br />
-        <table className="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 rounded-lg min-w-full">
+        <table className="shadow-sm border border-gray-200 dark:border-gray-700 rounded-lg min-w-full">
           {children}
         </table>
         <br />

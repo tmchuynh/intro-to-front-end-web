@@ -20,12 +20,12 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   };
 
   return (
-    <div className="flex bg-gray-50 dark:bg-gray-900 h-screen">
+    <div className="flex h-screen">
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
 
       {/* Main content area */}
-      <div className="flex flex-col flex-1 min-w-0">
+      <div className="flex flex-1 flex-col min-w-0">
         {/* Top navbar */}
         <TopNavbar onToggleSidebar={toggleSidebar} />
 

@@ -80,6 +80,7 @@ function categorizeNavigationItems(
     projects: [] as NavigationItem[],
     utilities: [] as NavigationItem[],
     advanced: [] as NavigationItem[],
+    advanced_projects: [] as NavigationItem[],
   };
 
   items.forEach((item) => {
@@ -107,6 +108,17 @@ function categorizeNavigationItems(
       title.includes("developer tools")
     ) {
       categories.developer_tools.push(item);
+    } else if (
+      path.includes("advanced") ||
+      path.includes("advancing") ||
+      path.includes("blog-website") ||
+      path.includes("ecommerce-platform") ||
+      title.includes("advanced") ||
+      title.includes("blog") ||
+      title.includes("ecommerce") ||
+      title.includes("advancing")
+    ) {
+      categories.advanced_projects.push(item);
     } else if (
       path.includes("performance") ||
       path.includes("security") ||
@@ -233,6 +245,13 @@ function categorizeNavigationItems(
     });
   }
 
+  if (categories.advanced_projects.length > 0) {
+    sections.push({
+      title: "Advanced Projects",
+      items: categories.advanced_projects,
+    });
+  }
+
   return sections;
 }
 
@@ -264,18 +283,31 @@ function getPriority(title: string): number {
   if (normalizedTitle.includes("overview")) return 1;
   if (
     normalizedTitle.includes("setting up") ||
+    normalizedTitle.includes("set up") ||
+    normalizedTitle.includes("getting started") ||
     normalizedTitle.includes("setup")
   )
     return 2;
-  if (normalizedTitle.includes("getting started")) return 3;
   if (
     normalizedTitle.includes("introduction") ||
+    normalizedTitle.includes("project structure") ||
     normalizedTitle.includes("intro")
   )
-    return 4;
-  if (normalizedTitle.includes("fundamentals")) return 5;
+    return 3;
+  if (normalizedTitle.includes("home")) return 4;
+
+  if (
+    normalizedTitle.includes("fundamentals") ||
+    normalizedTitle.includes("layouts")
+  )
+    return 5;
   if (normalizedTitle.includes("vocabulary")) return 6;
-  if (normalizedTitle.includes("bonus")) return 9999; // Always at the bottom
+  if (
+    normalizedTitle.includes("bonus") ||
+    normalizedTitle.includes("libraries") ||
+    normalizedTitle.includes("frameworks")
+  )
+    return 9999; // Always at the bottom
   return 999; // Default priority for other items
 }
 

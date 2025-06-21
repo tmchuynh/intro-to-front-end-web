@@ -1,0 +1,286 @@
+import BackToTop from "@/components/BackToTop";
+
+# Types of APIs
+
+## Table of Contents
+
+## Types of APIs
+
+APIs can be categorized into several types based on their functionality and usage:
+
+### REST APIs
+
+Representational State Transfer (REST) APIs are the most common type of web API. They use standard HTTP methods (GET, POST, PUT, DELETE) to perform operations on resources and are designed to be stateless and scalable.
+
+- **REST API Endpoints**: Endpoints are specific URLs that represent resources in a REST API. They are used to perform operations on those resources.
+- **HTTP Methods**: REST APIs use standard HTTP methods to interact with resources. The most common methods are:
+
+| HTTP Method | Description                                      |
+| ----------- | ------------------------------------------------ |
+| `GET`       | Retrieve data from the server                    |
+| `POST`      | Send data to the server to create a new resource |
+| `PUT`       | Update an existing resource on the server        |
+| `DELETE`    | Remove a resource from the server                |
+
+<BackToTop />
+
+### GraphQL APIs
+
+GraphQL is a query language for APIs that allows clients to
+request specific data from the server. It provides more flexibility than REST
+APIs by allowing clients to specify exactly what data they need.
+
+- **GraphQL Queries**: Clients can define queries to fetch specific data from the server.
+- **GraphQL Mutations**: Clients can define mutations to modify data on the server.
+- **GraphQL Subscriptions**: Clients can subscribe to real-time updates from the server.
+- **GraphQL Fragments**: Fragments allow clients to define reusable pieces of queries, making it easier to manage complex data structures.
+
+| GraphQL Query                                                                           | Description                                               |
+| --------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `query { user(id: "1") { name email } }`                                                | Fetch a user by ID with specific fields                   |
+| `mutation { createUser(name: "John", email: "john_doe@sample.com") { id name email } }` | Create a new user with specified fields                   |
+| `subscription { userCreated { id name email } }`                                        | Subscribe to real-time updates when a new user is created |
+| `fragment UserFields on User { id name email }`                                         | Define reusable fields for user data                      |
+| `@include(if: $condition)`                                                              | Conditionally include fields based on a variable          |
+| `@skip(if: $condition)`                                                                 | Conditionally skip fields based on a variable             |
+| `@deprecated(reason: "Use newField instead")`                                           | Mark a field as deprecated with a reason                  |
+| `@client`                                                                               | Indicate that a field is resolved on the client side      |
+
+<BackToTop />
+
+### gRPC APIs
+
+gRPC (gRPC Remote Procedure Call) is a high-performance, open-source framework that uses HTTP/2 for transport and Protocol Buffers for serialization. It allows clients and servers to communicate with each other using strongly typed messages and supports features like streaming and bi-directional communication.
+
+- **gRPC Services**: gRPC APIs define services with methods that can be called remotely.
+- **Protocol Buffers**: gRPC uses Protocol Buffers (protobuf) to define the structure of messages exchanged between clients and servers. This provides a compact binary format for data serialization.
+  | gRPC Method | Description |
+  | -------------------------------------------------------------------------- | --------------------------------------------------------- |
+  | `rpc GetUser(UserRequest) returns (UserResponse);` | Fetch a user by ID with a request and response message |
+  | `rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);` | Create a new user with a request and response message |
+  | `rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);` | Update an existing user with a request and response message |
+  | `rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);` | Remove a user with a request and response message |
+
+<BackToTop />
+
+### Webhooks
+
+Webhooks are a way for applications to send real-time data to other applications. They are typically used to notify other systems about events, such as when a user signs up or when a payment is processed.
+Webhooks allow applications to push data to other systems without requiring the receiving system to poll for updates. This makes them efficient for real-time notifications and event-driven architectures.
+
+- **Webhook Endpoints**: Webhooks are configured to send data to specific URLs (endpoints) when certain events occur.
+- **Payloads**: When a webhook is triggered, it sends a payload containing information about the event to the specified endpoint. The receiving application can then process this data accordingly.
+  | Webhook Event | Description |
+  | -------------- | ----------- |
+  | `user.created` | Triggered when a new user is created in the system |
+  | `order.completed` | Triggered when an order is successfully completed |
+  | `payment.failed` | Triggered when a payment fails during processing |
+
+<BackToTop />
+
+### OpenID Connect
+
+OpenID Connect is an authentication layer built on top of OAuth 2.0. It allows clients to verify the identity of users and obtain basic profile information. OpenID Connect is commonly used for single sign-on (SSO) scenarios, enabling users to log in to multiple applications using a single set of credentials. OpenID Connect defines several flows for authentication, each suited for different scenarios. The most common flows are:
+
+| OpenID Connect Flow                          | Description                                                                                                                                                                          |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Authorization Code Flow**                  | The client redirects the user to the authorization server to obtain an authorization code, which is then exchanged for an ID token and access token.                                 |
+| **Implicit Flow**                            | The client directly receives an ID token and access token in the URL fragment after the user authenticates.                                                                          |
+| **Hybrid Flow**                              | A combination of the Authorization Code Flow and Implicit Flow, allowing the client to receive both an authorization code and tokens in a single response.                           |
+| **Client Credentials Flow**                  | Used for server-to-server communication where the client authenticates itself to obtain an access token without user interaction.                                                    |
+| **Resource Owner Password Credentials Flow** | The client collects the user's credentials (username and password) and exchanges them for an access token. This flow is less secure and should only be used in trusted applications. |
+| **Device Authorization Flow**                | Used for devices with limited input capabilities, allowing users to authenticate on a separate device (e.g., mobile phone) and grant access to the client.                           |
+| **Refresh Token Flow**                       | Allows the client to obtain a new access token using a refresh token without requiring the user to re-authenticate. This is useful for maintaining long-lived sessions.              |
+| **ID Tokens**                                | JSON Web Tokens (JWT) that contain information about the authenticated user, such as their unique identifier, name, and email address.                                               |
+
+<BackToTop />
+
+### OAuth 2.0
+
+OAuth 2.0 is an authorization framework that allows third-party applications to access user data without sharing the user's credentials. It provides a secure way for users to grant limited access to their resources on one service to another service.
+
+- **Access Tokens**: OAuth 2.0 uses access tokens to grant permissions to third-party applications. These tokens are issued by an authorization server and can be used to access protected resources.
+- **Authorization Server**: The server that issues access tokens after authenticating the user and obtaining their consent.
+- **Resource Server**: The server that hosts the protected resources and validates access tokens before granting access to those resources.
+- **Client**: The application that wants to access the user's resources on their behalf.
+- **Resource Owner**: The user who owns the resources and grants access to the client application.
+- **OAuth 2.0 Grant Types**: OAuth 2.0 defines several grant types that determine how the client obtains access tokens. Each grant type is suited for different scenarios, such as web applications, mobile apps, or server-to-server communication.
+
+| OAuth 2.0 Grant Type                    | Description                                                                                                                                                                                                                 |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Authorization Code**                  | Used for server-side applications where the client can securely store the client secret. The user is redirected to the authorization server to obtain an authorization code, which is then exchanged for an access token.   |
+| **Implicit**                            | Used for client-side applications (e.g., single-page applications) where the client cannot securely store the client secret. The client directly receives an access token in the URL fragment after the user authenticates. |
+| **Resource Owner Password Credentials** | The client collects the user's credentials (username and password) and exchanges them for an access token. This flow is less secure and should only be used in trusted applications.                                        |
+| **Client Credentials**                  | Used for server-to-server communication where the client authenticates itself to obtain an access token without user interaction.                                                                                           |
+| **Device Authorization**                | Used for devices with limited input capabilities, allowing users to authenticate on a separate device (e.g., mobile phone) and grant access to the client.                                                                  |
+| **Refresh Token**                       | Allows the client to obtain a new access token using a refresh token without requiring the user to re-authenticate. This is useful for maintaining long-lived sessions.                                                     |
+
+<BackToTop />
+
+### OpenAPI/Swagger
+
+OpenAPI (formerly known as Swagger) is a specification for building APIs that allows developers to describe the structure of their APIs in a machine-readable format. This enables automatic generation of documentation and client libraries.
+
+- **OpenAPI Specification**: The OpenAPI specification defines the endpoints, request/response formats, authentication methods, and other details of an API.
+- **Swagger UI**: Swagger UI is a tool that generates interactive API documentation from an OpenAPI specification, allowing developers to test API endpoints directly from the documentation.
+- **OpenAPI Features**: OpenAPI provides a standardized way to document APIs, making it easier for developers to understand and use them. It supports features like parameter validation, response schemas, and authentication methods.
+
+| OpenAPI Feature      | Description                                                                                           |
+| -------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Endpoints**        | Define the available API endpoints and their HTTP methods (GET, POST, PUT, DELETE).                   |
+| **Request/Response** | Specify the request and response formats, including headers, query parameters, and body content.      |
+| **Authentication**   | Define the authentication methods supported by the API, such as API keys, OAuth, or JWT.              |
+| **Error Handling**   | Document the error responses that the API can return, including status codes and error messages.      |
+| **Schemas**          | Define the data structures used in requests and responses, allowing for validation and documentation. |
+
+<br />
+
+```javascript
+import React from "react";
+import { useRouter } from "next/router";
+export default function PagesRouterExample() {
+  const router = useRouter();
+  const { slug } = router.query;
+
+  return (
+    <div>
+      <h1>Pages Router Example</h1>
+      <p>Current Route: {slug ? slug.join("/") : "Loading..."}</p>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+### JSON-RPC and XML-RPC
+
+These are remote procedure call (RPC) protocols that use JSON or XML to encode the requests and responses. They allow clients to invoke methods on a server and receive results in a structured format.
+
+- **JSON-RPC**: A lightweight protocol that uses JSON to encode requests and responses. It allows clients to call methods on a server and receive results in a simple format.
+- **XML-RPC**: Similar to JSON-RPC, but uses XML for encoding requests and responses. It provides a way for clients to invoke methods on a server and receive structured results.
+
+| RPC Protocol            | Description                                                                                                          |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **JSON-RPC**            | A lightweight protocol that uses JSON to encode requests and responses.                                              |
+| **XML-RPC**             | Similar to JSON-RPC, but uses XML for encoding requests and responses.                                               |
+| **Method Invocation**   | Clients can invoke methods on the server by sending a request with the method name and parameters.                   |
+| **Response Handling**   | The server responds with the result of the method invocation, which can be processed by the client.                  |
+| **Error Handling**      | Errors can be communicated back to the client with specific error codes and messages.                                |
+| **Batch Requests**      | Multiple method invocations can be sent in a single request, allowing for efficient communication.                   |
+| **Notifications**       | Clients can send notifications to the server without expecting a response, allowing for asynchronous communication.  |
+| **Transport Protocols** | JSON-RPC and XML-RPC can be used over various transport protocols, such as HTTP, WebSocket, or TCP.                  |
+| **Versioning**          | Both protocols support versioning, allowing clients and servers to negotiate the version of the protocol being used. |
+
+<br />
+
+```javascript
+import React from "react";
+import { useRouter } from "next/router";
+export default function JSONRPCExample() {
+  const router = useRouter();
+  const { method } = router.query;
+
+  return (
+    <div>
+      <h1>JSON-RPC Example</h1>
+      <p>Current Method: {method ? method : "Loading..."}</p>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+### Streaming APIs
+
+Streaming APIs allow clients to receive real-time updates from the server. They are commonly used in applications that require continuous data flow, such as social media feeds or stock market updates.
+Streaming APIs maintain an open connection between the client and server, allowing the server to push updates to the client as they occur. This is different from traditional APIs, where the client must poll the server for updates.
+
+| Streaming API Feature     | Description                                                                                                  |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **WebSockets**            | Provides full-duplex communication channels over a single TCP connection for real-time data exchange.        |
+| **Server-Sent Events**    | Allows servers to push updates to clients over HTTP, providing a simpler alternative to WebSockets.          |
+| **Long Polling**          | Keeps the connection open until the server has new data to send, allowing for continuous updates.            |
+| **HTTP/2 Server Push**    | Allows servers to push resources to clients without waiting for requests, enabling efficient updates.        |
+| **GraphQL Subscriptions** | Allows clients to subscribe to real-time updates for specific data, receiving updates when the data changes. |
+
+<br />
+
+```javascript
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+export default function StreamingAPIExample() {
+  const [data, setData] = useState([]);
+  const router = useRouter();
+  const { stream } = router.query;
+
+  useEffect(() => {
+    if (stream) {
+      const eventSource = new EventSource(`/api/stream/${stream}`);
+
+      eventSource.onmessage = (event) => {
+        setData((prevData) => [...prevData, JSON.parse(event.data)]);
+      };
+
+      return () => {
+        eventSource.close();
+      };
+    }
+  }, [stream]);
+
+  return (
+    <div>
+      <h1>Streaming API Example</h1>
+      <ul>
+        {data.map((item, index) => (
+          <li key={index}>{JSON.stringify(item)}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+### SOAP APIs
+
+Simple Object Access Protocol (SOAP) APIs are a protocol for exchanging structured information in web services. They use XML for message formatting and rely on other application layer protocols, such as HTTP or SMTP, for message transmission.
+SOAP APIs are designed to be platform-independent and can be used across different programming languages and systems. They provide a standardized way to define the structure of requests and responses, making it easier to integrate with various systems.
+
+- **SOAP Messages**: SOAP APIs use XML messages to encode requests and responses. Each message consists of an envelope, header, and body.
+- **WSDL (Web Services Description Language)**: WSDL is an XML-based language used to describe the functionality of a SOAP API. It defines the available operations, input/output parameters, and data types used in the API.
+- **SOAP Actions**: SOAP APIs use actions to specify the operation being performed in a request. The action is typically included in the HTTP headers of the request.
+- **SOAP Faults**: SOAP APIs can return faults to indicate errors in processing requests. These faults are structured XML messages that provide information about the error.
+- **SOAP Bindings**: SOAP APIs can be bound to different transport protocols, such as HTTP, SMTP, or JMS, allowing for flexibility in how messages are transmitted.
+- **SOAP Security**: SOAP APIs can implement security features, such as WS-Security, to ensure the confidentiality and integrity of messages exchanged between clients and servers.
+
+| SOAP Feature            | Description                                                                                                                                        |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **SOAP Messages**       | Use XML messages to encode requests and responses, consisting of an envelope, header, and body.                                                    |
+| **WSDL**                | Web Services Description Language (WSDL) is used to describe the structure of SOAP APIs, including operations, messages, and data types.           |
+| **Operations**          | Define the available operations (methods) that can be invoked on the SOAP service, along with their input and output parameters.                   |
+| **Fault Handling**      | Provide a standardized way to handle errors and exceptions in SOAP messages, allowing clients to understand and respond to errors.                 |
+| **Transport Protocols** | SOAP APIs can be used over various transport protocols, such as HTTP, SMTP, or JMS, providing flexibility in communication.                        |
+| **WS-Security**         | Support for secure message transmission, including encryption and digital signatures, ensuring the integrity and confidentiality of SOAP messages. |
+| **SOAP Bindings**       | Define how SOAP messages are transmitted over different transport protocols, allowing for interoperability between systems.                        |
+| **SOAP Actions**        | Specify the operation being performed in a SOAP request, typically included in the HTTP headers.                                                   |
+
+<BackToTop />
+
+### WebSocket APIs
+
+WebSocket APIs provide a full-duplex communication channel over a single TCP connection, allowing real-time data exchange between the client and server. They are commonly used for applications that require low latency and high-frequency updates, such as chat applications or live data feeds.
+WebSocket APIs maintain an open connection between the client and server, allowing both parties to send and receive messages at any time. This is different from traditional HTTP APIs, where the client must initiate each request.
+
+| WebSocket Feature             | Description                                                                                                                         |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| **Full-Duplex Communication** | Allows both the client and server to send messages independently, enabling real-time updates.                                       |
+| **Low Latency**               | Provides low-latency communication, making it suitable for applications that require immediate updates.                             |
+| **Persistent Connection**     | Maintains an open connection between the client and server, reducing the overhead of establishing new connections for each request. |
+| **Binary and Text Messages**  | Supports both binary and text messages, allowing for flexible data exchange formats.                                                |
+| **Event-Driven**              | Uses an event-driven model, where messages are sent and received as events, allowing for efficient handling of real-time data.      |
+| **Subprotocols**              | Allows clients and servers to negotiate subprotocols for specific use cases, enabling custom message formats and behaviors.         |
+
+<BackToTop />

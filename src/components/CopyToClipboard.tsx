@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
+import { BsClipboard2CheckFill, BsClipboard2Fill } from "react-icons/bs";
 import Button from "./Button";
-import { BsClipboard2Fill, BsClipboard2CheckFill } from "react-icons/bs";
 
 interface CopyButtonProps {
   textToCopy: string;
@@ -55,7 +55,7 @@ function CopyButton({ textToCopy }: CopyButtonProps) {
   return (
     <Button
       onClick={handleCopy}
-      className="absolute right-0 top-0 flex gap-2 items-center hover:bg-primary hover:border-primary rounded-none rounded-bl-lg"
+      className="absolute right-0 top-0 flex gap-2 items-center hover:bg-primary py-2 hover:border-primary rounded-none rounded-bl-lg"
       variant="outline"
       aria-label="Copy to clipboard"
     >

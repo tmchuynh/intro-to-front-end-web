@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 
 interface ButtonProps {
   href?: string;
-  variant?: "text" | "filled" | "outline";
+  variant?: "text" | "default" | "outline" | "secondary" | "tertiary";
   arrow?: "right" | "left";
   className?: string;
   children: ReactNode;
@@ -12,7 +12,7 @@ interface ButtonProps {
 
 export default function Button({
   href,
-  variant = "filled",
+  variant = "default",
   arrow,
   className = "",
   children,
@@ -22,9 +22,14 @@ export default function Button({
     "inline-flex items-center gap-2 font-medium transition-colors";
 
   const variantClasses = {
-    filled: "bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-lg",
+    default:
+      "bg-primary text-primary-foreground hover:bg-blue-700 px-4 rounded-lg",
+    secondary:
+      "bg-secondary text-secondary-foreground hover:bg-gray-200 px-4 rounded-lg",
+    tertiary:
+      "bg-tertiary text-tertiary-foreground hover:text-gray-700 px-4 rounded-lg",
     outline:
-      "border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg",
+      "border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 rounded-lg",
     text: "text-blue-600 hover:text-blue-700",
   };
 

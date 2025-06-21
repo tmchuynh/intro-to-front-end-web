@@ -7,19 +7,19 @@ import CopyButton from "./src/components/CopyToClipboard";
 
 // Utility function to extract text content from React children
 function extractTextContent(children: React.ReactNode): string {
-  if (typeof children === 'string') {
+  if (typeof children === "string") {
     return children;
   }
-  if (typeof children === 'number') {
+  if (typeof children === "number") {
     return children.toString();
   }
   if (Array.isArray(children)) {
-    return children.map(extractTextContent).join('');
+    return children.map(extractTextContent).join("");
   }
-  if (children && typeof children === 'object' && 'props' in children) {
+  if (children && typeof children === "object" && "props" in children) {
     return extractTextContent(children.props.children);
   }
-  return '';
+  return "";
 }
 
 interface Props {
@@ -110,10 +110,13 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     pre: ({ children }) => {
       const textContent = extractTextContent(children);
       return (
-        <div className="relative bg-zinc-800 dark:bg-transparent my-5 px-4 border-zinc-700 dark:border-zinc-800 rounded-2xl overflow-y-auto">
-          <CopyButton textToCopy={textContent} />
-          <pre className="my-4 p-4">{children}</pre>
-        </div>
+        <>
+          <div className="relative bg-zinc-800 dark:bg-transparent my-5 px-4 border-zinc-700 dark:border-zinc-800 rounded-2xl overflow-y-auto">
+            <CopyButton textToCopy={textContent} />
+            <pre className="my-4 p-4">{children}</pre>
+          </div>
+          <br />
+        </>
       );
     },
     a: ({ href, children }) => (
@@ -127,9 +130,13 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     // Table components
     table: ({ children }) => (
-      <table className="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 rounded-lg min-w-full">
-        {children}
-      </table>
+      <>
+        <br />
+        <table className="bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 rounded-lg min-w-full">
+          {children}
+        </table>
+        <br />
+      </>
     ),
     thead: ({ children }) => (
       <thead className="bg-gray-50 dark:bg-gray-700">{children}</thead>
@@ -153,6 +160,15 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <td className="px-6 py-4 border-gray-200 dark:border-gray-600 border-b text-gray-900 text-sm dark:text-gray-100">
         {children}
       </td>
+    ),
+    img: ({ src, alt, ...props }) => (
+      <img src={src} alt={alt} className="mx-auto my-6 rounded-lg" {...props} />
+    ),
+    blockquote: ({ children }) => (
+      <>
+        <blockquote>{children}</blockquote>
+        <br />
+      </>
     ),
     // Custom components
     Button,

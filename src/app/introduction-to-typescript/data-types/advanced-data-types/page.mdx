@@ -1,0 +1,577 @@
+import BackToTop from "@/components/BackToTop";
+
+# Advanced Data Types
+
+## Table of Contents
+
+## Type Aliases
+
+Type aliases in TypeScript allow you to create a new name for a type. They can be used to simplify complex types or to create more readable code.
+
+### Example Usage
+
+```typescript
+type Point = { x: number; y: number }; // Type alias for a point
+let point: Point = { x: 10, y: 20 }; // Using the Point type alias
+type StringOrNumber = string | number; // Type alias for a union type
+let value: StringOrNumber = "Hello"; // Using the StringOrNumber type alias
+let anotherValue: StringOrNumber = 42; // Using the StringOrNumber type alias
+```
+
+## Union Types
+
+Union types allow you to define a variable that can hold multiple types. This is useful when a value can be one of several types.
+
+### Example Usage
+
+```typescript
+let value: string | number; // Union type
+value = "Hello"; // Assigning a string
+value = 42; // Assigning a number
+let multiType: number | string;
+multiType = 20; // Valid
+multiType = "twenty"; // Valid
+multiType = true; // Error!
+let mixed: (string | number)[] = ["apple", 1, "banana", 2]; // Array with union types
+```
+
+## Intersection Types
+
+Intersection types allow you to combine multiple types into one. This is useful when you want to create a type that has all the properties of multiple types.
+
+### Example Usage
+
+```typescript
+type Person = { name: string; age: number };
+type Contact = { email: string; phone: string };
+type PersonContact = Person & Contact; // Intersection type
+let personContact: PersonContact = {
+  name: "Alice",
+  age: 30,
+  email: "alice189378@sample.com",
+  phone: "123-456-7890",
+}; // Object adhering to the PersonContact type
+let anotherContact: Person & { address: string } = {
+  name: "Bob",
+  age: 25,
+  email: "bob2938@sample.com",
+  phone: "987-654-3210",
+  address: "123 Main St",
+}; // Object adhering to the intersection type
+```
+
+## Literal Types
+
+Literal types allow you to specify exact values that a variable can hold. This is useful for creating more precise types and ensuring that only specific values are allowed.
+
+### Example Usage
+
+```typescript
+let direction: "up" | "down" | "left" | "right"; // Literal type
+direction = "up"; // Valid
+direction = "down"; // Valid
+direction = "forward"; // Error! Not a valid literal type
+let status: "active" | "inactive" | "pending"; // Literal type
+status = "active"; // Valid
+status = "inactive"; // Valid
+status = "completed"; // Error! Not a valid literal type
+```
+
+## Casting Types / Type Assertions
+
+Type casting, also known as type assertions, allows you to tell TypeScript to treat a variable as a specific type. This is useful when you know the type of a variable better than TypeScript does, or when you want to override the inferred type.
+
+### Example Usage
+
+```typescript
+// Angle-bracket syntax
+let someValue: any = "this is a string";
+let strLength: number = (<string>someValue).length;
+
+// As syntax
+let otherValue: any = "this is a string";
+let otherLength: number = (someValue as string).length;
+
+// Using type assertions with DOM elements
+let inputElement = document.getElementById("myInput") as HTMLInputElement;
+let inputValue: string = inputElement.value; // Accessing value as a string
+```
+
+**TIP**
+
+> Use type assertions sparingly and only when necessary, as they can bypass TypeScript's type checking and lead to runtime errors if used incorrectly.
+
+## Type Inference
+
+Type inference is a powerful feature of TypeScript that allows the compiler to automatically determine the type of a variable based on its initial value. This means you don't always have to explicitly declare types, as TypeScript can infer them for you.
+
+### Example Usage
+
+```typescript
+let inferredNumber = 42; // TypeScript infers this as number
+let inferredString = "Hello, TypeScript"; // TypeScript infers this as string
+let inferredBoolean = true; // TypeScript infers this as boolean
+let inferredArray = [1, 2, 3]; // TypeScript infers this as number[]
+let inferredObject = { name: "Alice", age: 30 }; // TypeScript infers this as { name: string; age: number }
+```
+
+**NOTE**
+
+> Type inference helps reduce boilerplate code and makes TypeScript more flexible while still providing type safety. While TypeScript's type inference is powerful, explicitly declaring types can make code more readable and self-documenting.
+
+<BackToTop />
+
+## Type Manipulation
+
+Type manipulation in TypeScript allows you to create new types based on existing ones. This can be done using utility types, mapped types, and conditional types.
+
+### Generics
+
+Generics allow you to create reusable components and functions that can work with different types while maintaining type safety. They enable you to define a type parameter that can be replaced with any type when the component or function is used.
+
+```typescript
+function identity<T>(arg: T): T {
+  return arg; // Returns the argument of type T
+}
+
+let numberIdentity = identity<number>(42); // Using the identity function with a number
+let stringIdentity = identity<string>("Hello"); // Using the identity function with a string
+let arrayIdentity = identity<number[]>([1, 2, 3]); // Using the identity function with an array of numbers
+```
+
+### Type Guards
+
+Type guards are functions that allow you to narrow down the type of a variable at runtime. They help TypeScript understand the specific type of a variable based on certain conditions.
+
+```typescript
+function isString(value: any): value is string {
+  return typeof value === "string"; // Checks if the value is a string
+}
+function processValue(value: string | number) {
+  if (isString(value)) {
+    console.log(`String value: ${value.toUpperCase()}`); // Safe to use string methods
+  } else {
+    console.log(`Number value: ${value.toFixed(2)}`); // Safe to use number methods
+  }
+}
+processValue("Hello"); // Output: String value: HELLO
+processValue(42); // Output: Number value: 42.00
+```
+
+### Type Assertions
+
+Type assertions allow you to tell TypeScript to treat a variable as a specific type. This is useful when you know the type of a variable better than TypeScript does, or when you want to override the inferred type.
+
+```typescript
+let someValue: any = "this is a string";
+let strLength: number = (someValue as string).length; // Using 'as' syntax for type assertion
+let anotherValue: any = "this is another string";
+let anotherStrLength: number = (<string>anotherValue).length; // Using angle-bracket syntax for type assertion
+```
+
+### Utility Types
+
+Utility types are built-in types provided by TypeScript that help manipulate existing types. Some commonly used utility types include:
+
+- `Partial<T>`: Makes all properties of type `T` optional.
+- `Required<T>`: Makes all properties of type `T` required.
+- `Readonly<T>`: Makes all properties of type `T` read-only.
+- `Record<K, T>`: Creates an object type with keys of type `K` and values of type `T`.
+
+```typescript
+type User = {
+  id: number;
+  name: string;
+  email?: string; // Optional property
+};
+type PartialUser = Partial<User>; // All properties are optional
+type RequiredUser = Required<User>; // All properties are required
+type ReadonlyUser = Readonly<User>; // All properties are read-only
+type UserRecord = Record<string, User>; // Creates an object type with string keys and User values
+```
+
+#### Partials
+
+Partial types allow you to create a new type with all properties of an existing type set to optional. This is useful when you want to update only some properties of an object.
+
+```typescript
+type User = {
+  id: number;
+  name: string;
+  email?: string; // Optional property
+};
+type PartialUser = Partial<User>; // All properties are optional
+let userUpdate: PartialUser = {
+  name: "Alice",
+  // Only updating the name property
+}; // Valid, as all properties are optional
+```
+
+#### Required
+
+Required types allow you to create a new type with all properties of an existing type set to required. This is useful when you want to ensure that all properties must be provided.
+
+```typescript
+type User = {
+  id: number;
+  name?: string; // Optional property
+  email?: string; // Optional property
+};
+type RequiredUser = Required<User>; // All properties are required
+let user: RequiredUser = {
+  id: 1,
+  name: "Alice",
+  email: "alice09392@sample.com",
+}; // Valid, as all properties are required
+```
+
+#### Readonly
+
+Readonly types allow you to create a new type with all properties of an existing type set to read-only. This is useful when you want to prevent modifications to an object.
+
+```typescript
+type User = {
+  id: number;
+  name: string;
+  email?: string; // Optional property
+};
+type ReadonlyUser = Readonly<User>; // All properties are read-only
+let user: ReadonlyUser = {
+  id: 1,
+  name: "Alice",
+  email: "alice90193@sample.com",
+}; // Valid, as all properties are read-only
+// user.name = "Bob"; // Error! Cannot modify read-only property
+```
+
+#### Record
+
+Record types allow you to create an object type with specific keys and values. This is useful when you want to create a mapping of keys to values.
+
+```typescript
+type User = {
+  id: number;
+  name: string;
+};
+type UserRecord = Record<string, User>; // Creates an object type with string keys and User values
+let users: UserRecord = {
+  user1: { id: 1, name: "Alice" },
+  user2: { id: 2, name: "Bob" },
+}; // Valid, as it creates a mapping of string keys to User values
+```
+
+#### Pick and Omit
+
+Pick and Omit types allow you to create new types by selecting or excluding specific properties from an existing type.
+
+```typescript
+type User = {
+  id: number;
+  name: string;
+  email?: string; // Optional property
+};
+type PickedUser = Pick<User, "id" | "name">; // Creates a type with only id and name properties
+let user: PickedUser = {
+  id: 1,
+  name: "Alice",
+}; // Valid, as it only includes id and name properties
+type OmittedUser = Omit<User, "email">; // Creates a type without the email property
+let anotherUser: OmittedUser = {
+  id: 2,
+  name: "Bob",
+}; // Valid, as it excludes the email property
+```
+
+<BackToTop />
+
+### Mapped Types
+
+Mapped types allow you to create new types by transforming properties of an existing type. You can use mapped types to iterate over the keys of a type and apply transformations.
+
+```typescript
+type Readonly<T> = {
+  readonly [P in keyof T]: T[P];
+};
+
+type Optional<T> = {
+  [P in keyof T]?: T[P];
+};
+
+interface Person {
+  name: string;
+  age: number;
+}
+
+// Makes all properties readonly
+type ReadonlyPerson = Readonly<Person>;
+
+// Makes all properties optional
+type OptionalPerson = Optional<Person>;
+```
+
+**TIP**
+
+> Combine utility types for more complex type transformations. For example: `type ReadonlyOptional<T> = Readonly<Partial<T>>;`
+
+### Conditional Types
+
+Conditional types allow you to create types based on conditions. They can be used to create types that depend on other types or values.
+
+```typescript
+type TypeName<T> = T extends string
+  ? "string"
+  : T extends number
+    ? "number"
+    : T extends boolean
+      ? "boolean"
+      : T extends undefined
+        ? "undefined"
+        : T extends Function
+          ? "function"
+          : "object";
+
+type T0 = TypeName<string>; // "string"
+type T1 = TypeName<"hello">; // "string"
+type T2 = TypeName<() => void>; // "function"
+```
+
+<BackToTop />
+
+## Type Predicates
+
+```typescript
+function isString(value: any): value is string {
+  return typeof value === "string";
+}
+
+function processValue(value: any) {
+  if (isString(value)) {
+    // TypeScript knows value is a string here
+    console.log(value.toUpperCase());
+  }
+}
+```
+
+**NOTE**
+
+> Use type predicates to narrow types in a type-safe way rather than using type assertions.
+
+## Interfaces
+
+Interfaces in TypeScript are used to define the structure of an object. They allow you to specify the properties and methods that an object should have, providing a way to enforce type checking.
+
+### Basic Interface
+
+```typescript
+interface User {
+  name: string;
+  email: string;
+  age: number;
+  readonly id: number;
+  isActive?: boolean;
+}
+
+const user: User = {
+  name: "John Doe",
+  email: "john@example.com",
+  age: 30,
+  id: 1,
+};
+```
+
+In this example, the `User` interface defines the structure of a user object with properties like `name`, `email`, `age`, and an optional property `isActive`. The `id` property is marked as `readonly`, meaning it cannot be changed after initialization.
+
+#### Interface VS Type Alias
+
+| Feature                       | Interface | Type Alias |
+| ----------------------------- | --------- | ---------- |
+| Can be extended               | Yes       | No         |
+| Can be implemented by classes | Yes       | No         |
+| Can define function types     | Yes       | Yes        |
+| Can define object types       | Yes       | Yes        |
+| Can define union types        | No        | Yes        |
+| Can define intersection types | No        | Yes        |
+| Can define mapped types       | No        | Yes        |
+| Can define conditional types  | No        | Yes        |
+| Can define utility types      | No        | Yes        |
+| Supports declaration merging  | Yes       | No         |
+| Can be used with generics     | Yes       | Yes        |
+| Can be used with enums        | No        | Yes        |
+| Supports index signatures     | Yes       | Yes        |
+| Can be used with namespaces   | Yes       | No         |
+
+<br />
+TypeScript supports both interfaces and type aliases, but they have different
+use cases and capabilities. Interfaces are primarily used to define the
+structure of objects and can be extended or implemented by classes, while type
+aliases can represent more complex types, including unions and intersections.
+
+```typescript
+// Interface
+interface Point {
+  x: number;
+  y: number;
+}
+
+// Type alias
+type Point = {
+  x: number;
+  y: number;
+};
+
+// Interfaces can be extended
+interface Animal {
+  name: string;
+}
+interface Dog extends Animal {
+  breed: string;
+}
+
+// Types can be intersected
+type Animal = {
+  name: string;
+};
+type Dog = Animal & {
+  breed: string;
+};
+```
+
+### Interface Extension
+
+```typescript
+interface Animal {
+  name: string;
+}
+
+interface Bear extends Animal {
+  honey: boolean;
+}
+
+const bear: Bear = {
+  name: "Winnie",
+  honey: true,
+};
+```
+
+In this example, the `Bear` interface extends the `Animal` interface, inheriting its properties while adding a new property `honey`. This allows for code reuse and better organization of related types.
+
+### Function Interfaces
+
+```typescript
+interface SearchFunc {
+  (source: string, subString: string): boolean;
+}
+
+let mySearch: SearchFunc = function (src: string, sub: string): boolean {
+  return src.search(sub) > -1;
+};
+```
+
+In this example, the `SearchFunc` interface defines a function type that takes two string parameters and returns a boolean. The `mySearch` variable is assigned a function that matches this interface, demonstrating how interfaces can be used to define function signatures.
+
+### Interface with Methods
+
+```typescript
+interface User {
+  name: string;
+  email: string;
+  age: number;
+  greet(): string; // Method declaration
+}
+const user: User = {
+  name: "Jane Doe",
+  email: "john_doe@sample.com",
+  age: 25,
+  greet() {
+    return `Hello, my name is ${this.name}`;
+  }, // Method implementation
+};
+```
+
+In this example, the `User` interface includes a method `greet` that returns a greeting string. The `user` object implements this method, demonstrating how interfaces can define both properties and methods.
+
+### Class Interfaces
+
+```typescript
+interface ClockConstructor {
+  new (hour: number, minute: number): ClockInterface;
+}
+
+interface ClockInterface {
+  tick(): void;
+}
+
+class DigitalClock implements ClockInterface {
+  constructor(h: number, m: number) {}
+  tick() {
+    console.log("beep beep");
+  }
+}
+```
+
+In this example, the `ClockConstructor` interface defines a constructor signature for creating clock instances. The `ClockInterface` defines a method `tick`. The `DigitalClock` class implements the `ClockInterface`, ensuring that it provides the required method.
+
+### Hybrid Interfaces
+
+```typescript
+interface Counter {
+  (start: number): string;
+  interval: number;
+  reset(): void;
+}
+
+function getCounter(): Counter {
+  let counter = function (start: number) {} as Counter;
+  counter.interval = 123;
+  counter.reset = function () {};
+  return counter;
+}
+```
+
+In this example, the `Counter` interface defines a function type with additional properties and methods. The `getCounter` function returns an object that matches the `Counter` interface, demonstrating how interfaces can be used to create hybrid types that combine functions and properties.
+
+### Index Signatures
+
+```typescript
+interface StringArray {
+  [index: number]: string;
+}
+
+interface Dictionary {
+  [key: string]: any;
+  length: number; // ok, length is a number
+  name: string; // ok, name is a string
+}
+```
+
+In this example, the `StringArray` interface defines an index signature that allows accessing string values using numeric indices. The `Dictionary` interface demonstrates how to define an index signature for string keys while also specifying additional properties.
+
+### Extending Multiple Interfaces
+
+```typescript
+interface Shape {
+  color: string;
+}
+
+interface PenStroke {
+  penWidth: number;
+}
+
+interface Square extends Shape, PenStroke {
+  sideLength: number;
+}
+
+const square: Square = {
+  color: "blue",
+  penWidth: 2,
+  sideLength: 10,
+};
+```
+
+In this example, the `Square` interface extends both the `Shape` and `PenStroke` interfaces, combining their properties into a single type. This allows for more complex types that can inherit from multiple sources, promoting code reuse and modularity.
+
+**TIP**
+
+> Use interfaces to define the structure of objects and classes, ensuring type safety and better code organization. Interfaces can be extended and combined to create complex types that suit your application's needs.
+
+<BackToTop />

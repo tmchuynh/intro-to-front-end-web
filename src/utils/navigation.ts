@@ -8,6 +8,7 @@ export interface NavigationItem {
   children?: NavigationItem[];
   icon?: string;
   order?: number;
+  isExpanded?: boolean;
 }
 
 export interface NavigationSection {
@@ -31,7 +32,7 @@ export function formatTitle(name: string): string {
 
 // Function to read metadata from MDX files
 export async function readMDXMetadata(
-  filePath: string,
+  filePath: string
 ): Promise<{ title?: string; order?: number }> {
   try {
     if (typeof window !== "undefined") {
@@ -71,7 +72,7 @@ export async function readMDXMetadata(
 
 // Function to categorize pages into logical sections
 function categorizeNavigationItems(
-  items: NavigationItem[],
+  items: NavigationItem[]
 ): NavigationSection[] {
   const categories = {
     fundamentals: [] as NavigationItem[],
@@ -84,19 +85,137 @@ function categorizeNavigationItems(
     advanced_projects: [] as NavigationItem[],
   };
 
-  items.forEach((item) => {
+  // Helper function to categorize an item and its children recursively
+  function categorizeItem(item: NavigationItem): string {
     const path = item.href.toLowerCase();
     const title = item.title.toLowerCase();
 
-    // Categorize based on path and title
+    // If item has children, check if it's a top-level section that should be categorized as a whole
+    if (item.children && item.children.length > 0) {
+      // Check for API-related top-level sections
+      if (
+        path.includes("introduction-to-apis") ||
+        path.includes("introduction-to-APIs") ||
+        title.includes("introduction to apis") ||
+        title.includes("api")
+      ) {
+        return "advanced";
+      }
+
+      // Check for other framework/library sections
+      if (
+        path.includes("introduction-to-graphql") ||
+        path.includes("introduction-to-frameworks") ||
+        path.includes("introduction-to-typescript") ||
+        path.includes("introduction-to-react") ||
+        path.includes("introduction-to-next") ||
+        title.includes("graphql") ||
+        title.includes("framework") ||
+        title.includes("library") ||
+        title.includes("typescript") ||
+        title.includes("react") ||
+        title.includes("next.js")
+      ) {
+        return "advanced";
+      }
+
+      // Check for core technology sections
+      if (
+        path.includes("introduction-to-html") ||
+        path.includes("introduction-to-css") ||
+        path.includes("introduction-to-javascript") ||
+        path.includes("document-object-model") ||
+        title.includes("html") ||
+        title.includes("css") ||
+        title.includes("javascript") ||
+        title.includes("dom")
+      ) {
+        return "core_technologies";
+      }
+
+      // Check for developer tools sections
+      if (
+        path.includes("developer-tools") ||
+        title.includes("developer tools")
+      ) {
+        return "developer_tools";
+      }
+
+      // Check for design sections
+      if (
+        path.includes("ux-ui-design") ||
+        title.includes("design") ||
+        title.includes("ux") ||
+        title.includes("ui")
+      ) {
+        return "design";
+      }
+
+      // Check for project sections
+      if (
+        path.includes("quiz-app") ||
+        path.includes("website-portfolio") ||
+        title.includes("project") ||
+        title.includes("portfolio")
+      ) {
+        return "projects";
+      }
+
+      // Check for advanced project sections
+      if (
+        path.includes("blog-website") ||
+        path.includes("ecommerce-platform") ||
+        path.includes("advancing") ||
+        title.includes("blog") ||
+        title.includes("ecommerce") ||
+        title.includes("advancing")
+      ) {
+        return "advanced_projects";
+      }
+    }
+
+    // For individual pages or items without children, use original logic
     if (
       path === "/" ||
-      path.includes("overview") ||
+      (path.includes("overview") &&
+        !path.includes("introduction-to-apis") &&
+        !path.includes("introduction-to-APIs")) ||
       path.includes("getting-started") ||
       path.includes("vocabulary") ||
       path.includes("abbreviations")
     ) {
-      categories.fundamentals.push(item);
+      return "fundamentals";
+    } else if (
+      path.includes("introduction-to-apis") ||
+      path.includes("introduction-to-APIs") ||
+      path.includes("performance") ||
+      path.includes("security") ||
+      path.includes("storage-solutions") ||
+      path.includes("graphql") ||
+      path.includes("introduction-to-graphql") ||
+      path.includes("frameworks") ||
+      path.includes("introduction-to-frameworks") ||
+      path.includes("libraries") ||
+      path.includes("typescript") ||
+      path.includes("introduction-to-typescript") ||
+      path.includes("react") ||
+      path.includes("introduction-to-react") ||
+      path.includes("next.js") ||
+      path.includes("introduction-to-next") ||
+      title.includes("performance") ||
+      title.includes("graphql") ||
+      title.includes("security") ||
+      title.includes("storage") ||
+      title.includes("apis") ||
+      title.includes("api") ||
+      title.includes("framework") ||
+      title.includes("library") ||
+      title.includes("typescript") ||
+      title.includes("react") ||
+      title.includes("next.js") ||
+      title.includes("advanced")
+    ) {
+      return "advanced";
     } else if (
       path.includes("browser-developer-tools") ||
       path.includes("command-line-interface") ||
@@ -108,42 +227,16 @@ function categorizeNavigationItems(
       title.includes("development environment") ||
       title.includes("developer tools")
     ) {
-      categories.developer_tools.push(item);
+      return "developer_tools";
     } else if (
-      path.includes("advanced") ||
       path.includes("advancing") ||
       path.includes("blog-website") ||
       path.includes("ecommerce-platform") ||
-      title.includes("advanced") ||
       title.includes("blog") ||
       title.includes("ecommerce") ||
       title.includes("advancing")
     ) {
-      categories.advanced_projects.push(item);
-    } else if (
-      path.includes("performance") ||
-      path.includes("security") ||
-      path.includes("storage-solutions") ||
-      path.includes("graphql") ||
-      path.includes("APIs") ||
-      path.includes("frameworks") ||
-      path.includes("libraries") ||
-      path.includes("typescript") ||
-      path.includes("react") ||
-      path.includes("next.js") ||
-      title.includes("performance") ||
-      title.includes("graphql") ||
-      title.includes("security") ||
-      title.includes("storage") ||
-      title.includes("apis") ||
-      title.includes("framework") ||
-      title.includes("library") ||
-      title.includes("typescript") ||
-      title.includes("react") ||
-      title.includes("next.js") ||
-      title.includes("advanced")
-    ) {
-      categories.advanced.push(item);
+      return "advanced_projects";
     } else if (
       path.includes("seo-accessibility") ||
       path.includes("introduction-to-html") ||
@@ -161,7 +254,7 @@ function categorizeNavigationItems(
       title.includes("forms") ||
       title.includes("jquery")
     ) {
-      categories.core_technologies.push(item);
+      return "core_technologies";
     } else if (
       path.includes("quiz-app") ||
       path.includes("project") ||
@@ -169,7 +262,7 @@ function categorizeNavigationItems(
       title.includes("project") ||
       title.includes("portfolio")
     ) {
-      categories.projects.push(item);
+      return "projects";
     } else if (
       path.includes("ux-ui-design") ||
       path.includes("design") ||
@@ -177,7 +270,7 @@ function categorizeNavigationItems(
       title.includes("ux") ||
       title.includes("ui")
     ) {
-      categories.design.push(item);
+      return "design";
     } else if (
       path.includes("utilities-tools") ||
       path.includes("resources-utilities") ||
@@ -189,11 +282,15 @@ function categorizeNavigationItems(
       title.includes("helper") ||
       title.includes("tools")
     ) {
-      categories.utilities.push(item);
+      return "utilities";
     } else {
-      // Default to fundamentals for uncategorized items
-      categories.fundamentals.push(item);
+      return "fundamentals";
     }
+  }
+
+  items.forEach((item) => {
+    const category = categorizeItem(item);
+    categories[category as keyof typeof categories].push(item);
   });
 
   // Create sections only if they have items
@@ -337,7 +434,7 @@ function sortNavigationItems(items: NavigationItem[]): NavigationItem[] {
 
 async function scanDirectory(
   dirPath: string,
-  basePath: string,
+  basePath: string
 ): Promise<NavigationItem[]> {
   const items: NavigationItem[] = [];
 
@@ -361,13 +458,13 @@ async function scanDirectory(
         // Check if directory has a page file
         const pageFiles = ["page.tsx", "page.mdx", "page.js"];
         const hasPage = pageFiles.some((file) =>
-          fs.existsSync(path.join(fullPath, file)),
+          fs.existsSync(path.join(fullPath, file))
         );
 
         if (hasPage) {
           // Directory with a page file
           const pageFile = pageFiles.find((file) =>
-            fs.existsSync(path.join(fullPath, file)),
+            fs.existsSync(path.join(fullPath, file))
           );
           const pagePath = path.join(fullPath, pageFile!);
           const metadata = await readMDXMetadata(pagePath);
@@ -410,4 +507,65 @@ async function scanDirectory(
     console.error("Error scanning directory:", dirPath, error);
     return [];
   }
+}
+
+// Function to set expanded state based on current URL
+export function setExpandedState(
+  sections: NavigationSection[],
+  currentPath: string
+): NavigationSection[] {
+  const normalizedPath = currentPath.startsWith("/")
+    ? currentPath
+    : `/${currentPath}`;
+
+  return sections.map((section) => ({
+    ...section,
+    items: section.items.map((item) =>
+      setItemExpandedState(item, normalizedPath)
+    ),
+  }));
+}
+
+function setItemExpandedState(
+  item: NavigationItem,
+  currentPath: string
+): NavigationItem {
+  const shouldExpand = isPathInSubtree(currentPath, item);
+
+  return {
+    ...item,
+    isExpanded: shouldExpand,
+    children: item.children?.map((child) =>
+      setItemExpandedState(child, currentPath)
+    ),
+  };
+}
+
+function isPathInSubtree(currentPath: string, item: NavigationItem): boolean {
+  // Check if current path matches this item exactly
+  if (currentPath === item.href) {
+    return true;
+  }
+
+  // Check if current path is a child of this item
+  if (currentPath.startsWith(item.href + "/")) {
+    return true;
+  }
+
+  // Check if any children match
+  if (item.children) {
+    return item.children.some((child) => isPathInSubtree(currentPath, child));
+  }
+
+  return false;
+}
+
+// Function to get client-side navigation with expanded state
+export function getClientSideNavigation(
+  currentPath?: string
+): NavigationSection[] {
+  if (currentPath) {
+    return setExpandedState(fallbackNav, currentPath);
+  }
+  return fallbackNav;
 }

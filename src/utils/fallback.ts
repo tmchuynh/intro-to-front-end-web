@@ -271,16 +271,38 @@ export const fallbackNav = [
         href: "/graphql",
       },
       {
-        title: "Application Programming Interface",
-        href: "/application-programming-interface",
+        title: "Introduction To APIs",
+        href: "/introduction-to-APIs",
         children: [
           {
-            title: "APIs",
-            href: "/application-programming-interface/APIs",
+            title: "Overview",
+            href: "/introduction-to-APIs/overview",
           },
           {
-            title: "Content Delivery Networks",
-            href: "/application-programming-interface/content-delivery-networks",
+            title: "API Technologies",
+            href: "/introduction-to-APIs/API-technologies",
+            children: [
+              {
+                title: "API Gateways",
+                href: "/introduction-to-APIs/API-technologies/API-gateways",
+              },
+              {
+                title: "REST APIs",
+                href: "/introduction-to-APIs/API-technologies/REST-APIs",
+              },
+              {
+                title: "GraphQL",
+                href: "/introduction-to-APIs/API-technologies/GraphQL",
+              },
+            ],
+          },
+          {
+            title: "API Design",
+            href: "/introduction-to-APIs/API-design",
+          },
+          {
+            title: "API Security",
+            href: "/introduction-to-APIs/API-security",
           },
         ],
       },

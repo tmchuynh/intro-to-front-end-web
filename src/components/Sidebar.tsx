@@ -1,4 +1,5 @@
 import { useNavigation } from "@/hooks/useNavigation";
+import type { NavigationItem } from "@/utils/navigation";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -17,22 +18,33 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   // Function to find which section contains the current path
   const findSectionForPath = (path: string) => {
     for (const section of navigation) {
-      for (const item of section.items) {
-        // Check direct match
-        if (item.href === path) {
-          return section.title;
-        }
-        // Check children
-        if (item.children) {
-          for (const child of item.children) {
-            if (child.href === path) {
-              return section.title;
-            }
-          }
-        }
+      if (checkItemContainsPath(section.items, path)) {
+        return section.title;
       }
     }
     return null;
+  };
+
+  // Recursive function to check if any item or its children contain the path
+  const checkItemContainsPath = (
+    items: NavigationItem[],
+    path: string
+  ): boolean => {
+    for (const item of items) {
+      // Check direct match
+      if (item.href === path) {
+        return true;
+      }
+      // Check if path starts with this item's path (for sub-routes)
+      if (path.startsWith(item.href + "/") && item.href !== "#") {
+        return true;
+      }
+      // Recursively check children
+      if (item.children && checkItemContainsPath(item.children, path)) {
+        return true;
+      }
+    }
+    return false;
   };
 
   // Set the section containing the current page as open by default

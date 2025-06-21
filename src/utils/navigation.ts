@@ -123,6 +123,7 @@ function categorizeNavigationItems(
       path.includes("performance") ||
       path.includes("security") ||
       path.includes("storage-solutions") ||
+      path.includes("graphql") ||
       path.includes("APIs") ||
       path.includes("frameworks") ||
       path.includes("libraries") ||
@@ -130,6 +131,7 @@ function categorizeNavigationItems(
       path.includes("react") ||
       path.includes("next.js") ||
       title.includes("performance") ||
+      title.includes("graphql") ||
       title.includes("security") ||
       title.includes("storage") ||
       title.includes("apis") ||

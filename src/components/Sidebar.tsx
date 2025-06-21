@@ -1,5 +1,6 @@
 import { useNavigation } from "@/hooks/useNavigation";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import NavigationSection from "./NavigationSection";
 
@@ -10,14 +11,42 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { navigation, loading } = useNavigation();
+  const pathname = usePathname();
   const [openSection, setOpenSection] = useState<string | null>(null);
 
-  // Set the first section as open by default when navigation loads
+  // Function to find which section contains the current path
+  const findSectionForPath = (path: string) => {
+    for (const section of navigation) {
+      for (const item of section.items) {
+        // Check direct match
+        if (item.href === path) {
+          return section.title;
+        }
+        // Check children
+        if (item.children) {
+          for (const child of item.children) {
+            if (child.href === path) {
+              return section.title;
+            }
+          }
+        }
+      }
+    }
+    return null;
+  };
+
+  // Set the section containing the current page as open by default
   useEffect(() => {
     if (navigation.length > 0 && openSection === null) {
-      setOpenSection(navigation[0].title);
+      const currentSection = findSectionForPath(pathname);
+      if (currentSection) {
+        setOpenSection(currentSection);
+      } else {
+        // Fallback to first section if no match found
+        setOpenSection(navigation[0].title);
+      }
     }
-  }, [navigation, openSection]);
+  }, [navigation, pathname, openSection]);
 
   const handleSectionToggle = (sectionTitle: string) => {
     setOpenSection(openSection === sectionTitle ? null : sectionTitle);
@@ -28,7 +57,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="z-40 fixed inset-0 lg:hidden overlay"
+          className="fixed inset-0 z-40 lg:hidden overlay"
           onClick={onClose}
         />
       )}
@@ -46,11 +75,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div
-            className="flex justify-between items-center p-4 border-b"
+            className="flex items-center justify-between p-4 border-b"
             style={{ borderColor: "var(--sidebar-border)" }}
           >
             <Link href="/" className="flex items-center space-x-2">
-              <div className="flex justify-center items-center w-8 h-8 brand-logo">
+              <div className="flex items-center justify-center h-8 w-8 brand-logo">
                 <span className="font-bold text-lg text-white">W</span>
               </div>
               <span
@@ -66,7 +95,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               style={{ color: "var(--sidebar-text-secondary)" }}
             >
               <svg
-                className="w-5 h-5"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

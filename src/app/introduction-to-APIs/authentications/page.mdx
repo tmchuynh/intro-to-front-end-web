@@ -72,7 +72,6 @@ fetch("https://api.example.com/protected", {
 | No additional infrastructure required | No built-in token expiration                |
 | Easy to test with tools like Postman  | Vulnerable to replay attacks if not secured |
 
-<br />
 **WARNING**
 
 > Basic Authentication has significant security drawbacks. Base64 encoding is not encryption; it merely disguises the credentials, making them easily reversible. Always use HTTPS with Basic Authentication to encrypt the entire HTTP request.
@@ -185,6 +184,7 @@ class TokenManager {
   }
 }
 ```
+
 <BackToTop />
 
 #### Token Refresh Implementation
@@ -300,7 +300,6 @@ fetch("https://api.example.com/protected", {
   .then((data) => console.log("Protected data:", data))
   .catch((error) => console.error("Error:", error));
 ```
-<br />
 
 | Advantages                            | Disadvantages                                           |
 | ------------------------------------- | ------------------------------------------------------- |
@@ -311,14 +310,11 @@ fetch("https://api.example.com/protected", {
 | Supports token expiration and refresh | Requires careful implementation to avoid security risks |
 | Easy to implement with libraries      | Requires additional infrastructure for token management |
 
-<br />
-
-**WARNING** 
+**WARNING**
 
 > Bearer tokens must be handled with care. If a token is compromised, an attacker can access protected resources without needing to know the user's credentials. Always use HTTPS to protect tokens in transit and consider using short-lived tokens with refresh mechanisms.
 
 <BackToTop />
-
 
 ```javascript
 // Secure Bearer Token implementation
@@ -501,6 +497,7 @@ const logout = async () => {
   }
 };
 ```
+
 <BackToTop />
 
 #### Session vs Token Comparison
@@ -514,9 +511,6 @@ const logout = async () => {
 | **Complexity**  | Simple                   | Moderate          |
 | **Performance** | Database lookup required | No server storage |
 | **Expiration**  | Server-defined           | Client-defined    |
-
-<br />
-<br />
 
 ### Session Security Considerations
 
@@ -534,18 +528,12 @@ confidentiality of user sessions.
 | **Session Revocation**                | Provide a way to revoke sessions (e.g., logout, admin controls), maintain a blacklist of revoked sessions |
 | **Session Management**                | Monitor session activity, log session creation and termination, implement rate limiting                   |
 
-<br />
-<br />
-
 | Advantages                                          | Disadvantages                            |
 | --------------------------------------------------- | ---------------------------------------- |
 | Server has full control over sessions               | Requires server-side storage             |
 | Can revoke sessions immediately                     | Difficult to scale horizontally          |
 | Session data is not exposed to client               | Not suitable for stateless architectures |
 | Built-in CSRF protection with proper implementation | Session fixation vulnerabilities         |
-
-<br />
-<br />
 
 ```javascript
 // Secure session configuration example (Express.js)
@@ -566,7 +554,7 @@ app.use(
       maxAge: 1000 * 60 * 60 * 24, // 24 hours
       sameSite: "strict", // CSRF protection
     },
-  })
+  }),
 );
 ```
 
@@ -644,6 +632,7 @@ const handleOAuthCallback = async () => {
   }
 };
 ```
+
 <BackToTop />
 
 #### 2. Implicit Flow (Deprecated for Security Reasons)
@@ -759,7 +748,7 @@ const auth = new PKCEAuth(
   "your_client_id",
   "https://yourapp.com/callback",
   "https://accounts.google.com/oauth2/v2/auth",
-  "https://oauth2.googleapis.com/token"
+  "https://oauth2.googleapis.com/token",
 );
 
 // Start authentication
@@ -800,7 +789,7 @@ const API_KEY = process.env.REACT_APP_API_KEY; // For public APIs only
 const fetchWeatherData = async (city) => {
   try {
     const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}`
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}`,
     );
 
     if (!response.ok) {
@@ -840,6 +829,7 @@ app.get("/api/data", validateApiKey, (req, res) => {
   res.json({ message: "Access granted", data: "sensitive information" });
 });
 ```
+
 <BackToTop />
 
 #### API Key Security Best Practices
@@ -940,7 +930,6 @@ class ApiKeyManager {
 - **Secure Cookies**: Use `HttpOnly`, `Secure`, and `SameSite` attributes for cookies.
 - **CORS (Cross-Origin Resource Sharing)**: Properly configure CORS to control which domains can access your API.
 
-
 ```javascript
 // Enforce HTTPS in production
 const enforceHTTPS = (req, res, next) => {
@@ -950,9 +939,11 @@ const enforceHTTPS = (req, res, next) => {
   next();
 };
 ```
+
 <BackToTop />
 
 ### 2. Token Security
+
 - **Use short-lived access tokens** with refresh tokens for long-term access.
 - **Implement token revocation**: Maintain a blacklist of revoked tokens.
 - **Validate tokens on every request**: Ensure tokens are not expired and belong to an active user.
@@ -986,9 +977,11 @@ const validateToken = async (token) => {
   }
 };
 ```
+
 <BackToTop />
 
 ### 3. CSRF Protection
+
 - **Use anti-CSRF tokens**: Generate a unique token for each session and include it in forms and AJAX requests.
 - **Set the `SameSite` attribute** on cookies to prevent CSRF attacks.
 - **Implement CORS policies** to restrict cross-origin requests.
@@ -1025,6 +1018,7 @@ const makeProtectedRequest = async (url, data) => {
 ```
 
 ### 4. Rate Limiting
+
 - **Implement rate limiting** to prevent abuse and brute-force attacks.
 - **Limit requests per IP address** or user account.
 - **Use libraries like `express-rate-limit`** for easy implementation in Node.js applications.
@@ -1117,7 +1111,7 @@ const AuthService = {
     window.dispatchEvent(
       new CustomEvent("userLoggedIn", {
         detail: data.user,
-      })
+      }),
     );
 
     // Redirect to intended page or dashboard
@@ -1128,6 +1122,7 @@ const AuthService = {
   },
 };
 ```
+
 <BackToTop />
 
 ### 2. Registration Flow
@@ -1190,7 +1185,7 @@ const RegistrationService = {
 
     if (password && !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
       errors.push(
-        "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+        "Password must contain at least one uppercase letter, one lowercase letter, and one number",
       );
     }
 
@@ -1202,9 +1197,11 @@ const RegistrationService = {
   },
 };
 ```
+
 <BackToTop />
 
 ### 3. Password Reset Flow
+
 The example below demonstrates a password reset flow that includes requesting a password reset, validating the reset token, and updating the password. It ensures that the new password meets security requirements and provides feedback to the user in case of errors.
 
 ```javascript
@@ -1269,6 +1266,7 @@ const PasswordResetService = {
 <BackToTop />
 
 ## Authentication Error Handling
+
 This section provides a comprehensive error handling utility for authentication-related errors. It includes a custom error class, predefined error codes, and a handler that processes errors based on their type. This approach allows for consistent error handling across the application, making it easier to manage authentication-related issues.
 
 ### Common Authentication Errors
@@ -1357,7 +1355,7 @@ const AuthErrorHandler = {
         throw new AuthError(
           "Network error occurred",
           AuthErrorCodes.NETWORK_ERROR,
-          0
+          0,
         );
       }
 
@@ -1369,19 +1367,19 @@ const AuthErrorHandler = {
             throw new AuthError(
               data.error || "Authentication failed",
               AuthErrorCodes.INVALID_CREDENTIALS,
-              401
+              401,
             );
           case 403:
             throw new AuthError(
               "Insufficient permissions",
               AuthErrorCodes.INSUFFICIENT_PERMISSIONS,
-              403
+              403,
             );
           case 429:
             throw new AuthError(
               "Rate limit exceeded",
               AuthErrorCodes.RATE_LIMIT_EXCEEDED,
-              429
+              429,
             );
           default:
             throw error;
@@ -1440,7 +1438,7 @@ const LoginForm = () => {
 
 ## Testing Authentication
 
-Testing authentication logic is crucial to ensure that your authentication flows work as expected and handle errors gracefully. It involves both unit tests for individual functions and integration tests for the complete authentication flow. 
+Testing authentication logic is crucial to ensure that your authentication flows work as expected and handle errors gracefully. It involves both unit tests for individual functions and integration tests for the complete authentication flow.
 
 ### Unit Testing Authentication Logic
 
@@ -1502,19 +1500,19 @@ describe("AuthService", () => {
       fetch.mockResolvedValueOnce(mockResponse);
 
       await expect(
-        AuthService.login("test@example.com", "wrong-password")
+        AuthService.login("test@example.com", "wrong-password"),
       ).rejects.toThrow("Invalid credentials");
     });
 
     it("should validate email format", async () => {
       await expect(
-        AuthService.login("invalid-email", "password")
+        AuthService.login("invalid-email", "password"),
       ).rejects.toThrow("Email format is invalid");
     });
 
     it("should validate password length", async () => {
       await expect(
-        AuthService.login("test@example.com", "123")
+        AuthService.login("test@example.com", "123"),
       ).rejects.toThrow("Password must be at least 6 characters");
     });
   });
@@ -1543,6 +1541,7 @@ describe("AuthService", () => {
   });
 });
 ```
+
 <BackToTop />
 
 ### Integration Testing
@@ -1569,12 +1568,12 @@ const server = setupServer(
           success: true,
           user: { id: 1, email: "test@example.com", name: "Test User" },
           token: "mock-jwt-token",
-        })
+        }),
       );
     }
 
     return res(ctx.status(401), ctx.json({ error: "Invalid credentials" }));
-  })
+  }),
 );
 
 beforeAll(() => server.listen());
@@ -1625,6 +1624,7 @@ describe("Login Integration", () => {
   });
 });
 ```
+
 <BackToTop />
 
 ### End-to-End Testing
@@ -1684,11 +1684,10 @@ test.describe("Authentication E2E", () => {
     // Should redirect to login
     await expect(page).toHaveURL("/login");
     await expect(
-      page.locator('[data-testid="session-expired-message"]')
+      page.locator('[data-testid="session-expired-message"]'),
     ).toBeVisible();
   });
 });
 ```
-
 
 <BackToTop />

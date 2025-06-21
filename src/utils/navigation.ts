@@ -31,7 +31,7 @@ export function formatTitle(name: string): string {
 
 // Function to read metadata from MDX files
 export async function readMDXMetadata(
-  filePath: string
+  filePath: string,
 ): Promise<{ title?: string; order?: number }> {
   try {
     if (typeof window !== "undefined") {
@@ -71,7 +71,7 @@ export async function readMDXMetadata(
 
 // Function to categorize pages into logical sections
 function categorizeNavigationItems(
-  items: NavigationItem[]
+  items: NavigationItem[],
 ): NavigationSection[] {
   const categories = {
     fundamentals: [] as NavigationItem[],
@@ -337,7 +337,7 @@ function sortNavigationItems(items: NavigationItem[]): NavigationItem[] {
 
 async function scanDirectory(
   dirPath: string,
-  basePath: string
+  basePath: string,
 ): Promise<NavigationItem[]> {
   const items: NavigationItem[] = [];
 
@@ -361,13 +361,13 @@ async function scanDirectory(
         // Check if directory has a page file
         const pageFiles = ["page.tsx", "page.mdx", "page.js"];
         const hasPage = pageFiles.some((file) =>
-          fs.existsSync(path.join(fullPath, file))
+          fs.existsSync(path.join(fullPath, file)),
         );
 
         if (hasPage) {
           // Directory with a page file
           const pageFile = pageFiles.find((file) =>
-            fs.existsSync(path.join(fullPath, file))
+            fs.existsSync(path.join(fullPath, file)),
           );
           const pagePath = path.join(fullPath, pageFile!);
           const metadata = await readMDXMetadata(pagePath);

@@ -81,57 +81,1941 @@ When the component using `useDeferredValue` is rendered, the hook will return a 
 - Avoid using `useDeferredValue` in scenarios where immediate updates are critical, such as in real-time applications or interactive user interfaces.
 - Avoid using `useDeferredValue` in components that do not require deferred updates, as it may lead to confusion and make the code harder to maintain.
 - Avoid using `useDeferredValue` for values that are not performance-sensitive, as it may introduce unnecessary complexity without providing significant benefits.
+  <BackToTop />
 
 ## Examples
 
-### Basic Example
+### Real-time Data Visualization Dashboard
 
 ```javascript
-import { useDeferredValue, useState } from "react";
-function MyComponent() {
-  const [value, setValue] = useState("Initial Value");
-  // Use useDeferredValue to defer the update of the value
-  const deferredValue = useDeferredValue(value);
+import React, { useDeferredValue, useState, useEffect, useMemo } from "react";
+
+function DataVisualizationDashboard() {
+  const [liveData, setLiveData] = useState([]);
+  const [filterCriteria, setFilterCriteria] = useState({
+    type: "all",
+    minValue: 0,
+    maxValue: 100,
+    timeRange: "1h",
+  });
+  const [chartType, setChartType] = useState("line");
+  const [isRealTimeEnabled, setIsRealTimeEnabled] = useState(true);
+
+  // Defer the filter criteria to prevent blocking the UI during rapid changes
+  const deferredFilterCriteria = useDeferredValue(filterCriteria);
+
+  // Defer chart type changes to allow smooth transitions
+  const deferredChartType = useDeferredValue(chartType);
+
+  // Simulate real-time data updates
+  useEffect(() => {
+    if (!isRealTimeEnabled) return;
+
+    const interval = setInterval(() => {
+      setLiveData((prevData) => {
+        const newPoint = {
+          id: Date.now(),
+          timestamp: new Date().toISOString(),
+          value: Math.random() * 100,
+          type: ["cpu", "memory", "network", "disk"][
+            Math.floor(Math.random() * 4)
+          ],
+          source: `Server-${Math.floor(Math.random() * 5) + 1}`,
+          priority:
+            Math.random() > 0.7
+              ? "high"
+              : Math.random() > 0.4
+                ? "medium"
+                : "low",
+        };
+
+        // Keep only last 100 data points for performance
+        const updatedData = [...prevData, newPoint].slice(-100);
+        return updatedData;
+      });
+    }, 100); // High frequency updates
+
+    return () => clearInterval(interval);
+  }, [isRealTimeEnabled]);
+
+  // Expensive filtering operation using deferred values
+  const filteredData = useMemo(() => {
+    console.log("🔄 Filtering data with deferred criteria...");
+
+    return liveData.filter((point) => {
+      const typeMatch =
+        deferredFilterCriteria.type === "all" ||
+        point.type === deferredFilterCriteria.type;
+      const valueMatch =
+        point.value >= deferredFilterCriteria.minValue &&
+        point.value <= deferredFilterCriteria.maxValue;
+
+      // Time range filtering
+      const now = new Date();
+      const pointTime = new Date(point.timestamp);
+      const timeDiff = now - pointTime;
+
+      let timeMatch = true;
+      switch (deferredFilterCriteria.timeRange) {
+        case "1m":
+          timeMatch = timeDiff <= 60 * 1000;
+          break;
+        case "5m":
+          timeMatch = timeDiff <= 5 * 60 * 1000;
+          break;
+        case "1h":
+          timeMatch = timeDiff <= 60 * 60 * 1000;
+          break;
+      }
+
+      return typeMatch && valueMatch && timeMatch;
+    });
+  }, [liveData, deferredFilterCriteria]);
+
+  // Expensive chart rendering using deferred chart type
+  const chartComponent = useMemo(() => {
+    console.log("📊 Rendering chart with deferred type:", deferredChartType);
+
+    const chartStyles = {
+      line: {
+        borderBottom: "3px solid #3498db",
+        background:
+          "linear-gradient(to top, rgba(52, 152, 219, 0.1), transparent)",
+      },
+      bar: {
+        borderBottom: "3px solid #e74c3c",
+        background:
+          "linear-gradient(to top, rgba(231, 76, 60, 0.1), transparent)",
+      },
+      scatter: {
+        borderBottom: "3px solid #2ecc71",
+        background:
+          "linear-gradient(to top, rgba(46, 204, 113, 0.1), transparent)",
+      },
+    };
+
+    return (
+      <div
+        style={{
+          height: "300px",
+          padding: "20px",
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+          margin: "20px 0",
+          ...chartStyles[deferredChartType],
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "15px",
+          }}
+        >
+          <h3 style={{ margin: 0 }}>
+            📈{" "}
+            {deferredChartType.charAt(0).toUpperCase() +
+              deferredChartType.slice(1)}{" "}
+            Chart
+          </h3>
+          <div style={{ fontSize: "14px", color: "#666" }}>
+            {filteredData.length} data points
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${Math.min(filteredData.length, 20)}, 1fr)`,
+            gap: "2px",
+            height: "200px",
+            alignItems: "end",
+            padding: "10px 0",
+          }}
+        >
+          {filteredData.slice(-20).map((point, index) => {
+            const height = (point.value / 100) * 100;
+            const color =
+              point.priority === "high"
+                ? "#e74c3c"
+                : point.priority === "medium"
+                  ? "#f39c12"
+                  : "#27ae60";
+
+            if (deferredChartType === "line") {
+              return (
+                <div
+                  key={point.id}
+                  style={{
+                    height: "100%",
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "end",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "4px",
+                      height: `${height}%`,
+                      backgroundColor: color,
+                      borderRadius: "2px",
+                    }}
+                  />
+                </div>
+              );
+            } else if (deferredChartType === "bar") {
+              return (
+                <div
+                  key={point.id}
+                  style={{
+                    height: `${height}%`,
+                    backgroundColor: color,
+                    borderRadius: "2px 2px 0 0",
+                    minHeight: "2px",
+                  }}
+                />
+              );
+            } else {
+              return (
+                <div
+                  key={point.id}
+                  style={{
+                    height: "100%",
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "end",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      backgroundColor: color,
+                      borderRadius: "50%",
+                      marginBottom: `${height}%`,
+                    }}
+                  />
+                </div>
+              );
+            }
+          })}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            fontSize: "12px",
+            color: "#999",
+            marginTop: "10px",
+          }}
+        >
+          <span>Latest Data</span>
+          <span>
+            {filteredData.length > 0
+              ? new Date(
+                  filteredData[filteredData.length - 1]?.timestamp
+                ).toLocaleTimeString()
+              : "No data"}
+          </span>
+        </div>
+      </div>
+    );
+  }, [filteredData, deferredChartType]);
+
+  const handleFilterChange = (key, value) => {
+    setFilterCriteria((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const stats = useMemo(() => {
+    if (filteredData.length === 0) return null;
+
+    const values = filteredData.map((d) => d.value);
+    return {
+      count: filteredData.length,
+      avg: (values.reduce((a, b) => a + b, 0) / values.length).toFixed(1),
+      min: Math.min(...values).toFixed(1),
+      max: Math.max(...values).toFixed(1),
+      latest: values[values.length - 1]?.toFixed(1) || "0",
+    };
+  }, [filteredData]);
+
   return (
-    <div>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-      />
-      <p>Original Value: {value}</p>
-      <p>Deferred Value: {deferredValue}</p>
+    <div
+      style={{
+        padding: "20px",
+        maxWidth: "1200px",
+        margin: "0 auto",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          color: "white",
+          padding: "30px",
+          borderRadius: "15px",
+          marginBottom: "20px",
+        }}
+      >
+        <h1 style={{ margin: "0 0 10px 0" }}>📊 Real-time Data Dashboard</h1>
+        <div style={{ fontSize: "14px", opacity: 0.9 }}>
+          Demonstrating useDeferredValue with high-frequency data updates
+        </div>
+        <div
+          style={{
+            marginTop: "15px",
+            display: "flex",
+            gap: "20px",
+            fontSize: "14px",
+          }}
+        >
+          <div>📈 Total Points: {liveData.length}</div>
+          <div>🎯 Filtered: {filteredData.length}</div>
+          <div>
+            🔄 Real-time: {isRealTimeEnabled ? "✅ Active" : "❌ Paused"}
+          </div>
+        </div>
+      </div>
+
+      {/* Control Panel */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: "15px",
+          marginBottom: "20px",
+          padding: "20px",
+          backgroundColor: "#f8f9fa",
+          borderRadius: "10px",
+        }}
+      >
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+            }}
+          >
+            Data Type Filter:
+          </label>
+          <select
+            value={filterCriteria.type}
+            onChange={(e) => handleFilterChange("type", e.target.value)}
+            style={{
+              width: "100%",
+              padding: "8px",
+              borderRadius: "4px",
+              border: "1px solid #ddd",
+            }}
+          >
+            <option value="all">All Types</option>
+            <option value="cpu">CPU</option>
+            <option value="memory">Memory</option>
+            <option value="network">Network</option>
+            <option value="disk">Disk</option>
+          </select>
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+            }}
+          >
+            Value Range: {filterCriteria.minValue} - {filterCriteria.maxValue}
+          </label>
+          <input
+            type="range"
+            min="0"
+            max="50"
+            value={filterCriteria.minValue}
+            onChange={(e) =>
+              handleFilterChange("minValue", parseInt(e.target.value))
+            }
+            style={{ width: "100%", marginBottom: "5px" }}
+          />
+          <input
+            type="range"
+            min="50"
+            max="100"
+            value={filterCriteria.maxValue}
+            onChange={(e) =>
+              handleFilterChange("maxValue", parseInt(e.target.value))
+            }
+            style={{ width: "100%" }}
+          />
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+            }}
+          >
+            Time Range:
+          </label>
+          <select
+            value={filterCriteria.timeRange}
+            onChange={(e) => handleFilterChange("timeRange", e.target.value)}
+            style={{
+              width: "100%",
+              padding: "8px",
+              borderRadius: "4px",
+              border: "1px solid #ddd",
+            }}
+          >
+            <option value="1m">Last 1 minute</option>
+            <option value="5m">Last 5 minutes</option>
+            <option value="1h">Last 1 hour</option>
+          </select>
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+            }}
+          >
+            Chart Type:
+          </label>
+          <div style={{ display: "flex", gap: "5px" }}>
+            {["line", "bar", "scatter"].map((type) => (
+              <button
+                key={type}
+                onClick={() => setChartType(type)}
+                style={{
+                  flex: 1,
+                  padding: "8px",
+                  backgroundColor: chartType === type ? "#667eea" : "white",
+                  color: chartType === type ? "white" : "#333",
+                  border: "1px solid #ddd",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                }}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Statistics Panel */}
+      {stats && (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+            gap: "15px",
+            marginBottom: "20px",
+          }}
+        >
+          {Object.entries(stats).map(([key, value]) => (
+            <div
+              key={key}
+              style={{
+                padding: "15px",
+                backgroundColor: "white",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                textAlign: "center",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "24px",
+                  fontWeight: "bold",
+                  color: "#667eea",
+                }}
+              >
+                {value}
+              </div>
+              <div
+                style={{
+                  fontSize: "12px",
+                  color: "#666",
+                  textTransform: "uppercase",
+                }}
+              >
+                {key}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Chart Component */}
+      {chartComponent}
+
+      {/* Control Buttons */}
+      <div
+        style={{
+          display: "flex",
+          gap: "10px",
+          justifyContent: "center",
+          marginTop: "20px",
+        }}
+      >
+        <button
+          onClick={() => setIsRealTimeEnabled(!isRealTimeEnabled)}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: isRealTimeEnabled ? "#e74c3c" : "#27ae60",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+          }}
+        >
+          {isRealTimeEnabled ? "⏸️ Pause Updates" : "▶️ Resume Updates"}
+        </button>
+        <button
+          onClick={() => setLiveData([])}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#95a5a6",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+          }}
+        >
+          🗑️ Clear Data
+        </button>
+      </div>
+
+      {/* Performance Info */}
+      <div
+        style={{
+          marginTop: "20px",
+          padding: "15px",
+          backgroundColor: "#e8f4fd",
+          borderRadius: "8px",
+          fontSize: "12px",
+          color: "#2c3e50",
+        }}
+      >
+        <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
+          🚀 Performance Optimization with useDeferredValue:
+        </div>
+        <div>
+          • Filter criteria changes are deferred to prevent blocking during
+          rapid slider movements
+        </div>
+        <div>
+          • Chart type transitions are deferred for smooth visual changes
+        </div>
+        <div>
+          • High-frequency data updates (10 updates/second) don't block the UI
+        </div>
+        <div>
+          • Expensive filtering and rendering operations use deferred values
+        </div>
+      </div>
     </div>
   );
 }
+
+export default DataVisualizationDashboard;
 ```
 
 <BackToTop />
-### Large List Example
+
+### Advanced Search with Autocomplete and Suggestions
+
 ```javascript
-import { useDeferredValue, useState } from "react";
-function LargeList() {
-  const [items, setItems] = useState(Array.from({ length: 1000 }, (_, i) => `Item ${i + 1}`));
-  const [searchTerm, setSearchTerm] = useState("");
-  // Use useDeferredValue to defer the update of the search term
-  const deferredSearchTerm = useDeferredValue(searchTerm);
-  const filteredItems = items.filter(item => item.toLowerCase().includes(deferredSearchTerm.toLowerCase()));
+import React, {
+  useDeferredValue,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
+
+function AdvancedSearchInterface() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchHistory, setSearchHistory] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("relevance");
+  const [filters, setFilters] = useState({
+    dateRange: "any",
+    contentType: "all",
+    difficulty: "any",
+  });
+
+  // Defer search query to prevent excessive API calls during typing
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+
+  // Defer filters to prevent blocking UI during rapid filter changes
+  const deferredFilters = useDeferredValue(filters);
+  const deferredSortBy = useDeferredValue(sortBy);
+
+  // Mock database of searchable content
+  const mockDatabase = useMemo(
+    () => [
+      {
+        id: 1,
+        title: "React Hooks Guide",
+        category: "tutorial",
+        type: "article",
+        difficulty: "beginner",
+        date: "2024-01-15",
+        content: "comprehensive guide to react hooks useState useEffect",
+        tags: ["react", "hooks", "frontend"],
+      },
+      {
+        id: 2,
+        title: "Advanced TypeScript Patterns",
+        category: "tutorial",
+        type: "video",
+        difficulty: "advanced",
+        date: "2024-02-20",
+        content: "advanced typescript patterns generics utility types",
+        tags: ["typescript", "patterns", "advanced"],
+      },
+      {
+        id: 3,
+        title: "CSS Grid Layout Mastery",
+        category: "design",
+        type: "course",
+        difficulty: "intermediate",
+        date: "2024-03-10",
+        content: "master css grid layout responsive design",
+        tags: ["css", "grid", "layout"],
+      },
+      {
+        id: 4,
+        title: "Node.js Performance Optimization",
+        category: "backend",
+        type: "article",
+        difficulty: "advanced",
+        date: "2024-01-25",
+        content: "optimize nodejs performance memory management clustering",
+        tags: ["nodejs", "performance", "backend"],
+      },
+      {
+        id: 5,
+        title: "JavaScript ES6+ Features",
+        category: "tutorial",
+        type: "article",
+        difficulty: "intermediate",
+        date: "2024-02-05",
+        content:
+          "modern javascript features arrow functions destructuring modules",
+        tags: ["javascript", "es6", "modern"],
+      },
+      // Add more mock data...
+      ...Array.from({ length: 50 }, (_, i) => ({
+        id: i + 6,
+        title: `Sample Article ${i + 6}`,
+        category: ["tutorial", "design", "backend", "frontend"][i % 4],
+        type: ["article", "video", "course"][i % 3],
+        difficulty: ["beginner", "intermediate", "advanced"][i % 3],
+        date: new Date(
+          2024,
+          Math.floor(Math.random() * 12),
+          Math.floor(Math.random() * 28) + 1
+        )
+          .toISOString()
+          .split("T")[0],
+        content: `sample content for article ${i + 6} with various keywords`,
+        tags: ["programming", "development", "web"].slice(
+          0,
+          Math.floor(Math.random() * 3) + 1
+        ),
+      })),
+    ],
+    []
+  );
+
+  // Generate search suggestions based on deferred query
+  const generateSuggestions = useCallback(
+    (query) => {
+      if (query.length < 2) return [];
+
+      const queryWords = query.toLowerCase().split(" ");
+      const suggestionSet = new Set();
+
+      mockDatabase.forEach((item) => {
+        // Check title matches
+        const titleWords = item.title.toLowerCase().split(" ");
+        titleWords.forEach((word) => {
+          if (word.includes(queryWords[0]) && word.length > 2) {
+            suggestionSet.add(word);
+          }
+        });
+
+        // Check tag matches
+        item.tags.forEach((tag) => {
+          if (tag.includes(queryWords[0])) {
+            suggestionSet.add(tag);
+          }
+        });
+      });
+
+      return Array.from(suggestionSet).slice(0, 8);
+    },
+    [mockDatabase]
+  );
+
+  // Perform search with deferred values
+  const performSearch = useCallback(
+    async (query, filters, sortBy) => {
+      if (query.length < 2) {
+        setSearchResults([]);
+        return;
+      }
+
+      setIsLoading(true);
+
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      const queryWords = query.toLowerCase().split(" ");
+
+      let results = mockDatabase.filter((item) => {
+        // Text search
+        const searchText =
+          `${item.title} ${item.content} ${item.tags.join(" ")}`.toLowerCase();
+        const textMatch = queryWords.some((word) => searchText.includes(word));
+
+        // Category filter
+        const categoryMatch =
+          selectedCategory === "all" || item.category === selectedCategory;
+
+        // Filters
+        const dateMatch =
+          filters.dateRange === "any" ||
+          (filters.dateRange === "recent" &&
+            new Date(item.date) > new Date("2024-02-01"));
+        const typeMatch =
+          filters.contentType === "all" || item.type === filters.contentType;
+        const difficultyMatch =
+          filters.difficulty === "any" ||
+          item.difficulty === filters.difficulty;
+
+        return (
+          textMatch &&
+          categoryMatch &&
+          dateMatch &&
+          typeMatch &&
+          difficultyMatch
+        );
+      });
+
+      // Sort results
+      results.sort((a, b) => {
+        switch (sortBy) {
+          case "date":
+            return new Date(b.date) - new Date(a.date);
+          case "title":
+            return a.title.localeCompare(b.title);
+          case "difficulty":
+            const difficultyOrder = {
+              beginner: 1,
+              intermediate: 2,
+              advanced: 3,
+            };
+            return (
+              difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty]
+            );
+          default: // relevance
+            const aRelevance = queryWords.reduce((score, word) => {
+              return (
+                score +
+                (a.title.toLowerCase().includes(word) ? 10 : 0) +
+                (a.content.toLowerCase().includes(word) ? 5 : 0) +
+                (a.tags.some((tag) => tag.includes(word)) ? 3 : 0)
+              );
+            }, 0);
+            const bRelevance = queryWords.reduce((score, word) => {
+              return (
+                score +
+                (b.title.toLowerCase().includes(word) ? 10 : 0) +
+                (b.content.toLowerCase().includes(word) ? 5 : 0) +
+                (b.tags.some((tag) => tag.includes(word)) ? 3 : 0)
+              );
+            }, 0);
+            return bRelevance - aRelevance;
+        }
+      });
+
+      setSearchResults(results);
+      setIsLoading(false);
+    },
+    [mockDatabase, selectedCategory]
+  );
+
+  // Effect for search with deferred query
+  useEffect(() => {
+    performSearch(deferredSearchQuery, deferredFilters, deferredSortBy);
+  }, [deferredSearchQuery, deferredFilters, deferredSortBy, performSearch]);
+
+  // Effect for suggestions
+  useEffect(() => {
+    const newSuggestions = generateSuggestions(searchQuery);
+    setSuggestions(newSuggestions);
+  }, [searchQuery, generateSuggestions]);
+
+  // Handle search submission
+  const handleSearchSubmit = (query) => {
+    if (query && !searchHistory.includes(query)) {
+      setSearchHistory((prev) => [query, ...prev.slice(0, 9)]); // Keep last 10 searches
+    }
+  };
+
+  const highlightText = (text, query) => {
+    if (!query) return text;
+
+    const queryWords = query
+      .toLowerCase()
+      .split(" ")
+      .filter((word) => word.length > 1);
+    let highlightedText = text;
+
+    queryWords.forEach((word) => {
+      const regex = new RegExp(`(${word})`, "gi");
+      highlightedText = highlightedText.replace(regex, "<mark>$1</mark>");
+    });
+
+    return <span dangerouslySetInnerHTML={{ __html: highlightedText }} />;
+  };
+
+  const getDifficultyColor = (difficulty) => {
+    switch (difficulty) {
+      case "beginner":
+        return "#27ae60";
+      case "intermediate":
+        return "#f39c12";
+      case "advanced":
+        return "#e74c3c";
+      default:
+        return "#95a5a6";
+    }
+  };
+
+  const getTypeIcon = (type) => {
+    switch (type) {
+      case "article":
+        return "📄";
+      case "video":
+        return "🎥";
+      case "course":
+        return "📚";
+      default:
+        return "📄";
+    }
+  };
+
   return (
-    <div>
-      <input
-        type="text"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Search items..."
-      />
-      <ul>
-        {filteredItems.map(item => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
+    <div
+      style={{
+        padding: "20px",
+        maxWidth: "1000px",
+        margin: "0 auto",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          color: "white",
+          padding: "30px",
+          borderRadius: "15px",
+          marginBottom: "20px",
+        }}
+      >
+        <h1 style={{ margin: "0 0 15px 0" }}>🔍 Advanced Search Interface</h1>
+        <div style={{ fontSize: "14px", opacity: 0.9 }}>
+          Demonstrating useDeferredValue with search, filtering, and
+          autocomplete
+        </div>
+      </div>
+
+      {/* Search Input */}
+      <div style={{ position: "relative", marginBottom: "20px" }}>
+        <div style={{ position: "relative" }}>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={(e) =>
+              e.key === "Enter" && handleSearchSubmit(searchQuery)
+            }
+            placeholder="Search articles, tutorials, and courses..."
+            style={{
+              width: "100%",
+              padding: "15px 50px 15px 20px",
+              fontSize: "16px",
+              border: "2px solid #ddd",
+              borderRadius: "10px",
+              outline: "none",
+              boxSizing: "border-box",
+            }}
+          />
+          <button
+            onClick={() => handleSearchSubmit(searchQuery)}
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              background: "#667eea",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              padding: "8px 12px",
+              cursor: "pointer",
+            }}
+          >
+            🔍
+          </button>
+        </div>
+
+        {/* Suggestions Dropdown */}
+        {suggestions.length > 0 && searchQuery.length > 1 && (
+          <div
+            style={{
+              position: "absolute",
+              top: "100%",
+              left: 0,
+              right: 0,
+              backgroundColor: "white",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+              zIndex: 1000,
+              maxHeight: "200px",
+              overflowY: "auto",
+            }}
+          >
+            {suggestions.map((suggestion, index) => (
+              <div
+                key={index}
+                onClick={() => {
+                  setSearchQuery(suggestion);
+                  setSuggestions([]);
+                }}
+                style={{
+                  padding: "10px 15px",
+                  cursor: "pointer",
+                  borderBottom:
+                    index < suggestions.length - 1 ? "1px solid #eee" : "none",
+                  ":hover": { backgroundColor: "#f5f5f5" },
+                }}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#f5f5f5")
+                }
+                onMouseLeave={(e) => (e.target.style.backgroundColor = "white")}
+              >
+                💡 {suggestion}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Search History */}
+      {searchHistory.length > 0 && (
+        <div style={{ marginBottom: "20px" }}>
+          <div style={{ fontSize: "14px", color: "#666", marginBottom: "8px" }}>
+            Recent searches:
+          </div>
+          <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            {searchHistory.map((query, index) => (
+              <button
+                key={index}
+                onClick={() => setSearchQuery(query)}
+                style={{
+                  padding: "6px 12px",
+                  backgroundColor: "#f8f9fa",
+                  border: "1px solid #ddd",
+                  borderRadius: "16px",
+                  fontSize: "12px",
+                  cursor: "pointer",
+                  color: "#666",
+                }}
+              >
+                🕒 {query}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Filters and Controls */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: "15px",
+          marginBottom: "20px",
+          padding: "20px",
+          backgroundColor: "#f8f9fa",
+          borderRadius: "10px",
+        }}
+      >
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+              fontSize: "14px",
+            }}
+          >
+            Category:
+          </label>
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "8px",
+              borderRadius: "4px",
+              border: "1px solid #ddd",
+            }}
+          >
+            <option value="all">All Categories</option>
+            <option value="tutorial">Tutorial</option>
+            <option value="design">Design</option>
+            <option value="backend">Backend</option>
+            <option value="frontend">Frontend</option>
+          </select>
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+              fontSize: "14px",
+            }}
+          >
+            Content Type:
+          </label>
+          <select
+            value={filters.contentType}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, contentType: e.target.value }))
+            }
+            style={{
+              width: "100%",
+              padding: "8px",
+              borderRadius: "4px",
+              border: "1px solid #ddd",
+            }}
+          >
+            <option value="all">All Types</option>
+            <option value="article">Articles</option>
+            <option value="video">Videos</option>
+            <option value="course">Courses</option>
+          </select>
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+              fontSize: "14px",
+            }}
+          >
+            Difficulty:
+          </label>
+          <select
+            value={filters.difficulty}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, difficulty: e.target.value }))
+            }
+            style={{
+              width: "100%",
+              padding: "8px",
+              borderRadius: "4px",
+              border: "1px solid #ddd",
+            }}
+          >
+            <option value="any">Any Level</option>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+              fontSize: "14px",
+            }}
+          >
+            Sort by:
+          </label>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "8px",
+              borderRadius: "4px",
+              border: "1px solid #ddd",
+            }}
+          >
+            <option value="relevance">Relevance</option>
+            <option value="date">Date</option>
+            <option value="title">Title</option>
+            <option value="difficulty">Difficulty</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Results Header */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "20px",
+          padding: "10px 0",
+          borderBottom: "1px solid #eee",
+        }}
+      >
+        <div>
+          {isLoading ? (
+            <span style={{ color: "#666" }}>🔍 Searching...</span>
+          ) : (
+            <span style={{ color: "#666" }}>
+              {searchResults.length} results for "{deferredSearchQuery}"
+            </span>
+          )}
+        </div>
+        {searchResults.length > 0 && (
+          <div style={{ fontSize: "14px", color: "#666" }}>
+            Sorted by {deferredSortBy}
+          </div>
+        )}
+      </div>
+
+      {/* Search Results */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+        {isLoading ? (
+          <div style={{ textAlign: "center", padding: "40px" }}>
+            <div style={{ fontSize: "24px", marginBottom: "10px" }}>⏳</div>
+            <div>Searching with deferred values...</div>
+          </div>
+        ) : searchResults.length === 0 && deferredSearchQuery ? (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "40px",
+              color: "#666",
+            }}
+          >
+            <div style={{ fontSize: "48px", marginBottom: "15px" }}>🔍</div>
+            <div style={{ fontSize: "18px", marginBottom: "8px" }}>
+              No results found
+            </div>
+            <div style={{ fontSize: "14px" }}>
+              Try adjusting your search terms or filters
+            </div>
+          </div>
+        ) : (
+          searchResults.map((result) => (
+            <div
+              key={result.id}
+              style={{
+                padding: "20px",
+                border: "1px solid #ddd",
+                borderRadius: "10px",
+                backgroundColor: "white",
+                transition: "box-shadow 0.2s ease",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)")
+              }
+              onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "10px",
+                }}
+              >
+                <span style={{ fontSize: "20px", marginRight: "8px" }}>
+                  {getTypeIcon(result.type)}
+                </span>
+                <h3 style={{ margin: 0, fontSize: "18px", color: "#2c3e50" }}>
+                  {highlightText(result.title, deferredSearchQuery)}
+                </h3>
+              </div>
+
+              <p
+                style={{
+                  margin: "10px 0",
+                  color: "#666",
+                  lineHeight: "1.5",
+                  fontSize: "14px",
+                }}
+              >
+                {highlightText(result.content, deferredSearchQuery)}
+              </p>
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginTop: "15px",
+                }}
+              >
+                <div
+                  style={{ display: "flex", gap: "15px", alignItems: "center" }}
+                >
+                  <span
+                    style={{
+                      padding: "4px 8px",
+                      backgroundColor:
+                        getDifficultyColor(result.difficulty) + "20",
+                      color: getDifficultyColor(result.difficulty),
+                      borderRadius: "12px",
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {result.difficulty}
+                  </span>
+                  <span style={{ fontSize: "12px", color: "#999" }}>
+                    📅 {new Date(result.date).toLocaleDateString()}
+                  </span>
+                  <span style={{ fontSize: "12px", color: "#999" }}>
+                    📂 {result.category}
+                  </span>
+                </div>
+
+                <div style={{ display: "flex", gap: "5px" }}>
+                  {result.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      style={{
+                        padding: "2px 6px",
+                        backgroundColor: "#e9ecef",
+                        borderRadius: "8px",
+                        fontSize: "10px",
+                        color: "#495057",
+                      }}
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Performance Info */}
+      <div
+        style={{
+          marginTop: "30px",
+          padding: "15px",
+          backgroundColor: "#e8f4fd",
+          borderRadius: "8px",
+          fontSize: "12px",
+          color: "#2c3e50",
+        }}
+      >
+        <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
+          🚀 Performance Features with useDeferredValue:
+        </div>
+        <div>
+          • Search queries are deferred to prevent excessive API calls during
+          typing
+        </div>
+        <div>
+          • Filter changes are deferred to prevent UI blocking during rapid
+          adjustments
+        </div>
+        <div>• Sort operations use deferred values for smooth interactions</div>
+        <div>
+          • Suggestions are generated in real-time while search is deferred
+        </div>
+        <div>
+          • Large result sets are processed efficiently without blocking the UI
+        </div>
+      </div>
     </div>
+  );
 }
+
+export default AdvancedSearchInterface;
 ```
+
+<BackToTop />
+
+### Interactive Content Editor with Live Preview
+
+````javascript
+import React, {
+  useDeferredValue,
+  useState,
+  useMemo,
+  useCallback,
+  useRef,
+  useEffect,
+} from "react";
+
+function InteractiveContentEditor() {
+  const [content, setContent] = useState(`# Welcome to the Content Editor
+
+This is a **markdown** editor with real-time preview capabilities.
+
+## Features
+- Live preview with deferred updates
+- Syntax highlighting simulation
+- Word count and reading time
+- Auto-save functionality
+- Performance optimization
+
+Try typing some content and see how the preview updates smoothly!
+
+### Code Example
+\`\`\`javascript
+function example() {
+  console.log("Hello, World!");
+}
+\`\`\`
+
+### List Example
+1. First item
+2. Second item
+3. Third item
+
+> This is a blockquote with some important information.
+`);
+
+  const [editorSettings, setEditorSettings] = useState({
+    theme: "light",
+    fontSize: 14,
+    lineHeight: 1.5,
+    showLineNumbers: true,
+    wordWrap: true,
+    autoSave: true,
+  });
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [replaceMode, setReplaceMode] = useState(false);
+  const [replaceTerm, setReplaceTerm] = useState("");
+  const [previewMode, setPreviewMode] = useState("split");
+  const [lastSaved, setLastSaved] = useState(new Date());
+
+  // Defer content updates to prevent blocking during fast typing
+  const deferredContent = useDeferredValue(content);
+
+  // Defer settings changes to prevent blocking during rapid adjustments
+  const deferredSettings = useDeferredValue(editorSettings);
+
+  // Defer search to prevent blocking during typing
+  const deferredSearchTerm = useDeferredValue(searchTerm);
+
+  const editorRef = useRef(null);
+  const previewRef = useRef(null);
+
+  // Expensive markdown parsing simulation using deferred content
+  const parsedContent = useMemo(() => {
+    console.log("🔄 Parsing markdown content...");
+
+    let html = deferredContent;
+
+    // Simulate expensive parsing operations
+    const startTime = performance.now();
+
+    // Headers
+    html = html.replace(/^### (.*$)/gim, "<h3>$1</h3>");
+    html = html.replace(/^## (.*$)/gim, "<h2>$1</h2>");
+    html = html.replace(/^# (.*$)/gim, "<h1>$1</h1>");
+
+    // Bold and italic
+    html = html.replace(/\*\*(.*)\*\*/gim, "<strong>$1</strong>");
+    html = html.replace(/\*(.*)\*/gim, "<em>$1</em>");
+
+    // Code blocks
+    html = html.replace(/```(\w+)?\n([\s\S]*?)```/gim, (match, lang, code) => {
+      return `<div class="code-block">
+        <div class="code-header">${lang || "code"}</div>
+        <pre><code>${code.trim()}</code></pre>
+      </div>`;
+    });
+
+    // Inline code
+    html = html.replace(/`([^`]+)`/gim, "<code>$1</code>");
+
+    // Lists
+    html = html.replace(/^\d+\.\s(.*)$/gim, "<li>$1</li>");
+    html = html.replace(/(<li>.*<\/li>)/gims, "<ol>$1</ol>");
+
+    // Blockquotes
+    html = html.replace(/^> (.*)$/gim, "<blockquote>$1</blockquote>");
+
+    // Line breaks
+    html = html.replace(/\n/gim, "<br>");
+
+    // Simulate processing time for demonstration
+    while (performance.now() - startTime < 5) {
+      // Simulate work
+    }
+
+    return html;
+  }, [deferredContent]);
+
+  // Content statistics using deferred content
+  const contentStats = useMemo(() => {
+    const text = deferredContent.replace(/[#*`>]/g, "").replace(/\n/g, " ");
+    const words = text
+      .trim()
+      .split(/\s+/)
+      .filter((word) => word.length > 0);
+    const characters = deferredContent.length;
+    const charactersNoSpaces = deferredContent.replace(/\s/g, "").length;
+    const lines = deferredContent.split("\n").length;
+    const readingTime = Math.ceil(words.length / 200); // 200 WPM average
+
+    return {
+      words: words.length,
+      characters,
+      charactersNoSpaces,
+      lines,
+      readingTime,
+      paragraphs: deferredContent.split("\n\n").filter((p) => p.trim()).length,
+    };
+  }, [deferredContent]);
+
+  // Search functionality using deferred search term
+  const searchResults = useMemo(() => {
+    if (!deferredSearchTerm || deferredSearchTerm.length < 2) return [];
+
+    const lines = content.split("\n");
+    const results = [];
+
+    lines.forEach((line, index) => {
+      const lowerLine = line.toLowerCase();
+      const lowerSearch = deferredSearchTerm.toLowerCase();
+      let searchIndex = lowerLine.indexOf(lowerSearch);
+
+      while (searchIndex !== -1) {
+        results.push({
+          line: index + 1,
+          column: searchIndex + 1,
+          text: line.trim(),
+          match: line.substring(
+            searchIndex,
+            searchIndex + deferredSearchTerm.length
+          ),
+        });
+        searchIndex = lowerLine.indexOf(lowerSearch, searchIndex + 1);
+      }
+    });
+
+    return results;
+  }, [content, deferredSearchTerm]);
+
+  // Auto-save functionality
+  useEffect(() => {
+    if (!editorSettings.autoSave) return;
+
+    const autoSaveTimer = setTimeout(() => {
+      console.log("💾 Auto-saving content...");
+      localStorage.setItem("editorContent", content);
+      setLastSaved(new Date());
+    }, 2000);
+
+    return () => clearTimeout(autoSaveTimer);
+  }, [content, editorSettings.autoSave]);
+
+  // Load saved content on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("editorContent");
+    if (saved) {
+      setContent(saved);
+    }
+  }, []);
+
+  const handleReplace = useCallback(() => {
+    if (!searchTerm || !replaceTerm) return;
+
+    const newContent = content.replaceAll(searchTerm, replaceTerm);
+    setContent(newContent);
+    setSearchTerm("");
+    setReplaceTerm("");
+    setReplaceMode(false);
+  }, [content, searchTerm, replaceTerm]);
+
+  const handleSettingChange = useCallback((key, value) => {
+    setEditorSettings((prev) => ({ ...prev, [key]: value }));
+  }, []);
+
+  const exportContent = useCallback(
+    (format) => {
+      const blob = new Blob([content], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `content.${format}`;
+      a.click();
+      URL.revokeObjectURL(url);
+    },
+    [content]
+  );
+
+  const getThemeStyles = (theme) => {
+    const themes = {
+      light: {
+        backgroundColor: "#ffffff",
+        color: "#333333",
+        borderColor: "#ddd",
+      },
+      dark: {
+        backgroundColor: "#2d3748",
+        color: "#e2e8f0",
+        borderColor: "#4a5568",
+      },
+      blue: {
+        backgroundColor: "#ebf8ff",
+        color: "#2a4365",
+        borderColor: "#90cdf4",
+      },
+    };
+    return themes[theme] || themes.light;
+  };
+
+  const themeStyle = getThemeStyles(deferredSettings.theme);
+
+  return (
+    <div
+      style={{
+        padding: "20px",
+        maxWidth: "1400px",
+        margin: "0 auto",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          color: "white",
+          padding: "30px",
+          borderRadius: "15px",
+          marginBottom: "20px",
+        }}
+      >
+        <h1 style={{ margin: "0 0 10px 0" }}>✏️ Interactive Content Editor</h1>
+        <div style={{ fontSize: "14px", opacity: 0.9 }}>
+          Real-time markdown editor with deferred updates for optimal
+          performance
+        </div>
+        <div style={{ marginTop: "10px", fontSize: "12px" }}>
+          Last saved: {lastSaved.toLocaleTimeString()} | Words:{" "}
+          {contentStats.words} | Reading time: {contentStats.readingTime} min
+        </div>
+      </div>
+
+      {/* Editor Controls */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: "15px",
+          marginBottom: "20px",
+          padding: "20px",
+          backgroundColor: "#f8f9fa",
+          borderRadius: "10px",
+        }}
+      >
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+              fontSize: "14px",
+            }}
+          >
+            Theme:
+          </label>
+          <select
+            value={editorSettings.theme}
+            onChange={(e) => handleSettingChange("theme", e.target.value)}
+            style={{
+              width: "100%",
+              padding: "8px",
+              borderRadius: "4px",
+              border: "1px solid #ddd",
+            }}
+          >
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+            <option value="blue">Blue</option>
+          </select>
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+              fontSize: "14px",
+            }}
+          >
+            Font Size: {editorSettings.fontSize}px
+          </label>
+          <input
+            type="range"
+            min="12"
+            max="24"
+            value={editorSettings.fontSize}
+            onChange={(e) =>
+              handleSettingChange("fontSize", parseInt(e.target.value))
+            }
+            style={{ width: "100%" }}
+          />
+        </div>
+
+        <div>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "5px",
+              fontWeight: "bold",
+              fontSize: "14px",
+            }}
+          >
+            Preview Mode:
+          </label>
+          <select
+            value={previewMode}
+            onChange={(e) => setPreviewMode(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "8px",
+              borderRadius: "4px",
+              border: "1px solid #ddd",
+            }}
+          >
+            <option value="split">Split View</option>
+            <option value="preview">Preview Only</option>
+            <option value="editor">Editor Only</option>
+          </select>
+        </div>
+
+        <div style={{ display: "flex", gap: "10px", alignItems: "end" }}>
+          <button
+            onClick={() => exportContent("md")}
+            style={{
+              padding: "8px 16px",
+              backgroundColor: "#27ae60",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontSize: "12px",
+            }}
+          >
+            📤 Export MD
+          </button>
+          <button
+            onClick={() => exportContent("txt")}
+            style={{
+              padding: "8px 16px",
+              backgroundColor: "#3498db",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontSize: "12px",
+            }}
+          >
+            📄 Export TXT
+          </button>
+        </div>
+      </div>
+
+      {/* Search Panel */}
+      <div
+        style={{
+          padding: "15px",
+          backgroundColor: themeStyle.backgroundColor,
+          border: `1px solid ${themeStyle.borderColor}`,
+          borderRadius: "8px",
+          marginBottom: "20px",
+          color: themeStyle.color,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            alignItems: "center",
+            marginBottom: "10px",
+          }}
+        >
+          <input
+            type="text"
+            placeholder="Search in content..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              flex: 1,
+              padding: "8px",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+              fontSize: "14px",
+            }}
+          />
+          <button
+            onClick={() => setReplaceMode(!replaceMode)}
+            style={{
+              padding: "8px 12px",
+              backgroundColor: replaceMode ? "#e74c3c" : "#95a5a6",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontSize: "12px",
+            }}
+          >
+            {replaceMode ? "Cancel" : "Replace"}
+          </button>
+        </div>
+
+        {replaceMode && (
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              alignItems: "center",
+              marginBottom: "10px",
+            }}
+          >
+            <input
+              type="text"
+              placeholder="Replace with..."
+              value={replaceTerm}
+              onChange={(e) => setReplaceTerm(e.target.value)}
+              style={{
+                flex: 1,
+                padding: "8px",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                fontSize: "14px",
+              }}
+            />
+            <button
+              onClick={handleReplace}
+              style={{
+                padding: "8px 12px",
+                backgroundColor: "#27ae60",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "12px",
+              }}
+            >
+              Replace All
+            </button>
+          </div>
+        )}
+
+        {searchResults.length > 0 && (
+          <div style={{ fontSize: "12px", color: "#666" }}>
+            Found {searchResults.length} matches for "{deferredSearchTerm}"
+          </div>
+        )}
+      </div>
+
+      {/* Editor and Preview */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: previewMode === "split" ? "1fr 1fr" : "1fr",
+          gap: "20px",
+          marginBottom: "20px",
+        }}
+      >
+        {/* Editor */}
+        {previewMode !== "preview" && (
+          <div
+            style={{
+              backgroundColor: themeStyle.backgroundColor,
+              border: `1px solid ${themeStyle.borderColor}`,
+              borderRadius: "8px",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                padding: "10px 15px",
+                backgroundColor: themeStyle.borderColor,
+                fontSize: "14px",
+                fontWeight: "bold",
+                color: themeStyle.color,
+              }}
+            >
+              ✏️ Editor
+            </div>
+            <textarea
+              ref={editorRef}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              style={{
+                width: "100%",
+                height: "500px",
+                padding: "20px",
+                border: "none",
+                outline: "none",
+                resize: "none",
+                fontFamily: "Monaco, Consolas, monospace",
+                fontSize: `${deferredSettings.fontSize}px`,
+                lineHeight: deferredSettings.lineHeight,
+                backgroundColor: themeStyle.backgroundColor,
+                color: themeStyle.color,
+                boxSizing: "border-box",
+              }}
+              placeholder="Start typing your content here..."
+            />
+          </div>
+        )}
+
+        {/* Preview */}
+        {previewMode !== "editor" && (
+          <div
+            style={{
+              backgroundColor: themeStyle.backgroundColor,
+              border: `1px solid ${themeStyle.borderColor}`,
+              borderRadius: "8px",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                padding: "10px 15px",
+                backgroundColor: themeStyle.borderColor,
+                fontSize: "14px",
+                fontWeight: "bold",
+                color: themeStyle.color,
+              }}
+            >
+              👁️ Preview
+            </div>
+            <div
+              ref={previewRef}
+              style={{
+                height: "500px",
+                padding: "20px",
+                overflow: "auto",
+                fontSize: `${deferredSettings.fontSize}px`,
+                lineHeight: deferredSettings.lineHeight,
+                backgroundColor: themeStyle.backgroundColor,
+                color: themeStyle.color,
+              }}
+              dangerouslySetInnerHTML={{ __html: parsedContent }}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Statistics Panel */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+          gap: "15px",
+          marginBottom: "20px",
+        }}
+      >
+        {Object.entries(contentStats).map(([key, value]) => (
+          <div
+            key={key}
+            style={{
+              padding: "15px",
+              backgroundColor: "white",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{ fontSize: "24px", fontWeight: "bold", color: "#667eea" }}
+            >
+              {typeof value === "number" ? value.toLocaleString() : value}
+            </div>
+            <div
+              style={{
+                fontSize: "12px",
+                color: "#666",
+                textTransform: "capitalize",
+              }}
+            >
+              {key.replace(/([A-Z])/g, " $1").trim()}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Performance Info */}
+      <div
+        style={{
+          padding: "15px",
+          backgroundColor: "#e8f4fd",
+          borderRadius: "8px",
+          fontSize: "12px",
+          color: "#2c3e50",
+        }}
+      >
+        <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
+          🚀 Performance Optimizations with useDeferredValue:
+        </div>
+        <div>
+          • Content parsing is deferred to prevent blocking during fast typing
+        </div>
+        <div>
+          • Theme and settings changes are deferred for smooth transitions
+        </div>
+        <div>
+          • Search operations use deferred values to prevent UI freezing
+        </div>
+        <div>• Statistics calculations are optimized with deferred content</div>
+        <div>
+          • Auto-save functionality works with original content for immediate
+          response
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default InteractiveContentEditor;
+````
+
 <BackToTop />
 ## Best Practices
 

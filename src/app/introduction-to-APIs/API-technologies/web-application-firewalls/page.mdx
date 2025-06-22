@@ -12,19 +12,19 @@ Modern WAFs have evolved beyond simple signature-based detection to incorporate 
 
 ### WAF Architecture Types
 
-#### **Reverse Proxy WAF**
+#### Reverse Proxy WAF
 - Deployed between clients and web servers
 - Terminates client connections and establishes new connections to backend servers
 - Provides deep packet inspection and content modification capabilities
 - Most common deployment model for cloud-based WAFs
 
-#### **Transparent/Bridge Mode WAF**
+#### Transparent/Bridge Mode WAF
 - Operates inline without changing network architecture
 - Inspects traffic without terminating connections
 - Minimal latency impact but limited content modification capabilities
 - Ideal for legacy applications with strict networking requirements
 
-#### **Out-of-Band WAF**
+#### Out-of-Band WAF
 - Receives traffic copies for analysis without disrupting the original flow
 - Provides monitoring and alerting but cannot block attacks in real-time
 - Used for compliance monitoring and forensic analysis
@@ -32,29 +32,29 @@ Modern WAFs have evolved beyond simple signature-based detection to incorporate 
 
 ### WAF Deployment Models
 
-#### **Hardware-Based WAFs**
+#### Hardware-Based WAFs
 - **Pros**: High performance, dedicated resources, complete control
 - **Cons**: High capital costs, maintenance overhead, limited scalability
 - **Best For**: Large enterprises with dedicated security teams
 
-#### **Software-Based WAFs**
+#### Software-Based WAFs
 - **Pros**: Flexible deployment, cost-effective, customizable
 - **Cons**: Resource sharing, performance dependent on host infrastructure
 - **Best For**: Organizations with existing server infrastructure
 
-#### **Cloud-Based WAFs**
+#### Cloud-Based WAFs
 - **Pros**: Rapid deployment, automatic updates, global threat intelligence
 - **Cons**: Vendor dependency, potential latency, data sovereignty concerns
 - **Best For**: SaaS applications, global web presence, DevOps environments
 
-#### **Container/Microservices WAFs**
+#### Container/Microservices WAFs
 - **Pros**: Native integration with containerized applications, API-first design
 - **Cons**: Complex configuration, service mesh overhead
 - **Best For**: Cloud-native applications, microservices architectures
 
 ### Key Features
 
-#### **Traffic Analysis and Filtering**
+#### Traffic Analysis and Filtering
 
 **Signature-Based Detection**
 - Pattern matching against known attack signatures
@@ -74,7 +74,7 @@ Modern WAFs have evolved beyond simple signature-based detection to incorporate 
 - Header field validation and sanitization
 - Content-type enforcement
 
-#### **Advanced Security Capabilities**
+#### Advanced Security Capabilities
 
 **API Security**
 - OpenAPI/Swagger specification enforcement
@@ -103,7 +103,7 @@ Modern WAFs have evolved beyond simple signature-based detection to incorporate 
 - Data exfiltration prevention
 - Compliance reporting for data protection regulations
 
-#### **Performance and Optimization Features**
+#### Performance and Optimization Features
 
 **SSL/TLS Management**
 - SSL termination and offloading
@@ -128,7 +128,7 @@ Modern WAFs have evolved beyond simple signature-based detection to incorporate 
 
 ### Use Cases
 
-#### **OWASP Top 10 Protection**
+#### OWASP Top 10 Protection
 
 **Injection Attacks**
 - SQL injection detection and prevention
@@ -158,7 +158,7 @@ Modern WAFs have evolved beyond simple signature-based detection to incorporate 
 - File inclusion attack mitigation
 - Privilege escalation prevention
 
-#### **Industry-Specific Security Requirements**
+#### Industry-Specific Security Requirements
 
 **Financial Services (PCI DSS Compliance)**
 - Payment card data protection
@@ -188,7 +188,7 @@ Modern WAFs have evolved beyond simple signature-based detection to incorporate 
 - Inventory management system security
 - Customer behavior analysis and fraud prevention
 
-#### **Modern Application Protection**
+#### Modern Application Protection
 
 **API Security**
 - RESTful API endpoint protection
@@ -226,6 +226,7 @@ Modern WAFs have evolved beyond simple signature-based detection to incorporate 
 - **Performance Overhead**: Depending on the implementation, WAFs can introduce latency to web applications, especially if they perform deep packet inspection or complex rule evaluations.
 - **Cost**: WAFs can be expensive, especially for enterprise-grade solutions with advanced features. Organizations must weigh the cost against the security benefits provided.
 - **Integration Challenges**: Integrating a WAF into existing infrastructure can be challenging, particularly in complex environments with multiple web applications and services. Ensuring compatibility and seamless operation may require additional effort and resources.
+<BackToTop />
 
 ## Popular WAF Providers
 
@@ -252,6 +253,7 @@ Modern WAFs have evolved beyond simple signature-based detection to incorporate 
 | [**WebKnight**](https://webknight.org/)                                                                      | An open-source WAF that provides basic protection against common web threats. It can be integrated with various web servers and application platforms, offering a flexible rule engine for creating custom security rules. WebKnight is suitable for smaller applications or environments where a lightweight WAF solution is sufficient.                                                          |
 | [**NAXSI**](https://naxsi.com/)                                                                              | An open-source WAF module for Nginx that provides protection against common web threats. It uses a whitelist approach to filter requests and can be customized with user-defined rules. NAXSI is suitable for environments using Nginx as a web server and offers a lightweight solution for basic web application security.                                                                       |
 | [**ModSecurity CRS**](https://coreruleset.org/)                                                              | A community-driven project that provides a set of open-source rules for ModSecurity, a widely used open-source WAF. The Core Rule Set (CRS) offers protection against common web threats and vulnerabilities, making it suitable for various web applications. It can be customized and extended to meet specific security needs.                                                                  |
+<BackToTop />
 
 ## Implementation Examples
 
@@ -604,6 +606,7 @@ Outputs:
     Export:
       Name: !Sub '${AWS::StackName}-WebACL-Id'
 ```
+<BackToTop />
 
 #### AWS WAF Custom Rule Engine with Lambda
 
@@ -961,474 +964,1637 @@ if __name__ == "__main__":
     metrics = engine.monitor_and_adjust(24)
     print("Monitoring Results:", json.dumps(metrics, indent=2))
 ```
+<BackToTop />
 
-### ModSecurity Configuration
+### Cloudflare WAF Configuration
 
-#### Advanced ModSecurity Setup with OWASP CRS
+#### Advanced Cloudflare WAF Rules with Terraform
 
-```apache
-# modsecurity-advanced.conf
-# Advanced ModSecurity configuration for Apache/Nginx
+```hcl
+# cloudflare-waf-advanced.tf
+terraform {
+  required_providers {
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 4.0"
+    }
+  }
+}
 
-# Basic configuration
-SecRuleEngine On
-SecRequestBodyAccess On
-SecResponseBodyAccess Off
+variable "zone_id" {
+  description = "Cloudflare Zone ID"
+  type        = string
+}
 
-# Request body handling
-SecRequestBodyLimit 13107200
-SecRequestBodyNoFilesLimit 131072
-SecRequestBodyInMemoryLimit 131072
-SecRequestBodyLimitAction Reject
+variable "domain_name" {
+  description = "Domain name to protect"
+  type        = string
+  default     = "example.com"
+}
 
-# File uploads
-SecTmpDir /tmp/
-SecDataDir /tmp/
-SecUploadDir /opt/modsecurity/var/upload/
-SecUploadKeepFiles RelevantOnly
-SecUploadFileMode 0600
+# WAF Custom Rules
+resource "cloudflare_ruleset" "waf_custom_rules" {
+  zone_id = var.zone_id
+  name    = "Custom WAF Rules"
+  kind    = "zone"
+  phase   = "http_request_firewall_custom"
 
-# Debug and audit logging
-SecDebugLog /var/log/apache2/modsec_debug.log
-SecDebugLogLevel 0
-SecAuditEngine RelevantOnly
-SecAuditLogRelevantStatus "^(?:5|4(?!04))"
-SecAuditLogParts ABDEFHIJZ
-SecAuditLogType Serial
-SecAuditLog /var/log/apache2/modsec_audit.log
+  rules {
+    action = "block"
+    expression = "(http.request.uri.path contains \"/admin\" and ip.src ne 203.0.113.0/24)"
+    description = "Block admin access from unauthorized IPs"
+    enabled = true
+  }
 
-# Sensor identification
-SecServerSignature "Apache/2.4.0 (Unix)"
+  rules {
+    action = "challenge"
+    expression = "(cf.threat_score gt 20)"
+    description = "Challenge requests with high threat score"
+    enabled = true
+  }
 
-# Custom rule configurations
-Include /etc/modsecurity/crs/crs-setup.conf
-Include /etc/modsecurity/crs/rules/*.conf
+  rules {
+    action = "block"
+    expression = "(http.request.method eq \"POST\" and http.request.uri.path contains \"/api/\" and not http.request.headers[\"authorization\"] contains \"Bearer\")"
+    description = "Block unauthenticated API POST requests"
+    enabled = true
+  }
 
-# Custom rules for specific application protection
-SecRule REQUEST_FILENAME "@beginsWith /api/" \
-    "id:1001,\
-    phase:1,\
-    block,\
-    msg:'API endpoint access without proper authentication',\
-    logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}',\
-    severity:'CRITICAL',\
-    ver:'1.0',\
-    maturity:'9',\
-    accuracy:'9',\
-    t:none,\
-    chain"
-    SecRule &REQUEST_HEADERS:Authorization "@eq 0" \
-        "setvar:'tx.anomaly_score=+%{tx.critical_anomaly_score}',\
-        setvar:'tx.%{rule.id}-POLICY-%{matched_var_name}=%{matched_var}'"
+  rules {
+    action = "block"
+    expression = "(http.request.body matches \"(?i)(union|select|insert|update|delete|drop|exec|script)\")"
+    description = "Block SQL injection and XSS attempts"
+    enabled = true
+  }
 
-# Advanced SQL injection detection
-SecRule ARGS "@detectSQLi" \
-    "id:1002,\
-    phase:2,\
-    block,\
-    msg:'SQL Injection Attack Detected via libinjection',\
-    logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}',\
-    severity:'CRITICAL',\
-    ver:'1.0',\
-    maturity:'9',\
-    accuracy:'9',\
-    t:none,\
-    t:urlDecodeUni,\
-    t:htmlEntityDecode,\
-    t:removeNulls,\
-    setvar:'tx.anomaly_score=+%{tx.critical_anomaly_score}',\
-    setvar:'tx.%{rule.id}-POLICY-%{matched_var_name}=%{matched_var}'"
+  rules {
+    action = "skip"
+    action_parameters {
+      ruleset = "current"
+    }
+    expression = "(ip.src in {203.0.113.0/24 198.51.100.0/24})"
+    description = "Skip WAF for trusted IP ranges"
+    enabled = true
+  }
+}
 
-# XSS protection with enhanced detection
-SecRule ARGS "@detectXSS" \
-    "id:1003,\
-    phase:2,\
-    block,\
-    msg:'XSS Attack Detected via libinjection',\
-    logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}',\
-    severity:'CRITICAL',\
-    ver:'1.0',\
-    maturity:'9',\
-    accuracy:'9',\
-    t:none,\
-    t:urlDecodeUni,\
-    t:htmlEntityDecode,\
-    t:removeNulls,\
-    setvar:'tx.anomaly_score=+%{tx.critical_anomaly_score}',\
-    setvar:'tx.%{rule.id}-POLICY-%{matched_var_name}=%{matched_var}'"
+# Rate Limiting Rules
+resource "cloudflare_ruleset" "rate_limiting" {
+  zone_id = var.zone_id
+  name    = "Rate Limiting Rules"
+  kind    = "zone"
+  phase   = "http_ratelimit"
 
-# Rate limiting based on IP
-SecAction \
-    "id:1004,\
-    phase:1,\
-    nolog,\
-    pass,\
-    initcol:ip=%{remote_addr},\
-    setvar:ip.requests_per_minute=+1,\
-    expirevar:ip.requests_per_minute=60"
+  rules {
+    action = "block"
+    expression = "(http.request.uri.path contains \"/api/\")"
+    description = "API Rate Limiting"
+    enabled = true
+    
+    action_parameters {
+      response {
+        status_code = 429
+        content = "Rate limit exceeded"
+        content_type = "text/plain"
+      }
+    }
+    
+    ratelimit {
+      characteristics = ["ip.src", "http.request.headers[\"authorization\"]"]
+      period = 60
+      requests_per_period = 100
+      mitigation_timeout = 600
+    }
+  }
 
-SecRule IP:REQUESTS_PER_MINUTE "@gt 60" \
-    "id:1005,\
-    phase:1,\
-    deny,\
-    status:429,\
-    msg:'Rate limit exceeded - too many requests per minute',\
-    logdata:'Client IP: %{remote_addr}, Requests: %{ip.requests_per_minute}',\
-    severity:'WARNING',\
-    setvar:'tx.anomaly_score=+%{tx.warning_anomaly_score}'"
+  rules {
+    action = "block"
+    expression = "(http.request.uri.path eq \"/login\")"
+    description = "Login endpoint rate limiting"
+    enabled = true
+    
+    ratelimit {
+      characteristics = ["ip.src"]
+      period = 300
+      requests_per_period = 5
+      mitigation_timeout = 3600
+    }
+  }
+}
 
-# Session-based rate limiting
-SecAction \
-    "id:1006,\
-    phase:1,\
-    nolog,\
-    pass,\
-    initcol:session=%{request_cookies.sessionid},\
-    setvar:session.requests_per_session=+1"
+# Bot Management
+resource "cloudflare_bot_management" "bot_management" {
+  zone_id = var.zone_id
+  enable_js = true
+  fight_mode = true
+  using_latest_model = true
+  
+  # Allow verified bots
+  auto_update_model = true
+  suppress_session_score = false
+}
 
-SecRule SESSION:REQUESTS_PER_SESSION "@gt 1000" \
-    "id:1007,\
-    phase:1,\
-    deny,\
-    status:429,\
-    msg:'Session-based rate limit exceeded',\
-    logdata:'Session ID: %{request_cookies.sessionid}, Requests: %{session.requests_per_session}',\
-    severity:'WARNING'"
+# Security Level
+resource "cloudflare_zone_settings_override" "security_settings" {
+  zone_id = var.zone_id
+  
+  settings {
+    security_level = "high"
+    challenge_ttl = 1800
+    browser_check = "on"
+    hotlink_protection = "on"
+    email_obfuscation = "on"
+    server_side_exclude = "on"
+    
+    # SSL settings
+    ssl = "strict"
+    always_use_https = "on"
+    min_tls_version = "1.2"
+    tls_1_3 = "zrt"
+    automatic_https_rewrites = "on"
+    
+    # Security headers
+    security_header {
+      enabled = true
+      max_age = 31536000
+      include_subdomains = true
+      preload = true
+      nosniff = true
+    }
+  }
+}
 
-# Geographic blocking (example for specific countries)
-SecGeoLookupDB /etc/modsecurity/geoip/GeoLite2-Country.mmdb
+# Page Rules for additional protection
+resource "cloudflare_page_rule" "admin_protection" {
+  zone_id = var.zone_id
+  target = "${var.domain_name}/admin/*"
+  priority = 1
+  
+  actions {
+    security_level = "high"
+    cache_level = "bypass"
+    disable_apps = true
+    disable_performance = true
+  }
+}
 
-SecRule GEO:COUNTRY_CODE "@pmFromFile /etc/modsecurity/blocked_countries.txt" \
-    "id:1008,\
-    phase:1,\
-    deny,\
-    status:403,\
-    msg:'Access denied from blocked country',\
-    logdata:'Country: %{geo.country_code}, IP: %{remote_addr}',\
-    severity:'WARNING'"
+resource "cloudflare_page_rule" "api_cache_bypass" {
+  zone_id = var.zone_id
+  target = "${var.domain_name}/api/*"
+  priority = 2
+  
+  actions {
+    cache_level = "bypass"
+    disable_zaraz = true
+  }
+}
 
-# Admin panel protection
-SecRule REQUEST_FILENAME "@beginsWith /admin/" \
-    "id:1009,\
-    phase:1,\
-    block,\
-    msg:'Admin panel access from unauthorized IP',\
-    logdata:'IP: %{remote_addr}, URI: %{request_filename}',\
-    severity:'CRITICAL',\
-    chain"
-    SecRule REMOTE_ADDR "!@ipMatchFromFile /etc/modsecurity/admin_ips.txt"
+# Access Rules for IP-based filtering
+resource "cloudflare_access_rule" "block_malicious_ips" {
+  zone_id = var.zone_id
+  mode = "block"
+  notes = "Block known malicious IP ranges"
+  
+  configuration {
+    target = "ip_range"
+    value = "192.0.2.0/24"  # Example malicious IP range
+  }
+}
 
-# File upload security
-SecRule FILES_TMPNAMES "@inspectFile /etc/modsecurity/util/runav.pl" \
-    "id:1010,\
-    phase:2,\
-    block,\
-    msg:'Malicious file upload detected',\
-    logdata:'File: %{matched_var}',\
-    severity:'CRITICAL'"
+resource "cloudflare_access_rule" "allow_trusted_ips" {
+  zone_id = var.zone_id
+  mode = "whitelist"
+  notes = "Allow trusted corporate IPs"
+  
+  configuration {
+    target = "ip_range"
+    value = "203.0.113.0/24"
+  }
+}
 
-# Custom anomaly scoring threshold
-SecRule TX:ANOMALY_SCORE "@ge %{tx.inbound_anomaly_score_threshold}" \
-    "id:1011,\
-    phase:2,\
-    deny,\
-    status:403,\
-    msg:'Inbound Anomaly Score Exceeded (Total Score: %{TX.ANOMALY_SCORE})',\
-    severity:'CRITICAL',\
-    ver:'1.0',\
-    maturity:'9',\
-    accuracy:'9'"
+# WAF Package Rules (OWASP)
+resource "cloudflare_waf_package" "owasp" {
+  zone_id = var.zone_id
+  package_id = "c504870194831cd12c3fc0284f294abb"
+  sensitivity = "high"
+  action_mode = "block"
+}
 
-# Response filtering for data leakage prevention
-SecRule RESPONSE_BODY "@pmFromFile /etc/modsecurity/sensitive_data_patterns.txt" \
-    "id:1012,\
-    phase:4,\
-    block,\
-    msg:'Sensitive data leakage detected in response',\
-    logdata:'Pattern matched: %{matched_var}',\
-    severity:'ERROR',\
-    sanitiseMatched"
+# Custom WAF Rules for specific threats
+resource "cloudflare_waf_rule" "sql_injection" {
+  zone_id = var.zone_id
+  rule_id = "100000"
+  mode = "block"
+}
+
+resource "cloudflare_waf_rule" "xss_protection" {
+  zone_id = var.zone_id
+  rule_id = "100001"
+  mode = "block"
+}
+
+# Firewall Rules with advanced expressions
+resource "cloudflare_filter" "advanced_threat_detection" {
+  zone_id = var.zone_id
+  description = "Advanced threat detection filter"
+  expression = <<EOF
+(
+  (http.request.body matches "(?i)(union|select|insert|update|delete|drop|exec|script|alert|prompt|confirm)") or
+  (http.request.uri.query matches "(?i)(union|select|insert|update|delete|drop|exec|script)") or
+  (http.request.headers["user-agent"] contains "sqlmap") or
+  (http.request.headers["user-agent"] contains "nikto") or
+  (http.request.headers["user-agent"] contains "burp") or
+  (http.request.uri.path contains "../") or
+  (http.request.uri.path contains "..\\") or
+  (http.request.uri.path contains "/etc/passwd") or
+  (http.request.uri.path contains "web.config")
+)
+EOF
+}
+
+resource "cloudflare_firewall_rule" "block_advanced_threats" {
+  zone_id = var.zone_id
+  description = "Block advanced threats"
+  filter_id = cloudflare_filter.advanced_threat_detection.id
+  action = "block"
+  priority = 1
+}
+
+# Output important information
+output "waf_ruleset_id" {
+  value = cloudflare_ruleset.waf_custom_rules.id
+}
+
+output "rate_limiting_ruleset_id" {
+  value = cloudflare_ruleset.rate_limiting.id
+}
 ```
+<BackToTop />
 
-#### ModSecurity with Machine Learning Integration
+#### Cloudflare WAF Analytics and Monitoring
 
 ```python
-# modsecurity-ml-integration.py
-import pickle
-import numpy as np
-import re
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
+# cloudflare-waf-monitor.py
+import requests
 import json
+import time
+from datetime import datetime, timedelta
+from typing import Dict, List, Any
 import logging
-from typing import Dict, List, Tuple
 
-class ModSecurityMLEngine:
-    def __init__(self, model_path: str = None):
-        self.vectorizer = TfidfVectorizer(
-            max_features=10000,
-            ngram_range=(1, 3),
-            analyzer='char_wb'
-        )
-        self.classifier = RandomForestClassifier(
-            n_estimators=100,
-            random_state=42,
-            class_weight='balanced'
-        )
-        self.model_path = model_path
-        
-        if model_path:
-            self.load_model()
-        
-        self.feature_extractors = {
-            'length_features': self._extract_length_features,
-            'char_features': self._extract_character_features,
-            'pattern_features': self._extract_pattern_features,
-            'entropy_features': self._extract_entropy_features
+class CloudflareWAFMonitor:
+    def __init__(self, api_token: str, zone_id: str):
+        self.api_token = api_token
+        self.zone_id = zone_id
+        self.base_url = "https://api.cloudflare.com/client/v4"
+        self.headers = {
+            "Authorization": f"Bearer {api_token}",
+            "Content-Type": "application/json"
         }
     
-    def _extract_length_features(self, request: str) -> List[float]:
-        """Extract length-based features"""
-        return [
-            len(request),
-            len(request.split('/')),
-            len(request.split('&')),
-            len(request.split('=')),
-            request.count('%'),
-            max(len(param) for param in request.split('&')) if '&' in request else 0
-        ]
-    
-    def _extract_character_features(self, request: str) -> List[float]:
-        """Extract character distribution features"""
-        total_chars = len(request)
-        if total_chars == 0:
-            return [0] * 10
+    def get_firewall_events(self, hours_back: int = 24) -> List[Dict[str, Any]]:
+        """Get firewall events from the last N hours"""
         
-        return [
-            sum(1 for c in request if c.isalpha()) / total_chars,
-            sum(1 for c in request if c.isdigit()) / total_chars,
-            sum(1 for c in request if c in '!@#$%^&*()') / total_chars,
-            sum(1 for c in request if c in '<>"\'/') / total_chars,
-            sum(1 for c in request if c.isupper()) / total_chars,
-            sum(1 for c in request if c.islower()) / total_chars,
-            request.count('=') / total_chars,
-            request.count('&') / total_chars,
-            request.count('%') / total_chars,
-            request.count('+') / total_chars
-        ]
-    
-    def _extract_pattern_features(self, request: str) -> List[float]:
-        """Extract pattern-based features"""
-        patterns = {
-            'sql_keywords': r'(?i)(select|union|insert|update|delete|drop|create|alter)',
-            'xss_patterns': r'(?i)(<script|javascript:|onload|onerror|onclick)',
-            'file_inclusion': r'(?i)(\.\.\/|\.\.\\|\/etc\/|c:\\)',
-            'command_injection': r'(?i)(;|\||&|`|\$\()',
-            'hex_encoding': r'%[0-9a-fA-F]{2}',
-            'unicode_encoding': r'\\u[0-9a-fA-F]{4}',
-            'html_entities': r'&[a-zA-Z]+;',
-            'repeated_chars': r'(.)\1{5,}'
+        end_time = datetime.utcnow()
+        start_time = end_time - timedelta(hours=hours_back)
+        
+        url = f"{self.base_url}/zones/{self.zone_id}/firewall/events"
+        params = {
+            "since": start_time.isoformat() + "Z",
+            "until": end_time.isoformat() + "Z",
+            "per_page": 50
         }
         
-        features = []
-        for pattern in patterns.values():
-            matches = len(re.findall(pattern, request))
-            features.append(matches)
+        all_events = []
+        page = 1
         
-        return features
+        while True:
+            params["page"] = page
+            response = requests.get(url, headers=self.headers, params=params)
+            
+            if response.status_code != 200:
+                logging.error(f"API request failed: {response.status_code}")
+                break
+            
+            data = response.json()
+            events = data.get("result", [])
+            
+            if not events:
+                break
+            
+            all_events.extend(events)
+            
+            # Check if there are more pages
+            result_info = data.get("result_info", {})
+            if page >= result_info.get("total_pages", 1):
+                break
+            
+            page += 1
+        
+        return all_events
     
-    def _extract_entropy_features(self, request: str) -> List[float]:
-        """Extract entropy-based features"""
-        if len(request) == 0:
-            return [0, 0]
+    def analyze_firewall_events(self, events: List[Dict[str, Any]]) -> Dict[str, Any]:
+        """Analyze firewall events for patterns and insights"""
         
-        # Calculate Shannon entropy
-        char_counts = {}
-        for char in request:
-            char_counts[char] = char_counts.get(char, 0) + 1
-        
-        entropy = 0
-        total_chars = len(request)
-        for count in char_counts.values():
-            probability = count / total_chars
-            entropy -= probability * np.log2(probability)
-        
-        # Calculate normalized entropy
-        max_entropy = np.log2(len(char_counts)) if len(char_counts) > 1 else 0
-        normalized_entropy = entropy / max_entropy if max_entropy > 0 else 0
-        
-        return [entropy, normalized_entropy]
-    
-    def extract_features(self, request: str) -> np.ndarray:
-        """Extract all features from a request"""
-        all_features = []
-        
-        for extractor in self.feature_extractors.values():
-            features = extractor(request)
-            all_features.extend(features)
-        
-        return np.array(all_features)
-    
-    def train_model(self, training_data: List[Tuple[str, int]]):
-        """Train the ML model with labeled data"""
-        requests = [item[0] for item in training_data]
-        labels = [item[1] for item in training_data]
-        
-        # Extract features
-        feature_matrix = np.array([self.extract_features(req) for req in requests])
-        
-        # Add TF-IDF features
-        tfidf_features = self.vectorizer.fit_transform(requests)
-        
-        # Combine features
-        combined_features = np.hstack([feature_matrix, tfidf_features.toarray()])
-        
-        # Split data
-        X_train, X_test, y_train, y_test = train_test_split(
-            combined_features, labels, test_size=0.2, random_state=42
-        )
-        
-        # Train classifier
-        self.classifier.fit(X_train, y_train)
-        
-        # Evaluate
-        train_score = self.classifier.score(X_train, y_train)
-        test_score = self.classifier.score(X_test, y_test)
-        
-        logging.info(f"Training accuracy: {train_score:.3f}")
-        logging.info(f"Test accuracy: {test_score:.3f}")
-        
-        return {
-            'train_accuracy': train_score,
-            'test_accuracy': test_score,
-            'feature_importance': self.classifier.feature_importances_.tolist()
+        analysis = {
+            "total_events": len(events),
+            "blocked_requests": 0,
+            "challenged_requests": 0,
+            "allowed_requests": 0,
+            "top_blocked_ips": {},
+            "top_blocked_countries": {},
+            "top_blocked_user_agents": {},
+            "attack_types": {},
+            "hourly_distribution": {},
+            "top_blocked_paths": {}
         }
+        
+        for event in events:
+            action = event.get("action", "unknown")
+            
+            # Count actions
+            if action == "block":
+                analysis["blocked_requests"] += 1
+            elif action == "challenge":
+                analysis["challenged_requests"] += 1
+            elif action == "allow":
+                analysis["allowed_requests"] += 1
+            
+            # Analyze source IPs
+            source_ip = event.get("source", {}).get("ip", "unknown")
+            analysis["top_blocked_ips"][source_ip] = analysis["top_blocked_ips"].get(source_ip, 0) + 1
+            
+            # Analyze countries
+            country = event.get("source", {}).get("country", "unknown")
+            analysis["top_blocked_countries"][country] = analysis["top_blocked_countries"].get(country, 0) + 1
+            
+            # Analyze user agents
+            user_agent = event.get("metadata", {}).get("user_agent", "unknown")[:100]  # Truncate for analysis
+            analysis["top_blocked_user_agents"][user_agent] = analysis["top_blocked_user_agents"].get(user_agent, 0) + 1
+            
+            # Analyze attack types based on rule matches
+            rule_message = event.get("rule_message", "unknown")
+            analysis["attack_types"][rule_message] = analysis["attack_types"].get(rule_message, 0) + 1
+            
+            # Analyze time distribution
+            event_time = datetime.fromisoformat(event.get("occurred_at", "").replace("Z", "+00:00"))
+            hour_key = event_time.strftime("%Y-%m-%d %H:00")
+            analysis["hourly_distribution"][hour_key] = analysis["hourly_distribution"].get(hour_key, 0) + 1
+            
+            # Analyze blocked paths
+            path = event.get("metadata", {}).get("path", "unknown")
+            analysis["top_blocked_paths"][path] = analysis["top_blocked_paths"].get(path, 0) + 1
+        
+        # Sort top lists
+        analysis["top_blocked_ips"] = dict(sorted(analysis["top_blocked_ips"].items(), 
+                                                key=lambda x: x[1], reverse=True)[:10])
+        analysis["top_blocked_countries"] = dict(sorted(analysis["top_blocked_countries"].items(), 
+                                                      key=lambda x: x[1], reverse=True)[:10])
+        analysis["top_blocked_user_agents"] = dict(sorted(analysis["top_blocked_user_agents"].items(), 
+                                                        key=lambda x: x[1], reverse=True)[:10])
+        analysis["attack_types"] = dict(sorted(analysis["attack_types"].items(), 
+                                             key=lambda x: x[1], reverse=True)[:10])
+        analysis["top_blocked_paths"] = dict(sorted(analysis["top_blocked_paths"].items(), 
+                                                  key=lambda x: x[1], reverse=True)[:10])
+        
+        return analysis
     
-    def predict_threat(self, request: str) -> Dict[str, any]:
-        """Predict if a request is malicious"""
-        # Extract features
-        features = self.extract_features(request)
-        tfidf_features = self.vectorizer.transform([request])
+    def get_zone_analytics(self, hours_back: int = 24) -> Dict[str, Any]:
+        """Get zone analytics for WAF performance"""
         
-        # Combine features
-        combined_features = np.hstack([features.reshape(1, -1), tfidf_features.toarray()])
+        end_time = datetime.utcnow()
+        start_time = end_time - timedelta(hours=hours_back)
         
-        # Predict
-        prediction = self.classifier.predict(combined_features)[0]
-        probability = self.classifier.predict_proba(combined_features)[0]
+        url = f"{self.base_url}/zones/{self.zone_id}/analytics/dashboard"
+        params = {
+            "since": start_time.isoformat() + "Z",
+            "until": end_time.isoformat() + "Z",
+            "continuous": "true"
+        }
         
-        threat_probability = probability[1] if len(probability) > 1 else 0
+        response = requests.get(url, headers=self.headers, params=params)
         
-        # Determine threat level
-        if threat_probability >= 0.9:
-            threat_level = 'CRITICAL'
-        elif threat_probability >= 0.7:
-            threat_level = 'HIGH'
-        elif threat_probability >= 0.5:
-            threat_level = 'MEDIUM'
-        elif threat_probability >= 0.3:
-            threat_level = 'LOW'
+        if response.status_code == 200:
+            return response.json().get("result", {})
         else:
-            threat_level = 'SAFE'
+            logging.error(f"Analytics request failed: {response.status_code}")
+            return {}
+    
+    def create_firewall_rule(self, rule_config: Dict[str, Any]) -> bool:
+        """Create a new firewall rule"""
+        
+        url = f"{self.base_url}/zones/{self.zone_id}/firewall/rules"
+        
+        response = requests.post(url, headers=self.headers, json=[rule_config])
+        
+        if response.status_code == 200:
+            logging.info(f"Firewall rule created successfully")
+            return True
+        else:
+            logging.error(f"Failed to create firewall rule: {response.status_code}")
+            return False
+    
+    def update_security_level(self, level: str) -> bool:
+        """Update zone security level"""
+        
+        url = f"{self.base_url}/zones/{self.zone_id}/settings/security_level"
+        data = {"value": level}
+        
+        response = requests.patch(url, headers=self.headers, json=data)
+        
+        if response.status_code == 200:
+            logging.info(f"Security level updated to {level}")
+            return True
+        else:
+            logging.error(f"Failed to update security level: {response.status_code}")
+            return False
+    
+    def auto_adjust_security(self, analysis: Dict[str, Any]):
+        """Automatically adjust security settings based on threat analysis"""
+        
+        total_events = analysis["total_events"]
+        blocked_requests = analysis["blocked_requests"]
+        
+        if total_events == 0:
+            return
+        
+        block_rate = blocked_requests / total_events
+        
+        # Adjust security level based on threat volume
+        if block_rate > 0.3:  # High threat activity
+            self.update_security_level("high")
+            logging.info("High threat activity detected - increased security level")
+        elif block_rate > 0.1:  # Medium threat activity
+            self.update_security_level("medium")
+            logging.info("Medium threat activity detected - set security level to medium")
+        else:  # Low threat activity
+            self.update_security_level("low")
+            logging.info("Low threat activity - set security level to low")
+        
+        # Create temporary rules for highly active malicious IPs
+        for ip, count in list(analysis["top_blocked_ips"].items())[:5]:
+            if count > 50:  # IP with more than 50 blocked requests
+                rule_config = {
+                    "filter": {
+                        "expression": f"(ip.src eq {ip})",
+                        "paused": False
+                      },
+                      "action": "block",
+                      "description": f"Auto-block for malicious IP {ip} ({count} requests)",
+                      "paused": False
+                }
+                
+                self.create_firewall_rule(rule_config)
+                logging.info(f"Created temporary block rule for IP {ip}")
+    
+    def generate_report(self, analysis: Dict[str, Any]) -> str:
+        """Generate a detailed security report"""
+        
+        report = f"""
+        Cloudflare WAF Security Report
+        Generated: {datetime.utcnow().isoformat()}
+        
+        SUMMARY:
+        - Total Events: {analysis['total_events']}
+        - Blocked Requests: {analysis['blocked_requests']}
+        - Challenged Requests: {analysis['challenged_requests']}
+        - Allowed Requests: {analysis['allowed_requests']}
+        
+        TOP BLOCKED IPs:
+        """
+        
+        for ip, count in analysis["top_blocked_ips"].items():
+            report += f"  {ip}: {count} requests\n"
+        
+        report += "\nTOP BLOCKED COUNTRIES:\n"
+        for country, count in analysis["top_blocked_countries"].items():
+            report += f"  {country}: {count} requests\n"
+        
+        report += "\nTOP ATTACK TYPES:\n"
+        for attack_type, count in analysis["attack_types"].items():
+            report += f"  {attack_type}: {count} events\n"
+        
+        report += "\nTOP BLOCKED PATHS:\n"
+        for path, count in analysis["top_blocked_paths"].items():
+            report += f"  {path}: {count} requests\n"
+        
+        return report
+
+def main():
+    """Main monitoring function"""
+    
+    # Configuration
+    API_TOKEN = "your_cloudflare_api_token"
+    ZONE_ID = "your_zone_id"
+    
+    # Initialize monitor
+    monitor = CloudflareWAFMonitor(API_TOKEN, ZONE_ID)
+    
+    # Get firewall events
+    events = monitor.get_firewall_events(hours_back=24)
+    
+    # Analyze events
+    analysis = monitor.analyze_firewall_events(events)
+    
+    # Auto-adjust security if needed
+    monitor.auto_adjust_security(analysis)
+    
+    # Generate and print report
+    report = monitor.generate_waf_report(analysis)
+    print(report)
+    
+    # Get zone analytics
+    analytics = monitor.get_zone_analytics(hours_back=24)
+    print(f"\nZone Analytics: {json.dumps(analytics, indent=2)}")
+
+if __name__ == "__main__":
+    main()
+```
+<BackToTop />
+
+### NGINX with WAF Module
+
+#### NGINX ModSecurity Integration
+
+```nginx
+# nginx-modsecurity.conf
+# NGINX configuration with ModSecurity WAF module
+
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log warn;
+pid /var/run/nginx.pid;
+
+# Load ModSecurity module
+load_module modules/ngx_http_modsecurity_module.so;
+
+events {
+    worker_connections 4096;
+    use epoll;
+    multi_accept on;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+    
+    # Logging configuration
+    log_format waf_log '$remote_addr - $remote_user [$time_local] '
+                       '"$request" $status $body_bytes_sent '
+                       '"$http_referer" "$http_user_agent" '
+                       '$request_time $upstream_response_time '
+                       '$modsec_transaction_id';
+    
+    access_log /var/log/nginx/access.log waf_log;
+    
+    # Basic NGINX optimizations
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
+    client_max_body_size 50M;
+    
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1000;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
+    
+    # Rate limiting zones
+    limit_req_zone $binary_remote_addr zone=login_limit:10m rate=5r/m;
+    limit_req_zone $binary_remote_addr zone=api_limit:10m rate=100r/m;
+    limit_req_zone $binary_remote_addr zone=general_limit:10m rate=200r/m;
+    
+    # Connection limiting
+    limit_conn_zone $binary_remote_addr zone=conn_limit:10m;
+    
+    # ModSecurity configuration
+    modsecurity on;
+    modsecurity_rules_file /etc/nginx/modsec/main.conf;
+    
+    # Security headers
+    add_header X-Frame-Options DENY always;
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    
+    # Hide NGINX version
+    server_tokens off;
+    
+    # Upstream servers
+    upstream backend_servers {
+        least_conn;
+        server 192.168.1.10:8080 weight=3 max_fails=3 fail_timeout=30s;
+        server 192.168.1.11:8080 weight=3 max_fails=3 fail_timeout=30s;
+        server 192.168.1.12:8080 weight=2 max_fails=3 fail_timeout=30s;
+        keepalive 32;
+    }
+    
+    # API servers
+    upstream api_servers {
+        least_conn;
+        server 192.168.1.20:8080 max_fails=2 fail_timeout=10s;
+        server 192.168.1.21:8080 max_fails=2 fail_timeout=10s;
+        keepalive 16;
+    }
+    
+    # Main server block
+    server {
+        listen 80;
+        listen 443 ssl http2;
+        server_name example.com www.example.com;
+        
+        # SSL configuration
+        ssl_certificate /etc/ssl/certs/example.com.crt;
+        ssl_certificate_key /etc/ssl/private/example.com.key;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384;
+        ssl_prefer_server_ciphers off;
+        ssl_session_cache shared:SSL:10m;
+        ssl_session_timeout 10m;
+        
+        # Redirect HTTP to HTTPS
+        if ($scheme = http) {
+            return 301 https://$server_name$request_uri;
+        }
+        
+        # ModSecurity enabled for all locations
+        modsecurity on;
+        
+        # Rate limiting
+        limit_req zone=general_limit burst=50 nodelay;
+        limit_conn conn_limit 20;
+        
+        # Health check endpoint (bypass WAF)
+        location = /health {
+            modsecurity off;
+            access_log off;
+            return 200 "OK";
+            add_header Content-Type text/plain;
+        }
+        
+        # Login endpoint with strict rate limiting
+        location = /login {
+            limit_req zone=login_limit burst=3 nodelay;
+            
+            # Additional ModSecurity rules for login
+            modsecurity_rules '
+                SecRule REQUEST_METHOD "@streq POST" \
+                    "id:2001,\
+                    phase:1,\
+                    pass,\
+                    nolog,\
+                    setvar:tx.allowed_methods=POST"
+                
+                SecRule ARGS:password "@gt 100" \
+                    "id:2002,\
+                    phase:2,\
+                    deny,\
+                    status:400,\
+                    msg:Password too long,\
+                    logdata:Password length: %{MATCHED_VAR}"
+            ';
+            
+            proxy_pass http://backend_servers;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # API endpoints with specific protection
+        location /api/ {
+            limit_req zone=api_limit burst=20 nodelay;
+            
+            # API-specific ModSecurity rules
+            modsecurity_rules '
+                SecRule REQUEST_HEADERS:Content-Type "!@beginsWith application/json" \
+                    "id:3001,\
+                    phase:1,\
+                    deny,\
+                    status:415,\
+                    msg:Invalid content type for API,\
+                    logdata:Content-Type: %{REQUEST_HEADERS.content-type}"
+                
+                SecRule REQUEST_METHOD "!@pm GET POST PUT DELETE PATCH" \
+                    "id:3002,\
+                    phase:1,\
+                    deny,\
+                    status:405,\
+                    msg:Method not allowed for API"
+                
+                SecRule REQUEST_HEADERS:Authorization "@beginsWith Bearer " \
+                    "id:3003,\
+                    phase:1,\
+                    pass,\
+                    nolog,\
+                    setvar:tx.has_auth=1"
+                
+                SecRule TX:has_auth "@eq 0" \
+                    "id:3004,\
+                    phase:1,\
+                    deny,\
+                    status:401,\
+                    msg:Missing authorization header"
+            ';
+            
+            proxy_pass http://api_servers;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            
+            # API response timeout
+            proxy_connect_timeout 5s;
+            proxy_send_timeout 10s;
+            proxy_read_timeout 30s;
+        }
+        
+        # Admin panel with IP restriction and enhanced security
+        location /admin/ {
+            # IP whitelist
+            allow 203.0.113.0/24;
+            allow 198.51.100.0/24;
+            deny all;
+            
+            # Enhanced ModSecurity rules for admin
+            modsecurity_rules '
+                SecRule REMOTE_ADDR "@ipMatch 203.0.113.0/24,198.51.100.0/24" \
+                    "id:4001,\
+                    phase:1,\
+                    pass,\
+                    nolog,\
+                    setvar:tx.admin_access=1"
+                
+                SecRule TX:admin_access "@eq 0" \
+                    "id:4002,\
+                    phase:1,\
+                    deny,\
+                    status:403,\
+                    msg:Admin access denied"
+                
+                SecRule REQUEST_HEADERS:User-Agent "@pmFromFile /etc/nginx/modsec/admin_allowed_agents.txt" \
+                    "id:4003,\
+                    phase:1,\
+                    pass,\
+                    nolog,\
+                    setvar:tx.valid_agent=1"
+            ';
+            
+            proxy_pass http://backend_servers;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Admin-Access "true";
+        }
+        
+        # File upload endpoint with size and type restrictions
+        location /upload {
+            client_max_body_size 10M;
+            
+            modsecurity_rules '
+                SecRule FILES_NAMES "@pmFromFile /etc/nginx/modsec/allowed_extensions.txt" \
+                    "id:5001,\
+                    phase:2,\
+                    pass,\
+                    nolog,\
+                    setvar:tx.valid_extension=1"
+                
+                SecRule TX:valid_extension "@eq 0" \
+                    "id:5002,\
+                    phase:2,\
+                    deny,\
+                    status:400,\
+                    msg:Invalid file extension"
+                
+                SecRule FILES_TMPNAMES "@inspectFile /usr/local/bin/scan_upload.sh" \
+                    "id:5003,\
+                    phase:2,\
+                    deny,\
+                    status:400,\
+                    msg:Malicious file detected"
+            ';
+            
+            proxy_pass http://backend_servers;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Static content (bypass ModSecurity for performance)
+        location ~* \.(jpg|jpeg|png|gif|ico|css|js|woff|woff2|ttf|eot)$ {
+            modsecurity off;
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+            
+            # Basic security for static content
+            location ~* \.(php|php5|phtml|pl|py|jsp|asp|sh|cgi)$ {
+                deny all;
+            }
+            
+            try_files $uri @backend;
+        }
+        
+        # WebSocket support with ModSecurity
+        location /ws/ {
+            modsecurity_rules '
+                SecRule REQUEST_HEADERS:Upgrade "@streq websocket" \
+                    "id:6001,\
+                    phase:1,\
+                    pass,\
+                    nolog,\
+                    setvar:tx.websocket=1"
+                
+                SecRule TX:websocket "@eq 0" \
+                    "id:6002,\
+                    phase:1,\
+                    deny,\
+                    status:400,\
+                    msg:Invalid WebSocket request"
+            ';
+            
+            proxy_pass http://backend_servers;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            
+            # WebSocket timeouts
+            proxy_read_timeout 3600s;
+            proxy_send_timeout 3600s;
+        }
+        
+        # Default location
+        location / {
+            try_files $uri @backend;
+        }
+        
+        # Backend fallback
+        location @backend {
+            proxy_pass http://backend_servers;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            
+            # Error handling
+            proxy_intercept_errors on;
+            error_page 500 502 503 504 /50x.html;
+        }
+        
+        # Custom error pages
+        location = /50x.html {
+            root /usr/share/nginx/html;
+            internal;
+        }
+        
+        # Block access to sensitive files
+        location ~ /\.(ht|git|svn) {
+            deny all;
+            access_log off;
+            log_not_found off;
+        }
+        
+        location ~ /(config|includes|logs)/ {
+            deny all;
+            access_log off;
+            log_not_found off;
+        }
+    }
+    
+    # Monitoring and metrics server
+    server {
+        listen 8080;
+        server_name localhost;
+        
+        location = /nginx_status {
+            stub_status on;
+            access_log off;
+            allow 127.0.0.1;
+            allow 203.0.113.0/24;
+            deny all;
+        }
+        
+        location = /modsec_status {
+            modsecurity_rules '
+                SecRule REQUEST_METHOD "@streq GET" \
+                    "id:7001,\
+                    phase:1,\
+                    pass,\
+                    nolog,\
+                    exec:/usr/local/bin/modsec_status.sh"
+            ';
+            
+            return 200 "ModSecurity Status: Active";
+            add_header Content-Type text/plain;
+        }
+    }
+}
+```
+<BackToTop />
+
+## WAF Monitoring and Analytics
+
+### Comprehensive WAF Monitoring Dashboard
+
+```python
+# waf-monitoring-dashboard.py
+import plotly.graph_objects as go
+import plotly.express as px
+from plotly.subplots import make_subplots
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+import json
+import boto3
+from typing import Dict, List, Any
+import logging
+
+class WAFMonitoringDashboard:
+    def __init__(self, waf_configs: Dict[str, Any]):
+        self.waf_configs = waf_configs
+        self.metrics_data = {}
+        
+        # Initialize cloud clients
+        self.cloudwatch = boto3.client('cloudwatch')
+        self.wafv2 = boto3.client('wafv2')
+        
+    def collect_aws_waf_metrics(self, web_acl_name: str, hours_back: int = 24) -> Dict[str, Any]:
+        """Collect AWS WAF metrics from CloudWatch"""
+        
+        end_time = datetime.utcnow()
+        start_time = end_time - timedelta(hours=hours_back)
+        
+        metrics = {
+            'allowed_requests': [],
+            'blocked_requests': [],
+            'counted_requests': [],
+            'sampled_requests': []
+        }
+        
+        metric_names = [
+            'AllowedRequests',
+            'BlockedRequests',
+            'CountedRequests',
+            'SampledRequests'
+        ]
+        
+        for metric_name in metric_names:
+            try:
+                response = self.cloudwatch.get_metric_statistics(
+                    Namespace='AWS/WAFV2',
+                    MetricName=metric_name,
+                    Dimensions=[
+                        {'Name': 'WebACL', 'Value': web_acl_name},
+                        {'Name': 'Region', 'Value': 'CloudFront'}
+                    ],
+                    StartTime=start_time,
+                    EndTime=end_time,
+                    Period=300,  # 5-minute intervals
+                    Statistics=['Sum']
+                )
+                
+                datapoints = response.get('Datapoints', [])
+                sorted_points = sorted(datapoints, key=lambda x: x['Timestamp'])
+                
+                metrics[metric_name.lower()] = [
+                    {
+                        'timestamp': point['Timestamp'].isoformat(),
+                        'value': point['Sum']
+                    }
+                    for point in sorted_points
+                ]
+                
+            except Exception as e:
+                logging.error(f"Error collecting {metric_name}: {e}")
+                metrics[metric_name.lower()] = []
+        
+        return metrics
+    
+    def collect_rule_metrics(self, web_acl_name: str, hours_back: int = 24) -> Dict[str, Any]:
+        """Collect metrics for individual WAF rules"""
+        
+        end_time = datetime.utcnow()
+        start_time = end_time - timedelta(hours=hours_back)
+        
+        # Get list of rules from WebACL
+        try:
+            response = self.wafv2.get_web_acl(
+                Scope='CLOUDFRONT',
+                Name=web_acl_name
+            )
+            
+            rules = response.get('WebACL', {}).get('Rules', [])
+            rule_metrics = {}
+            
+            for rule in rules:
+                rule_name = rule['Name']
+                
+                try:
+                    metric_response = self.cloudwatch.get_metric_statistics(
+                        Namespace='AWS/WAFV2',
+                        MetricName='BlockedRequests',
+                        Dimensions=[
+                            {'Name': 'WebACL', 'Value': web_acl_name},
+                            {'Name': 'Region', 'Value': 'CloudFront'},
+                            {'Name': 'Rule', 'Value': rule_name}
+                        ],
+                        StartTime=start_time,
+                        EndTime=end_time,
+                        Period=3600,  # 1-hour intervals
+                        Statistics=['Sum']
+                    )
+                    
+                    datapoints = metric_response.get('Datapoints', [])
+                    total_blocked = sum(point['Sum'] for point in datapoints)
+                    
+                    rule_metrics[rule_name] = {
+                        'total_blocked': total_blocked,
+                        'rule_priority': rule.get('Priority', 0),
+                        'datapoints': sorted(datapoints, key=lambda x: x['Timestamp'])
+                    }
+                    
+                except Exception as e:
+                    logging.error(f"Error collecting metrics for rule {rule_name}: {e}")
+                    rule_metrics[rule_name] = {'total_blocked': 0, 'datapoints': []}
+            
+            return rule_metrics
+            
+        except Exception as e:
+            logging.error(f"Error getting WebACL rules: {e}")
+            return {}
+    
+    def create_traffic_overview_chart(self, metrics_data: Dict[str, Any]) -> go.Figure:
+        """Create traffic overview chart"""
+        
+        fig = make_subplots(
+            rows=2, cols=2,
+            subplot_titles=('Traffic Volume Over Time', 'Request Types Distribution', 
+                          'Top Blocked Rules', 'Geographic Distribution'),
+            specs=[[{"secondary_y": True}, {"type": "pie"}],
+                   [{"type": "bar"}, {"type": "choropleth"}]]
+        )
+        
+        # Traffic volume over time
+        if 'allowed_requests' in metrics_data and metrics_data['allowed_requests']:
+            timestamps = [item['timestamp'] for item in metrics_data['allowed_requests']]
+            allowed_values = [item['value'] for item in metrics_data['allowed_requests']]
+            blocked_values = [item['value'] for item in metrics_data.get('blocked_requests', [])]
+            
+            fig.add_trace(
+                go.Scatter(x=timestamps, y=allowed_values, name='Allowed Requests',
+                          line=dict(color='green')),
+                row=1, col=1
+            )
+            
+            fig.add_trace(
+                go.Scatter(x=timestamps, y=blocked_values, name='Blocked Requests',
+                          line=dict(color='red')),
+                row=1, col=1, secondary_y=True
+            )
+        
+        # Request types pie chart
+        total_allowed = sum(item['value'] for item in metrics_data.get('allowed_requests', []))
+        total_blocked = sum(item['value'] for item in metrics_data.get('blocked_requests', []))
+        total_counted = sum(item['value'] for item in metrics_data.get('counted_requests', []))
+        
+        fig.add_trace(
+            go.Pie(labels=['Allowed', 'Blocked', 'Counted'],
+                   values=[total_allowed, total_blocked, total_counted],
+                   name="Request Types"),
+            row=1, col=2
+        )
+        
+        fig.update_layout(height=800, showlegend=True)
+        return fig
+    
+    def create_rule_performance_chart(self, rule_metrics: Dict[str, Any]) -> go.Figure:
+        """Create rule performance analysis chart"""
+        
+        # Sort rules by total blocked requests
+        sorted_rules = sorted(rule_metrics.items(), key=lambda x: x[1]['total_blocked'], reverse=True)
+        
+        rule_names = [item[0] for item in sorted_rules[:10]]  # Top 10 rules
+        blocked_counts = [item[1]['total_blocked'] for item in sorted_rules[:10]]
+        
+        fig = go.Figure(data=[
+            go.Bar(
+                x=rule_names,
+                y=blocked_counts,
+                marker_color='red',
+                text=blocked_counts,
+                textposition='auto',
+            )
+        ])
+        
+        fig.update_layout(
+            title='Top 10 Rules by Blocked Requests',
+            xaxis_title='Rule Name',
+            yaxis_title='Blocked Requests',
+            xaxis_tickangle=-45
+        )
+        
+        return fig
+    
+    def create_threat_intelligence_chart(self, threat_data: Dict[str, Any]) -> go.Figure:
+        """Create threat intelligence visualization"""
+        
+        fig = make_subplots(
+            rows=2, cols=2,
+            subplot_titles=('Attack Types Over Time', 'Source Countries', 
+                          'Attack Severity Distribution', 'False Positive Rate'),
+            specs=[[{"type": "scatter"}, {"type": "bar"}],
+                   [{"type": "pie"}, {"type": "scatter"}]]
+        )
+        
+        # Mock threat data for demonstration
+        attack_types = ['SQL Injection', 'XSS', 'CSRF', 'Path Traversal', 'Command Injection']
+        attack_counts = [150, 89, 45, 23, 12]
+        
+        fig.add_trace(
+            go.Bar(x=attack_types, y=attack_counts, name='Attack Types'),
+            row=2, col=1
+        )
+        
+        # Severity distribution
+        severities = ['Critical', 'High', 'Medium', 'Low']
+        severity_counts = [45, 123, 89, 67]
+        
+        fig.add_trace(
+            go.Pie(labels=severities, values=severity_counts, name="Severity"),
+            row=2, col=2
+        )
+        
+        fig.update_layout(height=800, showlegend=True)
+        return fig
+    
+    def generate_waf_report(self, metrics_data: Dict[str, Any], 
+                           rule_metrics: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate comprehensive WAF performance report"""
+        
+        total_requests = (
+            sum(item['value'] for item in metrics_data.get('allowed_requests', [])) +
+            sum(item['value'] for item in metrics_data.get('blocked_requests', []))
+        )
+        
+        total_blocked = sum(item['value'] for item in metrics_data.get('blocked_requests', []))
+        block_rate = (total_blocked / total_requests * 100) if total_requests > 0 else 0
+        
+        # Calculate rule effectiveness
+        most_effective_rules = sorted(
+            rule_metrics.items(),
+            key=lambda x: x[1]['total_blocked'],
+            reverse=True
+        )[:5]
+        
+        # Performance metrics
+        avg_response_time = 45  # Mock data - would come from application metrics
+        error_rate = 0.02  # Mock data
+        
+        report = {
+            'summary': {
+                'total_requests': total_requests,
+                'blocked_requests': total_blocked,
+                'block_rate_percentage': round(block_rate, 2),
+                'avg_response_time_ms': avg_response_time,
+                'error_rate_percentage': round(error_rate * 100, 3)
+            },
+            'top_rules': [
+                {
+                    'name': rule[0],
+                    'blocked_count': rule[1]['total_blocked'],
+                    'priority': rule[1]['rule_priority']
+                }
+                for rule in most_effective_rules
+            ],
+            'recommendations': self._generate_recommendations(block_rate, rule_metrics),
+            'timestamp': datetime.utcnow().isoformat()
+        }
+        
+        return report
+    
+    def _generate_recommendations(self, block_rate: float, 
+                                rule_metrics: Dict[str, Any]) -> List[str]:
+        """Generate optimization recommendations"""
+        
+        recommendations = []
+        
+        if block_rate > 10:
+            recommendations.append(
+                "High block rate detected (>10%). Review rules for false positives."
+            )
+        elif block_rate < 0.1:
+            recommendations.append(
+                "Very low block rate (<0.1%). Consider enabling more restrictive rules."
+            )
+        
+        # Check for unused rules
+        unused_rules = [
+            name for name, metrics in rule_metrics.items()
+            if metrics['total_blocked'] == 0
+        ]
+        
+        if unused_rules:
+            recommendations.append(
+                f"Consider reviewing {len(unused_rules)} rules with no blocks: {', '.join(unused_rules[:3])}"
+            )
+        
+        # Check for rule priority optimization
+        high_priority_low_usage = [
+            name for name, metrics in rule_metrics.items()
+            if metrics['rule_priority'] < 10 and metrics['total_blocked'] < 5
+        ]
+        
+        if high_priority_low_usage:
+            recommendations.append(
+                "Consider adjusting priority for rules with low usage but high priority"
+            )
+        
+        return recommendations
+    
+    def export_dashboard_data(self, output_file: str):
+        """Export dashboard data to JSON file"""
+        
+        dashboard_data = {
+            'metrics': self.metrics_data,
+            'generated_at': datetime.utcnow().isoformat(),
+            'config': self.waf_configs
+        }
+        
+        with open(output_file, 'w') as f:
+            json.dump(dashboard_data, f, indent=2)
+        
+        logging.info(f"Dashboard data exported to {output_file}")
+
+def create_realtime_monitoring_system():
+    """Create real-time WAF monitoring system"""
+    
+    import streamlit as st
+    import time
+    
+    st.set_page_config(page_title="WAF Monitoring Dashboard", layout="wide")
+    st.title("Web Application Firewall - Real-time Monitoring")
+    
+    # Configuration
+    waf_configs = {
+        'aws_waf': {
+            'web_acl_name': 'production-web-acl',
+            'region': 'us-east-1'
+        },
+        'cloudflare': {
+            'zone_id': 'your-zone-id',
+            'api_token': 'your-api-token'
+        }
+    }
+    
+    dashboard = WAFMonitoringDashboard(waf_configs)
+    
+    # Sidebar controls
+    st.sidebar.header("Monitoring Controls")
+    refresh_interval = st.sidebar.slider("Refresh Interval (seconds)", 30, 300, 60)
+    time_window = st.sidebar.selectbox("Time Window", ["1 hour", "6 hours", "24 hours", "7 days"])
+    
+    # Auto-refresh
+    placeholder = st.empty()
+    
+    while True:
+        with placeholder.container():
+            # Collect metrics
+            hours_map = {"1 hour": 1, "6 hours": 6, "24 hours": 24, "7 days": 168}
+            hours_back = hours_map[time_window]
+            
+            metrics_data = dashboard.collect_aws_waf_metrics(
+                waf_configs['aws_waf']['web_acl_name'], 
+                hours_back
+            )
+            
+            rule_metrics = dashboard.collect_rule_metrics(
+                waf_configs['aws_waf']['web_acl_name'], 
+                hours_back
+            )
+            
+            # Display metrics
+            col1, col2, col3, col4 = st.columns(4)
+            
+            total_allowed = sum(item['value'] for item in metrics_data.get('allowed_requests', []))
+            total_blocked = sum(item['value'] for item in metrics_data.get('blocked_requests', []))
+            total_requests = total_allowed + total_blocked
+            block_rate = (total_blocked / total_requests * 100) if total_requests > 0 else 0
+            
+            col1.metric("Total Requests", f"{total_requests:,}")
+            col2.metric("Blocked Requests", f"{total_blocked:,}")
+            col3.metric("Block Rate", f"{block_rate:.2f}%")
+            col4.metric("Rules Active", len(rule_metrics))
+            
+            # Charts
+            st.subheader("Traffic Overview")
+            traffic_chart = dashboard.create_traffic_overview_chart(metrics_data)
+            st.plotly_chart(traffic_chart, use_container_width=True)
+            
+            st.subheader("Rule Performance")
+            rule_chart = dashboard.create_rule_performance_chart(rule_metrics)
+            st.plotly_chart(rule_chart, use_container_width=True)
+            
+            # Generate and display report
+            report = dashboard.generate_waf_report(metrics_data, rule_metrics)
+            
+            st.subheader("Recommendations")
+            for recommendation in report['recommendations']:
+                st.warning(recommendation)
+            
+            # Last update time
+            st.caption(f"Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        
+        time.sleep(refresh_interval)
+
+if __name__ == "__main__":
+    # Example usage
+    waf_configs = {
+        'aws_waf': {
+            'web_acl_name': 'production-web-acl',
+            'region': 'us-east-1'
+        }
+    }
+    
+    dashboard = WAFMonitoringDashboard(waf_configs)
+    
+    # Collect metrics
+    metrics = dashboard.collect_aws_waf_metrics('production-web-acl', 24)
+    rule_metrics = dashboard.collect_rule_metrics('production-web-acl', 24)
+    
+    # Generate report
+    report = dashboard.generate_waf_report(metrics, rule_metrics)
+    print(json.dumps(report, indent=2))
+    
+    # Export data
+    dashboard.export_dashboard_data('waf_dashboard_data.json')
+```
+<BackToTop />
+
+## Comparison Matrix
+
+### WAF Solutions Comparison
+
+| Feature | AWS WAF | Cloudflare WAF | ModSecurity | F5 Advanced WAF | Imperva WAF | Azure WAF |
+|---------|---------|----------------|-------------|-----------------|-------------|-----------|
+| **Deployment Model** | Cloud-native | Cloud-edge | On-premises/Cloud | Hybrid | Hybrid | Cloud-native |
+| **Rule Engine** | Managed + Custom | Managed + Custom | Custom (CRS) | Advanced Custom | AI-Enhanced | Managed + Custom |
+| **Machine Learning** | Limited | Advanced | None | Advanced | Advanced | Basic |
+| **Bot Management** | Basic | Advanced | Manual | Advanced | Advanced | Basic |
+| **API Protection** | Good | Excellent | Manual Config | Excellent | Excellent | Good |
+| **Performance Impact** | Low | Very Low | Medium | Low | Low | Low |
+| **Global Presence** | AWS Regions | Global CDN | N/A | Limited | Global | Azure Regions |
+| **Cost Structure** | Pay-per-request | Subscription | Open Source | License + Support | Subscription | Pay-per-request |
+| **Ease of Management** | Medium | High | Low | Medium | High | Medium |
+| **Custom Rules** | Complex | Simple | Very Complex | Advanced | Medium | Simple |
+| **Integration** | AWS Ecosystem | Universal | Web Servers | F5 Ecosystem | Multi-vendor | Azure Ecosystem |
+| **Real-time Updates** | Manual | Automatic | Manual | Automatic | Automatic | Manual |
+| **DDoS Protection** | Basic | Advanced | None | Advanced | Advanced | Basic |
+| **SSL/TLS Termination** | Yes | Yes | Yes | Yes | Yes | Yes |
+| **Geo-blocking** | Yes | Yes | Manual | Yes | Yes | Yes |
+| **Rate Limiting** | Basic | Advanced | Manual | Advanced | Advanced | Basic |
+| **Monitoring & Analytics** | CloudWatch | Built-in Dashboard | External Tools | Advanced | Built-in | Azure Monitor |
+| **Compliance Support** | PCI DSS, SOC | Multiple | Manual | Multiple | Multiple | Multiple |
+| **Learning Curve** | Medium | Low | High | High | Medium | Medium |
+| **False Positive Rate** | Medium | Low | High (initial) | Low | Very Low | Medium |
+| **Scalability** | Auto | Global | Manual | Enterprise | Auto | Auto |
+
+### Use Case Recommendations
+
+#### **Choose AWS WAF when:**
+- Deep integration with AWS services required
+- Cost optimization through pay-per-request model
+- Existing AWS infrastructure
+- CloudFront or Application Load Balancer usage
+- Need for custom rules with AWS Lambda integration
+
+#### **Choose Cloudflare WAF when:**
+- Global content delivery requirement
+- Advanced bot management needed
+- Real-time threat intelligence important
+- Ease of management prioritized
+- Multi-cloud or vendor-agnostic approach
+
+#### **Choose ModSecurity when:**
+- Maximum customization and control required
+- Open-source solution preferred
+- Specific compliance requirements
+- Existing NGINX/Apache infrastructure
+- Security team has deep WAF expertise
+
+#### **Choose F5 Advanced WAF when:**
+- Enterprise-grade features required
+- Advanced application security needed
+- Hybrid cloud deployment
+- Integration with F5 ecosystem
+- High-performance requirements
+
+#### **Choose Imperva WAF when:**
+- Advanced threat detection with AI/ML
+- Comprehensive application security suite
+- Multi-vendor environment
+- Strong compliance requirements
+- Managed security service preferred
+
+#### **Choose Azure WAF when:**
+- Microsoft-centric infrastructure
+- Integration with Azure services
+- Hybrid cloud with on-premises AD
+- Cost optimization within Azure
+- .NET application environment
+<BackToTop />
+
+### Cost Analysis Framework
+
+```python
+# waf-cost-calculator.py
+from typing import Dict, List, Any
+import numpy as np
+
+class WAFCostCalculator:
+    def __init__(self):
+        self.pricing_models = {
+            'aws_waf': {
+                'web_acl': 1.00,  # per month
+                'rule_group': 1.00,  # per month
+                'request_processing': 0.60,  # per million requests
+                'rule_evaluations': 1.00,  # per million rule evaluations
+                'managed_rule_groups': 2.00  # per month per group
+            },
+            'cloudflare_waf': {
+                'pro_plan': 20.00,  # per month
+                'business_plan': 200.00,  # per month
+                'enterprise_plan': 'custom',  # contact sales
+                'rate_limiting': 5.00,  # per month
+                'bot_management': 10.00  # per month
+            },
+            'azure_waf': {
+                'application_gateway': 0.0125,  # per hour
+                'front_door': 0.0125,  # per hour
+                'request_processing': 0.80,  # per million requests
+                'managed_rules': 0.00  # included
+            },
+            'f5_big_ip': {
+                'virtual_edition': 2000.00,  # per month (estimated)
+                'hardware_appliance': 15000.00,  # one-time (estimated)
+                'support': 3000.00,  # per year
+                'additional_modules': 500.00  # per month
+            },
+            'imperva_cloud_waf': {
+                'starter': 59.00,  # per month
+                'professional': 299.00,  # per month
+                'enterprise': 'custom',  # contact sales
+                'additional_domains': 25.00  # per month per domain
+            }
+        }
+    
+    def calculate_monthly_cost(self, solution: str, traffic_profile: Dict[str, Any]) -> Dict[str, float]:
+        """Calculate monthly cost for a specific WAF solution"""
+        
+        monthly_requests = traffic_profile.get('monthly_requests', 0)
+        domains = traffic_profile.get('domains', 1)
+        rules = traffic_profile.get('custom_rules', 0)
+        managed_rule_groups = traffic_profile.get('managed_rule_groups', 0)
+        
+        costs = {'base_cost': 0, 'variable_cost': 0, 'total_cost': 0}
+        
+        if solution == 'aws_waf':
+            # Base costs
+            costs['base_cost'] += self.pricing_models['aws_waf']['web_acl'] * domains
+            costs['base_cost'] += self.pricing_models['aws_waf']['managed_rule_groups'] * managed_rule_groups
+            
+            # Variable costs
+            million_requests = monthly_requests / 1_000_000
+            costs['variable_cost'] += self.pricing_models['aws_waf']['request_processing'] * million_requests
+            
+            # Estimate rule evaluations (average 5 rules per request)
+            rule_evaluations = monthly_requests * 5 / 1_000_000
+            costs['variable_cost'] += self.pricing_models['aws_waf']['rule_evaluations'] * rule_evaluations
+        
+        elif solution == 'cloudflare_waf':
+            # Determine plan based on traffic
+            if monthly_requests < 10_000_000:
+                costs['base_cost'] = self.pricing_models['cloudflare_waf']['pro_plan'] * domains
+            elif monthly_requests < 100_000_000:
+                costs['base_cost'] = self.pricing_models['cloudflare_waf']['business_plan'] * domains
+            else:
+                costs['base_cost'] = 500 * domains  # Estimated enterprise cost
+            
+            # Additional features
+            if traffic_profile.get('bot_management', False):
+                costs['base_cost'] += self.pricing_models['cloudflare_waf']['bot_management'] * domains
+        
+        elif solution == 'azure_waf':
+            # Application Gateway or Front Door cost
+            hours_per_month = 24 * 30
+            costs['base_cost'] = self.pricing_models['azure_waf']['application_gateway'] * hours_per_month * domains
+            
+            # Request processing
+            million_requests = monthly_requests / 1_000_000
+            costs['variable_cost'] = self.pricing_models['azure_waf']['request_processing'] * million_requests
+        
+        elif solution == 'f5_big_ip':
+            # Assuming virtual edition
+            costs['base_cost'] = self.pricing_models['f5_big_ip']['virtual_edition']
+            
+            # Support (monthly portion)
+            costs['base_cost'] += self.pricing_models['f5_big_ip']['support'] / 12
+        
+        elif solution == 'imperva_cloud_waf':
+            # Determine plan based on requirements
+            if domains <= 1 and monthly_requests < 50_000_000:
+                costs['base_cost'] = self.pricing_models['imperva_cloud_waf']['starter']
+            elif domains <= 5 and monthly_requests < 200_000_000:
+                costs['base_cost'] = self.pricing_models['imperva_cloud_waf']['professional']
+            else:
+                costs['base_cost'] = 1000  # Estimated enterprise cost
+            
+            # Additional domains
+            if domains > 1:
+                additional_domains = domains - 1
+                costs['base_cost'] += self.pricing_models['imperva_cloud_waf']['additional_domains'] * additional_domains
+        
+        costs['total_cost'] = costs['base_cost'] + costs['variable_cost']
+        return costs
+    
+    def compare_solutions(self, traffic_profile: Dict[str, Any]) -> Dict[str, Dict[str, float]]:
+        """Compare costs across all WAF solutions"""
+        
+        solutions = ['aws_waf', 'cloudflare_waf', 'azure_waf', 'f5_big_ip', 'imperva_cloud_waf']
+        comparison = {}
+        
+        for solution in solutions:
+            comparison[solution] = self.calculate_monthly_cost(solution, traffic_profile)
+        
+        return comparison
+    
+    def calculate_roi(self, solution_cost: float, risk_mitigation_value: float, 
+                     incident_cost_savings: float) -> Dict[str, float]:
+        """Calculate ROI for WAF investment"""
+        
+        annual_cost = solution_cost * 12
+        annual_savings = risk_mitigation_value + incident_cost_savings
+        
+        roi_percentage = ((annual_savings - annual_cost) / annual_cost) * 100 if annual_cost > 0 else 0
+        payback_period_months = (annual_cost / (annual_savings / 12)) if annual_savings > 0 else float('inf')
         
         return {
-            'is_malicious': bool(prediction),
-            'threat_probability': float(threat_probability),
-            'threat_level': threat_level,
-            'confidence': float(max(probability)),
-            'features': features.tolist()
+            'annual_cost': annual_cost,
+            'annual_savings': annual_savings,
+            'roi_percentage': roi_percentage,
+            'payback_period_months': payback_period_months,
+            'net_benefit': annual_savings - annual_cost
         }
-    
-    def save_model(self, path: str):
-        """Save the trained model"""
-        model_data = {
-            'vectorizer': self.vectorizer,
-            'classifier': self.classifier
-        }
-        
-        with open(path, 'wb') as f:
-            pickle.dump(model_data, f)
-    
-    def load_model(self):
-        """Load a trained model"""
-        try:
-            with open(self.model_path, 'rb') as f:
-                model_data = pickle.load(f)
-                self.vectorizer = model_data['vectorizer']
-                self.classifier = model_data['classifier']
-        except FileNotFoundError:
-            logging.warning(f"Model file {self.model_path} not found")
-
-# ModSecurity integration script
-def modsecurity_ml_hook(request_data: str) -> str:
-    """Hook function for ModSecurity to call ML engine"""
-    
-    # Initialize ML engine
-    ml_engine = ModSecurityMLEngine('/opt/modsecurity/models/threat_model.pkl')
-    
-    # Analyze request
-    result = ml_engine.predict_threat(request_data)
-    
-    # Return ModSecurity-compatible response
-    if result['is_malicious'] and result['threat_probability'] > 0.7:
-        return f"THREAT_DETECTED:{result['threat_level']}:{result['threat_probability']:.3f}"
-    else:
-        return f"SAFE:{result['threat_level']}:{result['threat_probability']:.3f}"
-
-# Training data preparation script
-def prepare_training_data() -> List[Tuple[str, int]]:
-    """Prepare training data from ModSecurity logs"""
-    
-    training_data = []
-    
-    # Malicious requests (label: 1)
-    malicious_requests = [
-        "/app/admin/index.php?id=1' OR '1'='1",
-        "/search.php?q=<script>alert('xss')</script>",
-        "/upload.php?file=../../etc/passwd",
-        "/api/users?id=1; DROP TABLE users;--",
-        "/login.php?user=admin&pass=admin' UNION SELECT password FROM users--"
-    ]
-    
-    for req in malicious_requests:
-        training_data.append((req, 1))
-    
-    # Benign requests (label: 0)
-    benign_requests = [
-        "/index.php?page=home",
-        "/search.php?q=python+programming",
-        "/api/users?id=123&format=json",
-        "/products.php?category=electronics&sort=price",
-        "/contact.php?name=John&email=john@example.com"
-    ]
-    
-    for req in benign_requests:
-        training_data.append((req, 0))
-    
-    return training_data
 
 # Example usage
 if __name__ == "__main__":
-    # Initialize and train the model
-    ml_engine = ModSecurityMLEngine()
+    calculator = WAFCostCalculator()
     
-    # Prepare training data
-    training_data = prepare_training_data()
+    # Example traffic profile
+    traffic_profile = {
+        'monthly_requests': 50_000_000,  # 50M requests per month
+        'domains': 3,
+        'custom_rules': 10,
+        'managed_rule_groups': 5,
+        'bot_management': True
+    }
     
-    # Train the model
-    results = ml_engine.train_model(training_data)
-    print("Training results:", json.dumps(results, indent=2))
+    # Compare costs
+    cost_comparison = calculator.compare_solutions(traffic_profile)
     
-    # Save the model
-    ml_engine.save_model('/tmp/threat_model.pkl')
+    print("WAF Cost Comparison (Monthly):")
+    print("=" * 50)
+    for solution, costs in cost_comparison.items():
+        print(f"{solution.upper()}:")
+        print(f"  Base Cost: ${costs['base_cost']:.2f}")
+        print(f"  Variable Cost: ${costs['variable_cost']:.2f}")
+        print(f"  Total Cost: ${costs['total_cost']:.2f}")
+        print()
     
-    # Test prediction
-    test_request = "/app/login.php?user=admin&pass=' OR '1'='1"
-    prediction = ml_engine.predict_threat(test_request)
-    print("Threat prediction:", json.dumps(prediction, indent=2))
+    # Calculate ROI for AWS WAF
+    aws_monthly_cost = cost_comparison['aws_waf']['total_cost']
+    risk_mitigation = 500_000  # Estimated annual value of risk mitigation
+    incident_savings = 200_000  # Estimated annual savings from prevented incidents
     
-    # Test ModSecurity hook
-    hook_result = modsecurity_ml_hook(test_request)
-    print("ModSecurity hook result:", hook_result)
+    roi = calculator.calculate_roi(aws_monthly_cost, risk_mitigation, incident_savings)
+    
+    print("AWS WAF ROI Analysis:")
+    print("=" * 30)
+    for metric, value in roi.items():
+        if 'percentage' in metric:
+            print(f"{metric}: {value:.1f}%")
+        elif 'months' in metric:
+            print(f"{metric}: {value:.1f} months")
+        else:
+            print(f"{metric}: ${value:,.2f}")
 ```
+
+
+<BackToTop />

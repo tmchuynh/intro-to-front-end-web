@@ -76,6 +76,8 @@ function ShoppingCart() {
 export default ShoppingCart;
 ```
 
+<BackToTop />
+
 ## Common Use Cases
 
 - **Form Handling**: Managing form inputs and validation.
@@ -278,7 +280,10 @@ const logout = () => {
 };
 ```
 
+<BackToTop />
+
 ## Examples
+
 ### Personal Expense Tracker
 
 ```javascript
@@ -291,85 +296,101 @@ function ExpenseTracker() {
     description: "",
     amount: "",
     category: "food",
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toISOString().split("T")[0],
   });
   const [view, setView] = useState("list"); // list, chart, budget
 
   const categories = [
     { id: "food", label: "Food & Dining", color: "#ff6b6b", icon: "🍽️" },
     { id: "transport", label: "Transportation", color: "#4ecdc4", icon: "🚗" },
-    { id: "entertainment", label: "Entertainment", color: "#45b7d1", icon: "🎬" },
+    {
+      id: "entertainment",
+      label: "Entertainment",
+      color: "#45b7d1",
+      icon: "🎬",
+    },
     { id: "shopping", label: "Shopping", color: "#f9ca24", icon: "🛍️" },
     { id: "bills", label: "Bills & Utilities", color: "#6c5ce7", icon: "💡" },
     { id: "health", label: "Health", color: "#a29bfe", icon: "⚕️" },
-    { id: "other", label: "Other", color: "#fd79a8", icon: "📦" }
+    { id: "other", label: "Other", color: "#fd79a8", icon: "📦" },
   ];
 
   const addExpense = () => {
-    if (newExpense.description && newExpense.amount && parseFloat(newExpense.amount) > 0) {
+    if (
+      newExpense.description &&
+      newExpense.amount &&
+      parseFloat(newExpense.amount) > 0
+    ) {
       const expense = {
         id: Date.now(),
         ...newExpense,
         amount: parseFloat(newExpense.amount),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      setExpenses(prev => [expense, ...prev]);
+      setExpenses((prev) => [expense, ...prev]);
       setNewExpense({
         description: "",
         amount: "",
         category: "food",
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString().split("T")[0],
       });
     }
   };
 
   const deleteExpense = (id) => {
-    setExpenses(prev => prev.filter(expense => expense.id !== id));
+    setExpenses((prev) => prev.filter((expense) => expense.id !== id));
   };
 
   const getCurrentMonthExpenses = () => {
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
-    return expenses.filter(expense => {
+    return expenses.filter((expense) => {
       const expenseDate = new Date(expense.date);
-      return expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear;
+      return (
+        expenseDate.getMonth() === currentMonth &&
+        expenseDate.getFullYear() === currentYear
+      );
     });
   };
 
   const getExpensesByCategory = () => {
     const monthlyExpenses = getCurrentMonthExpenses();
     const categoryTotals = {};
-    
-    categories.forEach(cat => {
+
+    categories.forEach((cat) => {
       categoryTotals[cat.id] = {
         ...cat,
         total: monthlyExpenses
-          .filter(expense => expense.category === cat.id)
+          .filter((expense) => expense.category === cat.id)
           .reduce((sum, expense) => sum + expense.amount, 0),
-        count: monthlyExpenses.filter(expense => expense.category === cat.id).length
+        count: monthlyExpenses.filter((expense) => expense.category === cat.id)
+          .length,
       };
     });
-    
+
     return categoryTotals;
   };
 
   const getTotalSpent = () => {
-    return getCurrentMonthExpenses().reduce((sum, expense) => sum + expense.amount, 0);
+    return getCurrentMonthExpenses().reduce(
+      (sum, expense) => sum + expense.amount,
+      0
+    );
   };
 
   const setBudgetForCategory = (categoryId, amount) => {
-    setBudget(prev => ({
+    setBudget((prev) => ({
       ...prev,
       categories: {
         ...prev.categories,
-        [categoryId]: parseFloat(amount) || 0
-      }
+        [categoryId]: parseFloat(amount) || 0,
+      },
     }));
   };
 
   const getWeeklyTrends = () => {
     const weeks = {};
-    getCurrentMonthExpenses().forEach(expense => {
+    getCurrentMonthExpenses().forEach((expense) => {
       const date = new Date(expense.date);
       const weekNumber = Math.ceil(date.getDate() / 7);
       if (!weeks[weekNumber]) weeks[weekNumber] = 0;
@@ -384,24 +405,30 @@ function ExpenseTracker() {
   const weeklyTrends = getWeeklyTrends();
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1000px', fontFamily: 'Arial, sans-serif' }}>
+    <div
+      style={{
+        padding: "20px",
+        maxWidth: "1000px",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
       <h3>Personal Expense Tracker</h3>
-      
+
       {/* Navigation */}
-      <div style={{ marginBottom: '20px' }}>
-        {["list", "chart", "budget"].map(viewType => (
+      <div style={{ marginBottom: "20px" }}>
+        {["list", "chart", "budget"].map((viewType) => (
           <button
             key={viewType}
             onClick={() => setView(viewType)}
             style={{
-              marginRight: '10px',
-              padding: '8px 16px',
-              backgroundColor: view === viewType ? '#007bff' : '#f8f9fa',
-              color: view === viewType ? 'white' : '#333',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              cursor: 'pointer',
-              textTransform: 'capitalize'
+              marginRight: "10px",
+              padding: "8px 16px",
+              backgroundColor: view === viewType ? "#007bff" : "#f8f9fa",
+              color: view === viewType ? "white" : "#333",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+              cursor: "pointer",
+              textTransform: "capitalize",
             }}
           >
             {viewType}
@@ -410,47 +437,61 @@ function ExpenseTracker() {
       </div>
 
       {/* Summary Cards */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-        gap: '15px',
-        marginBottom: '30px'
-      }}>
-        <div style={{ 
-          padding: '20px', 
-          backgroundColor: '#e3f2fd', 
-          borderRadius: '8px',
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#1976d2' }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: "15px",
+          marginBottom: "30px",
+        }}
+      >
+        <div
+          style={{
+            padding: "20px",
+            backgroundColor: "#e3f2fd",
+            borderRadius: "8px",
+            textAlign: "center",
+          }}
+        >
+          <div
+            style={{ fontSize: "28px", fontWeight: "bold", color: "#1976d2" }}
+          >
             ${totalSpent.toFixed(2)}
           </div>
           <div>Total Spent This Month</div>
         </div>
-        
-        <div style={{ 
-          padding: '20px', 
-          backgroundColor: remainingBudget >= 0 ? '#e8f5e8' : '#ffebee', 
-          borderRadius: '8px',
-          textAlign: 'center'
-        }}>
-          <div style={{ 
-            fontSize: '28px', 
-            fontWeight: 'bold', 
-            color: remainingBudget >= 0 ? '#388e3c' : '#d32f2f'
-          }}>
+
+        <div
+          style={{
+            padding: "20px",
+            backgroundColor: remainingBudget >= 0 ? "#e8f5e8" : "#ffebee",
+            borderRadius: "8px",
+            textAlign: "center",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "28px",
+              fontWeight: "bold",
+              color: remainingBudget >= 0 ? "#388e3c" : "#d32f2f",
+            }}
+          >
             ${Math.abs(remainingBudget).toFixed(2)}
           </div>
-          <div>{remainingBudget >= 0 ? 'Remaining Budget' : 'Over Budget'}</div>
+          <div>{remainingBudget >= 0 ? "Remaining Budget" : "Over Budget"}</div>
         </div>
-        
-        <div style={{ 
-          padding: '20px', 
-          backgroundColor: '#fff3e0', 
-          borderRadius: '8px',
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: '28px', fontWeight: 'bold', color: '#f57c00' }}>
+
+        <div
+          style={{
+            padding: "20px",
+            backgroundColor: "#fff3e0",
+            borderRadius: "8px",
+            textAlign: "center",
+          }}
+        >
+          <div
+            style={{ fontSize: "28px", fontWeight: "bold", color: "#f57c00" }}
+          >
             {getCurrentMonthExpenses().length}
           </div>
           <div>Transactions</div>
@@ -460,51 +501,71 @@ function ExpenseTracker() {
       {view === "list" && (
         <>
           {/* Add Expense Form */}
-          <div style={{ 
-            padding: '20px', 
-            backgroundColor: '#f8f9fa', 
-            borderRadius: '8px',
-            marginBottom: '20px'
-          }}>
+          <div
+            style={{
+              padding: "20px",
+              backgroundColor: "#f8f9fa",
+              borderRadius: "8px",
+              marginBottom: "20px",
+            }}
+          >
             <h4>Add New Expense</h4>
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: '2fr 1fr 1fr 1fr auto', 
-              gap: '10px', 
-              alignItems: 'end' 
-            }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "2fr 1fr 1fr 1fr auto",
+                gap: "10px",
+                alignItems: "end",
+              }}
+            >
               <input
                 type="text"
                 placeholder="Description"
                 value={newExpense.description}
-                onChange={(e) => setNewExpense(prev => ({ ...prev, description: e.target.value }))}
-                style={{ padding: '8px' }}
+                onChange={(e) =>
+                  setNewExpense((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+                style={{ padding: "8px" }}
               />
               <input
                 type="number"
                 placeholder="Amount"
                 value={newExpense.amount}
-                onChange={(e) => setNewExpense(prev => ({ ...prev, amount: e.target.value }))}
+                onChange={(e) =>
+                  setNewExpense((prev) => ({ ...prev, amount: e.target.value }))
+                }
                 step="0.01"
                 min="0"
-                style={{ padding: '8px' }}
+                style={{ padding: "8px" }}
               />
               <select
                 value={newExpense.category}
-                onChange={(e) => setNewExpense(prev => ({ ...prev, category: e.target.value }))}
-                style={{ padding: '8px' }}
+                onChange={(e) =>
+                  setNewExpense((prev) => ({
+                    ...prev,
+                    category: e.target.value,
+                  }))
+                }
+                style={{ padding: "8px" }}
               >
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.icon} {cat.label}</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.icon} {cat.label}
+                  </option>
                 ))}
               </select>
               <input
                 type="date"
                 value={newExpense.date}
-                onChange={(e) => setNewExpense(prev => ({ ...prev, date: e.target.value }))}
-                style={{ padding: '8px' }}
+                onChange={(e) =>
+                  setNewExpense((prev) => ({ ...prev, date: e.target.value }))
+                }
+                style={{ padding: "8px" }}
               />
-              <button onClick={addExpense} style={{ padding: '8px 16px' }}>
+              <button onClick={addExpense} style={{ padding: "8px 16px" }}>
                 Add
               </button>
             </div>
@@ -514,45 +575,67 @@ function ExpenseTracker() {
           <div>
             <h4>Recent Expenses</h4>
             {expenses.length === 0 ? (
-              <p style={{ textAlign: 'center', color: '#666', padding: '40px' }}>
+              <p
+                style={{ textAlign: "center", color: "#666", padding: "40px" }}
+              >
                 No expenses recorded yet
               </p>
             ) : (
-              expenses.slice(0, 10).map(expense => {
-                const category = categories.find(cat => cat.id === expense.category);
+              expenses.slice(0, 10).map((expense) => {
+                const category = categories.find(
+                  (cat) => cat.id === expense.category
+                );
                 return (
-                  <div key={expense.id} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '15px',
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                    marginBottom: '10px',
-                    borderLeft: `4px solid ${category?.color || '#ccc'}`
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                      <span style={{ fontSize: '24px' }}>{category?.icon}</span>
+                  <div
+                    key={expense.id}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "15px",
+                      border: "1px solid #ddd",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
+                      borderLeft: `4px solid ${category?.color || "#ccc"}`,
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "15px",
+                      }}
+                    >
+                      <span style={{ fontSize: "24px" }}>{category?.icon}</span>
                       <div>
-                        <div style={{ fontWeight: 'bold' }}>{expense.description}</div>
-                        <div style={{ fontSize: '12px', color: '#666' }}>
-                          {category?.label} • {new Date(expense.date).toLocaleDateString()}
+                        <div style={{ fontWeight: "bold" }}>
+                          {expense.description}
+                        </div>
+                        <div style={{ fontSize: "12px", color: "#666" }}>
+                          {category?.label} •{" "}
+                          {new Date(expense.date).toLocaleDateString()}
                         </div>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                      <span style={{ fontSize: '18px', fontWeight: 'bold' }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "15px",
+                      }}
+                    >
+                      <span style={{ fontSize: "18px", fontWeight: "bold" }}>
                         ${expense.amount.toFixed(2)}
                       </span>
                       <button
                         onClick={() => deleteExpense(expense.id)}
                         style={{
-                          padding: '4px 8px',
-                          backgroundColor: '#dc3545',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer'
+                          padding: "4px 8px",
+                          backgroundColor: "#dc3545",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer",
                         }}
                       >
                         Delete
@@ -569,58 +652,97 @@ function ExpenseTracker() {
       {view === "chart" && (
         <div>
           <h4>Spending by Category</h4>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-            {Object.values(categoryData).map(category => (
-              <div key={category.id} style={{
-                padding: '20px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                backgroundColor: 'white'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                  <span style={{ fontSize: '24px', marginRight: '10px' }}>{category.icon}</span>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+              gap: "20px",
+            }}
+          >
+            {Object.values(categoryData).map((category) => (
+              <div
+                key={category.id}
+                style={{
+                  padding: "20px",
+                  border: "1px solid #ddd",
+                  borderRadius: "8px",
+                  backgroundColor: "white",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: "10px",
+                  }}
+                >
+                  <span style={{ fontSize: "24px", marginRight: "10px" }}>
+                    {category.icon}
+                  </span>
                   <div>
-                    <div style={{ fontWeight: 'bold' }}>{category.label}</div>
-                    <div style={{ fontSize: '12px', color: '#666' }}>{category.count} transactions</div>
+                    <div style={{ fontWeight: "bold" }}>{category.label}</div>
+                    <div style={{ fontSize: "12px", color: "#666" }}>
+                      {category.count} transactions
+                    </div>
                   </div>
                 </div>
-                <div style={{ 
-                  height: '10px', 
-                  backgroundColor: '#f0f0f0', 
-                  borderRadius: '5px',
-                  marginBottom: '10px'
-                }}>
-                  <div style={{
-                    height: '100%',
-                    width: `${Math.min((category.total / totalSpent) * 100, 100)}%`,
-                    backgroundColor: category.color,
-                    borderRadius: '5px'
-                  }} />
+                <div
+                  style={{
+                    height: "10px",
+                    backgroundColor: "#f0f0f0",
+                    borderRadius: "5px",
+                    marginBottom: "10px",
+                  }}
+                >
+                  <div
+                    style={{
+                      height: "100%",
+                      width: `${Math.min((category.total / totalSpent) * 100, 100)}%`,
+                      backgroundColor: category.color,
+                      borderRadius: "5px",
+                    }}
+                  />
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
                   <span>${category.total.toFixed(2)}</span>
-                  <span>{totalSpent > 0 ? ((category.total / totalSpent) * 100).toFixed(1) : 0}%</span>
+                  <span>
+                    {totalSpent > 0
+                      ? ((category.total / totalSpent) * 100).toFixed(1)
+                      : 0}
+                    %
+                  </span>
                 </div>
               </div>
             ))}
           </div>
 
-          <div style={{ marginTop: '30px' }}>
+          <div style={{ marginTop: "30px" }}>
             <h4>Weekly Spending Trend</h4>
-            <div style={{ display: 'flex', alignItems: 'end', gap: '10px', height: '200px' }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "end",
+                gap: "10px",
+                height: "200px",
+              }}
+            >
               {Object.entries(weeklyTrends).map(([week, amount]) => (
-                <div key={week} style={{ textAlign: 'center' }}>
+                <div key={week} style={{ textAlign: "center" }}>
                   <div
                     style={{
-                      width: '60px',
+                      width: "60px",
                       height: `${(amount / Math.max(...Object.values(weeklyTrends))) * 150}px`,
-                      backgroundColor: '#007bff',
-                      marginBottom: '5px',
-                      borderRadius: '4px 4px 0 0'
+                      backgroundColor: "#007bff",
+                      marginBottom: "5px",
+                      borderRadius: "4px 4px 0 0",
                     }}
                   />
-                  <div style={{ fontSize: '12px' }}>Week {week}</div>
-                  <div style={{ fontSize: '10px', color: '#666' }}>${amount.toFixed(0)}</div>
+                  <div style={{ fontSize: "12px" }}>Week {week}</div>
+                  <div style={{ fontSize: "10px", color: "#666" }}>
+                    ${amount.toFixed(0)}
+                  </div>
                 </div>
               ))}
             </div>
@@ -631,69 +753,112 @@ function ExpenseTracker() {
       {view === "budget" && (
         <div>
           <h4>Budget Management</h4>
-          <div style={{ marginBottom: '20px' }}>
+          <div style={{ marginBottom: "20px" }}>
             <label>Monthly Budget: $</label>
             <input
               type="number"
               value={budget.monthly}
-              onChange={(e) => setBudget(prev => ({ ...prev, monthly: parseFloat(e.target.value) || 0 }))}
-              style={{ padding: '8px', marginLeft: '10px', width: '150px' }}
+              onChange={(e) =>
+                setBudget((prev) => ({
+                  ...prev,
+                  monthly: parseFloat(e.target.value) || 0,
+                }))
+              }
+              style={{ padding: "8px", marginLeft: "10px", width: "150px" }}
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px' }}>
-            {Object.values(categoryData).map(category => {
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
+              gap: "20px",
+            }}
+          >
+            {Object.values(categoryData).map((category) => {
               const categoryBudget = budget.categories[category.id] || 0;
-              const percentUsed = categoryBudget > 0 ? (category.total / categoryBudget) * 100 : 0;
-              
+              const percentUsed =
+                categoryBudget > 0
+                  ? (category.total / categoryBudget) * 100
+                  : 0;
+
               return (
-                <div key={category.id} style={{
-                  padding: '20px',
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  backgroundColor: 'white'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', marginBottom: '15px' }}>
-                    <span style={{ fontSize: '24px', marginRight: '10px' }}>{category.icon}</span>
+                <div
+                  key={category.id}
+                  style={{
+                    padding: "20px",
+                    border: "1px solid #ddd",
+                    borderRadius: "8px",
+                    backgroundColor: "white",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: "15px",
+                    }}
+                  >
+                    <span style={{ fontSize: "24px", marginRight: "10px" }}>
+                      {category.icon}
+                    </span>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 'bold' }}>{category.label}</div>
-                      <div style={{ fontSize: '12px', color: '#666' }}>
+                      <div style={{ fontWeight: "bold" }}>{category.label}</div>
+                      <div style={{ fontSize: "12px", color: "#666" }}>
                         ${category.total.toFixed(2)} spent
                       </div>
                     </div>
                   </div>
-                  
-                  <div style={{ marginBottom: '10px' }}>
+
+                  <div style={{ marginBottom: "10px" }}>
                     <label>Budget: $</label>
                     <input
                       type="number"
                       value={categoryBudget}
-                      onChange={(e) => setBudgetForCategory(category.id, e.target.value)}
-                      style={{ padding: '4px', marginLeft: '5px', width: '100px' }}
+                      onChange={(e) =>
+                        setBudgetForCategory(category.id, e.target.value)
+                      }
+                      style={{
+                        padding: "4px",
+                        marginLeft: "5px",
+                        width: "100px",
+                      }}
                     />
                   </div>
 
                   {categoryBudget > 0 && (
                     <>
-                      <div style={{ 
-                        height: '10px', 
-                        backgroundColor: '#f0f0f0', 
-                        borderRadius: '5px',
-                        marginBottom: '10px'
-                      }}>
-                        <div style={{
-                          height: '100%',
-                          width: `${Math.min(percentUsed, 100)}%`,
-                          backgroundColor: percentUsed > 100 ? '#dc3545' : percentUsed > 80 ? '#ffc107' : '#28a745',
-                          borderRadius: '5px'
-                        }} />
+                      <div
+                        style={{
+                          height: "10px",
+                          backgroundColor: "#f0f0f0",
+                          borderRadius: "5px",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            height: "100%",
+                            width: `${Math.min(percentUsed, 100)}%`,
+                            backgroundColor:
+                              percentUsed > 100
+                                ? "#dc3545"
+                                : percentUsed > 80
+                                  ? "#ffc107"
+                                  : "#28a745",
+                            borderRadius: "5px",
+                          }}
+                        />
                       </div>
-                      <div style={{ 
-                        fontSize: '12px', 
-                        color: percentUsed > 100 ? '#dc3545' : '#666' 
-                      }}>
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          color: percentUsed > 100 ? "#dc3545" : "#666",
+                        }}
+                      >
                         {percentUsed.toFixed(1)}% used
-                        {percentUsed > 100 && ` (Over by $${(category.total - categoryBudget).toFixed(2)})`}
+                        {percentUsed > 100 &&
+                          ` (Over by $${(category.total - categoryBudget).toFixed(2)})`}
                       </div>
                     </>
                   )}

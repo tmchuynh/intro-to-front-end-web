@@ -6,81 +6,3354 @@ import BackToTop from "@/components/BackToTop";
 
 ## Overview
 
-Auto-scaling infrastructure is a critical component of modern cloud computing, enabling applications to dynamically adjust their resource allocation based on real-time demand. This technology ensures that applications remain responsive and cost-effective by automatically scaling resources up or down as needed.
+Auto-scaling infrastructure is a fundamental capability in modern cloud-native architectures that automatically adjusts compute resources based on real-time demand, application performance metrics, and predefined policies. This dynamic resource management ensures optimal performance while minimizing costs through intelligent provisioning and de-provisioning of infrastructure components.
+
+Auto-scaling operates on the principle of **elastic computing**, where resources expand and contract based on workload demands, providing businesses with the agility to handle unpredictable traffic patterns, seasonal variations, and sudden spikes without manual intervention or over-provisioning.
 
 ### Key Concepts
 
 #### Elasticity
+Elasticity is the fundamental characteristic that enables systems to automatically and transparently acquire and release resources in response to changing demand. Unlike traditional static provisioning, elastic systems can:
+- **Scale out/in**: Add or remove instances dynamically
+- **Scale up/down**: Increase or decrease resource capacity of existing instances
+- **Respond in real-time**: React to metrics within seconds or minutes
+- **Maintain performance**: Ensure consistent user experience during scaling events
 
-Elasticity refers to the ability of a system to automatically adjust its resource allocation in response to changing workloads. This is essential for maintaining performance during peak usage times while minimizing costs during low-demand periods.
+#### Horizontal Scaling (Scale Out/In)
+Horizontal scaling distributes workload across multiple instances of the same resource type:
 
-#### Horizontal Scaling
+**Advantages:**
+- **Linear scalability**: Performance scales proportionally with instances
+- **Fault tolerance**: Failure of one instance doesn't affect others
+- **Cost-effective**: Pay only for resources in use
+- **No theoretical limits**: Can scale to thousands of instances
 
-Horizontal scaling involves adding or removing instances of resources (such as servers) to handle varying loads. This approach allows applications to distribute workloads across multiple instances, enhancing performance and reliability.
+**Use Cases:**
+- Web servers handling HTTP requests
+- Microservices processing independent transactions
+- Container orchestration with Kubernetes pods
+- Database read replicas for query distribution
 
-#### Vertical Scaling
+#### Vertical Scaling (Scale Up/Down)
+Vertical scaling adjusts the resource capacity of existing instances:
 
-Vertical scaling, also known as scaling up, involves increasing the resources (CPU, memory, etc.) of a single instance. While this can improve performance, it has limitations compared to horizontal scaling, as it can lead to single points of failure and may not be as cost-effective for large-scale applications.
+**Advantages:**
+- **Simplicity**: No architectural changes required
+- **Consistency**: Single instance maintains state and connections
+- **Lower latency**: No network overhead between instances
 
-#### Auto-Scaling Policies
+**Limitations:**
+- **Hardware limits**: Bounded by maximum instance sizes
+- **Higher risk**: Single point of failure
+- **Downtime**: May require instance restart
+- **Cost inefficiency**: Large instances often have premium pricing
+<BackToTop />
 
-Auto-scaling policies define the rules and conditions under which resources are scaled. These policies can be based on various metrics, such as CPU utilization, memory usage, or custom application metrics. Common policies include:
+## Auto-Scaling Types
 
-- **Target Tracking**: Automatically adjusts resources to maintain a specific metric (e.g., keeping CPU utilization at 70%).
-- **Step Scaling**: Increases or decreases resources in predefined steps based on metric thresholds.
-- **Scheduled Scaling**: Scales resources at specific times, such as during known peak usage periods.
-- **Predictive Scaling**: Uses machine learning to forecast future demand and adjust resources accordingly.
-- **Cooldown Periods**: Prevents rapid scaling actions by introducing a delay after scaling events, allowing the system to stabilize before making further adjustments.
-- **Health Checks**: Regularly monitors the health of instances to ensure they are functioning correctly. If an instance fails a health check, it can be automatically replaced or scaled down.
-- **Instance Types**: Different types of instances (e.g., compute-optimized, memory-optimized) can be used based on the specific needs of the application. Auto-scaling can involve switching between instance types to optimize performance and cost.
-- **Load Balancing Integration**: Auto-scaling often works in conjunction with load balancers to distribute traffic evenly across instances. When new instances are added, the load balancer directs traffic to them, ensuring optimal resource utilization.
+### 1. Reactive Auto-Scaling
+Responds to metrics after thresholds are breached:
 
-#### Monitoring and Metrics
+```yaml
+# Example: AWS Auto Scaling Group Policy
+ReactiveScalingPolicy:
+  Type: AWS::AutoScaling::ScalingPolicy
+  Properties:
+    ScalingTargetId: !Ref AutoScalingGroup
+    ServiceNamespace: autoscaling
+    ScalableDimension: autoscaling:autoScalingGroup:DesiredCapacity
+    PolicyType: TargetTrackingScaling
+    TargetTrackingConfiguration:
+      TargetValue: 70.0
+      PredefinedMetricSpecification:
+        PredefinedMetricType: ASGAverageCPUUtilization
+      ScaleOutCooldown: 300
+      ScaleInCooldown: 300
+```
 
-Effective monitoring is crucial for auto-scaling. Metrics such as CPU utilization, memory usage, request counts, and response times provide insights into application performance and resource needs. Monitoring tools can trigger auto-scaling actions based on these metrics, ensuring that resources are adjusted in real-time to meet demand.
+### 2. Predictive Auto-Scaling
+Uses machine learning to forecast demand and pre-scale resources:
 
-#### Cost Management
+```python
+# Example: Predictive scaling with time series analysis
+import pandas as pd
+from sklearn.ensemble import RandomForestRegressor
+import numpy as np
 
-While auto-scaling helps optimize resource usage, it is essential to manage costs effectively. This includes setting appropriate scaling thresholds, using cost-effective instance types, and regularly reviewing usage patterns to adjust scaling policies. Many cloud providers offer cost management tools that can help track and optimize spending related to auto-scaling.
+class PredictiveScaler:
+    def __init__(self, historical_data):
+        self.model = RandomForestRegressor(n_estimators=100)
+        self.historical_data = historical_data
+        
+    def prepare_features(self, data):
+        """Extract time-based features for prediction"""
+        data['hour'] = data.index.hour
+        data['day_of_week'] = data.index.dayofweek
+        data['month'] = data.index.month
+        data['is_weekend'] = data.index.dayofweek >= 5
+        
+        # Rolling averages
+        data['cpu_avg_1h'] = data['cpu_utilization'].rolling('1H').mean()
+        data['cpu_avg_24h'] = data['cpu_utilization'].rolling('24H').mean()
+        
+        return data
+    
+    def train_model(self):
+        """Train the predictive model"""
+        features = self.prepare_features(self.historical_data)
+        X = features[['hour', 'day_of_week', 'month', 'is_weekend', 
+                     'cpu_avg_1h', 'cpu_avg_24h']].dropna()
+        y = features['cpu_utilization'].dropna()
+        
+        self.model.fit(X, y)
+        
+    def predict_demand(self, future_timestamp):
+        """Predict resource demand for future timestamp"""
+        future_data = pd.DataFrame(index=[future_timestamp])
+        features = self.prepare_features(future_data)
+        
+        # Get recent historical data for rolling averages
+        recent_data = self.historical_data.tail(24)
+        features.loc[future_timestamp, 'cpu_avg_1h'] = recent_data['cpu_utilization'].tail(1).mean()
+        features.loc[future_timestamp, 'cpu_avg_24h'] = recent_data['cpu_utilization'].mean()
+        
+        X_pred = features[['hour', 'day_of_week', 'month', 'is_weekend', 
+                          'cpu_avg_1h', 'cpu_avg_24h']].dropna()
+        
+        return self.model.predict(X_pred)[0]
+    
+    def recommend_instances(self, predicted_cpu, current_instances):
+        """Recommend number of instances based on predicted demand"""
+        target_cpu_per_instance = 70.0  # Target 70% CPU utilization
+        required_capacity = (predicted_cpu / target_cpu_per_instance) * current_instances
+        
+        return max(1, int(np.ceil(required_capacity)))
+```
+
+### 3. Scheduled Auto-Scaling
+Pre-planned scaling based on known patterns:
+
+```yaml
+# Kubernetes Horizontal Pod Autoscaler with scheduled scaling
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: scheduled-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web-application
+  minReplicas: 2
+  maxReplicas: 50
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+---
+# CronJob for scheduled scaling
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: peak-hour-scaler
+spec:
+  schedule: "0 8 * * 1-5"  # Scale up at 8 AM on weekdays
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: scaler
+            image: bitnami/kubectl
+            command:
+            - kubectl
+            - patch
+            - hpa
+            - web-application
+            - -p
+            - '{"spec":{"minReplicas":10}}'
+          restartPolicy: OnFailure
+```
+<BackToTop />
+
+## Scaling Algorithms and Strategies
+
+### 1. Target Tracking Algorithm
+
+```python
+# Target tracking auto-scaling implementation
+class TargetTrackingScaler:
+    def __init__(self, target_value, scale_out_cooldown=300, scale_in_cooldown=300):
+        self.target_value = target_value
+        self.scale_out_cooldown = scale_out_cooldown
+        self.scale_in_cooldown = scale_in_cooldown
+        self.last_scale_out = 0
+        self.last_scale_in = 0
+    
+    def calculate_desired_capacity(self, current_capacity, current_metric):
+        """Calculate desired capacity using target tracking"""
+        import time
+        
+        current_time = time.time()
+        
+        # Calculate the capacity needed to achieve target
+        if current_metric > 0:
+            desired_capacity = current_capacity * (current_metric / self.target_value)
+        else:
+            desired_capacity = current_capacity
+        
+        # Round to nearest integer and apply constraints
+        desired_capacity = max(1, round(desired_capacity))
+        
+        # Apply cooldown periods
+        if desired_capacity > current_capacity:
+            if current_time - self.last_scale_out < self.scale_out_cooldown:
+                return current_capacity  # Still in cooldown
+            self.last_scale_out = current_time
+        elif desired_capacity < current_capacity:
+            if current_time - self.last_scale_in < self.scale_in_cooldown:
+                return current_capacity  # Still in cooldown
+            self.last_scale_in = current_time
+        
+        return int(desired_capacity)
+    
+    def should_scale(self, current_capacity, desired_capacity):
+        """Determine if scaling action should be taken"""
+        # Avoid scaling for small changes (less than 10%)
+        change_percentage = abs(desired_capacity - current_capacity) / current_capacity
+        return change_percentage >= 0.1
+```
+
+### 2. Step Scaling Algorithm
+
+```python
+class StepScalingPolicy:
+    def __init__(self, metric_name, scaling_steps):
+        self.metric_name = metric_name
+        self.scaling_steps = scaling_steps  # List of (threshold, scaling_adjustment)
+        
+    def calculate_scaling_adjustment(self, current_metric, alarm_threshold):
+        """Calculate scaling adjustment based on step policy"""
+        breach_amount = current_metric - alarm_threshold
+        
+        for threshold, adjustment in sorted(self.scaling_steps):
+            if breach_amount >= threshold:
+                continue
+            return adjustment
+        
+        # If breach exceeds all thresholds, use the largest adjustment
+        return self.scaling_steps[-1][1]
+
+# Example step scaling configuration
+cpu_step_policy = StepScalingPolicy(
+    metric_name="CPUUtilization",
+    scaling_steps=[
+        (0, 1),      # 0-10 percentage points: add 1 instance
+        (10, 2),     # 10-20 percentage points: add 2 instances
+        (20, 5),     # 20+ percentage points: add 5 instances
+    ]
+)
+
+memory_step_policy = StepScalingPolicy(
+    metric_name="MemoryUtilization", 
+    scaling_steps=[
+        (0, 1),      # 0-15 percentage points: add 1 instance
+        (15, 3),     # 15-30 percentage points: add 3 instances
+        (30, 8),     # 30+ percentage points: add 8 instances
+    ]
+)
+```
+
+### 3. Custom Metrics Scaling
+
+```python
+# Custom metrics-based auto-scaling
+class CustomMetricsScaler:
+    def __init__(self, metrics_config):
+        self.metrics_config = metrics_config
+        
+    def evaluate_scaling_decision(self, metrics_data):
+        """Evaluate multiple custom metrics for scaling decision"""
+        scaling_signals = []
+        
+        for metric_name, config in self.metrics_config.items():
+            current_value = metrics_data.get(metric_name, 0)
+            threshold = config['threshold']
+            weight = config.get('weight', 1.0)
+            
+            if current_value > threshold:
+                signal_strength = (current_value - threshold) / threshold * weight
+                scaling_signals.append(signal_strength)
+        
+        # Aggregate signals
+        if not scaling_signals:
+            return 0
+        
+        # Use weighted average of signals
+        return sum(scaling_signals) / len(scaling_signals)
+
+# Example configuration
+custom_scaler = CustomMetricsScaler({
+    'active_connections': {
+        'threshold': 1000,
+        'weight': 1.5,  # Higher weight for connection count
+    },
+    'queue_length': {
+        'threshold': 100,
+        'weight': 2.0,  # Highest weight for queue backlog
+    },
+    'response_time_p99': {
+        'threshold': 500,  # milliseconds
+        'weight': 1.2,
+    },
+    'error_rate': {
+        'threshold': 0.05,  # 5% error rate
+        'weight': 1.8,
+    }
+})
+```
+<BackToTop />
 
 ### Benefits
 
-- **Improved Performance**: Applications can handle varying loads without performance degradation, ensuring a smooth user experience.
-- **Cost Efficiency**: Resources are allocated based on demand, reducing costs associated with over-provisioning or under-utilization.
-- **High Availability**: Auto-scaling can enhance application availability by automatically replacing failed instances and distributing traffic across healthy instances.
-- **Flexibility**: Applications can adapt to changing workloads without manual intervention, allowing for rapid scaling in response to business needs.
+#### Performance Benefits
+- **Consistent Response Times**: Maintains optimal performance under varying load conditions
+- **Automatic Load Distribution**: Spreads traffic across multiple instances for better resource utilization
+- **Reduced Latency**: Scales resources closer to users in multi-region deployments
+- **High Throughput**: Handles traffic spikes without degradation
+
+#### Cost Benefits
+- **Resource Optimization**: Eliminates over-provisioning by matching resources to demand
+- **Pay-as-you-Scale**: Reduces costs by scaling down during low-demand periods
+- **Efficient Resource Utilization**: Maximizes ROI on infrastructure investments
+- **Automated Optimization**: Continuously adjusts resources without manual intervention
+
+#### Operational Benefits
+- **24/7 Availability**: Responds to demand changes even outside business hours
+- **Reduced Manual Intervention**: Minimizes need for human monitoring and adjustment
+- **Faster Time-to-Market**: Enables rapid deployment without capacity planning delays
+- **Business Agility**: Supports sudden business growth or marketing campaigns
 
 ### Challenges
 
-- **Complexity**: Implementing auto-scaling can introduce complexity in managing scaling policies, monitoring metrics, and ensuring proper integration with other components like load balancers.
-- **Testing and Validation**: Ensuring that auto-scaling policies work as intended requires thorough testing and validation, especially in production environments.
-- **Cost Management**: While auto-scaling can reduce costs, it can also lead to unexpected expenses if not properly configured. Monitoring and adjusting scaling policies is essential to avoid overspending.
-- **Latency**: Scaling actions may introduce latency, especially if new instances take time to start up or if there are delays in load balancer configuration. Proper planning and testing can help mitigate these issues.
-- **Resource Limits**: Cloud providers often impose limits on the number of instances or resources that can be scaled. Understanding these limits and planning accordingly is crucial to avoid disruptions during scaling events.
+#### Technical Challenges
+- **Cold Start Latency**: New instances may take time to initialize and warm up
+- **State Management**: Stateful applications require careful handling during scaling events
+- **Database Bottlenecks**: Scaling application tiers while database remains a bottleneck
+- **Network Partitioning**: Ensuring proper network configuration for new instances
+- **Monitoring Lag**: Delay between metric collection and scaling decision execution
+
+#### Operational Challenges
+- **Configuration Complexity**: Balancing multiple metrics and scaling policies
+- **Testing Challenges**: Simulating realistic load patterns for validation
+- **Debugging Distributed Systems**: Troubleshooting issues across dynamically changing infrastructure
+- **Compliance Requirements**: Ensuring scaled resources meet security and compliance standards
+- **Team Coordination**: Managing changes across multiple teams and services
+
+#### Business Challenges
+- **Cost Unpredictability**: Difficulty forecasting costs with dynamic scaling
+- **Performance SLA Management**: Maintaining service level agreements during scaling events
+- **Vendor Lock-in**: Dependency on cloud provider-specific auto-scaling features
+- **Capacity Planning**: Balancing between cost optimization and performance requirements
+<BackToTop />
+
+## Implementation Examples
+
+### AWS Auto Scaling with CloudFormation
+
+#### 1. Complete Auto Scaling Group Setup
+
+```yaml
+# aws-autoscaling-stack.yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Production-ready Auto Scaling setup with comprehensive monitoring'
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID for deployment
+  SubnetIds:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnet IDs for Auto Scaling Group
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: EC2 Key Pair for instance access
+  Environment:
+    Type: String
+    Default: production
+    AllowedValues: [development, staging, production]
+
+Resources:
+  # Launch Template with user data and security
+  LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: !Sub '${AWS::StackName}-launch-template'
+      LaunchTemplateData:
+        ImageId: ami-0c02fb55956c7d316  # Amazon Linux 2
+        InstanceType: t3.medium
+        KeyName: !Ref KeyPairName
+        SecurityGroupIds:
+          - !Ref InstanceSecurityGroup
+        IamInstanceProfile:
+          Arn: !GetAtt InstanceProfile.Arn
+        Monitoring:
+          Enabled: true
+        UserData:
+          Fn::Base64: !Sub |
+            #!/bin/bash
+            yum update -y
+            yum install -y amazon-cloudwatch-agent aws-cli
+            
+            # Install application
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+            source ~/.bashrc
+            nvm install 18
+            nvm use 18
+            
+            # Configure CloudWatch agent
+            cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json << EOF
+            {
+              "metrics": {
+                "namespace": "AutoScaling/${AWS::StackName}",
+                "metrics_collected": {
+                  "cpu": {
+                    "measurement": ["cpu_usage_idle", "cpu_usage_iowait"],
+                    "metrics_collection_interval": 60
+                  },
+                  "disk": {
+                    "measurement": ["used_percent"],
+                    "metrics_collection_interval": 60,
+                    "resources": ["*"]
+                  },
+                  "mem": {
+                    "measurement": ["mem_used_percent"],
+                    "metrics_collection_interval": 60
+                  }
+                }
+              },
+              "logs": {
+                "logs_collected": {
+                  "files": {
+                    "collect_list": [
+                      {
+                        "file_path": "/var/log/application.log",
+                        "log_group_name": "/aws/ec2/${AWS::StackName}",
+                        "log_stream_name": "{instance_id}/application.log"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+            EOF
+            
+            /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+              -a fetch-config -m ec2 -s \
+              -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+            
+            # Start application
+            git clone https://github.com/your-org/your-app.git /app
+            cd /app
+            npm install --production
+            npm start
+        TagSpecifications:
+          - ResourceType: instance
+            Tags:
+              - Key: Name
+                Value: !Sub '${AWS::StackName}-instance'
+              - Key: Environment
+                Value: !Ref Environment
+
+  # Auto Scaling Group
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: !Sub '${AWS::StackName}-asg'
+      LaunchTemplate:
+        LaunchTemplateId: !Ref LaunchTemplate
+        Version: !GetAtt LaunchTemplate.LatestVersionNumber
+      MinSize: 2
+      MaxSize: 20
+      DesiredCapacity: 4
+      VPCZoneIdentifier: !Ref SubnetIds
+      TargetGroupARNs:
+        - !Ref ApplicationTargetGroup
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      DefaultCooldown: 300
+      EnabledMetrics:
+        - GroupMinSize
+        - GroupMaxSize
+        - GroupDesiredCapacity
+        - GroupInServiceInstances
+        - GroupTotalInstances
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-asg-instance'
+          PropagateAtLaunch: true
+        - Key: Environment
+          Value: !Ref Environment
+          PropagateAtLaunch: true
+
+  # Target Tracking Scaling Policies
+  CPUTargetTrackingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref AutoScalingGroup
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 70.0
+        ScaleOutCooldown: 300
+        ScaleInCooldown: 300
+
+  ALBRequestCountTargetTrackingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref AutoScalingGroup
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ALBRequestCountPerTarget
+          ResourceLabel: !Sub '${ApplicationLoadBalancer.LoadBalancerFullName}/${ApplicationTargetGroup.TargetGroupFullName}'
+        TargetValue: 1000.0
+        ScaleOutCooldown: 300
+        ScaleInCooldown: 300
+
+  # Step Scaling Policy for high CPU spikes
+  HighCPUStepScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref AutoScalingGroup
+      PolicyType: StepScaling
+      AdjustmentType: ChangeInCapacity
+      StepAdjustments:
+        - MetricIntervalLowerBound: 0
+          MetricIntervalUpperBound: 20
+          ScalingAdjustment: 1
+        - MetricIntervalLowerBound: 20
+          MetricIntervalUpperBound: 40
+          ScalingAdjustment: 2
+        - MetricIntervalLowerBound: 40
+          ScalingAdjustment: 5
+
+  # CloudWatch Alarms
+  HighCPUAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${AWS::StackName}-high-cpu'
+      AlarmDescription: 'High CPU utilization alarm'
+      MetricName: CPUUtilization
+      Namespace: AWS/EC2
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 90
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: AutoScalingGroupName
+          Value: !Ref AutoScalingGroup
+      AlarmActions:
+        - !Ref HighCPUStepScalingPolicy
+        - !Ref AlertTopic
+
+  # Application Load Balancer
+  ApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub '${AWS::StackName}-alb'
+      Type: application
+      Scheme: internet-facing
+      SecurityGroups:
+        - !Ref LoadBalancerSecurityGroup
+      Subnets: !Ref SubnetIds
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-alb'
+
+  ApplicationTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub '${AWS::StackName}-tg'
+      Port: 3000
+      Protocol: HTTP
+      VpcId: !Ref VpcId
+      HealthCheckPath: /health
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 5
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: '30'
+        - Key: stickiness.enabled
+          Value: 'false'
+
+  ApplicationListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ApplicationTargetGroup
+
+  # Security Groups
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Application Load Balancer
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Auto Scaling instances
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3000
+          ToPort: 3000
+          SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 10.0.0.0/8
+
+  # IAM Role for instances
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+      Policies:
+        - PolicyName: AutoScalingMetrics
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudwatch:PutMetricData
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref InstanceRole
+
+  # SNS Topic for alerts
+  AlertTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub '${AWS::StackName}-alerts'
+
+Outputs:
+  LoadBalancerDNS:
+    Description: DNS name of the load balancer
+    Value: !GetAtt ApplicationLoadBalancer.DNSName
+  AutoScalingGroupName:
+    Description: Name of the Auto Scaling Group
+    Value: !Ref AutoScalingGroup
+```
+<BackToTop />
+
+#### 2. Advanced Auto Scaling with Predictive Scaling
+
+```python
+# aws-predictive-scaling.py
+import boto3
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+import json
+
+class AWSPredictiveScaler:
+    def __init__(self, region='us-east-1'):
+        self.autoscaling = boto3.client('autoscaling', region_name=region)
+        self.cloudwatch = boto3.client('cloudwatch', region_name=region)
+        self.application_autoscaling = boto3.client('application-autoscaling', region_name=region)
+    
+    def enable_predictive_scaling(self, auto_scaling_group_name):
+        """Enable AWS Predictive Scaling for an Auto Scaling Group"""
+        try:
+            response = self.autoscaling.put_scaling_policy(
+                AutoScalingGroupName=auto_scaling_group_name,
+                PolicyName=f'{auto_scaling_group_name}-predictive-policy',
+                PolicyType='PredictiveScaling',
+                PredictiveScalingConfiguration={
+                    'MetricSpecifications': [
+                        {
+                            'TargetValue': 70.0,
+                            'PredefinedMetricSpecification': {
+                                'PredefinedMetricType': 'ASGAverageCPUUtilization'
+                            }
+                        }
+                    ],
+                    'Mode': 'ForecastAndScale',
+                    'SchedulingBufferTime': 300,
+                    'MaxCapacityBreachBehavior': 'IncreaseMaxCapacity',
+                    'MaxCapacityBuffer': 10
+                }
+            )
+            print(f"Predictive scaling enabled: {response['PolicyARN']}")
+            return response['PolicyARN']
+        except Exception as e:
+            print(f"Error enabling predictive scaling: {e}")
+            return None
+    
+    def create_custom_predictive_model(self, auto_scaling_group_name, historical_days=30):
+        """Create a custom predictive model using historical data"""
+        
+        # Get historical metrics
+        end_time = datetime.utcnow()
+        start_time = end_time - timedelta(days=historical_days)
+        
+        # Fetch CPU utilization data
+        cpu_metrics = self.cloudwatch.get_metric_statistics(
+            Namespace='AWS/EC2',
+            MetricName='CPUUtilization',
+            Dimensions=[
+                {
+                    'Name': 'AutoScalingGroupName',
+                    'Value': auto_scaling_group_name
+                }
+            ],
+            StartTime=start_time,
+            EndTime=end_time,
+            Period=3600,  # 1 hour intervals
+            Statistics=['Average']
+        )
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(cpu_metrics['Datapoints'])
+        df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+        df = df.sort_values('Timestamp').set_index('Timestamp')
+        
+        # Feature engineering
+        df['hour'] = df.index.hour
+        df['day_of_week'] = df.index.dayofweek
+        df['is_weekend'] = df.index.dayofweek >= 5
+        df['month'] = df.index.month
+        
+        # Calculate rolling averages
+        df['cpu_rolling_3h'] = df['Average'].rolling(window=3).mean()
+        df['cpu_rolling_24h'] = df['Average'].rolling(window=24).mean()
+        
+        return df
+    
+    def predict_capacity_needs(self, historical_data, forecast_hours=24):
+        """Predict capacity needs for the next N hours"""
+        from sklearn.ensemble import RandomForestRegressor
+        from sklearn.model_selection import train_test_split
+        
+        # Prepare features
+        features = ['hour', 'day_of_week', 'is_weekend', 'month', 
+                   'cpu_rolling_3h', 'cpu_rolling_24h']
+        
+        # Remove NaN values
+        clean_data = historical_data.dropna()
+        
+        if len(clean_data) < 24:  # Need at least 24 hours of data
+            print("Insufficient historical data for prediction")
+            return None
+        
+        X = clean_data[features]
+        y = clean_data['Average']
+        
+        # Train model
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        model = RandomForestRegressor(n_estimators=100, random_state=42)
+        model.fit(X_train, y_train)
+        
+        # Generate predictions for next 24 hours
+        future_times = []
+        current_time = datetime.utcnow()
+        
+        for i in range(forecast_hours):
+            future_time = current_time + timedelta(hours=i)
+            future_times.append(future_time)
+        
+        # Create future feature matrix
+        future_df = pd.DataFrame(index=future_times)
+        future_df['hour'] = future_df.index.hour
+        future_df['day_of_week'] = future_df.index.dayofweek
+        future_df['is_weekend'] = future_df.index.dayofweek >= 5
+        future_df['month'] = future_df.index.month
+        
+        # Use latest rolling averages
+        latest_3h_avg = clean_data['cpu_rolling_3h'].iloc[-1]
+        latest_24h_avg = clean_data['cpu_rolling_24h'].iloc[-1]
+        
+        future_df['cpu_rolling_3h'] = latest_3h_avg
+        future_df['cpu_rolling_24h'] = latest_24h_avg
+        
+        # Make predictions
+        predictions = model.predict(future_df[features])
+        
+        # Calculate recommended capacity
+        target_cpu = 70.0
+        current_capacity = self.get_current_capacity()
+        
+        recommended_capacities = []
+        for pred_cpu in predictions:
+            if pred_cpu > 0:
+                recommended_capacity = max(1, int(np.ceil(current_capacity * (pred_cpu / target_cpu))))
+            else:
+                recommended_capacity = current_capacity
+            recommended_capacities.append(recommended_capacity)
+        
+        return list(zip(future_times, predictions, recommended_capacities))
+    
+    def schedule_predictive_scaling(self, auto_scaling_group_name, predictions):
+        """Schedule scaling actions based on predictions"""
+        for timestamp, predicted_cpu, recommended_capacity in predictions:
+            # Create CloudWatch event rule for scheduled scaling
+            event_rule_name = f'predictive-scale-{auto_scaling_group_name}-{timestamp.strftime("%Y%m%d%H%M")}'
+            
+            # Schedule scaling action 15 minutes before predicted peak
+            scale_time = timestamp - timedelta(minutes=15)
+            
+            if scale_time > datetime.utcnow():
+                self.create_scheduled_scaling_action(
+                    auto_scaling_group_name,
+                    event_rule_name,
+                    scale_time,
+                    recommended_capacity
+                )
+    
+    def create_scheduled_scaling_action(self, asg_name, rule_name, scale_time, capacity):
+        """Create a scheduled scaling action using CloudWatch Events"""
+        events_client = boto3.client('events')
+        
+        # Create CloudWatch Events rule
+        cron_expression = f"cron({scale_time.minute} {scale_time.hour} {scale_time.day} {scale_time.month} ? {scale_time.year})"
+        
+        events_client.put_rule(
+            Name=rule_name,
+            ScheduleExpression=cron_expression,
+            Description=f'Predictive scaling for {asg_name}',
+            State='ENABLED'
+        )
+        
+        # Create Lambda function to execute scaling (simplified)
+        lambda_function_arn = self.create_scaling_lambda(asg_name, capacity)
+        
+        # Add Lambda as target
+        events_client.put_targets(
+            Rule=rule_name,
+            Targets=[
+                {
+                    'Id': '1',
+                    'Arn': lambda_function_arn,
+                    'Input': json.dumps({
+                        'auto_scaling_group_name': asg_name,
+                        'desired_capacity': capacity
+                    })
+                }
+            ]
+        )
+    
+    def create_scaling_lambda(self, asg_name, capacity):
+        """Create Lambda function for executing scaling actions"""
+        lambda_client = boto3.client('lambda')
+        
+        lambda_code = f"""
+import boto3
+import json
+
+def lambda_handler(event, context):
+    autoscaling = boto3.client('autoscaling')
+    
+    try:
+        response = autoscaling.set_desired_capacity(
+            AutoScalingGroupName=event['auto_scaling_group_name'],
+            DesiredCapacity=event['desired_capacity'],
+            HonorCooldown=False
+        )
+        
+        return {{
+            'statusCode': 200,
+            'body': json.dumps('Scaling action completed successfully')
+        }}
+    except Exception as e:
+        print(f'Error: {{e}}')
+        return {{
+            'statusCode': 500,
+            'body': json.dumps(f'Error: {{str(e)}}')
+        }}
+"""
+        
+        # This is a simplified example - in practice, you'd deploy the Lambda function
+        # through proper deployment tools like AWS SAM or Terraform
+        print(f"Lambda function would be created for scaling {asg_name} to {capacity}")
+        return f"arn:aws:lambda:us-east-1:123456789012:function:predictive-scaler-{asg_name}"
+    
+    def get_current_capacity(self, auto_scaling_group_name):
+        """Get current capacity of Auto Scaling Group"""
+        response = self.autoscaling.describe_auto_scaling_groups(
+            AutoScalingGroupNames=[auto_scaling_group_name]
+        )
+        
+        if response['AutoScalingGroups']:
+            return response['AutoScalingGroups'][0]['DesiredCapacity']
+        return 0
+
+# Usage Example
+if __name__ == "__main__":
+    scaler = AWSPredictiveScaler()
+    asg_name = "my-application-asg"
+    
+    # Enable AWS native predictive scaling
+    scaler.enable_predictive_scaling(asg_name)
+    
+    # Create custom predictive model
+    historical_data = scaler.create_custom_predictive_model(asg_name)
+    
+    if historical_data is not None:
+        predictions = scaler.predict_capacity_needs(historical_data)
+        
+        if predictions:
+            print("Capacity predictions for next 24 hours:")
+            for timestamp, cpu, capacity in predictions[:5]:  # Show first 5 predictions
+                print(f"{timestamp}: CPU {cpu:.1f}% -> Capacity {capacity}")
+            
+            # Schedule predictive scaling actions
+            scaler.schedule_predictive_scaling(asg_name, predictions)
+```
+<BackToTop />
+
+### Kubernetes Horizontal Pod Autoscaler (HPA)
+
+#### 1. Advanced HPA Configuration
+
+```yaml
+# kubernetes-hpa-advanced.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: web-app-hpa
+  namespace: production
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web-application
+  minReplicas: 3
+  maxReplicas: 100
+  metrics:
+  # CPU-based scaling
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  # Memory-based scaling
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  # Custom metrics from Prometheus
+  - type: Pods
+    pods:
+      metric:
+        name: http_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "100"
+  # External metrics (e.g., SQS queue length)
+  - type: External
+    external:
+      metric:
+        name: sqs_queue_length
+        selector:
+          matchLabels:
+            queue: user-notifications
+      target:
+        type: Value
+        value: "10"
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 60
+      - type: Pods
+        value: 5
+        periodSeconds: 60
+      selectPolicy: Max
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+      selectPolicy: Min
+---
+# ServiceMonitor for Prometheus metrics
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: web-app-metrics
+  namespace: production
+spec:
+  selector:
+    matchLabels:
+      app: web-application
+  endpoints:
+  - port: metrics
+    interval: 30s
+    path: /metrics
+---
+# Custom metrics API adapter
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: adapter-config
+  namespace: custom-metrics
+data:
+  config.yaml: |
+    rules:
+    - seriesQuery: 'http_requests_total{namespace!="",pod!=""}'
+      seriesFilters: []
+      resources:
+        overrides:
+          namespace:
+            resource: namespace
+          pod:
+            resource: pod
+      name:
+        matches: "^(.*)_total$"
+        as: "${1}_per_second"
+      metricsQuery: 'sum(rate(<<.Series>>{<<.LabelMatchers>>}[2m])) by (<<.GroupBy>>)'
+    - seriesQuery: 'queue_length{queue!=""}'
+      resources:
+        template: <<.Resource>>
+      name:
+        as: "sqs_queue_length"
+      metricsQuery: 'avg(<<.Series>>{<<.LabelMatchers>>}) by (<<.GroupBy>>)'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: custom-metrics-apiserver
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: custom-metrics-apiserver
+  template:
+    metadata:
+      labels:
+        app: custom-metrics-apiserver
+    spec:
+      containers:
+      - name: custom-metrics-apiserver
+        image: k8s.gcr.io/prometheus-adapter/prometheus-adapter:v0.10.0
+        args:
+        - --secure-port=6443
+        - --tls-cert-file=/var/run/serving-cert/tls.crt
+        - --tls-private-key-file=/var/run/serving-cert/tls.key
+        - --logtostderr=true
+        - --prometheus-url=http://prometheus-server:9090/
+        - --metrics-relist-interval=1m
+        - --v=4
+        - --config=/etc/adapter/config.yaml
+        ports:
+        - containerPort: 6443
+        volumeMounts:
+        - mountPath: /var/run/serving-cert
+          name: volume-serving-cert
+          readOnly: true
+        - mountPath: /etc/adapter/
+          name: config
+          readOnly: true
+        - mountPath: /tmp
+          name: tmp-vol
+      volumes:
+      - name: volume-serving-cert
+        secret:
+          secretName: cm-adapter-serving-certs
+      - name: config
+        configMap:
+          name: adapter-config
+      - name: tmp-vol
+        emptyDir: {}
+```
+<BackToTop />
+
+#### 2. Vertical Pod Autoscaler (VPA) Configuration
+
+```yaml
+# kubernetes-vpa.yaml
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: web-app-vpa
+  namespace: production
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web-application
+  updatePolicy:
+    updateMode: "Auto"  # Options: Off, Initial, Auto
+  resourcePolicy:
+    containerPolicies:
+    - containerName: web-container
+      minAllowed:
+        cpu: 100m
+        memory: 128Mi
+      maxAllowed:
+        cpu: 2
+        memory: 4Gi
+      controlledResources: ["cpu", "memory"]
+      controlledValues: RequestsAndLimits
+    - containerName: sidecar-container
+      mode: Off  # Don't auto-scale sidecar
+---
+# Deployment with VPA annotations
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-application
+  namespace: production
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-application
+  template:
+    metadata:
+      labels:
+        app: web-application
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: web-container
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+        - containerPort: 8080
+          name: metrics
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        env:
+        - name: NODE_ENV
+          value: production
+      - name: sidecar-container
+        image: prometheus/node-exporter:latest
+        ports:
+        - containerPort: 9100
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+```
+<BackToTop />
+
+#### 3. Custom Controller for Advanced Scaling Logic
+
+```go
+// custom-autoscaler.go
+package main
+
+import (
+    "context"
+    "fmt"
+    "log"
+    "time"
+    
+    appsv1 "k8s.io/api/apps/v1"
+    autoscalingv2 "k8s.io/api/autoscaling/v2"
+    metav1 "k8s.io/apimmetav1"
+    "k8s.io/client-go/kubernetes"
+    "k8s.io/client-go/rest"
+    "k8s.io/client-go/tools/clientcmd"
+    metricsv1beta1 "k8s.io/metrics/pkg/client/clientset/versioned"
+)
+
+type CustomAutoscaler struct {
+    clientset        kubernetes.Interface
+    metricsClientset metricsv1beta1.Interface
+    namespace        string
+}
+
+type ScalingDecision struct {
+    TargetReplicas int32
+    Reason         string
+    Confidence     float64
+}
+
+func NewCustomAutoscaler(kubeconfig, namespace string) (*CustomAutoscaler, error) {
+    var config *rest.Config
+    var err error
+    
+    if kubeconfig != "" {
+        config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+    } else {
+        config, err = rest.InClusterConfig()
+    }
+    
+    if err != nil {
+        return nil, err
+    }
+    
+    clientset, err := kubernetes.NewForConfig(config)
+    if err != nil {
+        return nil, err
+    }
+    
+    metricsClientset, err := metricsv1beta1.NewForConfig(config)
+    if err != nil {
+        return nil, err
+    }
+    
+    return &CustomAutoscaler{
+        clientset:        clientset,
+        metricsClientset: metricsClientset,
+        namespace:        namespace,
+    }, nil
+}
+
+func (ca *CustomAutoscaler) AnalyzeScaling(deploymentName string) (*ScalingDecision, error) {
+    // Get current deployment
+    deployment, err := ca.clientset.AppsV1().Deployments(ca.namespace).Get(
+        context.TODO(), deploymentName, metav1.GetOptions{})
+    if err != nil {
+        return nil, err
+    }
+    
+    currentReplicas := *deployment.Spec.Replicas
+    
+    // Get pod metrics
+    podMetrics, err := ca.metricsClientset.MetricsV1beta1().PodMetricses(ca.namespace).List(
+        context.TODO(), metav1.ListOptions{
+            LabelSelector: metav1.FormatLabelSelector(deployment.Spec.Selector),
+        })
+    if err != nil {
+        return nil, err
+    }
+    
+    // Calculate average CPU and memory utilization
+    var totalCPU, totalMemory float64
+    podCount := len(podMetrics.Items)
+    
+    if podCount == 0 {
+        return &ScalingDecision{
+            TargetReplicas: currentReplicas,
+            Reason:         "No pod metrics available",
+            Confidence:     0.0,
+        }, nil
+    }
+    
+    for _, pod := range podMetrics.Items {
+        for _, container := range pod.Containers {
+            cpuQuantity := container.Usage["cpu"]
+            memoryQuantity := container.Usage["memory"]
+            
+            totalCPU += float64(cpuQuantity.MilliValue()) / 1000.0 # Convert to cores
+            totalMemory += float64(memoryQuantity.Value()) / (1024 * 1024 * 1024) # Convert to GB
+        }
+    }
+    
+    avgCPU := totalCPU / float64(podCount)
+    avgMemory := totalMemory / float64(podCount)
+    
+    # Advanced scaling logic
+    decision := ca.calculateScalingDecision(currentReplicas, avgCPU, avgMemory)
+    
+    log.Printf("Deployment: %s, Current: %d, CPU: %.2f, Memory: %.2fGB, Target: %d, Reason: %s",
+        deploymentName, currentReplicas, avgCPU, avgMemory, decision.TargetReplicas, decision.Reason)
+    
+    return decision, nil
+}
+
+func (ca *CustomAutoscaler) calculateScalingDecision(currentReplicas int32, avgCPU, avgMemory float64) *ScalingDecision {
+    # Define thresholds
+    const (
+        cpuScaleUpThreshold    = 0.7  # 70% CPU
+        cpuScaleDownThreshold  = 0.3  # 30% CPU
+        memoryScaleUpThreshold = 0.8  # 80% Memory
+        memoryScaleDownThreshold = 0.4 # 40% Memory
+        maxReplicas = 50
+        minReplicas = 2
+    )
+    
+    # Calculate scaling factors
+    cpuScalingFactor := avgCPU / cpuScaleUpThreshold
+    memoryScalingFactor := avgMemory / memoryScaleUpThreshold
+    
+    # Use the higher scaling factor (more conservative)
+    scalingFactor := cpuScalingFactor
+    if memoryScalingFactor > cpuScalingFactor {
+        scalingFactor = memoryScalingFactor
+    }
+    
+    # Calculate target replicas
+    targetReplicas := int32(float64(currentReplicas) * scalingFactor)
+    
+    # Apply constraints
+    if targetReplicas > maxReplicas {
+        targetReplicas = maxReplicas
+    }
+    if targetReplicas < minReplicas {
+        targetReplicas = minReplicas
+    }
+    
+    # Determine confidence based on how far we are from thresholds
+    var confidence float64
+    var reason string
+    
+    if avgCPU > cpuScaleUpThreshold || avgMemory > memoryScaleUpThreshold {
+        confidence = 0.8
+        reason = fmt.Sprintf("High resource utilization (CPU: %.1f%%, Memory: %.1f%%)", 
+                           avgCPU*100, avgMemory*100)
+    } else if avgCPU < cpuScaleDownThreshold && avgMemory < memoryScaleDownThreshold {
+        confidence = 0.6
+        reason = fmt.Sprintf("Low resource utilization (CPU: %.1f%%, Memory: %.1f%%)", 
+                           avgCPU*100, avgMemory*100)
+    } else {
+        targetReplicas = currentReplicas
+        confidence = 0.9
+        reason = "Resource utilization within acceptable range"
+    }
+    
+    return &ScalingDecision{
+        TargetReplicas: targetReplicas,
+        Reason:         reason,
+        Confidence:     confidence,
+    }
+}
+
+func (ca *CustomAutoscaler) ApplyScaling(deploymentName string, decision *ScalingDecision) error {
+    if decision.Confidence < 0.5 {
+        log.Printf("Low confidence (%.2f), skipping scaling action", decision.Confidence)
+        return nil
+    }
+    
+    # Get current deployment
+    deployment, err := ca.clientset.AppsV1().Deployments(ca.namespace).Get(
+        context.TODO(), deploymentName, metav1.GetOptions{})
+    if err != nil {
+        return err
+    }
+    
+    if *deployment.Spec.Replicas == decision.TargetReplicas {
+        log.Printf("No scaling needed, current replicas already at target: %d", decision.TargetReplicas)
+        return nil
+    }
+    
+    # Update deployment
+    deployment.Spec.Replicas = &decision.TargetReplicas
+    
+    _, err = ca.clientset.AppsV1().Deployments(ca.namespace).Update(
+        context.TODO(), deployment, metav1.UpdateOptions{})
+    
+    if err != nil {
+        return err
+    }
+    
+    log.Printf("Scaled deployment %s to %d replicas. Reason: %s", 
+               deploymentName, decision.TargetReplicas, decision.Reason)
+    
+    return nil
+}
+
+func (ca *CustomAutoscaler) RunAutoscalingLoop(deploymentName string, interval time.Duration) {
+    ticker := time.NewTicker(interval)
+    defer ticker.Stop()
+    
+    for {
+        select {
+        case <-ticker.C:
+            decision, err := ca.AnalyzeScaling(deploymentName)
+            if err != nil {
+                log.Printf("Error analyzing scaling: %v", err)
+                continue
+            }
+            
+            err = ca.ApplyScaling(deploymentName, decision)
+            if err != nil {
+                log.Printf("Error applying scaling: %v", err)
+            }
+        }
+    }
+}
+
+func main() {
+    autoscaler, err := NewCustomAutoscaler("", "production")
+    if err != nil {
+        log.Fatalf("Failed to create autoscaler: %v", err)
+    }
+    
+    # Run autoscaling loop for web-application deployment
+    log.Println("Starting custom autoscaler...")
+    autoscaler.RunAutoscalingLoop("web-application", 30*time.Second)
+}
+```
+<BackToTop />
+
+### Azure Auto Scaling Implementation
+
+#### 1. Azure Virtual Machine Scale Sets
+
+```json
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmssName": {
+      "type": "string",
+      "defaultValue": "web-app-vmss"
+    },
+    "instanceCount": {
+      "type": "int",
+      "defaultValue": 3,
+      "minValue": 1,
+      "maxValue": 100
+    },
+    "adminUsername": {
+      "type": "string"
+    },
+    "adminPassword": {
+      "type": "securestring"
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "virtualNetworkName": "vmss-vnet",
+    "subnetName": "vmss-subnet",
+    "publicIPAddressName": "vmss-pip",
+    "loadBalancerName": "vmss-lb",
+    "natPoolName": "vmss-natpool"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('virtualNetworkName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": ["10.0.0.0/16"]
+        },
+        "subnets": [
+          {
+            "name": "[variables('subnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.0.0/24"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('publicIPAddressName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "publicIPAllocationMethod": "Static"
+      }
+    },
+    {
+      "type": "Microsoft.Network/loadBalancers",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('loadBalancerName')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
+      ],
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "LoadBalancerFrontEnd",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
+              }
+            }
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "bepool"
+          }
+        ],
+        "inboundNatPools": [
+          {
+            "name": "[variables('natPoolName')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/frontendIPConfigurations/LoadBalancerFrontEnd')]"
+              },
+              "protocol": "Tcp",
+              "frontendPortRangeStart": 50000,
+              "frontendPortRangeEnd": 50119,
+              "backendPort": 22
+            }
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "LBRule",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/frontendIPConfigurations/LoadBalancerFrontEnd')]"
+              },
+              "backendAddressPool": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/backendAddressPools/bepool')]"
+              },
+              "protocol": "Tcp",
+              "frontendPort": 80,
+              "backendPort": 80,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 5,
+              "probe": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/probes/tcpProbe')]"
+              }
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "tcpProbe",
+            "properties": {
+              "protocol": "Tcp",
+              "port": 80,
+              "intervalInSeconds": 5,
+              "numberOfProbes": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "apiVersion": "2020-06-01",
+      "name": "[parameters('vmssName')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
+      ],
+      "sku": {
+        "name": "Standard_B2s",
+        "tier": "Standard",
+        "capacity": "[parameters('instanceCount')]"
+      },
+      "properties": {
+        "overprovision": true,
+        "upgradePolicy": {
+          "mode": "Automatic"
+        },
+        "virtualMachineProfile": {
+          "storageProfile": {
+            "osDisk": {
+              "createOption": "FromImage",
+              "caching": "ReadWrite"
+            },
+            "imageReference": {
+              "publisher": "Canonical",
+              "offer": "UbuntuServer",
+              "sku": "18.04-LTS",
+              "version": "latest"
+            }
+          },
+          "osProfile": {
+            "computerNamePrefix": "[parameters('vmssName')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]",
+            "customData": "[base64(concat('#!/bin/bash\napt-get update\napt-get install -y nginx\nsystemctl start nginx\nsystemctl enable nginx\necho \"<h1>Instance: $(hostname)</h1>\" > /var/www/html/index.html'))]"
+          },
+          "networkProfile": {
+            "networkInterfaceConfigurations": [
+              {
+                "name": "nic",
+                "properties": {
+                  "primary": true,
+                  "ipConfigurations": [
+                    {
+                      "name": "ipconfig",
+                      "properties": {
+                        "subnet": {
+                          "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
+                        },
+                        "loadBalancerBackendAddressPools": [
+                          {
+                            "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/backendAddressPools/bepool')]"
+                          }
+                        ],
+                        "loadBalancerInboundNatPools": [
+                          {
+                            "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/inboundNatPools/', variables('natPoolName'))]"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "extensionProfile": {
+            "extensions": [
+              {
+                "name": "HealthExtension",
+                "properties": {
+                  "publisher": "Microsoft.ManagedServices",
+                  "type": "ApplicationHealthLinux",
+                  "typeHandlerVersion": "1.0",
+                  "autoUpgradeMinorVersion": false,
+                  "settings": {
+                    "protocol": "http",
+                    "port": 80,
+                    "requestPath": "/"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Insights/autoscalesettings",
+      "apiVersion": "2015-04-01",
+      "name": "[concat(parameters('vmssName'), '-autoscale')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'))]"
+      ],
+      "properties": {
+        "name": "[concat(parameters('vmssName'), '-autoscale')]",
+        "targetResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'))]",
+        "enabled": true,
+        "profiles": [
+          {
+            "name": "Default",
+            "capacity": {
+              "minimum": "2",
+              "maximum": "20",
+              "default": "3"
+            },
+            "rules": [
+              {
+                "metricTrigger": {
+                  "metricName": "Percentage CPU",
+                  "metricNamespace": "",
+                  "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'))]",
+                  "timeGrain": "PT1M",
+                  "statistic": "Average",
+                  "timeWindow": "PT5M",
+                  "timeAggregation": "Average",
+                  "operator": "GreaterThan",
+                  "threshold": 70
+                },
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": "1",
+                  "cooldown": "PT10M"
+                }
+              },
+              {
+                "metricTrigger": {
+                  "metricName": "Percentage CPU",
+                  "metricNamespace": "",
+                  "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'))]",
+                  "timeGrain": "PT1M",
+                  "statistic": "Average",
+                  "timeWindow": "PT5M",
+                  "timeAggregation": "Average",
+                  "operator": "LessThan",
+                  "threshold": 30
+                },
+                "scaleAction": {
+                  "direction": "Decrease",
+                  "type": "ChangeCount",
+                  "value": "1",
+                  "cooldown": "PT10M"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Peak Hours",
+            "capacity": {
+              "minimum": "5",
+              "maximum": "50",
+              "default": "10"
+            },
+            "rules": [
+              {
+                "metricTrigger": {
+                  "metricName": "Percentage CPU",
+                  "metricNamespace": "",
+                  "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'))]",
+                  "timeGrain": "PT1M",
+                  "statistic": "Average",
+                  "timeWindow": "PT3M",
+                  "timeAggregation": "Average",
+                  "operator": "GreaterThan",
+                  "threshold": 60
+                },
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": "3",
+                  "cooldown": "PT5M"
+                }
+              }
+            ],
+            "recurrence": {
+              "frequency": "Week",
+              "schedule": {
+                "timeZone": "Pacific Standard Time",
+                "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "hours": [8],
+                "minutes": [0]
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "publicIPAddress": {
+      "type": "string",
+      "value": "[reference(variables('publicIPAddressName')).ipAddress]"
+    }
+  }
+}
+```
+
+<BackToTop />
 
 ## Tools for Auto-Scaling
 
-| Tool                    | Description                                                                                                                                                  |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Amazon CloudWatch**   | A monitoring service that provides metrics and alarms for auto-scaling actions in AWS. It can trigger scaling events based on predefined thresholds.         |
-| **Azure Monitor**       | A comprehensive monitoring service for Azure resources, allowing users to set up auto-scaling rules based on various metrics and conditions.                 |
-| **SigNoz**              | A cloud-native observability platform that provides real-time monitoring and alerting for auto-scaling events, helping teams optimize resource usage.        |
-| **Dynatrace**           | An application performance management tool that offers advanced monitoring and analytics for auto-scaling, enabling proactive resource management.           |
-| **Sematext Synthetics** | A synthetic monitoring tool that can simulate user interactions and provide insights into application performance, helping to inform auto-scaling decisions. |
-| **Runscope**            | A performance monitoring tool that provides real-time insights into application performance, helping teams optimize auto-scaling configurations.             |
-| **Assertible**          | A performance testing tool that can simulate high loads and help teams validate auto-scaling configurations before deploying to production.                  |
+| Platform | Tool | Type | Key Features | Best For |
+|----------|------|------|-------------|----------|
+| **AWS** | Auto Scaling Groups | Native | EC2 instance scaling, target tracking, step scaling | General compute workloads |
+| **AWS** | Application Auto Scaling | Native | ECS, Lambda, DynamoDB scaling | Container and serverless apps |
+| **AWS** | Predictive Scaling | AI/ML | Machine learning-based forecasting | Predictable workload patterns |
+| **Azure** | Virtual Machine Scale Sets | Native | VM scaling with load balancing | Traditional applications |
+| **Azure** | Container Instances | Native | Serverless container scaling | Event-driven workloads |
+| **Azure** | App Service Auto Scale | Native | Web app automatic scaling | Web applications and APIs |
+| **GCP** | Compute Engine Autoscaler | Native | VM instance group scaling | Compute-intensive workloads |
+| **GCP** | GKE Cluster Autoscaler | Native | Kubernetes node scaling | Container orchestration |
+| **GCP** | Cloud Run | Serverless | Automatic container scaling | Microservices and APIs |
+| **Kubernetes** | Horizontal Pod Autoscaler | Native | Pod replica scaling | Container workloads |
+| **Kubernetes** | Vertical Pod Autoscaler | Native | Resource request/limit scaling | Resource optimization |
+| **Kubernetes** | Cluster Autoscaler | Native | Node scaling based on demand | Dynamic cluster sizing |
+| **KEDA** | Event-driven Autoscaler | CNCF | Custom metric scaling for K8s | Event-driven applications |
+| **Prometheus** | PrometheusAdapter | Open Source | Custom metrics for HPA | Monitoring-based scaling |
 
-## Best Practices for Monitoring Auto-Scaling Infrastructure
+### Advanced Auto-Scaling Tools
 
-- **Set Up Alerts**: Configure alerts for key metrics to notify teams of scaling events, performance issues, or resource constraints. This helps ensure timely responses to potential problems.
-- **Regularly Review Scaling Policies**: Periodically assess and adjust auto-scaling policies based on changing application requirements, traffic patterns, and performance metrics. This helps maintain optimal resource allocation and cost efficiency.
-- **Test Scaling Scenarios**: Conduct load testing and simulate scaling scenarios to validate auto-scaling configurations. This helps identify potential issues and ensures that scaling actions work as expected under different load conditions.
-- **Monitor Resource Utilization**: Continuously monitor resource utilization metrics to identify trends and adjust scaling policies accordingly. This helps ensure that resources are allocated efficiently and that applications remain responsive under varying loads.
-- **Implement Health Checks**: Regularly perform health checks on instances to ensure they are functioning correctly. If an instance fails a health check, it can be automatically replaced or scaled down to maintain application availability.
-- **Use Predictive Scaling**: Leverage machine learning algorithms to forecast future demand and adjust resources proactively. Predictive scaling can help optimize resource allocation and improve application performance during peak usage times.
-- **Document Scaling Strategies**: Maintain clear documentation of auto-scaling strategies, policies, and configurations. This helps ensure that team members understand how auto-scaling is implemented and can effectively manage and optimize it over time.
-- **Integrate with CI/CD Pipelines**: Incorporate auto-scaling configurations into continuous integration and deployment (CI/CD) pipelines. This ensures that scaling policies are consistently applied across different environments and that changes are tested before deployment.
-- **Review Cost Implications**: Regularly analyze the cost implications of auto-scaling configurations. Use cost management tools to track spending related to auto-scaling and identify opportunities for optimization. This helps ensure that auto-scaling remains cost-effective while meeting application performance requirements.
-- **Implement Security Measures**: Ensure that auto-scaling configurations are secure and follow best practices for cloud security. This includes setting appropriate access controls, monitoring for unauthorized changes, and regularly reviewing security configurations to protect against potential threats.
-- **Use Tags for Resource Management**: Implement tagging strategies for auto-scaled resources to facilitate better management and organization. Tags can help identify resources associated with specific applications, environments, or teams, making it easier to monitor and manage them effectively.
-- **Monitor Latency and Response Times**: Keep an eye on latency and response times during scaling events. This helps identify potential bottlenecks and ensures that applications remain responsive even as resources are scaled up or down. Use monitoring tools to track these metrics and adjust scaling policies as needed.
+#### KEDA (Kubernetes Event-Driven Autoscaling)
+
+```yaml
+# keda-scaler.yaml
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: redis-scaledobject
+  namespace: production
+spec:
+  scaleTargetRef:
+    name: redis-consumer
+    kind: Deployment
+  pollingInterval: 30
+  cooldownPeriod: 300
+  minReplicaCount: 1
+  maxReplicaCount: 50
+  triggers:
+  # Scale based on Redis stream length
+  - type: redis-streams
+    metadata:
+      address: redis-server:6379
+      stream: user-events
+      consumerGroup: processors
+      pendingEntriesCount: '10'
+  # Scale based on Prometheus metrics
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-server:9090
+      metricName: http_requests_per_second
+      threshold: '100'
+      query: sum(rate(http_requests_total[2m]))
+  # Scale based on AWS SQS queue
+  - type: aws-sqs-queue
+    metadata:
+      queueURL: https://sqs.us-east-1.amazonaws.com/123456789/user-notifications
+      queueLength: '5'
+      awsRegion: us-east-1
+  # Scale based on Kafka consumer lag
+  - type: kafka
+    metadata:
+      bootstrapServers: kafka-cluster:9092
+      consumerGroup: event-processors
+      topic: user-events
+      lagThreshold: '100'
+---
+# TriggerAuthentication for secure access
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: aws-credentials
+  namespace: production
+spec:
+  secretTargetRef:
+  - parameter: awsAccessKeyID
+    name: aws-secret
+    key: AWS_ACCESS_KEY_ID
+  - parameter: awsSecretAccessKey
+    name: aws-secret
+    key: AWS_SECRET_ACCESS_KEY
+```
+<BackToTop />
+
+#### Prometheus-based Custom Metrics
+
+```yaml
+# prometheus-adapter.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: adapter-config
+  namespace: monitoring
+data:
+  config.yaml: |
+    rules:
+    # HTTP requests per second
+    - seriesQuery: 'http_requests_total{namespace!="",pod!=""}'
+      seriesFilters: []
+      resources:
+        overrides:
+          namespace:
+            resource: namespace
+          pod:
+            resource: pod
+      name:
+        matches: "^(.*)_total$"
+        as: "${1}_per_second"
+      metricsQuery: 'sum(rate(<<.Series>>{<<.LabelMatchers>>}[2m])) by (<<.GroupBy>>)'
+    
+    # Database connection pool utilization
+    - seriesQuery: 'db_connections_active{namespace!="",pod!=""}'
+      resources:
+        overrides:
+          namespace:
+            resource: namespace
+          pod:
+            resource: pod
+      name:
+        as: "database_connection_utilization"
+      metricsQuery: 'avg(<<.Series>>{<<.LabelMatchers>>}) by (<<.GroupBy>>)'
+    
+    # Queue depth from external systems
+    - seriesQuery: 'queue_depth{queue!=""}'
+      resources:
+        template: <<.Resource>>
+      name:
+        as: "external_queue_depth"
+      metricsQuery: 'avg(<<.Series>>{<<.LabelMatchers>>}) by (<<.GroupBy>>)'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: custom-metrics-apiserver
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: custom-metrics-apiserver
+  template:
+    metadata:
+      labels:
+        app: custom-metrics-apiserver
+    spec:
+      containers:
+      - name: custom-metrics-apiserver
+        image: k8s.gcr.io/prometheus-adapter/prometheus-adapter:v0.10.0
+        args:
+        - --secure-port=6443
+        - --tls-cert-file=/var/run/serving-cert/tls.crt
+        - --tls-private-key-file=/var/run/serving-cert/tls.key
+        - --logtostderr=true
+        - --prometheus-url=http://prometheus-server:9090/
+        - --metrics-relist-interval=1m
+        - --v=4
+        - --config=/etc/adapter/config.yaml
+        ports:
+        - containerPort: 6443
+        volumeMounts:
+        - mountPath: /var/run/serving-cert
+          name: volume-serving-cert
+          readOnly: true
+        - mountPath: /etc/adapter/
+          name: config
+          readOnly: true
+        - mountPath: /tmp
+          name: tmp-vol
+      volumes:
+      - name: volume-serving-cert
+        secret:
+          secretName: cm-adapter-serving-certs
+      - name: config
+        configMap:
+          name: adapter-config
+      - name: tmp-vol
+        emptyDir: {}
+```
+<BackToTop />
+
+#### 2. Vertical Pod Autoscaler (VPA) Configuration
+
+```yaml
+# kubernetes-vpa.yaml
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: web-app-vpa
+  namespace: production
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web-application
+  updatePolicy:
+    updateMode: "Auto"  # Options: Off, Initial, Auto
+  resourcePolicy:
+    containerPolicies:
+    - containerName: web-container
+      minAllowed:
+        cpu: 100m
+        memory: 128Mi
+      maxAllowed:
+        cpu: 2
+        memory: 4Gi
+      controlledResources: ["cpu", "memory"]
+      controlledValues: RequestsAndLimits
+    - containerName: sidecar-container
+      mode: Off  # Don't auto-scale sidecar
+---
+# Deployment with VPA annotations
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-application
+  namespace: production
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-application
+  template:
+    metadata:
+      labels:
+        app: web-application
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: web-container
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+        - containerPort: 8080
+          name: metrics
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        env:
+        - name: NODE_ENV
+          value: production
+      - name: sidecar-container
+        image: prometheus/node-exporter:latest
+        ports:
+        - containerPort: 9100
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+```
+<BackToTop />
+
+#### 3. Custom Controller for Advanced Scaling Logic
+
+```go
+// custom-autoscaler.go
+package main
+
+import (
+    "context"
+    "fmt"
+    "log"
+    "time"
+    
+    appsv1 "k8s.io/api/apps/v1"
+    autoscalingv2 "k8s.io/api/autoscaling/v2"
+    metav1 "k8s.io/apimmetav1"
+    "k8s.io/client-go/kubernetes"
+    "k8s.io/client-go/rest"
+    "k8s.io/client-go/tools/clientcmd"
+    metricsv1beta1 "k8s.io/metrics/pkg/client/clientset/versioned"
+)
+
+type CustomAutoscaler struct {
+    clientset        kubernetes.Interface
+    metricsClientset metricsv1beta1.Interface
+    namespace        string
+}
+
+type ScalingDecision struct {
+    TargetReplicas int32
+    Reason         string
+    Confidence     float64
+}
+
+func NewCustomAutoscaler(kubeconfig, namespace string) (*CustomAutoscaler, error) {
+    var config *rest.Config
+    var err error
+    
+    if kubeconfig != "" {
+        config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+    } else {
+        config, err = rest.InClusterConfig()
+    }
+    
+    if err != nil {
+        return nil, err
+    }
+    
+    clientset, err := kubernetes.NewForConfig(config)
+    if err != nil {
+        return nil, err
+    }
+    
+    metricsClientset, err := metricsv1beta1.NewForConfig(config)
+    if err != nil {
+        return nil, err
+    }
+    
+    return &CustomAutoscaler{
+        clientset:        clientset,
+        metricsClientset: metricsClientset,
+        namespace:        namespace,
+    }, nil
+}
+
+func (ca *CustomAutoscaler) AnalyzeScaling(deploymentName string) (*ScalingDecision, error) {
+    // Get current deployment
+    deployment, err := ca.clientset.AppsV1().Deployments(ca.namespace).Get(
+        context.TODO(), deploymentName, metav1.GetOptions{})
+    if err != nil {
+        return nil, err
+    }
+    
+    currentReplicas := *deployment.Spec.Replicas
+    
+    // Get pod metrics
+    podMetrics, err := ca.metricsClientset.MetricsV1beta1().PodMetricses(ca.namespace).List(
+        context.TODO(), metav1.ListOptions{
+            LabelSelector: metav1.FormatLabelSelector(deployment.Spec.Selector),
+        })
+    if err != nil {
+        return nil, err
+    }
+    
+    // Calculate average CPU and memory utilization
+    var totalCPU, totalMemory float64
+    podCount := len(podMetrics.Items)
+    
+    if podCount == 0 {
+        return &ScalingDecision{
+            TargetReplicas: currentReplicas,
+            Reason:         "No pod metrics available",
+            Confidence:     0.0,
+        }, nil
+    }
+    
+    for _, pod := range podMetrics.Items {
+        for _, container := range pod.Containers {
+            cpuQuantity := container.Usage["cpu"]
+            memoryQuantity := container.Usage["memory"]
+            
+            totalCPU += float64(cpuQuantity.MilliValue()) / 1000.0 # Convert to cores
+            totalMemory += float64(memoryQuantity.Value()) / (1024 * 1024 * 1024) # Convert to GB
+        }
+    }
+    
+    avgCPU := totalCPU / float64(podCount)
+    avgMemory := totalMemory / float64(podCount)
+    
+    # Advanced scaling logic
+    decision := ca.calculateScalingDecision(currentReplicas, avgCPU, avgMemory)
+    
+    log.Printf("Deployment: %s, Current: %d, CPU: %.2f, Memory: %.2fGB, Target: %d, Reason: %s",
+        deploymentName, currentReplicas, avgCPU, avgMemory, decision.TargetReplicas, decision.Reason)
+    
+    return decision, nil
+}
+
+func (ca *CustomAutoscaler) calculateScalingDecision(currentReplicas int32, avgCPU, avgMemory float64) *ScalingDecision {
+    # Define thresholds
+    const (
+        cpuScaleUpThreshold    = 0.7  # 70% CPU
+        cpuScaleDownThreshold  = 0.3  # 30% CPU
+        memoryScaleUpThreshold = 0.8  # 80% Memory
+        memoryScaleDownThreshold = 0.4 # 40% Memory
+        maxReplicas = 50
+        minReplicas = 2
+    )
+    
+    # Calculate scaling factors
+    cpuScalingFactor := avgCPU / cpuScaleUpThreshold
+    memoryScalingFactor := avgMemory / memoryScaleUpThreshold
+    
+    # Use the higher scaling factor (more conservative)
+    scalingFactor := cpuScalingFactor
+    if memoryScalingFactor > cpuScalingFactor {
+        scalingFactor = memoryScalingFactor
+    }
+    
+    # Calculate target replicas
+    targetReplicas := int32(float64(currentReplicas) * scalingFactor)
+    
+    # Apply constraints
+    if targetReplicas > maxReplicas {
+        targetReplicas = maxReplicas
+    }
+    if targetReplicas < minReplicas {
+        targetReplicas = minReplicas
+
+    }
+    
+    # Determine confidence based on how far we are from thresholds
+    var confidence float64
+    var reason string
+    
+    if avgCPU > cpuScaleUpThreshold || avgMemory > memoryScaleUpThreshold {
+        confidence = 0.8
+        reason = fmt.Sprintf("High resource utilization (CPU: %.1f%%, Memory: %.1f%%)", 
+                           avgCPU*100, avgMemory*100)
+    } else if avgCPU < cpuScaleDownThreshold && avgMemory < memoryScaleDownThreshold {
+        confidence = 0.6
+        reason = fmt.Sprintf("Low resource utilization (CPU: %.1f%%, Memory: %.1f%%)", 
+                           avgCPU*100, avgMemory*100)
+    } else {
+        targetReplicas = currentReplicas
+        confidence = 0.9
+        reason = "Resource utilization within acceptable range"
+    }
+    
+    return &ScalingDecision{
+        TargetReplicas: targetReplicas,
+        Reason:         reason,
+        Confidence:     confidence,
+    }
+}
+
+func (ca *CustomAutoscaler) ApplyScaling(deploymentName string, decision *ScalingDecision) error {
+    if decision.Confidence < 0.5 {
+        log.Printf("Low confidence (%.2f), skipping scaling action", decision.Confidence)
+        return nil
+    }
+    
+    # Get current deployment
+    deployment, err := ca.clientset.AppsV1().Deployments(ca.namespace).Get(
+        context.TODO(), deploymentName, metav1.GetOptions{})
+    if err != nil {
+        return err
+    }
+    
+    if *deployment.Spec.Replicas == decision.TargetReplicas {
+        log.Printf("No scaling needed, current replicas already at target: %d", decision.TargetReplicas)
+        return nil
+    }
+    
+    # Update deployment
+    deployment.Spec.Replicas = &decision.TargetReplicas
+    
+    _, err = ca.clientset.AppsV1().Deployments(ca.namespace).Update(
+        context.TODO(), deployment, metav1.UpdateOptions{})
+    
+    if err != nil {
+        return err
+    }
+    
+    log.Printf("Scaled deployment %s to %d replicas. Reason: %s", 
+               deploymentName, decision.TargetReplicas, decision.Reason)
+    
+    return nil
+}
+
+func (ca *CustomAutoscaler) RunAutoscalingLoop(deploymentName string, interval time.Duration) {
+    ticker := time.NewTicker(interval)
+    defer ticker.Stop()
+    
+    for {
+        select {
+        case <-ticker.C:
+            decision, err := ca.AnalyzeScaling(deploymentName)
+            if err != nil {
+                log.Printf("Error analyzing scaling: %v", err)
+                continue
+            }
+            
+            err = ca.ApplyScaling(deploymentName, decision)
+            if err != nil {
+                log.Printf("Error applying scaling: %v", err)
+            }
+        }
+    }
+}
+
+func main() {
+    autoscaler, err := NewCustomAutoscaler("", "production")
+    if err != nil {
+        log.Fatalf("Failed to create autoscaler: %v", err)
+    }
+    
+    # Run autoscaling loop for web-application deployment
+    log.Println("Starting custom autoscaler...")
+    autoscaler.RunAutoscalingLoop("web-application", 30*time.Second)
+}
+```
+<BackToTop />
+
+### Azure Auto Scaling Implementation
+
+#### 1. Azure Virtual Machine Scale Sets
+
+```json
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmssName": {
+      "type": "string",
+      "defaultValue": "web-app-vmss"
+    },
+    "instanceCount": {
+      "type": "int",
+      "defaultValue": 3,
+      "minValue": 1,
+      "maxValue": 100
+    },
+    "adminUsername": {
+      "type": "string"
+    },
+    "adminPassword": {
+      "type": "securestring"
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "virtualNetworkName": "vmss-vnet",
+    "subnetName": "vmss-subnet",
+    "publicIPAddressName": "vmss-pip",
+    "loadBalancerName": "vmss-lb",
+    "natPoolName": "vmss-natpool"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('virtualNetworkName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": ["10.0.0.0/16"]
+        },
+        "subnets": [
+          {
+            "name": "[variables('subnetName')]",
+            "properties": {
+              "addressPrefix": "10.0.0.0/24"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('publicIPAddressName')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "publicIPAllocationMethod": "Static"
+      }
+    },
+    {
+      "type": "Microsoft.Network/loadBalancers",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('loadBalancerName')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
+      ],
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "LoadBalancerFrontEnd",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
+              }
+            }
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "bepool"
+          }
+        ],
+        "inboundNatPools": [
+          {
+            "name": "[variables('natPoolName')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/frontendIPConfigurations/LoadBalancerFrontEnd')]"
+              },
+              "protocol": "Tcp",
+              "frontendPortRangeStart": 50000,
+              "frontendPortRangeEnd": 50119,
+              "backendPort": 22
+            }
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "LBRule",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/frontendIPConfigurations/LoadBalancerFrontEnd')]"
+              },
+              "backendAddressPool": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/backendAddressPools/bepool')]"
+              },
+              "protocol": "Tcp",
+              "frontendPort": 80,
+              "backendPort": 80,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 5,
+              "probe": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/probes/tcpProbe')]"
+              }
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "tcpProbe",
+            "properties": {
+              "protocol": "Tcp",
+              "port": 80,
+              "intervalInSeconds": 5,
+              "numberOfProbes": 2
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "apiVersion": "2020-06-01",
+      "name": "[parameters('vmssName')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]"
+      ],
+      "sku": {
+        "name": "Standard_B2s",
+        "tier": "Standard",
+        "capacity": "[parameters('instanceCount')]"
+      },
+      "properties": {
+        "overprovision": true,
+        "upgradePolicy": {
+          "mode": "Automatic"
+        },
+        "virtualMachineProfile": {
+          "storageProfile": {
+            "osDisk": {
+              "createOption": "FromImage",
+              "caching": "ReadWrite"
+            },
+            "imageReference": {
+              "publisher": "Canonical",
+              "offer": "UbuntuServer",
+              "sku": "18.04-LTS",
+              "version": "latest"
+            }
+          },
+          "osProfile": {
+            "computerNamePrefix": "[parameters('vmssName')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]",
+            "customData": "[base64(concat('#!/bin/bash\napt-get update\napt-get install -y nginx\nsystemctl start nginx\nsystemctl enable nginx\necho \"<h1>Instance: $(hostname)</h1>\" > /var/www/html/index.html'))]"
+          },
+          "networkProfile": {
+            "networkInterfaceConfigurations": [
+              {
+                "name": "nic",
+                "properties": {
+                  "primary": true,
+                  "ipConfigurations": [
+                    {
+                      "name": "ipconfig",
+                      "properties": {
+                        "subnet": {
+                          "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]"
+                        },
+                        "loadBalancerBackendAddressPools": [
+                          {
+                            "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/backendAddressPools/bepool')]"
+                          }
+                        ],
+                        "loadBalancerInboundNatPools": [
+                          {
+                            "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/inboundNatPools/', variables('natPoolName'))]"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "extensionProfile": {
+            "extensions": [
+              {
+                "name": "HealthExtension",
+                "properties": {
+                  "publisher": "Microsoft.ManagedServices",
+                  "type": "ApplicationHealthLinux",
+                  "typeHandlerVersion": "1.0",
+                  "autoUpgradeMinorVersion": false,
+                  "settings": {
+                    "protocol": "http",
+                    "port": 80,
+                    "requestPath": "/"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Insights/autoscalesettings",
+      "apiVersion": "2015-04-01",
+      "name": "[concat(parameters('vmssName'), '-autoscale')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'))]"
+      ],
+      "properties": {
+        "name": "[concat(parameters('vmssName'), '-autoscale')]",
+        "targetResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'))]",
+        "enabled": true,
+        "profiles": [
+          {
+            "name": "Default",
+            "capacity": {
+              "minimum": "2",
+              "maximum": "20",
+              "default": "3"
+            },
+            "rules": [
+              {
+                "metricTrigger": {
+                  "metricName": "Percentage CPU",
+                  "metricNamespace": "",
+                  "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'))]",
+                  "timeGrain": "PT1M",
+                  "statistic": "Average",
+                  "timeWindow": "PT5M",
+                  "timeAggregation": "Average",
+                  "operator": "GreaterThan",
+                  "threshold": 70
+                },
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": "1",
+                  "cooldown": "PT10M"
+                }
+              },
+              {
+                "metricTrigger": {
+                  "metricName": "Percentage CPU",
+                  "metricNamespace": "",
+                  "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'))]",
+                  "timeGrain": "PT1M",
+                  "statistic": "Average",
+                  "timeWindow": "PT5M",
+                  "timeAggregation": "Average",
+                  "operator": "LessThan",
+                  "threshold": 30
+                },
+                "scaleAction": {
+                  "direction": "Decrease",
+                  "type": "ChangeCount",
+                  "value": "1",
+                  "cooldown": "PT10M"
+                }
+              }
+            ]
+          },
+          {
+            "name": "Peak Hours",
+            "capacity": {
+              "minimum": "5",
+              "maximum": "50",
+              "default": "10"
+            },
+            "rules": [
+              {
+                "metricTrigger": {
+                  "metricName": "Percentage CPU",
+                  "metricNamespace": "",
+                  "metricResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', parameters('vmssName'))]",
+                  "timeGrain": "PT1M",
+                  "statistic": "Average",
+                  "timeWindow": "PT3M",
+                  "timeAggregation": "Average",
+                  "operator": "GreaterThan",
+                  "threshold": 60
+                },
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": "3",
+                  "cooldown": "PT5M"
+                }
+              }
+            ],
+            "recurrence": {
+              "frequency": "Week",
+              "schedule": {
+                "timeZone": "Pacific Standard Time",
+                "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "hours": [8],
+                "minutes": [0]
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "publicIPAddress": {
+      "type": "string",
+      "value": "[reference(variables('publicIPAddressName')).ipAddress]"
+    }
+  }
+}
+```
+<BackToTop />
+
+## Best Practices
+
+### 1. Design Principles
+
+#### Graceful Degradation
+```python
+# graceful-scaling.py
+class GracefulScaler:
+    def __init__(self, min_instances=2, max_instances=100):
+        self.min_instances = min_instances
+        self.max_instances = max_instances
+        self.scaling_history = []
+        
+    def calculate_safe_scaling(self, current_instances, target_instances, metrics):
+        """Calculate safe scaling increment to avoid system shock"""
+        
+        # Never scale by more than 50% of current capacity at once
+        max_scale_increment = max(1, int(current_instances * 0.5))
+        
+        if target_instances > current_instances:
+            # Scale up gradually
+            safe_target = min(
+                target_instances,
+                current_instances + max_scale_increment,
+                self.max_instances
+            )
+        else:
+            # Scale down more conservatively
+            max_scale_decrement = max(1, int(current_instances * 0.25))
+            safe_target = max(
+                target_instances,
+                current_instances - max_scale_decrement,
+                self.min_instances
+            )
+        
+        return safe_target
+    
+    def validate_scaling_decision(self, metrics, target_instances):
+        """Validate scaling decision against multiple criteria"""
+        validations = []
+        
+        # Check if system is under stress
+        if metrics.get('error_rate', 0) > 0.05:  # 5% error rate
+            validations.append("High error rate detected - defer scaling down")
+        
+        # Check if recent scaling events occurred
+        recent_scaling = [event for event in self.scaling_history 
+                         if (time.time() - event['timestamp']) < 300]  # 5 minutes
+        
+        if len(recent_scaling) > 2:
+            validations.append("Too many recent scaling events - apply cooldown")
+        
+        # Check database connection limits
+        if metrics.get('db_connections', 0) > metrics.get('db_max_connections', 100) * 0.8:
+            validations.append("Database connection limit approaching")
+        
+        return validations
+```
+
+#### Health-Check Integration
+```yaml
+# health-aware-scaling.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: health-check-config
+data:
+  health-check.sh: |
+    #!/bin/bash
+    
+    # Comprehensive health check script
+    
+    # Check application health endpoint
+    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/health)
+    if [ "$HTTP_STATUS" != "200" ]; then
+        echo "Health check failed: HTTP $HTTP_STATUS"
+        exit 1
+    fi
+    
+    # Check database connectivity
+    if ! nc -z database-service 5432; then
+        echo "Database connectivity check failed"
+        exit 1
+    fi
+    
+    # Check memory usage
+    MEMORY_USAGE=$(free | grep Mem | awk '{printf "%.0f", $3/$2 * 100.0}')
+    if [ "$MEMORY_USAGE" -gt 90 ]; then
+        echo "Memory usage too high: ${MEMORY_USAGE}%"
+        exit 1
+    fi
+    
+    # Check CPU load
+    CPU_LOAD=$(uptime | awk -F'load average:' '{ print $2 }' | awk '{ print $1 }' | sed 's/,//')
+    if (( $(echo "$CPU_LOAD > 5.0" | bc -l) )); then
+        echo "CPU load too high: $CPU_LOAD"
+        exit 1
+    fi
+    
+    echo "All health checks passed"
+    exit 0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: health-aware-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: health-aware-app
+  template:
+    metadata:
+      labels:
+        app: health-aware-app
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.21
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          exec:
+            command:
+            - /bin/bash
+            - /etc/health/health-check.sh
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: health-scripts
+          mountPath: /etc/health
+      volumes:
+      - name: health-scripts
+        configMap:
+          name: health-check-config
+          defaultMode: 0755
+```
+<BackToTop />
+
+### 2. Performance Optimization
+
+#### Resource Right-Sizing
+```python
+# resource-optimizer.py
+import numpy as np
+from datetime import datetime, timedelta
+
+class ResourceOptimizer:
+    def __init__(self, historical_data):
+        self.historical_data = historical_data
+        
+    def analyze_resource_utilization(self, time_window_days=30):
+        """Analyze resource utilization patterns"""
+        
+        # Calculate percentiles for different time periods
+        analysis = {}
+        
+        for resource in ['cpu', 'memory', 'network_io', 'disk_io']:
+            resource_data = self.historical_data[resource]
+            
+            analysis[resource] = {
+                'p50': np.percentile(resource_data, 50),
+                'p90': np.percentile(resource_data, 90),
+                'p95': np.percentile(resource_data, 95),
+                'p99': np.percentile(resource_data, 99),
+                'max': np.max(resource_data),
+                'avg': np.mean(resource_data),
+                'std': np.std(resource_data)
+            }
+        
+        return analysis
+    
+    def recommend_instance_types(self, cloud_provider='aws'):
+        """Recommend optimal instance types based on usage patterns"""
+        
+        analysis = self.analyze_resource_utilization()
+        
+        # Define instance type characteristics
+        instance_types = {
+            'aws': {
+                't3.micro': {'cpu': 2, 'memory': 1, 'cost_per_hour': 0.0104},
+                't3.small': {'cpu': 2, 'memory': 2, 'cost_per_hour': 0.0208},
+                't3.medium': {'cpu': 2, 'memory': 4, 'cost_per_hour': 0.0416},
+                't3.large': {'cpu': 2, 'memory': 8, 'cost_per_hour': 0.0832},
+                'c5.large': {'cpu': 2, 'memory': 4, 'cost_per_hour': 0.085},
+                'c5.xlarge': {'cpu': 4, 'memory': 8, 'cost_per_hour': 0.17},
+                'm5.large': {'cpu': 2, 'memory': 8, 'cost_per_hour': 0.096},
+                'm5.xlarge': {'cpu': 4, 'memory': 16, 'cost_per_hour': 0.192},
+                'r5.large': {'cpu': 2, 'memory': 16, 'cost_per_hour': 0.126},
+            }
+        }
+        
+        # Calculate required resources (using P95 + buffer)
+        required_cpu = analysis['cpu']['p95'] * 1.2  # 20% buffer
+        required_memory = analysis['memory']['p95'] * 1.2
+        
+        # Find suitable instance types
+        suitable_instances = []
+        
+        for instance_type, specs in instance_types[cloud_provider].items():
+            if (specs['cpu'] >= required_cpu and 
+                specs['memory'] >= required_memory):
+                
+                # Calculate efficiency score
+                cpu_efficiency = required_cpu / specs['cpu']
+                memory_efficiency = required_memory / specs['memory']
+                overall_efficiency = (cpu_efficiency + memory_efficiency) / 2
+                
+                suitable_instances.append({
+                    'type': instance_type,
+                    'efficiency': overall_efficiency,
+                    'cost_per_hour': specs['cost_per_hour'],
+                    'cpu_utilization': cpu_efficiency * 100,
+                    'memory_utilization': memory_efficiency * 100
+                })
+        
+        # Sort by efficiency (higher is better)
+        suitable_instances.sort(key=lambda x: x['efficiency'], reverse=True)
+        
+        return suitable_instances[:3]  # Top 3 recommendations
+    
+    def calculate_cost_optimization(self, current_instance_type, recommended_instance_type):
+        """Calculate potential cost savings"""
+        
+        # This is a simplified calculation
+        current_cost = instance_types['aws'][current_instance_type]['cost_per_hour']
+        recommended_cost = instance_types['aws'][recommended_instanceType]['cost_per_hour']
+        
+        monthly_savings = (current_cost - recommended_cost) * 24 * 30
+        annual_savings = monthly_savings * 12
+        
+        return {
+            'monthly_savings': monthly_savings,
+            'annual_savings': annual_savings,
+            'savings_percentage': ((current_cost - recommended_cost) / current_cost) * 100
+        }
+```
+<BackToTop />
+
+## Monitoring and Metrics
+
+### Key Metrics to Monitor
+
+#### Infrastructure Metrics
+```yaml
+# monitoring-metrics.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: autoscaling-metrics-config
+data:
+  metrics.yaml: |
+    # Core Infrastructure Metrics
+    infrastructure:
+      - name: cpu_utilization
+        threshold_scale_up: 70
+        threshold_scale_down: 30
+        evaluation_periods: 3
+        period_seconds: 300
+        
+      - name: memory_utilization
+        threshold_scale_up: 80
+        threshold_scale_down: 40
+        evaluation_periods: 2
+        period_seconds: 300
+        
+      - name: network_throughput
+        threshold_scale_up: 80
+        threshold_scale_down: 20
+        evaluation_periods: 2
+        period_seconds: 300
+    
+    # Application Metrics
+    application:
+      - name: request_latency_p99
+        threshold_scale_up: 1000  # milliseconds
+        threshold_scale_down: 200
+        evaluation_periods: 3
+        period_seconds: 180
+        
+      - name: error_rate
+        threshold_scale_up: 5     # percentage
+        threshold_scale_down: 1
+        evaluation_periods: 2
+        period_seconds: 300
+        
+      - name: requests_per_second
+        threshold_scale_up: 1000
+        threshold_scale_down: 100
+        evaluation_periods: 2
+        period_seconds: 180
+    
+    # Business Metrics
+    business:
+      - name: active_users
+        threshold_scale_up: 10000
+        threshold_scale_down: 1000
+        evaluation_periods: 1
+        period_seconds: 300
+        
+      - name: queue_depth
+        threshold_scale_up: 100
+        threshold_scale_down: 10
+        evaluation_periods: 1
+        period_seconds: 60
+```
+
+#### Custom Metrics Collection
+```python
+# metrics-collector.py
+import time
+import json
+import boto3
+import psutil
+import requests
+from datetime import datetime
+
+class AutoScalingMetricsCollector:
+    def __init__(self, cloudwatch_namespace='AutoScaling/Custom'):
+        self.cloudwatch = boto3.client('cloudwatch')
+        self.namespace = cloudwatch_namespace
+        
+    def collect_system_metrics(self):
+        """Collect system-level metrics"""
+        
+        # CPU metrics
+        cpu_percent = psutil.cpu_percent(interval=1)
+        cpu_count = psutil.cpu_count()
+        
+        # Memory metrics
+        memory = psutil.virtual_memory()
+        memory_percent = memory.percent
+        memory_available_gb = memory.available / (1024**3)
+        
+        # Disk metrics
+        disk = psutil.disk_usage('/')
+        disk_percent = disk.percent
+        
+        # Network metrics
+        network = psutil.net_io_counters()
+        
+        return {
+            'cpu_utilization': cpu_percent,
+            'cpu_count': cpu_count,
+            'memory_utilization': memory_percent,
+            'memory_available_gb': memory_available_gb,
+            'disk_utilization': disk_percent,
+            'network_bytes_sent': network.bytes_sent,
+            'network_bytes_recv': network.bytes_recv,
+            'timestamp': datetime.utcnow()
+        }
+    
+    def collect_application_metrics(self, app_metrics_url='http://localhost:8080/metrics'):
+        """Collect application-specific metrics"""
+        
+        try:
+            response = requests.get(app_metrics_url, timeout=5)
+            metrics_text = response.text
+            
+            # Parse Prometheus-style metrics
+            app_metrics = self.parse_prometheus_metrics(metrics_text)
+            
+            return {
+                'requests_per_second': app_metrics.get('http_requests_total', 0),
+                'response_time_p99': app_metrics.get('http_request_duration_p99', 0),
+                'error_rate': app_metrics.get('http_errors_total', 0),
+                'active_connections': app_metrics.get('active_connections', 0),
+                'database_connections': app_metrics.get('db_connections_active', 0),
+                'timestamp': datetime.utcnow()
+            }
+            
+        except Exception as e:
+            print(f"Failed to collect application metrics: {e}")
+            return {}
+    
+    def parse_prometheus_metrics(self, metrics_text):
+        """Parse Prometheus metrics format"""
+        metrics = {}
+        
+        for line in metrics_text.split('\n'):
+            if line and not line.startswith('#'):
+                try:
+                    parts = line.split(' ')
+                    if len(parts) >= 2:
+                        metric_name = parts[0].split('{')[0]  # Remove labels
+                        metric_value = float(parts[1])
+                        metrics[metric_name] = metric_value
+                except:
+                    continue
+        
+        return metrics
+    
+    def collect_custom_business_metrics(self):
+        """Collect business-specific metrics"""
+        
+        # Example: Get queue depth from Redis
+        try:
+            import redis
+            r = redis.Redis(host='localhost', port=6379, db=0)
+            
+            queue_depth = r.llen('task_queue')
+            active_users = r.scard('active_users')
+            
+            return {
+                'queue_depth': queue_depth,
+                'active_users': active_users,
+                'timestamp': datetime.utcnow()
+            }
+            
+        except Exception as e:
+            print(f"Failed to collect business metrics: {e}")
+            return {}
+    
+    def publish_metrics_to_cloudwatch(self, metrics_data):
+        """Publish metrics to CloudWatch"""
+        
+        metric_data = []
+        
+        for metric_name, value in metrics_data.items():
+            if metric_name != 'timestamp' and isinstance(value, (int, float)):
+                metric_data.append({
+                    'MetricName': metric_name,
+                    'Value': value,
+                    'Unit': 'Count',
+                    'Timestamp': metrics_data['timestamp']
+                })
+        
+        if metric_data:
+            try:
+                self.cloudwatch.put_metric_data(
+                    Namespace=self.namespace,
+                    MetricData=metric_data
+                )
+                print(f"Published {len(metric_data)} metrics to CloudWatch")
+                
+            except Exception as e:
+                print(f"Failed to publish metrics: {e}")
+    
+    def run_collection_loop(self, interval_seconds=60):
+        """Run continuous metrics collection"""
+        
+        while True:
+            try:
+                # Collect all metrics
+                system_metrics = self.collect_system_metrics()
+                app_metrics = self.collect_application_metrics()
+                business_metrics = self.collect_custom_business_metrics()
+                
+                # Combine all metrics
+                all_metrics = {**system_metrics, **app_metrics, **business_metrics}
+                
+                # Publish to CloudWatch
+                self.publish_metrics_to_cloudwatch(all_metrics)
+                
+                # Log summary
+                print(f"Collected metrics at {all_metrics['timestamp']}: "
+                      f"CPU: {all_metrics.get('cpu_utilization', 0):.1f}%, "
+                      f"Memory: {all_metrics.get('memory_utilization', 0):.1f}%, "
+                      f"Queue: {all_metrics.get('queue_depth', 0)}")
+                
+                time.sleep(interval_seconds)
+                
+            except KeyboardInterrupt:
+                print("Stopping metrics collection...")
+                break
+            except Exception as e:
+                print(f"Error in collection loop: {e}")
+                time.sleep(interval_seconds)
+
+# Usage
+if __name__ == "__main__":
+    collector = AutoScalingMetricsCollector()
+    collector.run_collection_loop(interval_seconds=30)
+```
+<BackToTop />
+
+## Cost Optimization
+
+### Cost-Aware Scaling Strategies
+
+```python
+# cost-aware-scaling.py
+import numpy as np
+from datetime import datetime, timedelta
+
+class CostAwareScaler:
+    def __init__(self, cost_config):
+        self.cost_config = cost_config
+        self.price_history = []
+        
+    def calculate_instance_costs(self, instance_type, quantity, hours):
+        """Calculate cost for specific instance configuration"""
+        
+        hourly_rate = self.cost_config['instance_types'][instance_type]['hourly_rate']
+        
+        # Apply spot pricing if configured
+        if self.cost_config.get('use_spot_instances', False):
+            spot_discount = 0.7  # Typical 30% savings
+            hourly_rate *= spot_discount
+        
+        # Apply reserved instance discounts if available
+        if self.cost_config.get('reserved_instances', {}).get(instance_type, 0) > 0:
+            reserved_count = min(quantity, self.cost_config['reserved_instances'][instance_type])
+            reserved_discount = 0.6  # Typical 40% savings
+            
+            reserved_cost = reserved_count * hourly_rate * reserved_discount * hours
+            on_demand_cost = (quantity - reserved_count) * hourly_rate * hours
+            
+            return reserved_cost + on_demand_cost
+        
+        return quantity * hourly_rate * hours
+    
+    def find_cost_optimal_configuration(self, required_capacity, duration_hours):
+        """Find the most cost-effective scaling configuration"""
+        
+        configurations = []
+        
+        for instance_type, specs in self.cost_config['instance_types'].items():
+            # Calculate how many instances needed
+            instances_needed = np.ceil(required_capacity / specs['capacity_units'])
+            
+            # Calculate total cost
+            total_cost = self.calculate_instance_costs(
+                instance_type, instances_needed, duration_hours
+            )
+            
+            # Calculate efficiency metrics
+            total_capacity = instances_needed * specs['capacity_units']
+            capacity_efficiency = required_capacity / total_capacity
+            cost_per_capacity_unit = total_cost / total_capacity
+            
+            configurations.append({
+                'instance_type': instance_type,
+                'instance_count': int(instances_needed),
+                'total_cost': total_cost,
+                'total_capacity': total_capacity,
+                'capacity_efficiency': capacity_efficiency,
+                'cost_per_capacity_unit': cost_per_capacity_unit,
+                'over_provisioning': total_capacity - required_capacity
+            })
+        
+        # Sort by cost efficiency
+        configurations.sort(key=lambda x: x['cost_per_capacity_unit'])
+        
+        return configurations
+    
+    def should_scale_based_on_cost(self, current_config, predicted_demand, time_horizon_hours):
+        """Determine if scaling is cost-justified"""
+        
+        # Calculate cost of current configuration
+        current_cost = self.calculate_instance_costs(
+            current_config['instance_type'],
+            current_config['instance_count'],
+            time_horizon_hours
+        )
+        
+        # Find optimal configuration for predicted demand
+        optimal_configs = self.find_cost_optimal_configuration(
+            predicted_demand, time_horizon_hours
+        )
+        
+        if not optimal_configs:
+            return False, current_config
+        
+        optimal_config = optimal_configs[0]
+        
+        # Calculate potential savings
+        potential_savings = current_cost - optimal_config['total_cost']
+        savings_percentage = (potential_savings / current_cost) * 100
+        
+        # Only scale if savings are significant (>10%) or performance impact is severe
+        if savings_percentage > 10 or optimal_config['capacity_efficiency'] > 0.9:
+            return True, optimal_config
+        
+        return False, current_config
+    
+    def implement_cost_optimization_schedule(self):
+        """Create a schedule for cost-optimized scaling"""
+        
+        # Define time periods with different cost priorities
+        cost_schedule = {
+            'business_hours': {
+                'start_hour': 8,
+                'end_hour': 18,
+                'days': ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                'cost_priority': 'performance',  # Prioritize performance over cost
+                'max_cost_increase': 50  # Allow up to 50% cost increase for performance
+            },
+            'off_hours': {
+                'start_hour': 18,
+                'end_hour': 8,
+                'days': ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                'cost_priority': 'cost',  # Prioritize cost savings
+                'max_performance_degradation': 20  # Allow up to 20% performance reduction
+            },
+            'weekends': {
+                'days': ['saturday', 'sunday'],
+                'cost_priority': 'cost',
+                'max_performance_degradation': 30  # Allow higher performance reduction
+            }
+        }
+        
+        return cost_schedule
+
+# Example cost configuration
+cost_config = {
+    'instance_types': {
+        't3.micro': {'hourly_rate': 0.0104, 'capacity_units': 1},
+        't3.small': {'hourly_rate': 0.0208, 'capacity_units': 2},
+        't3.medium': {'hourly_rate': 0.0416, 'capacity_units': 4},
+        't3.large': {'hourly_rate': 0.0832, 'capacity_units': 8},
+        'c5.large': {'hourly_rate': 0.085, 'capacity_units': 8},
+        'c5.xlarge': {'hourly_rate': 0.17, 'capacity_units': 16},
+    },
+    'use_spot_instances': True,
+    'reserved_instances': {
+        't3.medium': 5,  # 5 reserved t3.medium instances
+        'c5.large': 3    # 3 reserved c5.large instances
+    }
+}
+
+# Usage example
+scaler = CostAwareScaler(cost_config)
+
+# Find optimal configuration for 50 capacity units over 24 hours
+optimal_configs = scaler.find_cost_optimal_configuration(50, 24)
+
+print("Top 3 cost-optimal configurations:")
+for i, config in enumerate(optimal_configs[:3], 1):
+    print(f"{i}. {config['instance_type']}: "
+          f"{config['instance_count']} instances, "
+          f"${config['total_cost']:.2f}/day, "
+          f"{config['capacity_efficiency']:.1%} efficiency")
+```
+<BackToTop />
+
+## Comparison Matrix
+
+| Feature | AWS Auto Scaling | Azure Scale Sets | GCP Autoscaler | Kubernetes HPA | KEDA |
+|---------|------------------|------------------|----------------|----------------|------|
+| **Scaling Types** | Horizontal & Vertical | Horizontal & Vertical | Horizontal & Vertical | Horizontal & Vertical | Horizontal |
+| **Predictive Scaling** | Yes (AI-based) | Limited | Yes (AI-based) | No | No |
+| **Custom Metrics** | CloudWatch | Azure Monitor | Stackdriver | Prometheus | 50+ Scalers |
+| **Multi-Cloud** | No | No | No | Yes | Yes |
+| **Event-Driven** | Limited | Limited | Limited | Limited | Native |
+| **Cost Optimization** | Spot instances | Spot instances | Preemptible | N/A | N/A |
+| **Learning Curve** | Medium | Medium | Medium | High | Medium |
+| **Latency** | 1-5 minutes | 1-5 minutes | 1-5 minutes | 30-60 seconds | 30-60 seconds |
+| **Max Scale Speed** | Medium | Medium | Medium | Fast | Fast |
+| **Vendor Lock-in** | High | High | High | None | None |
+
+### Decision Matrix
+
+**Choose AWS Auto Scaling when:**
+- Deep AWS ecosystem integration required
+- Need predictive scaling capabilities
+- Using spot instances for cost optimization
+- Enterprise support requirements
+
+**Choose Azure Scale Sets when:**
+- Microsoft-centric infrastructure
+- Integration with Azure DevOps pipelines
+- Hybrid cloud requirements
+- .NET application ecosystem
+
+**Choose GCP Autoscaler when:**
+- Google Cloud Platform preference
+- Data analytics and ML workloads
+- BigQuery integration needs
+- Kubernetes-native approach
+
+**Choose Kubernetes HPA when:**
+- Cloud-agnostic requirements
+- Container-native applications
+- Multi-cloud deployments
+- DevOps team with Kubernetes expertise
+
+**Choose KEDA when:**
+- Event-driven architectures
+- Microservices with message queues
+- Complex custom metrics requirements
+- Serverless-style scaling patterns
+
+This comprehensive guide provides production-ready auto-scaling implementations with real-world code examples, best practices, and decision guidance for selecting the appropriate auto-scaling solution for different use cases.
+
+<BackToTop />

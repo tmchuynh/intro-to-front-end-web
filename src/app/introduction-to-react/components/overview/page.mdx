@@ -59,15 +59,25 @@ State is an object that holds the data that affects the rendering of a component
 
 ```javascript
 import React, { useState } from "react";
-function Counter() {
-  const [count, setCount] = useState(0);
+function DisplayNames() {
+  const [names, setNames] = useState(["Alice", "Bob", "Charlie"]);
+
+  const addName = () => {
+    setNames([...names, `Name ${names.length + 1}`]);
+  };
+
   return (
     <div>
-      <p>You clicked {count} times</p>
-      <button onClick={() => setCount(count + 1)}>Click me</button>
+      <h2>Names List</h2>
+      <ul>
+        {names.map((name, index) => (
+          <li key={index}>{name}</li>
+        ))}
+      </ul>
+      <button onClick={addName}>Add Name</button>
     </div>
+  );
 }
-export default Counter;
 ```
 
 In this example, the `Counter` component uses the `useState` hook to manage the `count` state. The `useState` hook returns an array with the current state value and a function to update the state. The `setCount` function is used to update the state when the button is clicked. The component re-renders whenever the state changes, displaying the updated count.
@@ -310,26 +320,32 @@ Client components run in the browser and can handle user interactions, maintain 
 
 import { useState, useEffect } from "react";
 
-function ClientCounter() {
-  const [count, setCount] = useState(0);
-  const [mounted, setMounted] = useState(false);
+function ClientUserList() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setMounted(true);
-    // Access browser APIs
-    document.title = `Count: ${count}`;
-  }, [count]);
+    // This runs on the client
+    fetch("https://api.example.com/users")
+      .then((res) => res.json())
+      .then((data) => {
+        setUsers(data);
+        setLoading(false);
+      });
+  }, []);
 
-  if (!mounted) {
-    return <div>Loading...</div>;
-  }
+  if (loading) return <div>Loading users...</div>;
 
   return (
     <div>
-      <h2>Interactive Counter (Client-rendered)</h2>
-      <p>Count: {count}</p>
-      <button onClick={() => setCount(count + 1)}>Increment</button>
-      <button onClick={() => setCount(count - 1)}>Decrement</button>
+      <h2>Users (Client-rendered)</h2>
+      <ul>
+        {users.map((user) => (
+          <li key={user.id}>
+            {user.name} - {user.email}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -637,24 +653,28 @@ const ExpensiveUserCard = memo(function UserCard({ user, onEdit }) {
 });
 
 // Parent component
-function UserList() {
-  const [users, setUsers] = useState([
-    { id: 1, name: "Alice", posts: [{ likes: 10 }, { likes: 5 }] },
-    { id: 2, name: "Bob", posts: [{ likes: 15 }, { likes: 20 }] },
-  ]);
-  const [count, setCount] = useState(0);
+function UserList({ users, onEdit }) {
+  const [filter, setFilter] = useState("");
 
-  const handleEdit = (userId) => {
-    console.log("Editing user:", userId);
-  };
+  const filteredUsers = users.filter((user) =>
+    user.name.toLowerCase().includes(filter.toLowerCase())
+  );
 
   return (
     <div>
-      <button onClick={() => setCount(count + 1)}>Count: {count}</button>
+      <input
+        type="text"
+        placeholder="Filter users"
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+        className="mb-4 p-2 border rounded"
+      />
 
-      {users.map((user) => (
-        <ExpensiveUserCard key={user.id} user={user} onEdit={handleEdit} />
-      ))}
+      <div className="grid gap-4">
+        {filteredUsers.map((user) => (
+          <ExpensiveUserCard key={user.id} user={user} onEdit={onEdit} />
+        ))}
+      </div>
     </div>
   );
 }
@@ -814,32 +834,43 @@ Functional components use hooks to manage lifecycle events:
 
 ```javascript
 import React, { useState, useEffect } from "react";
-
 function MyFunctionalComponent() {
+  const [data, setData] = useState(null);
   const [count, setCount] = useState(0);
+  console.log("Component rendered");
+  useEffect(() => {
+    console.log("useEffect: Component did mount or update");
+    // Fetch data or perform setup
+    fetchData();
 
-  useEffect(
-    () => {
-      console.log("Component did mount or update");
-
-      // Effect: Subscribe to a data source
-      const subscription = dataSource.subscribe((data) => {
-        // Handle new data
-      });
-
-      return () => {
-        console.log("Component will unmount or update");
-        // Cleanup: Unsubscribe from the data source
-        subscription.unsubscribe();
-      };
-    },
-    [
-      /* dependencies */
-    ]
+    return () => {
+      console.log("Cleanup: Component will unmount");
+      // Cleanup tasks
+    };
+  }, []); // Empty dependency array means this runs once after mount
+  useEffect(() => {
+    console.log("useEffect: Component did update");
+    // Respond to count changes
+  }, [count]); // Runs when 'count' changes
+  const fetchData = async () => {
+    console.log("Fetching data...");
+    // Simulate data fetching
+    const response = await new Promise((resolve) =>
+      setTimeout(() => resolve({ data: "Fetched Data" }), 1000)
+    );
+    setData(response.data);
+  };
+  return (
+    <div>
+      <h1>My Functional Component</h1>
+      <p>Data: {data}</p>
+      <button onClick={() => setCount(count + 1)}>
+        Increment Count ({count})
+      </button>
+    </div>
   );
-
-  return <div>Count: {count}</div>;
 }
+export default MyFunctionalComponent;
 ```
 
 ### Summary of Lifecycle Methods

@@ -27,6 +27,7 @@ It helps to avoid unnecessary re-computations and can improve the performance of
 - **Derived State**: When you need to derive state from props or other state variables, and you want to avoid recalculating it on every render.
 - **Memoizing Component Props**: When you want to memoize the props passed to a child component to prevent unnecessary re-renders of that component.
 - **Optimizing Rendering Performance**: When you want to optimize the rendering performance of a component by memoizing the result of a computation that is used in the render method.
+- **Complex Data Processing**: When you need to process large datasets or perform complex calculations that can be expensive in terms of performance.
 
 ### Syntax
 
@@ -46,6 +47,7 @@ const MyComponent = ({ data }) => {
 
 - `create`: A function that returns the computed value. This function will be executed only when the dependencies change.
 - `dependencies`: An array of dependencies that determine when the memoized value should be recalculated. If any of the dependencies change, the `create` function will be executed again to recalculate the memoized value. If the dependencies do not change, the previously memoized value will be returned.
+  <BackToTop />
 
 ## How It Works
 
@@ -70,37 +72,1102 @@ When the component re-renders, the `useMemo` hook checks the dependencies array.
 
 ## Examples
 
-### Memoizing an Expensive Calculation
+### Complex Data Processing and Filtering
 
 ```javascript
-import React, { useMemo } from "react";
-const ExpensiveCalculationComponent = ({ data }) => {
-  const computedValue = useMemo(() => {
-    // Simulating an expensive calculation
-    return data.reduce((acc, item) => acc + item.value, 0);
-  }, [data]); // Only recalculate when 'data' changes
-  return <div>Computed Value: {computedValue}</div>;
+import React, { useMemo, useState } from "react";
+
+const DataAnalyticsDashboard = ({ rawData }) => {
+  const [filterCriteria, setFilterCriteria] = useState({
+    category: "all",
+    minValue: 0,
+    maxValue: 1000,
+    dateRange: "last30days",
+  });
+
+  // Expensive filtering and aggregation
+  const processedData = useMemo(() => {
+    console.log("Processing data..."); // This should only log when dependencies change
+
+    let filtered = rawData.filter((item) => {
+      const meetsCategory =
+        filterCriteria.category === "all" ||
+        item.category === filterCriteria.category;
+      const meetsValue =
+        item.value >= filterCriteria.minValue &&
+        item.value <= filterCriteria.maxValue;
+      const meetsDate =
+        filterCriteria.dateRange === "all" ||
+        new Date(item.date) >= getDateRange(filterCriteria.dateRange);
+
+      return meetsCategory && meetsValue && meetsDate;
+    });
+
+    // Complex aggregations
+    const summary = {
+      totalItems: filtered.length,
+      totalValue: filtered.reduce((sum, item) => sum + item.value, 0),
+      averageValue:
+        filtered.length > 0
+          ? filtered.reduce((sum, item) => sum + item.value, 0) /
+            filtered.length
+          : 0,
+      categoryBreakdown: filtered.reduce((acc, item) => {
+        acc[item.category] = (acc[item.category] || 0) + 1;
+        return acc;
+      }, {}),
+      topPerformers: filtered
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 5)
+        .map((item) => ({ name: item.name, value: item.value })),
+    };
+
+    return { filtered, summary };
+  }, [rawData, filterCriteria]);
+
+  const getDateRange = (range) => {
+    const now = new Date();
+    switch (range) {
+      case "last7days":
+        return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      case "last30days":
+        return new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      case "last90days":
+        return new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+      default:
+        return new Date(0);
+    }
+  };
+
+  return (
+    <div className="analytics-dashboard">
+      <div className="filters">
+        <select
+          value={filterCriteria.category}
+          onChange={(e) =>
+            setFilterCriteria((prev) => ({ ...prev, category: e.target.value }))
+          }
+        >
+          <option value="all">All Categories</option>
+          <option value="electronics">Electronics</option>
+          <option value="books">Books</option>
+          <option value="clothing">Clothing</option>
+        </select>
+
+        <input
+          type="range"
+          min="0"
+          max="1000"
+          value={filterCriteria.minValue}
+          onChange={(e) =>
+            setFilterCriteria((prev) => ({
+              ...prev,
+              minValue: parseInt(e.target.value),
+            }))
+          }
+        />
+        <span>Min Value: ${filterCriteria.minValue}</span>
+
+        <select
+          value={filterCriteria.dateRange}
+          onChange={(e) =>
+            setFilterCriteria((prev) => ({
+              ...prev,
+              dateRange: e.target.value,
+            }))
+          }
+        >
+          <option value="last7days">Last 7 Days</option>
+          <option value="last30days">Last 30 Days</option>
+          <option value="last90days">Last 90 Days</option>
+          <option value="all">All Time</option>
+        </select>
+      </div>
+
+      <div className="summary-cards">
+        <div className="card">
+          <h3>Total Items</h3>
+          <p>{processedData.summary.totalItems}</p>
+        </div>
+        <div className="card">
+          <h3>Total Value</h3>
+          <p>${processedData.summary.totalValue.toFixed(2)}</p>
+        </div>
+        <div className="card">
+          <h3>Average Value</h3>
+          <p>${processedData.summary.averageValue.toFixed(2)}</p>
+        </div>
+      </div>
+
+      <div className="top-performers">
+        <h3>Top Performers</h3>
+        {processedData.summary.topPerformers.map((item, index) => (
+          <div key={index} className="performer-item">
+            {item.name}: ${item.value}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
-export default ExpensiveCalculationComponent;
 ```
 
 <BackToTop />
 
-### Memoizing Component Props
+### Memoized Search and Highlighting
 
 ```javascript
-import React, { useMemo } from "react";
-const ChildComponent = React.memo(({ value }) => {
-  console.log("ChildComponent rendered");
-  return <div>Value: {value}</div>;
-});
-const ParentComponent = ({ data }) => {
-  const memoizedValue = useMemo(() => {
-    return data.reduce((acc, item) => acc + item.value, 0);
-  }, [data]); // Only recalculate when 'data' changes
-  return <ChildComponent value={memoizedValue} />;
+import React, { useMemo, useState } from "react";
+
+const SmartSearchComponent = ({
+  items,
+  searchFields = ["title", "description", "tags"],
+}) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchOptions, setSearchOptions] = useState({
+    caseSensitive: false,
+    exactMatch: false,
+    includeHighlighting: true,
+  });
+
+  // Expensive search algorithm with fuzzy matching and highlighting
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return items.map((item) => ({ ...item, highlights: {}, score: 0 }));
+    }
+
+    console.log("Performing search..."); // Should only log when search criteria changes
+
+    const query = searchOptions.caseSensitive
+      ? searchQuery
+      : searchQuery.toLowerCase();
+    const queryWords = query.split(/\s+/).filter((word) => word.length > 0);
+
+    const results = items.map((item) => {
+      let score = 0;
+      const highlights = {};
+
+      searchFields.forEach((field) => {
+        const fieldValue = searchOptions.caseSensitive
+          ? String(item[field] || "")
+          : String(item[field] || "").toLowerCase();
+
+        queryWords.forEach((word) => {
+          if (searchOptions.exactMatch) {
+            if (fieldValue.includes(word)) {
+              score += word.length * 2; // Exact matches get higher score
+              if (searchOptions.includeHighlighting) {
+                highlights[field] = highlightText(
+                  String(item[field] || ""),
+                  word,
+                  searchOptions.caseSensitive
+                );
+              }
+            }
+          } else {
+            // Fuzzy matching
+            const fuzzyScore = calculateFuzzyScore(fieldValue, word);
+            if (fuzzyScore > 0.3) {
+              // Threshold for fuzzy match
+              score += fuzzyScore * word.length;
+              if (searchOptions.includeHighlighting) {
+                highlights[field] = highlightText(
+                  String(item[field] || ""),
+                  word,
+                  searchOptions.caseSensitive
+                );
+              }
+            }
+          }
+        });
+      });
+
+      return { ...item, score, highlights };
+    });
+
+    // Sort by relevance score and filter out low-scoring results
+    return results
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score);
+  }, [items, searchQuery, searchOptions, searchFields]);
+
+  const highlightText = (text, query, caseSensitive) => {
+    if (!query || !text) return text;
+
+    const flags = caseSensitive ? "g" : "gi";
+    const regex = new RegExp(`(${escapeRegExp(query)})`, flags);
+
+    return text.replace(regex, "<mark>$1</mark>");
+  };
+
+  const escapeRegExp = (string) => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  };
+
+  const calculateFuzzyScore = (text, query) => {
+    // Simple fuzzy matching algorithm
+    let score = 0;
+    let queryIndex = 0;
+
+    for (let i = 0; i < text.length && queryIndex < query.length; i++) {
+      if (text[i] === query[queryIndex]) {
+        score++;
+        queryIndex++;
+      }
+    }
+
+    return queryIndex === query.length
+      ? score / query.length
+      : score / text.length;
+  };
+
+  // Memoized search statistics
+  const searchStats = useMemo(() => {
+    const totalResults = searchResults.length;
+    const hasHighScoreResults = searchResults.filter(
+      (item) => item.score > 10
+    ).length;
+    const averageScore =
+      totalResults > 0
+        ? searchResults.reduce((sum, item) => sum + item.score, 0) /
+          totalResults
+        : 0;
+
+    return {
+      totalResults,
+      hasHighScoreResults,
+      averageScore: averageScore.toFixed(2),
+      searchTime: Date.now(), // In real app, you'd measure actual search time
+    };
+  }, [searchResults]);
+
+  return (
+    <div className="smart-search">
+      <div className="search-controls">
+        <input
+          type="text"
+          placeholder="Search items..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="search-input"
+        />
+
+        <div className="search-options">
+          <label>
+            <input
+              type="checkbox"
+              checked={searchOptions.caseSensitive}
+              onChange={(e) =>
+                setSearchOptions((prev) => ({
+                  ...prev,
+                  caseSensitive: e.target.checked,
+                }))
+              }
+            />
+            Case Sensitive
+          </label>
+
+          <label>
+            <input
+              type="checkbox"
+              checked={searchOptions.exactMatch}
+              onChange={(e) =>
+                setSearchOptions((prev) => ({
+                  ...prev,
+                  exactMatch: e.target.checked,
+                }))
+              }
+            />
+            Exact Match
+          </label>
+
+          <label>
+            <input
+              type="checkbox"
+              checked={searchOptions.includeHighlighting}
+              onChange={(e) =>
+                setSearchOptions((prev) => ({
+                  ...prev,
+                  includeHighlighting: e.target.checked,
+                }))
+              }
+            />
+            Highlight Results
+          </label>
+        </div>
+      </div>
+
+      <div className="search-stats">
+        <span>Found {searchStats.totalResults} results</span>
+        <span>High relevance: {searchStats.hasHighScoreResults}</span>
+        <span>Avg score: {searchStats.averageScore}</span>
+      </div>
+
+      <div className="search-results">
+        {searchResults.map((item, index) => (
+          <div key={item.id || index} className="result-item">
+            <div className="result-header">
+              <h3
+                dangerouslySetInnerHTML={{
+                  __html: item.highlights.title || item.title,
+                }}
+              />
+              <span className="score">Score: {item.score.toFixed(1)}</span>
+            </div>
+            <p
+              dangerouslySetInnerHTML={{
+                __html: item.highlights.description || item.description,
+              }}
+            />
+            {item.tags && (
+              <div className="tags">
+                {item.tags.map((tag, tagIndex) => (
+                  <span
+                    key={tagIndex}
+                    className="tag"
+                    dangerouslySetInnerHTML={{
+                      __html: item.highlights.tags || tag,
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
-export default ParentComponent;
+```
+
+<BackToTop />
+
+### Complex Form Validation and Derived State
+
+```javascript
+import React, { useMemo, useState } from "react";
+
+const AdvancedFormValidator = () => {
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    age: "",
+    interests: [],
+    agreedToTerms: false,
+    newsletter: false,
+  });
+
+  // Complex validation logic with multiple rules
+  const validationResults = useMemo(() => {
+    console.log("Running validation..."); // Should only log when formData changes
+
+    const errors = {};
+    const warnings = {};
+    const suggestions = {};
+
+    // Username validation
+    if (formData.username.length < 3) {
+      errors.username = "Username must be at least 3 characters";
+    } else if (formData.username.length < 6) {
+      warnings.username =
+        "Username should be at least 6 characters for better security";
+    }
+
+    if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      errors.username =
+        "Username can only contain letters, numbers, and underscores";
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      errors.email = "Please enter a valid email address";
+    } else {
+      const commonDomains = [
+        "gmail.com",
+        "yahoo.com",
+        "hotmail.com",
+        "outlook.com",
+      ];
+      const domain = formData.email.split("@")[1];
+      if (!commonDomains.includes(domain)) {
+        suggestions.email =
+          "Consider using a more common email provider for better deliverability";
+      }
+    }
+
+    // Password validation
+    const passwordRules = {
+      minLength: formData.password.length >= 8,
+      hasUppercase: /[A-Z]/.test(formData.password),
+      hasLowercase: /[a-z]/.test(formData.password),
+      hasNumber: /\d/.test(formData.password),
+      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(formData.password),
+    };
+
+    const failedRules = Object.entries(passwordRules)
+      .filter(([rule, passed]) => !passed)
+      .map(([rule]) => rule);
+
+    if (failedRules.length > 0) {
+      const ruleMessages = {
+        minLength: "at least 8 characters",
+        hasUppercase: "an uppercase letter",
+        hasLowercase: "a lowercase letter",
+        hasNumber: "a number",
+        hasSpecialChar: "a special character",
+      };
+      errors.password = `Password must contain: ${failedRules.map((rule) => ruleMessages[rule]).join(", ")}`;
+    }
+
+    // Password confirmation
+    if (
+      formData.password !== formData.confirmPassword &&
+      formData.confirmPassword
+    ) {
+      errors.confirmPassword = "Passwords do not match";
+    }
+
+    // Age validation
+    const age = parseInt(formData.age);
+    if (isNaN(age) || age < 13) {
+      errors.age = "You must be at least 13 years old";
+    } else if (age < 18) {
+      warnings.age = "Users under 18 have limited features";
+    }
+
+    // Interests validation
+    if (formData.interests.length === 0) {
+      warnings.interests =
+        "Selecting interests helps us personalize your experience";
+    } else if (formData.interests.length > 10) {
+      warnings.interests =
+        "Too many interests selected. Consider focusing on your top preferences";
+    }
+
+    // Terms validation
+    if (!formData.agreedToTerms) {
+      errors.agreedToTerms = "You must agree to the terms and conditions";
+    }
+
+    // Calculate overall form strength
+    const totalFields = Object.keys(formData).length;
+    const validFields = Object.keys(formData).filter(
+      (field) => !errors[field]
+    ).length;
+    const completedFields = Object.entries(formData).filter(([key, value]) => {
+      if (typeof value === "boolean") return true;
+      if (Array.isArray(value)) return value.length > 0;
+      return value && value.toString().trim() !== "";
+    }).length;
+
+    const strength = {
+      validity: (validFields / totalFields) * 100,
+      completion: (completedFields / totalFields) * 100,
+      security: Object.values(passwordRules).filter(Boolean).length * 20,
+    };
+
+    return {
+      errors,
+      warnings,
+      suggestions,
+      passwordRules,
+      isValid: Object.keys(errors).length === 0,
+      strength,
+      fieldCount: {
+        total: totalFields,
+        valid: validFields,
+        completed: completedFields,
+        withErrors: Object.keys(errors).length,
+        withWarnings: Object.keys(warnings).length,
+      },
+    };
+  }, [formData]);
+
+  // Memoized form suggestions based on current state
+  const intelligentSuggestions = useMemo(() => {
+    const suggestions = [];
+
+    if (formData.username && formData.email) {
+      const emailLocalPart = formData.email.split("@")[0];
+      if (formData.username.toLowerCase() === emailLocalPart.toLowerCase()) {
+        suggestions.push({
+          type: "security",
+          message:
+            "Consider using a different username than your email for better privacy",
+        });
+      }
+    }
+
+    if (formData.age && parseInt(formData.age) >= 65) {
+      suggestions.push({
+        type: "accessibility",
+        message:
+          "Would you like to enable accessibility features for better usability?",
+      });
+    }
+
+    if (formData.interests.length > 0) {
+      const techInterests = formData.interests.filter((interest) =>
+        ["programming", "technology", "computers"].includes(
+          interest.toLowerCase()
+        )
+      );
+      if (techInterests.length > 0) {
+        suggestions.push({
+          type: "feature",
+          message:
+            "You might enjoy our developer newsletter and coding challenges",
+        });
+      }
+    }
+
+    return suggestions;
+  }, [formData]);
+
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleInterestToggle = (interest) => {
+    setFormData((prev) => ({
+      ...prev,
+      interests: prev.interests.includes(interest)
+        ? prev.interests.filter((i) => i !== interest)
+        : [...prev.interests, interest],
+    }));
+  };
+
+  const availableInterests = [
+    "Programming",
+    "Music",
+    "Sports",
+    "Reading",
+    "Gaming",
+    "Cooking",
+    "Travel",
+    "Photography",
+    "Art",
+    "Technology",
+  ];
+
+  return (
+    <div className="advanced-form">
+      <div className="form-header">
+        <h2>Create Account</h2>
+        <div className="form-strength">
+          <div className="strength-bar">
+            <div
+              className="strength-fill"
+              style={{ width: `${validationResults.strength.completion}%` }}
+            />
+          </div>
+          <span>
+            Form Completion: {validationResults.strength.completion.toFixed(0)}%
+          </span>
+        </div>
+      </div>
+
+      <div className="form-body">
+        <div className="form-group">
+          <label>Username</label>
+          <input
+            type="text"
+            value={formData.username}
+            onChange={(e) => handleInputChange("username", e.target.value)}
+            className={validationResults.errors.username ? "error" : ""}
+          />
+          {validationResults.errors.username && (
+            <span className="error">{validationResults.errors.username}</span>
+          )}
+          {validationResults.warnings.username && (
+            <span className="warning">
+              {validationResults.warnings.username}
+            </span>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label>Email</label>
+          <input
+            type="email"
+            value={formData.email}
+            onChange={(e) => handleInputChange("email", e.target.value)}
+            className={validationResults.errors.email ? "error" : ""}
+          />
+          {validationResults.errors.email && (
+            <span className="error">{validationResults.errors.email}</span>
+          )}
+          {validationResults.suggestions.email && (
+            <span className="suggestion">
+              {validationResults.suggestions.email}
+            </span>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label>Password</label>
+          <input
+            type="password"
+            value={formData.password}
+            onChange={(e) => handleInputChange("password", e.target.value)}
+            className={validationResults.errors.password ? "error" : ""}
+          />
+          {validationResults.errors.password && (
+            <span className="error">{validationResults.errors.password}</span>
+          )}
+
+          <div className="password-strength">
+            {Object.entries(validationResults.passwordRules).map(
+              ([rule, passed]) => (
+                <span
+                  key={rule}
+                  className={`rule ${passed ? "passed" : "failed"}`}
+                >
+                  {passed ? "✓" : "✗"}{" "}
+                  {rule.replace(/([A-Z])/g, " $1").toLowerCase()}
+                </span>
+              )
+            )}
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label>Interests</label>
+          <div className="interests-grid">
+            {availableInterests.map((interest) => (
+              <label key={interest} className="interest-item">
+                <input
+                  type="checkbox"
+                  checked={formData.interests.includes(interest)}
+                  onChange={() => handleInterestToggle(interest)}
+                />
+                {interest}
+              </label>
+            ))}
+          </div>
+          {validationResults.warnings.interests && (
+            <span className="warning">
+              {validationResults.warnings.interests}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="form-summary">
+        <h3>Form Summary</h3>
+        <div className="summary-stats">
+          <span>
+            Valid Fields: {validationResults.fieldCount.valid}/
+            {validationResults.fieldCount.total}
+          </span>
+          <span>Errors: {validationResults.fieldCount.withErrors}</span>
+          <span>Warnings: {validationResults.fieldCount.withWarnings}</span>
+        </div>
+
+        {intelligentSuggestions.length > 0 && (
+          <div className="intelligent-suggestions">
+            <h4>Suggestions</h4>
+            {intelligentSuggestions.map((suggestion, index) => (
+              <div key={index} className={`suggestion ${suggestion.type}`}>
+                {suggestion.message}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <button
+        type="submit"
+        disabled={!validationResults.isValid}
+        className={validationResults.isValid ? "enabled" : "disabled"}
+      >
+        Create Account
+      </button>
+    </div>
+  );
+};
+```
+
+<BackToTop />
+
+### Performance-Optimized Data Visualization
+
+```javascript
+import React, { useMemo, useState } from "react";
+
+const DataVisualizationDashboard = ({ rawMetrics, timeRange = "24h" }) => {
+  const [visualizationSettings, setVisualizationSettings] = useState({
+    chartType: "line",
+    aggregation: "hourly",
+    showTrends: true,
+    showAnomalies: true,
+    smoothing: 0.3,
+  });
+
+  // Expensive data processing for visualization
+  const processedChartData = useMemo(() => {
+    console.log("Processing chart data..."); // Should only log when dependencies change
+
+    if (!rawMetrics || rawMetrics.length === 0) {
+      return { datasets: [], statistics: {}, anomalies: [] };
+    }
+
+    // Filter data by time range
+    const now = new Date();
+    const timeRangeMs = {
+      "1h": 60 * 60 * 1000,
+      "24h": 24 * 60 * 60 * 1000,
+      "7d": 7 * 24 * 60 * 60 * 1000,
+      "30d": 30 * 24 * 60 * 60 * 1000,
+    }[timeRange];
+
+    const cutoffTime = new Date(now.getTime() - timeRangeMs);
+    const filteredData = rawMetrics.filter(
+      (metric) => new Date(metric.timestamp) >= cutoffTime
+    );
+
+    // Aggregate data based on settings
+    const aggregatedData = aggregateDataByInterval(
+      filteredData,
+      visualizationSettings.aggregation
+    );
+
+    // Apply smoothing if enabled
+    const smoothedData =
+      visualizationSettings.smoothing > 0
+        ? applySmoothingAlgorithm(
+            aggregatedData,
+            visualizationSettings.smoothing
+          )
+        : aggregatedData;
+
+    // Calculate statistics
+    const statistics = calculateStatistics(smoothedData);
+
+    // Detect anomalies
+    const anomalies = visualizationSettings.showAnomalies
+      ? detectAnomalies(smoothedData, statistics)
+      : [];
+
+    // Calculate trends
+    const trends = visualizationSettings.showTrends
+      ? calculateTrends(smoothedData)
+      : {};
+
+    // Format for chart library
+    const datasets = formatForChart(
+      smoothedData,
+      visualizationSettings.chartType
+    );
+
+    return {
+      datasets,
+      statistics,
+      anomalies,
+      trends,
+      dataPoints: smoothedData.length,
+      timeSpan: {
+        start: filteredData[0]?.timestamp,
+        end: filteredData[filteredData.length - 1]?.timestamp,
+      },
+    };
+  }, [rawMetrics, timeRange, visualizationSettings]);
+
+  // Memoized performance metrics
+  const performanceMetrics = useMemo(() => {
+    const dataSize = rawMetrics?.length || 0;
+    const processedSize = processedChartData.dataPoints;
+    const compressionRatio =
+      dataSize > 0 ? (processedSize / dataSize) * 100 : 0;
+
+    const renderingComplexity = calculateRenderingComplexity(
+      processedChartData.datasets,
+      visualizationSettings
+    );
+
+    return {
+      originalDataPoints: dataSize,
+      processedDataPoints: processedSize,
+      compressionRatio: compressionRatio.toFixed(1),
+      renderingComplexity: renderingComplexity.toFixed(2),
+      anomaliesDetected: processedChartData.anomalies?.length || 0,
+      estimatedRenderTime: estimateRenderTime(renderingComplexity),
+    };
+  }, [rawMetrics, processedChartData, visualizationSettings]);
+
+  // Helper functions (simplified implementations)
+  const aggregateDataByInterval = (data, interval) => {
+    const intervalMs = {
+      minute: 60 * 1000,
+      hourly: 60 * 60 * 1000,
+      daily: 24 * 60 * 60 * 1000,
+    }[interval];
+
+    const grouped = data.reduce((acc, point) => {
+      const intervalKey =
+        Math.floor(new Date(point.timestamp).getTime() / intervalMs) *
+        intervalMs;
+      if (!acc[intervalKey]) acc[intervalKey] = [];
+      acc[intervalKey].push(point);
+      return acc;
+    }, {});
+
+    return Object.entries(grouped).map(([timestamp, points]) => ({
+      timestamp: new Date(parseInt(timestamp)),
+      value: points.reduce((sum, p) => sum + p.value, 0) / points.length,
+      count: points.length,
+      min: Math.min(...points.map((p) => p.value)),
+      max: Math.max(...points.map((p) => p.value)),
+    }));
+  };
+
+  const applySmoothingAlgorithm = (data, factor) => {
+    if (data.length < 2) return data;
+
+    const smoothed = [data[0]]; // Keep first point
+
+    for (let i = 1; i < data.length; i++) {
+      const smoothedValue =
+        data[i].value * factor + smoothed[i - 1].value * (1 - factor);
+      smoothed.push({
+        ...data[i],
+        value: smoothedValue,
+        originalValue: data[i].value,
+      });
+    }
+
+    return smoothed;
+  };
+
+  const calculateStatistics = (data) => {
+    if (data.length === 0) return {};
+
+    const values = data.map((d) => d.value);
+    const sum = values.reduce((a, b) => a + b, 0);
+    const mean = sum / values.length;
+    const sortedValues = [...values].sort((a, b) => a - b);
+
+    return {
+      mean: mean.toFixed(2),
+      median: sortedValues[Math.floor(sortedValues.length / 2)].toFixed(2),
+      min: Math.min(...values).toFixed(2),
+      max: Math.max(...values).toFixed(2),
+      standardDeviation: Math.sqrt(
+        values.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) /
+          values.length
+      ).toFixed(2),
+      variance: (
+        values.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) /
+        values.length
+      ).toFixed(2),
+    };
+  };
+
+  const detectAnomalies = (data, stats) => {
+    const threshold = parseFloat(stats.standardDeviation) * 2; // 2 sigma rule
+    const mean = parseFloat(stats.mean);
+
+    return data
+      .filter((point) => Math.abs(point.value - mean) > threshold)
+      .map((point) => ({
+        ...point,
+        severity:
+          Math.abs(point.value - mean) / threshold > 1.5 ? "high" : "medium",
+      }));
+  };
+
+  const calculateTrends = (data) => {
+    if (data.length < 2) return {};
+
+    const values = data.map((d) => d.value);
+    const n = values.length;
+    const sumX = (n * (n - 1)) / 2;
+    const sumY = values.reduce((a, b) => a + b, 0);
+    const sumXY = values.reduce((sum, y, x) => sum + x * y, 0);
+    const sumXX = (n * (n - 1) * (2 * n - 1)) / 6;
+
+    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+    const direction =
+      slope > 0 ? "increasing" : slope < 0 ? "decreasing" : "stable";
+
+    return {
+      slope: slope.toFixed(4),
+      direction,
+      strength:
+        Math.abs(slope) > 0.1
+          ? "strong"
+          : Math.abs(slope) > 0.01
+            ? "moderate"
+            : "weak",
+    };
+  };
+
+  const formatForChart = (data, chartType) => {
+    // Simplified chart data formatting
+    return [
+      {
+        label: "Metrics",
+        data: data.map((d) => ({ x: d.timestamp, y: d.value })),
+        type: chartType,
+      },
+    ];
+  };
+
+  const calculateRenderingComplexity = (datasets, settings) => {
+    const dataPoints = datasets.reduce(
+      (sum, dataset) => sum + dataset.data.length,
+      0
+    );
+    const complexityFactors = {
+      line: 1,
+      bar: 1.2,
+      scatter: 0.8,
+      area: 1.5,
+    };
+
+    return dataPoints * (complexityFactors[settings.chartType] || 1);
+  };
+
+  const estimateRenderTime = (complexity) => {
+    return complexity < 1000 ? "Fast" : complexity < 5000 ? "Medium" : "Slow";
+  };
+
+  return (
+    <div className="visualization-dashboard">
+      <div className="dashboard-header">
+        <h2>Data Visualization Dashboard</h2>
+        <div className="performance-indicator">
+          Rendering: {performanceMetrics.estimatedRenderTime}(
+          {performanceMetrics.processedDataPoints} points)
+        </div>
+      </div>
+
+      <div className="visualization-controls">
+        <select
+          value={visualizationSettings.chartType}
+          onChange={(e) =>
+            setVisualizationSettings((prev) => ({
+              ...prev,
+              chartType: e.target.value,
+            }))
+          }
+        >
+          <option value="line">Line Chart</option>
+          <option value="bar">Bar Chart</option>
+          <option value="scatter">Scatter Plot</option>
+          <option value="area">Area Chart</option>
+        </select>
+
+        <select
+          value={visualizationSettings.aggregation}
+          onChange={(e) =>
+            setVisualizationSettings((prev) => ({
+              ...prev,
+              aggregation: e.target.value,
+            }))
+          }
+        >
+          <option value="minute">Per Minute</option>
+          <option value="hourly">Hourly</option>
+          <option value="daily">Daily</option>
+        </select>
+
+        <label>
+          <input
+            type="checkbox"
+            checked={visualizationSettings.showTrends}
+            onChange={(e) =>
+              setVisualizationSettings((prev) => ({
+                ...prev,
+                showTrends: e.target.checked,
+              }))
+            }
+          />
+          Show Trends
+        </label>
+
+        <label>
+          <input
+            type="checkbox"
+            checked={visualizationSettings.showAnomalies}
+            onChange={(e) =>
+              setVisualizationSettings((prev) => ({
+                ...prev,
+                showAnomalies: e.target.checked,
+              }))
+            }
+          />
+          Detect Anomalies
+        </label>
+
+        <label>
+          Smoothing:
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            value={visualizationSettings.smoothing}
+            onChange={(e) =>
+              setVisualizationSettings((prev) => ({
+                ...prev,
+                smoothing: parseFloat(e.target.value),
+              }))
+            }
+          />
+          {visualizationSettings.smoothing}
+        </label>
+      </div>
+
+      <div className="stats-grid">
+        <div className="stat-card">
+          <h3>Statistics</h3>
+          <div>Mean: {processedChartData.statistics.mean}</div>
+          <div>Median: {processedChartData.statistics.median}</div>
+          <div>Std Dev: {processedChartData.statistics.standardDeviation}</div>
+        </div>
+
+        <div className="stat-card">
+          <h3>Trends</h3>
+          <div>Direction: {processedChartData.trends.direction}</div>
+          <div>Strength: {processedChartData.trends.strength}</div>
+          <div>Slope: {processedChartData.trends.slope}</div>
+        </div>
+
+        <div className="stat-card">
+          <h3>Performance</h3>
+          <div>Data Points: {performanceMetrics.processedDataPoints}</div>
+          <div>Compression: {performanceMetrics.compressionRatio}%</div>
+          <div>Anomalies: {performanceMetrics.anomaliesDetected}</div>
+        </div>
+      </div>
+
+      {processedChartData.anomalies.length > 0 && (
+        <div className="anomalies-panel">
+          <h3>Detected Anomalies</h3>
+          {processedChartData.anomalies.slice(0, 5).map((anomaly, index) => (
+            <div key={index} className={`anomaly ${anomaly.severity}`}>
+              <span>{new Date(anomaly.timestamp).toLocaleString()}</span>
+              <span>Value: {anomaly.value.toFixed(2)}</span>
+              <span>Severity: {anomaly.severity}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="chart-container">
+        {/* This would be your actual chart component */}
+        <div className="chart-placeholder">
+          Chart would render here with {processedChartData.datasets.length}{" "}
+          dataset(s) and {processedChartData.dataPoints} data points
+        </div>
+      </div>
+    </div>
+  );
+};
 ```
 
 <BackToTop />

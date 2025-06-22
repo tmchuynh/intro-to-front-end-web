@@ -1,0 +1,1694 @@
+import BackToTop from "@/components/BackToTop";
+
+# View Transition
+
+## Table of Contents
+
+## Overview
+
+View Transition in React refers to the smooth animated changes between different states of components, pages, or UI elements. This encompasses everything from simple CSS transitions to complex orchestrated animations that enhance user experience by providing visual continuity and feedback during state changes.
+
+Modern React applications can implement view transitions through various approaches: CSS transitions, JavaScript animation libraries like Framer Motion, React Transition Group, or the new native View Transitions API. These transitions make applications feel more responsive, professional, and engaging.
+
+### Core Concepts
+
+- **Transition**: A smooth change from one visual state to another over time
+- **State Change**: The triggering event that initiates the transition (data updates, route changes, etc.)
+- **Animation**: The visual effect applied during the transition (movement, scaling, opacity changes)
+- **Timing**: Duration, delay, and easing functions that control the transition's behavior
+- **Easing**: Mathematical functions that define how animations accelerate and decelerate
+- **Keyframes**: Specific points in time during the animation that define intermediate states
+- **Lifecycle**: The sequence of events from animation start to completion
+- **Performance**: Optimization strategies to ensure smooth 60fps animations
+
+### Why View Transitions Matter
+
+- **User Experience**: Smooth transitions feel more natural than abrupt changes
+- **Visual Continuity**: Help users understand relationships between different states
+- **Perceived Performance**: Well-timed animations can make apps feel faster
+- **Professional Polish**: High-quality transitions distinguish professional applications
+- **Accessibility**: When done correctly, can help users with cognitive disabilities
+- **Engagement**: Delightful animations keep users interested and engaged
+  <BackToTop />
+
+## When to Use View Transitions
+
+View Transitions are most effective in these scenarios:
+
+### Navigation and Routing
+
+- Page transitions between different routes
+- Tab switching and panel changes
+- Modal and overlay appearances
+- Menu animations and dropdowns
+
+### State Changes
+
+- Loading states and progress indicators
+- Form validation feedback
+- Success and error notifications
+- Data updates and real-time changes
+
+### Layout Changes
+
+- Responsive layout adaptations
+- Content expansion and collapse
+- Sidebar and drawer animations
+- Grid and list reorganization
+
+### User Interactions
+
+- Button hover and click effects
+- Drag and drop operations
+- Scroll-triggered animations
+- Interactive element feedback
+
+### Content Updates
+
+- List item additions and removals
+- Content filtering and sorting
+- Image galleries and carousels
+- Search result updates
+  <BackToTop />
+
+## Basic View Transition Implementation
+
+### Simple CSS Transition Component
+
+```javascript
+import React, { useState } from "react";
+import "./Transition.css";
+
+function BasicTransition() {
+  const [isVisible, setIsVisible] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const handleToggle = () => {
+    setIsVisible(!isVisible);
+  };
+
+  const handleMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setPosition({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
+  return (
+    <div className="transition-container">
+      <div className="controls">
+        <button onClick={handleToggle} className="toggle-btn">
+          {isVisible ? "Hide" : "Show"} Element
+        </button>
+      </div>
+
+      <div className="interactive-area" onMouseMove={handleMove}>
+        <div
+          className={`transition-element ${isVisible ? "visible" : "hidden"}`}
+          style={{
+            transform: `translate(${position.x}px, ${position.y}px)`,
+          }}
+        >
+          <div className="element-content">
+            <h3>Transitioning Element</h3>
+            <p>This element smoothly transitions between states</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default BasicTransition;
+```
+
+<BackToTop />
+
+### CSS for Basic Transitions
+
+```css
+/* Transition.css */
+.transition-container {
+  padding: 2rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.controls {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.toggle-btn {
+  padding: 0.75rem 5rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.interactive-area {
+  height: 300px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+.transition-element {
+  position: absolute;
+  width: 200px;
+  height: 120px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+  /* Transition properties */
+  transition:
+    opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.transition-element.visible {
+  opacity: 1;
+  transform: scale(1);
+  visibility: visible;
+}
+
+.transition-element.hidden {
+  opacity: 0;
+  transform: scale(0.8);
+  visibility: hidden;
+}
+
+.element-content h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.element-content p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+```
+
+<BackToTop />
+
+## React Transition Group
+
+React Transition Group is a powerful library for managing component transitions:
+
+```javascript
+import React, { useState } from "react";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
+import "./TransitionGroup.css";
+
+function TransitionGroupExample() {
+  const [items, setItems] = useState([
+    { id: 1, text: "First item", color: "#ff6b6b" },
+    { id: 2, text: "Second item", color: "#4ecdc4" },
+    { id: 3, text: "Third item", color: "#45b7d1" },
+  ]);
+  const [nextId, setNextId] = useState(4);
+
+  const addItem = () => {
+    const colors = ["#96ceb4", "#ffeaa7", "#dda0dd", "#98d8c8"];
+    const newItem = {
+      id: nextId,
+      text: `Item ${nextId}`,
+      color: colors[Math.floor(Math.random() * colors.length)],
+    };
+    setItems([...items, newItem]);
+    setNextId(nextId + 1);
+  };
+
+  const removeItem = (id) => {
+    setItems(items.filter((item) => item.id !== id));
+  };
+
+  const shuffleItems = () => {
+    const shuffled = [...items].sort(() => Math.random() - 0.5);
+    setItems(shuffled);
+  };
+
+  return (
+    <div className="transition-group-container">
+      <div className="controls">
+        <button onClick={addItem} className="control-btn add">
+          Add Item
+        </button>
+        <button onClick={shuffleItems} className="control-btn shuffle">
+          Shuffle
+        </button>
+        <button
+          onClick={() => setItems([])}
+          className="control-btn clear"
+          disabled={items.length === 0}
+        >
+          Clear All
+        </button>
+      </div>
+
+      <TransitionGroup className="item-list">
+        {items.map((item) => (
+          <CSSTransition
+            key={item.id}
+            timeout={300}
+            classNames="item"
+            unmountOnExit
+          >
+            <div className="list-item" style={{ backgroundColor: item.color }}>
+              <span className="item-text">{item.text}</span>
+              <button
+                onClick={() => removeItem(item.id)}
+                className="remove-btn"
+                aria-label={`Remove ${item.text}`}
+              >
+                ×
+              </button>
+            </div>
+          </CSSTransition>
+        ))}
+      </TransitionGroup>
+
+      {items.length === 0 && (
+        <div className="empty-state">
+          <span className="empty-icon">📝</span>
+          <p>No items yet</p>
+          <small>Click "Add Item" to get started</small>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default TransitionGroupExample;
+```
+
+<BackToTop />
+
+### CSS for Transition Group
+
+```css
+/* TransitionGroup.css */
+.transition-group-container {
+  padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.control-btn {
+  padding: 0.75rem 5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.control-btn.add {
+  background: #28a745;
+  color: white;
+}
+
+.control-btn.add:hover:not(:disabled) {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.control-btn.shuffle {
+  background: #17a2b8;
+  color: white;
+}
+
+.control-btn.shuffle:hover:not(:disabled) {
+  background: #138496;
+  transform: translateY(-1px);
+}
+
+.control-btn.clear {
+  background: #dc3545;
+  color: white;
+}
+
+.control-btn.clear:hover:not(:disabled) {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+.item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 5rem;
+  border-radius: 8px;
+  color: white;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.item-text {
+  flex: 1;
+}
+
+.remove-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.remove-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Transition animations */
+.item-enter {
+  opacity: 0;
+  transform: translateX(-100%) scale(0.8);
+}
+
+.item-enter-active {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  transition: all 300ms cubic-bezier(0.175, 0.885, 0.32, 275);
+}
+
+.item-exit {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+
+.item-exit-active {
+  opacity: 0;
+  transform: translateX(100%) scale(0.8);
+  transition: all 300ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #6c757d;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.empty-state p {
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-state small {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+```
+
+<BackToTop />
+
+## Framer Motion Integration
+
+Framer Motion provides powerful animation capabilities for React:
+
+```javascript
+import React, { useState } from "react";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
+
+function FramerMotionExample() {
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [cards, setCards] = useState([
+    {
+      id: 1,
+      title: "Card One",
+      content: "This is the first card with some content.",
+    },
+    {
+      id: 2,
+      title: "Card Two",
+      content: "This is the second card with different content.",
+    },
+    {
+      id: 3,
+      title: "Card Three",
+      content: "This is the third card with more content.",
+    },
+  ]);
+
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const rotateX = useTransform(mouseY, [-300, 300], [10, -10]);
+  const rotateY = useTransform(mouseX, [-300, 300], [-10, 10]);
+
+  const cardVariants = {
+    hidden: {
+      opacity: 0,
+      y: 50,
+      scale: 0.8,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        damping: 20,
+        stiffness: 300,
+      },
+    },
+    hover: {
+      scale: 05,
+      y: -10,
+      transition: {
+        type: "spring",
+        damping: 20,
+        stiffness: 300,
+      },
+    },
+    tap: {
+      scale: 0.95,
+    },
+  };
+
+  const modalVariants = {
+    hidden: {
+      opacity: 0,
+      scale: 0.8,
+      y: 100,
+    },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        damping: 25,
+        stiffness: 300,
+      },
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.8,
+      y: 100,
+      transition: {
+        duration: 0.2,
+      },
+    },
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    mouseX.set(e.clientX - centerX);
+    mouseY.set(e.clientY - centerY);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+  };
+
+  return (
+    <div className="framer-motion-container">
+      <motion.h2
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="section-title"
+      >
+        Framer Motion Cards
+      </motion.h2>
+
+      <motion.div
+        className="cards-grid"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {cards.map((card) => (
+          <motion.div
+            key={card.id}
+            className="motion-card"
+            variants={cardVariants}
+            whileHover="hover"
+            whileTap="tap"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            onClick={() => setSelectedCard(card)}
+            style={{
+              rotateX,
+              rotateY,
+              transformPerspective: 1000,
+            }}
+            layoutId={`card-${card.id}`}
+          >
+            <motion.h3 layoutId={`card-title-${card.id}`}>
+              {card.title}
+            </motion.h3>
+            <motion.p layoutId={`card-content-${card.id}`}>
+              {card.content}
+            </motion.p>
+            <motion.div className="card-action">
+              <span>Click to expand</span>
+            </motion.div>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      <AnimatePresence>
+        {selectedCard && (
+          <motion.div
+            className="modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSelectedCard(null)}
+          >
+            <motion.div
+              className="modal-content"
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              onClick={(e) => e.stopPropagation()}
+              layoutId={`card-${selectedCard.id}`}
+            >
+              <motion.button
+                className="close-button"
+                onClick={() => setSelectedCard(null)}
+                whileHover={{ scale: 1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                ×
+              </motion.button>
+
+              <motion.h3 layoutId={`card-title-${selectedCard.id}`}>
+                {selectedCard.title}
+              </motion.h3>
+
+              <motion.p layoutId={`card-content-${selectedCard.id}`}>
+                {selectedCard.content}
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="modal-extra-content"
+              >
+                <p>
+                  This is additional content that appears in the modal view.
+                </p>
+                <p>
+                  It demonstrates how you can add content that only appears in
+                  the expanded state.
+                </p>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+export default FramerMotionExample;
+```
+
+<BackToTop />
+
+## Page Transitions
+
+Implementing smooth transitions between different pages or views:
+
+```javascript
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+function PageTransitions() {
+  const [currentPage, setCurrentPage] = useState("home");
+
+  const pages = {
+    home: {
+      title: "Home Page",
+      content: (
+        <div className="page-content">
+          <h2>Welcome Home</h2>
+          <p>This is the home page with some introductory content.</p>
+          <div className="feature-grid">
+            <div className="feature-card">
+              <h3>🚀 Fast</h3>
+              <p>Lightning fast transitions</p>
+            </div>
+            <div className="feature-card">
+              <h3>✨ Smooth</h3>
+              <p>Buttery smooth animations</p>
+            </div>
+            <div className="feature-card">
+              <h3>🎨 Beautiful</h3>
+              <p>Visually appealing design</p>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    about: {
+      title: "About Page",
+      content: (
+        <div className="page-content">
+          <h2>About Us</h2>
+          <p>Learn more about our mission and values.</p>
+          <div className="about-section">
+            <div className="about-text">
+              <h3>Our Story</h3>
+              <p>
+                We started with a simple goal: to create amazing user
+                experiences through thoughtful design and smooth animations.
+              </p>
+              <h3>Our Mission</h3>
+              <p>To make the web more delightful, one transition at a time.</p>
+            </div>
+            <div className="about-image">
+              <div className="placeholder-image">📖</div>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    contact: {
+      title: "Contact Page",
+      content: (
+        <div className="page-content">
+          <h2>Contact Us</h2>
+          <p>Get in touch with our team.</p>
+          <div className="contact-form">
+            <div className="form-group">
+              <label>Name</label>
+              <input type="text" placeholder="Your name" />
+            </div>
+            <div className="form-group">
+              <label>Email</label>
+              <input type="email" placeholder="your@email.com" />
+            </div>
+            <div className="form-group">
+              <label>Message</label>
+              <textarea placeholder="Your message..." rows="4"></textarea>
+            </div>
+            <button className="submit-btn">Send Message</button>
+          </div>
+        </div>
+      ),
+    },
+  };
+
+  const pageVariants = {
+    initial: (direction) => ({
+      x: direction > 0 ? 300 : -300,
+      opacity: 0,
+      scale: 0.8,
+    }),
+    in: {
+      x: 0,
+      opacity: 1,
+      scale: 1,
+      transition: {
+        type: "spring",
+        damping: 20,
+        stiffness: 300,
+      },
+    },
+    out: (direction) => ({
+      x: direction < 0 ? 300 : -300,
+      opacity: 0,
+      scale: 0.8,
+      transition: {
+        type: "spring",
+        damping: 20,
+        stiffness: 300,
+      },
+    }),
+  };
+
+  const [direction, setDirection] = useState(0);
+
+  const navigateToPage = (page) => {
+    const pageOrder = ["home", "about", "contact"];
+    const currentIndex = pageOrder.indexOf(currentPage);
+    const nextIndex = pageOrder.indexOf(page);
+
+    setDirection(nextIndex > currentIndex ? 1 : -1);
+    setCurrentPage(page);
+  };
+
+  return (
+    <div className="page-transitions-container">
+      <nav className="page-nav">
+        {Object.keys(pages).map((pageKey) => (
+          <motion.button
+            key={pageKey}
+            className={`nav-button ${currentPage === pageKey ? "active" : ""}`}
+            onClick={() => navigateToPage(pageKey)}
+            whileHover={{ scale: 05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {pages[pageKey].title}
+          </motion.button>
+        ))}
+      </nav>
+
+      <div className="page-container">
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div
+            key={currentPage}
+            custom={direction}
+            variants={pageVariants}
+            initial="initial"
+            animate="in"
+            exit="out"
+            className="page"
+          >
+            {pages[currentPage].content}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <div className="page-indicator">
+        <div className="indicator-dots">
+          {Object.keys(pages).map((pageKey) => (
+            <motion.div
+              key={pageKey}
+              className={`dot ${currentPage === pageKey ? "active" : ""}`}
+              onClick={() => navigateToPage(pageKey)}
+              whileHover={{ scale: 2 }}
+              whileTap={{ scale: 0.8 }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default PageTransitions;
+```
+
+<BackToTop />
+
+## Route Transitions
+
+Implementing transitions for React Router navigation:
+
+```javascript
+import React from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+
+// Wrapper component for route animations
+function AnimatedRoute({ children }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 100 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -100 }}
+      transition={{
+        type: "spring",
+        damping: 20,
+        stiffness: 300,
+      }}
+      className="animated-route"
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// Page components
+function HomePage() {
+  return (
+    <AnimatedRoute>
+      <div className="route-page">
+        <h1>Home</h1>
+        <p>Welcome to the home page</p>
+      </div>
+    </AnimatedRoute>
+  );
+}
+
+function AboutPage() {
+  return (
+    <AnimatedRoute>
+      <div className="route-page">
+        <h1>About</h1>
+        <p>Learn about us</p>
+      </div>
+    </AnimatedRoute>
+  );
+}
+
+function ContactPage() {
+  return (
+    <AnimatedRoute>
+      <div className="route-page">
+        <h1>Contact</h1>
+        <p>Get in touch</p>
+      </div>
+    </AnimatedRoute>
+  );
+}
+
+// Main router component
+function RouteTransitions() {
+  const location = useLocation();
+
+  return (
+    <div className="route-transitions-container">
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+        </Routes>
+      </AnimatePresence>
+    </div>
+  );
+}
+
+export default RouteTransitions;
+```
+
+<BackToTop />
+
+## Advanced Patterns
+
+### Shared Element Transitions
+
+Creating smooth transitions between elements across different states:
+
+```javascript
+import React, { useState } from "react";
+import { motion, AnimateSharedLayout, AnimatePresence } from "framer-motion";
+
+function SharedElementTransitions() {
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  const items = [
+    {
+      id: 1,
+      title: "Mountain View",
+      image: "🏔️",
+      description: "Beautiful mountain landscape with snow-capped peaks.",
+    },
+    {
+      id: 2,
+      title: "Ocean Waves",
+      image: "🌊",
+      description: "Serene ocean view with gentle rolling waves.",
+    },
+    {
+      id: 3,
+      title: "Forest Path",
+      image: "🌲",
+      description: "Peaceful forest trail surrounded by tall trees.",
+    },
+    {
+      id: 4,
+      title: "Desert Sunset",
+      image: "🌅",
+      description: "Stunning sunset over vast desert dunes.",
+    },
+  ];
+
+  return (
+    <AnimateSharedLayout>
+      <div className="shared-element-container">
+        <motion.div className="items-grid" layout>
+          {items.map((item) => (
+            <motion.div
+              key={item.id}
+              className="grid-item"
+              layoutId={`item-${item.id}`}
+              onClick={() => setSelectedItem(item)}
+              whileHover={{ scale: 05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <motion.div className="item-image" layoutId={`image-${item.id}`}>
+                {item.image}
+              </motion.div>
+              <motion.h3 className="item-title" layoutId={`title-${item.id}`}>
+                {item.title}
+              </motion.h3>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <AnimatePresence>
+          {selectedItem && (
+            <motion.div
+              className="modal-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedItem(null)}
+            >
+              <motion.div
+                className="modal-card"
+                layoutId={`item-${selectedItem.id}`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <motion.div
+                  className="modal-image"
+                  layoutId={`image-${selectedItem.id}`}
+                >
+                  {selectedItem.image}
+                </motion.div>
+                <motion.h2
+                  className="modal-title"
+                  layoutId={`title-${selectedItem.id}`}
+                >
+                  {selectedItem.title}
+                </motion.h2>
+                <motion.p
+                  className="modal-description"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  {selectedItem.description}
+                </motion.p>
+                <motion.button
+                  className="close-modal"
+                  onClick={() => setSelectedItem(null)}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  whileHover={{ scale: 1 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  Close
+                </motion.button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </AnimateSharedLayout>
+  );
+}
+```
+
+<BackToTop />
+
+### Gesture-Based Transitions
+
+Implementing swipe and drag interactions:
+
+```javascript
+import React, { useState } from 'react';
+import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion';
+
+function GestureTransitions() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const cards = [
+    { id: 1, title: 'Card 1', color: '#ff6b6b', content: 'Swipe me left or right!' },
+    { id: 2, title: 'Card 2', color: '#4ecdc4', content: 'Drag to explore more cards' },
+    { id: 3, title: 'Card 3', color: '#45b7d1', content: 'Gesture-based navigation' },
+    { id: 4, title: 'Card 4', color: '#96ceb4', content: 'Smooth animations everywhere' },
+    { id: 5, title: 'Card 5', color: '#ffeaa7', content: 'Last card in the stack' }
+  ];
+
+  const x = useMotionValue(0);
+  const rotate = useTransform(x, [-200, 200], [-25, 25]);
+  const opacity = useTransform(x, [-200, -100, 0, 100, 200], [0, 1, 1, 1, 0]);
+
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    setIsDragging(false);
+
+    if (Math.abs(info.offset.x) > 100) {
+      // Swipe threshold reached
+      if (info.offset.x > 0) {
+        // Swiped right - go to previous
+        setCurrentIndex(Math.max(0, currentIndex - 1));
+      } else {
+        // Swiped left - go to next
+        setCurrentIndex(Math.min(cards.length - 1, currentIndex + 1));
+      }
+    }
+
+    // Reset position
+    x.set(0);
+  };
+
+  const nextCard = () => {
+    setCurrentIndex(Math.min(cards.length - 1, currentIndex + 1));
+  };
+
+  const prevCard = () => {
+    setCurrentIndex(Math.max(0, currentIndex - 1));
+  };
+
+  return (
+    <div className="gesture-transitions-container">
+      <div className="card-stack">
+        <motion.div
+          className="swipe-card"
+          style={{
+            x,
+            rotate,
+            opacity,
+            backgroundColor: cards[currentIndex].color
+          }}
+          drag="x"
+          dragConstraints={{ left: -200, right: 200 }}
+          dragElastic={0.2}
+          onDragStart={() => setIsDragging(true)}
+          onDragEnd={handleDragEnd}
+          whileDrag={{ scale: 05, cursor: 'grabbing' }}
+          animate={{
+            scale: isDragging ? 05 : 1,
+            transition: { type: 'spring', damping: 20, stiffness: 300 }
+          }}
+        >
+          <div className="card-content">
+            <h2>{cards[currentIndex].title}</h2>
+            <p>{cards[currentIndex].content}</p>
+            <div className="swipe-hint">
+              {isDragging ? '👆 Release to navigate' : '👈 Swipe or drag 👉'}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Background cards for stack effect */}
+        {currentIndex < cards.length - 1 && (
+          <div
+            className="background-card"
+            style={{
+              backgroundColor: cards[currentIndex + 1].color,
+              transform: 'scale(0.95) translateY(10px)',
+              opacity: 0.5
+            }}
+          />
+        )}
+
+        {currentIndex < cards.length - 2 && (
+          <div
+            className="background-card"
+            style={{
+              backgroundColor: cards[currentIndex + 2].color,
+              transform: 'scale(0.9) translateY(20px)',
+              opacity: 0.25
+            }}
+          />
+        )}
+      </div>
+
+      <div className="navigation-controls">
+        <motion.button
+          className="nav-btn prev"
+          onClick={prevCard}
+          disabled={currentIndex === 0}
+          whileHover={{ scale: 1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          ← Previous
+        </motion.button>
+
+        <div className="card-indicator">
+          {currentIndex + 1} / {cards.length}
+        </div>
+
+        <motion.button
+          className="nav-btn next"
+          onClick={nextCard}
+          disabled={currentIndex === cards.length - 1}
+          whileHover={{ scale: 1 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          Next →
+        </motion.button>
+      </div>
+
+      <div className="card-dots">
+        {cards.map((_, index) => (
+          <motion.div
+            key={index}
+            className={`dot ${index === currentIndex ? 'active' : ''}`}
+            onClick={() => setCurrentIndex(index)}
+            whileHover={{ scale: 2 }}
+            whileTap={{ scale: 0.8 }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+## Performance Considerations
+
+### Optimizing Animations for Performance
+
+```javascript
+import React, { useMemo, useCallback } from "react";
+import { motion, useSpring, useTransform, useMotionValue } from "framer-motion";
+
+function PerformantTransitions() {
+  // Use transform properties that don't trigger layout recalculation
+  const optimizedVariants = {
+    // ✅ Good - only affects composite layer
+    hidden: {
+      opacity: 0,
+      transform: "translateY(20px) scale(0.8)",
+    },
+    visible: {
+      opacity: 1,
+      transform: "translateY(0px) scale(1)",
+    },
+  };
+
+  // ❌ Avoid - triggers layout recalculation
+  const badVariants = {
+    hidden: { height: 0, width: 0 },
+    visible: { height: "auto", width: "auto" },
+  };
+
+  // Use useMotionValue for frequently changing values
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  // Transform values efficiently
+  const rotateX = useTransform(mouseY, [-100, 100], [10, -10]);
+  const rotateY = useTransform(mouseX, [-100, 100], [-10, 10]);
+
+  // Memoize expensive calculations
+  const expensiveStyle = useMemo(
+    () => ({
+      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
+    }),
+    []
+  );
+
+  // Use useCallback for event handlers
+  const handleMouseMove = useCallback(
+    (e) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      mouseX.set(e.clientX - centerX);
+      mouseY.set(e.clientY - centerY);
+    },
+    [mouseX, mouseY]
+  );
+
+  // Optimize spring animations
+  const optimizedSpring = useSpring(0, {
+    stiffness: 300,
+    damping: 30,
+    mass: 1,
+  });
+
+  return (
+    <div className="performant-transitions">
+      <h3>Performance Best Practices</h3>
+
+      {/* Optimized card with transform-only animations */}
+      <motion.div
+        className="performance-card"
+        style={{
+          ...expensiveStyle,
+          rotateX,
+          rotateY,
+          transformPerspective: 1000,
+        }}
+        onMouseMove={handleMouseMove}
+        variants={optimizedVariants}
+        initial="hidden"
+        animate="visible"
+        whileHover={{
+          scale: 05,
+          transition: { duration: 0.2 },
+        }}
+      >
+        <h4>Optimized Animations</h4>
+        <p>Using transform properties for smooth 60fps animations</p>
+        <ul className="performance-tips">
+          <li>✅ Use transform and opacity</li>
+          <li>✅ Avoid width/height animations</li>
+          <li>✅ Use will-change sparingly</li>
+          <li>✅ Memoize expensive calculations</li>
+        </ul>
+      </motion.div>
+
+      {/* GPU-accelerated animations */}
+      <motion.div
+        className="gpu-card"
+        animate={{
+          x: [0, 100, 0],
+          y: [0, -50, 0],
+          rotate: [0, 180, 360],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+        style={{
+          willChange: "transform", // Hint for GPU acceleration
+        }}
+      >
+        <span>🚀</span>
+        <p>GPU Accelerated</p>
+      </motion.div>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+### CSS Performance Tips
+
+```css
+/* Performance-optimized CSS */
+.performance-card {
+  /* Enable hardware acceleration */
+  transform: translateZ(0);
+  will-change: transform;
+
+  /* Use transform instead of changing layout properties */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Prefer transforms over layout-affecting properties */
+.optimized-hover:hover {
+  /* ✅ Good */
+  transform: translateY(-5px) scale(02);
+
+  /* ❌ Avoid */
+  /* margin-top: -5px; */
+  /* width: 102%; */
+}
+
+/* Use contain for isolated animations */
+.animation-container {
+  contain: layout style paint;
+}
+
+/* Optimize repaints with specific properties */
+.smooth-animation {
+  backface-visibility: hidden;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+}
+```
+
+## Best Practices
+
+### Animation Principles
+
+```javascript
+// Follow the 12 principles of animation adapted for UI
+
+const animationPrinciples = {
+  // Squash and Stretch
+  squashStretch: {
+    whileHover: { scaleY: 05, scaleX: 0.98 },
+    whileTap: { scaleY: 0.95, scaleX: 02 },
+  },
+
+  // Anticipation
+  anticipation: {
+    whileHover: { y: -2 },
+    whileTap: { y: 2, transition: { duration: 0.1 } },
+  },
+
+  // Ease In/Out
+  easing: {
+    transition: {
+      type: "spring",
+      damping: 20,
+      stiffness: 300,
+    },
+  },
+
+  // Follow Through
+  followThrough: {
+    exit: {
+      y: 20,
+      opacity: 0,
+      transition: { duration: 0.2, delay: 0.1 },
+    },
+  },
+};
+```
+
+<BackToTop />
+
+### Accessibility Considerations
+
+```javascript
+import React, { useReducedMotion } from "react";
+
+function AccessibleTransitions({ children }) {
+  const shouldReduceMotion = useReducedMotion();
+
+  const accessibleVariants = {
+    hidden: {
+      opacity: 0,
+      ...(shouldReduceMotion ? {} : { y: 20 }),
+    },
+    visible: {
+      opacity: 1,
+      ...(shouldReduceMotion ? {} : { y: 0 }),
+      transition: {
+        duration: shouldReduceMotion ? 0.1 : 0.6,
+      },
+    },
+  };
+
+  return (
+    <motion.div
+      variants={accessibleVariants}
+      initial="hidden"
+      animate="visible"
+      // Respect user's motion preferences
+      style={{
+        transition: shouldReduceMotion ? "opacity 0.1s" : undefined,
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+```
+
+### Testing Transitions
+
+```javascript
+// Testing utilities for transitions
+import { render, screen } from "@testing-library/react";
+import { act } from "react-dom/test-utils";
+
+describe("Transition Components", () => {
+  beforeEach(() => {
+    // Mock motion for testing
+    jest.mock("framer-motion", () => ({
+      motion: {
+        div: ({ children, ...props }) => <div {...props}>{children}</div>,
+      },
+      AnimatePresence: ({ children }) => children,
+    }));
+  });
+
+  test("should handle transition states correctly", async () => {
+    const { rerender } = render(<TransitionComponent isVisible={false} />);
+
+    expect(screen.queryByTestId("transition-element")).not.toBeInTheDocument();
+
+    rerender(<TransitionComponent isVisible={true} />);
+
+    await act(async () => {
+      // Wait for animation to complete
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    });
+
+    expect(screen.getByTestId("transition-element")).toBeInTheDocument();
+  });
+});
+```
+
+<BackToTop />
+
+## Common Pitfalls
+
+### Performance Issues
+
+```javascript
+// ❌ Common mistakes that hurt performance
+
+// Don't animate layout properties
+const badAnimation = {
+  width: ["100px", "200px"],
+  height: ["50px", "100px"],
+  marginTop: [0, 20],
+};
+
+// Don't use many simultaneous animations
+const tooManyAnimations = items.map((item) => (
+  <motion.div
+    key={item.id}
+    animate={{
+      rotate: [0, 360],
+      scale: [1, 2, 1],
+      x: [0, 100, 0],
+      y: [0, 50, 0],
+    }}
+    transition={{ repeat: Infinity }}
+  />
+));
+
+// ✅ Better approaches
+
+// Use transform properties
+const goodAnimation = {
+  scale: [1, 2],
+  opacity: [0, 1],
+  transform: "translateY(0px)",
+};
+
+// Limit concurrent animations
+const optimizedList = items.slice(0, 10).map((item) => (
+  <motion.div
+    key={item.id}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{
+      delay: item.index * 0.1,
+      duration: 0.3,
+    }}
+  />
+));
+```
+
+<BackToTop />
+
+### Accessibility Oversights
+
+```javascript
+// ❌ Common accessibility mistakes
+
+// Ignoring motion preferences
+const ignoringPreferences = (
+  <motion.div animate={{ x: [0, 100, 0] }} transition={{ repeat: Infinity }}>
+    Content
+  </motion.div>
+);
+
+// Missing focus management
+const noFocusManagement = (
+  <AnimatePresence>
+    {showModal && (
+      <motion.div className="modal">
+        {/* No focus trap or management */}
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
+
+// ✅ Accessible implementations
+
+// Respect motion preferences
+const respectfulAnimation = (
+  <motion.div
+    animate={useReducedMotion() ? {} : { x: [0, 100, 0] }}
+    transition={{
+      repeat: useReducedMotion() ? 0 : Infinity,
+      duration: useReducedMotion() ? 0.1 : 2,
+    }}
+  >
+    Content
+  </motion.div>
+);
+
+// Proper focus management
+const accessibleModal = (
+  <AnimatePresence>
+    {showModal && (
+      <FocusTrap>
+        <motion.div
+          className="modal"
+          role="dialog"
+          aria-labelledby="modal-title"
+          aria-describedby="modal-description"
+        >
+          {/* Modal content */}
+        </motion.div>
+      </FocusTrap>
+    )}
+  </AnimatePresence>
+);
+```
+
+<BackToTop />
+
+## Browser Support
+
+### Native View Transitions API
+
+```javascript
+// Check for native View Transitions API support
+function useViewTransitions() {
+  const [isSupported, setIsSupported] = useState(false);
+
+  useEffect(() => {
+    setIsSupported("startViewTransition" in document);
+  }, []);
+
+  const startTransition = useCallback(
+    (updateCallback) => {
+      if (isSupported && document.startViewTransition) {
+        document.startViewTransition(updateCallback);
+      } else {
+        // Fallback for unsupported browsers
+        updateCallback();
+      }
+    },
+    [isSupported]
+  );
+
+  return { isSupported, startTransition };
+}
+
+// Usage example
+function NativeViewTransition() {
+  const [currentView, setCurrentView] = useState("view1");
+  const { isSupported, startTransition } = useViewTransitions();
+
+  const switchView = () => {
+    startTransition(() => {
+      setCurrentView((current) => (current === "view1" ? "view2" : "view1"));
+    });
+  };
+
+  return (
+    <div className="native-transition-container">
+      <button onClick={switchView}>
+        Switch View {isSupported && "(Native)"}
+      </button>
+
+      <div
+        className={`view ${currentView}`}
+        style={{ viewTransitionName: "main-content" }}
+      >
+        {currentView === "view1" ? (
+          <div>View 1 Content</div>
+        ) : (
+          <div>View 2 Content</div>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+### Browser Support Matrix
+
+| Feature              | Chrome  | Firefox | Safari | Edge    |
+| -------------------- | ------- | ------- | ------ | ------- |
+| CSS Transitions      | ✅      | ✅      | ✅     | ✅      |
+| CSS Animations       | ✅      | ✅      | ✅     | ✅      |
+| View Transitions API | ✅ 111+ | ❌      | ❌     | ✅ 111+ |
+| Web Animations API   | ✅      | ✅      | ✅ 11+ | ✅      |
+| Framer Motion        | ✅      | ✅      | ✅     | ✅      |
+
+<BackToTop />
+
+## Conclusion
+
+View Transitions are a powerful tool for enhancing user experience in React applications. When implemented thoughtfully, they provide visual continuity, improve perceived performance, and create more engaging interfaces.
+
+### Key Takeaways
+
+- **Choose the right tool** - CSS transitions for simple effects, libraries like Framer Motion for complex animations
+- **Prioritize performance** - Use transform and opacity properties, avoid layout-triggering animations
+- **Respect accessibility** - Honor motion preferences and provide alternatives
+- **Test thoroughly** - Ensure transitions work across devices and browsers
+- **Keep it purposeful** - Every animation should serve a functional purpose
+- **Progressive enhancement** - Provide fallbacks for unsupported browsers
+
+Well-implemented view transitions can transform a good React application into a great one, providing the polish and sophistication that users expect from modern web applications.
+
+<BackToTop />

@@ -51,6 +51,7 @@ const CustomInput = forwardRef((props, ref) => {
 
 - `ref`: The ref object that will be passed to the parent component.
 - `createHandle`: A function that returns an object containing the methods or properties to be exposed to the parent component. This function receives the `ref` as an argument and should return an object with the methods or properties to be exposed.
+  <BackToTop />
 
 ## How It Works
 
@@ -77,84 +78,1156 @@ When the component is unmounted, the `useImperativeHandle` hook will clean up th
 
 ## Examples
 
-### Custom Input Component
+### Advanced Form Component with Validation
 
 ```javascript
-import React, { useImperativeHandle, forwardRef, useRef } from "react";
-const CustomInput = forwardRef((props, ref) => {
-  const inputRef = useRef(null);
-  useImperativeHandle(ref, () => ({
-    focus: () => {
-      inputRef.current.focus();
-    },
-    clear: () => {
-      inputRef.current.value = "";
-    },
-  }));
-  return <input ref={inputRef} {...props} />;
-});
-const ParentComponent = () => {
-  const inputRef = useRef(null);
+import React, {
+  useImperativeHandle,
+  forwardRef,
+  useRef,
+  useState,
+} from "react";
 
-  const handleFocus = () => {
-    inputRef.current.focus();
+const AdvancedForm = forwardRef((props, ref) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const firstErrorRef = useRef(null);
+
+  const validateField = (name, value) => {
+    switch (name) {
+      case "email":
+        return !/\S+@\S+\.\S+/.test(value) ? "Invalid email format" : "";
+      case "phone":
+        return !/^\d{10}$/.test(value.replace(/\D/g, ""))
+          ? "Phone must be 10 digits"
+          : "";
+      case "name":
+        return value.length < 2 ? "Name must be at least 2 characters" : "";
+      default:
+        return "";
+    }
   };
 
-  const handleClear = () => {
-    inputRef.current.clear();
+  const validateAll = () => {
+    const newErrors = {};
+    Object.keys(formData).forEach((key) => {
+      const error = validateField(key, formData[key]);
+      if (error) newErrors[key] = error;
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  useImperativeHandle(ref, () => ({
+    submit: async () => {
+      if (!validateAll()) {
+        // Focus first error field
+        const firstErrorField = Object.keys(errors)[0];
+        if (firstErrorField && firstErrorRef.current) {
+          firstErrorRef.current.focus();
+        }
+        return { success: false, errors };
+      }
+
+      setIsSubmitting(true);
+      try {
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        return { success: true, data: formData };
+      } catch (error) {
+        return { success: false, error: error.message };
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    reset: () => {
+      setFormData({ name: "", email: "", phone: "", message: "" });
+      setErrors({});
+      setIsSubmitting(false);
+    },
+    isValid: () => validateAll(),
+    getData: () => formData,
+    setFieldValue: (name, value) => {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+      // Clear error when user starts typing
+      if (errors[name]) {
+        setErrors((prev) => ({ ...prev, [name]: "" }));
+      }
+    },
+    focusFirstError: () => {
+      const firstErrorField = Object.keys(errors)[0];
+      if (firstErrorField && firstErrorRef.current) {
+        firstErrorRef.current.focus();
+      }
+    },
+    isSubmitting: () => isSubmitting,
+  }));
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // Real-time validation
+    const error = validateField(name, value);
+    setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
   return (
-    <div>
-      <CustomInput ref={inputRef} />
-      <button onClick={handleFocus}>Focus Input</button>
-      <button onClick={handleClear}>Clear Input</button>
+    <form className="advanced-form">
+      <div className="form-group">
+        <label htmlFor="name">Full Name *</label>
+        <input
+          ref={errors.name ? firstErrorRef : null}
+          id="name"
+          name="name"
+          type="text"
+          value={formData.name}
+          onChange={handleInputChange}
+          className={errors.name ? "error" : ""}
+          disabled={isSubmitting}
+        />
+        {errors.name && <span className="error-message">{errors.name}</span>}
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="email">Email Address *</label>
+        <input
+          ref={errors.email && !errors.name ? firstErrorRef : null}
+          id="email"
+          name="email"
+          type="email"
+          value={formData.email}
+          onChange={handleInputChange}
+          className={errors.email ? "error" : ""}
+          disabled={isSubmitting}
+        />
+        {errors.email && <span className="error-message">{errors.email}</span>}
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="phone">Phone Number</label>
+        <input
+          id="phone"
+          name="phone"
+          type="tel"
+          value={formData.phone}
+          onChange={handleInputChange}
+          className={errors.phone ? "error" : ""}
+          disabled={isSubmitting}
+        />
+        {errors.phone && <span className="error-message">{errors.phone}</span>}
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="message">Message</label>
+        <textarea
+          id="message"
+          name="message"
+          value={formData.message}
+          onChange={handleInputChange}
+          rows="4"
+          disabled={isSubmitting}
+        />
+      </div>
+
+      {isSubmitting && (
+        <div className="submitting-indicator">
+          <span className="spinner"></span>
+          Processing your request...
+        </div>
+      )}
+    </form>
+  );
+});
+
+const FormContainer = () => {
+  const formRef = useRef(null);
+  const [submitResult, setSubmitResult] = useState(null);
+
+  const handleSubmit = async () => {
+    const result = await formRef.current.submit();
+    setSubmitResult(result);
+  };
+
+  const handleReset = () => {
+    formRef.current.reset();
+    setSubmitResult(null);
+  };
+
+  const handleValidate = () => {
+    const isValid = formRef.current.isValid();
+    alert(isValid ? "Form is valid!" : "Form has errors!");
+    if (!isValid) {
+      formRef.current.focusFirstError();
+    }
+  };
+
+  return (
+    <div className="form-container">
+      <h2>Contact Form</h2>
+      <AdvancedForm ref={formRef} />
+
+      <div className="form-actions">
+        <button
+          onClick={handleSubmit}
+          disabled={formRef.current?.isSubmitting()}
+        >
+          Submit Form
+        </button>
+        <button onClick={handleReset} type="button">
+          Reset Form
+        </button>
+        <button onClick={handleValidate} type="button">
+          Validate Form
+        </button>
+      </div>
+
+      {submitResult && (
+        <div className={`result ${submitResult.success ? "success" : "error"}`}>
+          {submitResult.success ? (
+            <p>Form submitted successfully!</p>
+          ) : (
+            <p>Error: {submitResult.error || "Validation failed"}</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };
 ```
 
-### Modal Component
+<BackToTop />
+
+### Audio Player Component
 
 ```javascript
-import React, { useImperativeHandle, forwardRef, useState } from "react";
-const Modal = forwardRef((props, ref) => {
-  const [isOpen, setIsOpen] = useState(false);
+import React, {
+  useImperativeHandle,
+  forwardRef,
+  useRef,
+  useState,
+  useEffect,
+} from "react";
+
+const AudioPlayer = forwardRef(({ src, onTimeUpdate, onEnded }, ref) => {
+  const audioRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [playbackRate, setPlaybackRate] = useState(1);
+
   useImperativeHandle(ref, () => ({
-    open: () => {
-      setIsOpen(true);
+    play: async () => {
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+        return true;
+      } catch (error) {
+        console.error("Failed to play audio:", error);
+        return false;
+      }
     },
-    close: () => {
-      setIsOpen(false);
+    pause: () => {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    },
+    stop: () => {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setIsPlaying(false);
+      setCurrentTime(0);
+    },
+    seekTo: (time) => {
+      audioRef.current.currentTime = Math.max(0, Math.min(time, duration));
+    },
+    setVolume: (vol) => {
+      const newVolume = Math.max(0, Math.min(vol, 1));
+      audioRef.current.volume = newVolume;
+      setVolume(newVolume);
+    },
+    setPlaybackRate: (rate) => {
+      const newRate = Math.max(0.25, Math.min(rate, 4));
+      audioRef.current.playbackRate = newRate;
+      setPlaybackRate(newRate);
+    },
+    mute: () => {
+      audioRef.current.muted = true;
+    },
+    unmute: () => {
+      audioRef.current.muted = false;
+    },
+    toggleMute: () => {
+      audioRef.current.muted = !audioRef.current.muted;
+      return audioRef.current.muted;
+    },
+    getCurrentTime: () => currentTime,
+    getDuration: () => duration,
+    getVolume: () => volume,
+    getPlaybackRate: () => playbackRate,
+    isPlaying: () => isPlaying,
+    isMuted: () => audioRef.current?.muted || false,
+    // Advanced controls
+    skipForward: (seconds = 10) => {
+      const newTime = Math.min(currentTime + seconds, duration);
+      audioRef.current.currentTime = newTime;
+    },
+    skipBackward: (seconds = 10) => {
+      const newTime = Math.max(currentTime - seconds, 0);
+      audioRef.current.currentTime = newTime;
+    },
+    fadeIn: (durationMs = 1000) => {
+      audioRef.current.volume = 0;
+      const startVolume = volume;
+      const increment = startVolume / (durationMs / 100);
+      let currentVol = 0;
+
+      const fadeInterval = setInterval(() => {
+        currentVol += increment;
+        if (currentVol >= startVolume) {
+          currentVol = startVolume;
+          clearInterval(fadeInterval);
+        }
+        audioRef.current.volume = currentVol;
+      }, 100);
+
+      return audioRef.current.play();
+    },
+    fadeOut: (durationMs = 1000) => {
+      const startVolume = audioRef.current.volume;
+      const decrement = startVolume / (durationMs / 100);
+      let currentVol = startVolume;
+
+      const fadeInterval = setInterval(() => {
+        currentVol -= decrement;
+        if (currentVol <= 0) {
+          currentVol = 0;
+          audioRef.current.volume = 0;
+          audioRef.current.pause();
+          audioRef.current.volume = startVolume; // Reset for next time
+          clearInterval(fadeInterval);
+        } else {
+          audioRef.current.volume = currentVol;
+        }
+      }, 100);
     },
   }));
+
+  useEffect(() => {
+    const audio = audioRef.current;
+
+    const handleTimeUpdate = () => {
+      const time = audio.currentTime;
+      setCurrentTime(time);
+      onTimeUpdate?.(time);
+    };
+
+    const handleDurationChange = () => {
+      setDuration(audio.duration);
+    };
+
+    const handleEnded = () => {
+      setIsPlaying(false);
+      setCurrentTime(0);
+      onEnded?.();
+    };
+
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
+
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("durationchange", handleDurationChange);
+    audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handlePause);
+
+    return () => {
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("durationchange", handleDurationChange);
+      audio.removeEventListener("ended", handleEnded);
+      audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("pause", handlePause);
+    };
+  }, [onTimeUpdate, onEnded]);
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
   return (
-    <div style={{ display: isOpen ? "block" : "none" }}>
-      <div className="modal-content">
-        <span className="close" onClick={() => setIsOpen(false)}>
-          &times;
+    <div className="audio-player">
+      <audio ref={audioRef} src={src} preload="metadata" />
+
+      <div className="player-info">
+        <div className="time-display">
+          {formatTime(currentTime)} / {formatTime(duration)}
+        </div>
+        <div className="progress-bar">
+          <div
+            className="progress"
+            style={{ width: `${(currentTime / duration) * 100}%` }}
+          />
+        </div>
+      </div>
+
+      <div className="player-status">
+        <span className={`status ${isPlaying ? "playing" : "paused"}`}>
+          {isPlaying ? "▶️ Playing" : "⏸️ Paused"}
         </span>
-        <p>{props.children}</p>
+        <span className="volume">🔊 {Math.round(volume * 100)}%</span>
+        <span className="speed">⚡ {playbackRate}x</span>
       </div>
     </div>
   );
 });
-const ParentComponent = () => {
-  const modalRef = useRef(null);
-  const handleOpen = () => {
-    modalRef.current.open();
+
+const MusicApp = () => {
+  const playerRef = useRef(null);
+  const [currentTrack, setCurrentTrack] = useState("/audio/sample.mp3");
+
+  const handlePlay = () => playerRef.current?.play();
+  const handlePause = () => playerRef.current?.pause();
+  const handleStop = () => playerRef.current?.stop();
+
+  const handleVolumeChange = (e) => {
+    const volume = parseFloat(e.target.value);
+    playerRef.current?.setVolume(volume);
   };
-  const handleClose = () => {
-    modalRef.current.close();
+
+  const handleSpeedChange = (speed) => {
+    playerRef.current?.setPlaybackRate(speed);
   };
+
+  const handleSkip = (direction) => {
+    if (direction === "forward") {
+      playerRef.current?.skipForward(10);
+    } else {
+      playerRef.current?.skipBackward(10);
+    }
+  };
+
   return (
-    <div>
-      <button onClick={handleOpen}>Open Modal</button>
-      <Modal ref={modalRef}>
-        <h2>Modal Title</h2>
-        <p>This is the modal content.</p>
-        <button onClick={handleClose}>Close Modal</button>
-      </Modal>
+    <div className="music-app">
+      <h2>Music Player</h2>
+
+      <AudioPlayer
+        ref={playerRef}
+        src={currentTrack}
+        onTimeUpdate={(time) => console.log("Time:", time)}
+        onEnded={() => console.log("Track ended")}
+      />
+
+      <div className="player-controls">
+        <button onClick={handlePlay}>Play</button>
+        <button onClick={handlePause}>Pause</button>
+        <button onClick={handleStop}>Stop</button>
+        <button onClick={() => handleSkip("backward")}>⏪ 10s</button>
+        <button onClick={() => handleSkip("forward")}>10s ⏩</button>
+      </div>
+
+      <div className="advanced-controls">
+        <div className="volume-control">
+          <label>Volume:</label>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            defaultValue="1"
+            onChange={handleVolumeChange}
+          />
+        </div>
+
+        <div className="speed-controls">
+          <label>Speed:</label>
+          {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
+            <button
+              key={speed}
+              onClick={() => handleSpeedChange(speed)}
+              className="speed-btn"
+            >
+              {speed}x
+            </button>
+          ))}
+        </div>
+
+        <div className="fade-controls">
+          <button onClick={() => playerRef.current?.fadeIn(2000)}>
+            Fade In (2s)
+          </button>
+          <button onClick={() => playerRef.current?.fadeOut(2000)}>
+            Fade Out (2s)
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+<BackToTop />
+
+### Virtual Scrolling List Component
+
+```javascript
+import React, {
+  useImperativeHandle,
+  forwardRef,
+  useRef,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
+
+const VirtualScrollList = forwardRef(
+  (
+    { items, itemHeight = 50, containerHeight = 400, renderItem, onItemClick },
+    ref
+  ) => {
+    const containerRef = useRef(null);
+    const [scrollTop, setScrollTop] = useState(0);
+    const [selectedItems, setSelectedItems] = useState(new Set());
+
+    const visibleStartIndex = Math.floor(scrollTop / itemHeight);
+    const visibleEndIndex = Math.min(
+      visibleStartIndex + Math.ceil(containerHeight / itemHeight) + 1,
+      items.length
+    );
+
+    const visibleItems = items.slice(visibleStartIndex, visibleEndIndex);
+    const totalHeight = items.length * itemHeight;
+
+    useImperativeHandle(ref, () => ({
+      scrollToIndex: (index) => {
+        const targetScrollTop = index * itemHeight;
+        containerRef.current.scrollTop = targetScrollTop;
+        setScrollTop(targetScrollTop);
+      },
+      scrollToTop: () => {
+        containerRef.current.scrollTop = 0;
+        setScrollTop(0);
+      },
+      scrollToBottom: () => {
+        const maxScroll = totalHeight - containerHeight;
+        containerRef.current.scrollTop = maxScroll;
+        setScrollTop(maxScroll);
+      },
+      getScrollPosition: () => scrollTop,
+      getVisibleRange: () => ({
+        start: visibleStartIndex,
+        end: visibleEndIndex,
+      }),
+      selectItem: (index) => {
+        setSelectedItems((prev) => new Set([...prev, index]));
+      },
+      deselectItem: (index) => {
+        setSelectedItems((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(index);
+          return newSet;
+        });
+      },
+      selectAll: () => {
+        setSelectedItems(new Set(items.map((_, index) => index)));
+      },
+      deselectAll: () => {
+        setSelectedItems(new Set());
+      },
+      getSelectedItems: () => Array.from(selectedItems),
+      getSelectedCount: () => selectedItems.size,
+      toggleSelection: (index) => {
+        setSelectedItems((prev) => {
+          const newSet = new Set(prev);
+          if (newSet.has(index)) {
+            newSet.delete(index);
+          } else {
+            newSet.add(index);
+          }
+          return newSet;
+        });
+      },
+      scrollBy: (offset) => {
+        const newScrollTop = Math.max(
+          0,
+          Math.min(scrollTop + offset, totalHeight - containerHeight)
+        );
+        containerRef.current.scrollTop = newScrollTop;
+        setScrollTop(newScrollTop);
+      },
+      findItemIndex: (predicate) => {
+        return items.findIndex(predicate);
+      },
+      scrollToItem: (predicate) => {
+        const index = items.findIndex(predicate);
+        if (index !== -1) {
+          containerRef.current.scrollTop = index * itemHeight;
+          setScrollTop(index * itemHeight);
+          return index;
+        }
+        return -1;
+      },
+    }));
+
+    const handleScroll = useCallback((e) => {
+      setScrollTop(e.target.scrollTop);
+    }, []);
+
+    const handleItemClick = useCallback(
+      (item, index) => {
+        onItemClick?.(item, index);
+      },
+      [onItemClick]
+    );
+
+    return (
+      <div
+        ref={containerRef}
+        className="virtual-scroll-container"
+        style={{ height: containerHeight, overflow: "auto" }}
+        onScroll={handleScroll}
+      >
+        <div style={{ height: totalHeight, position: "relative" }}>
+          <div
+            style={{
+              transform: `translateY(${visibleStartIndex * itemHeight}px)`,
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+            }}
+          >
+            {visibleItems.map((item, index) => {
+              const actualIndex = visibleStartIndex + index;
+              const isSelected = selectedItems.has(actualIndex);
+
+              return (
+                <div
+                  key={actualIndex}
+                  style={{
+                    height: itemHeight,
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "0 16px",
+                    borderBottom: "1px solid #eee",
+                    backgroundColor: isSelected ? "#e3f2fd" : "transparent",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleItemClick(item, actualIndex)}
+                >
+                  {renderItem ? (
+                    renderItem(item, actualIndex)
+                  ) : (
+                    <span>
+                      {typeof item === "string" ? item : JSON.stringify(item)}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+);
+
+const DataExplorer = () => {
+  const listRef = useRef(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Generate sample data
+  const allItems = Array.from({ length: 10000 }, (_, i) => ({
+    id: i,
+    name: `Item ${i + 1}`,
+    description: `Description for item ${i + 1}`,
+    category: ["Electronics", "Books", "Clothing", "Home"][i % 4],
+    price: Math.floor(Math.random() * 1000) + 10,
+  }));
+
+  const filteredItems = allItems.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const renderItem = (item, index) => (
+    <div className="item-content">
+      <div className="item-main">
+        <h4>{item.name}</h4>
+        <p>{item.description}</p>
+      </div>
+      <div className="item-meta">
+        <span className="category">{item.category}</span>
+        <span className="price">${item.price}</span>
+      </div>
+    </div>
+  );
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const scrollToRandom = () => {
+    const randomIndex = Math.floor(Math.random() * filteredItems.length);
+    listRef.current?.scrollToIndex(randomIndex);
+  };
+
+  const scrollToExpensive = () => {
+    const index = listRef.current?.scrollToItem((item) => item.price > 900);
+    if (index === -1) {
+      alert("No expensive items found!");
+    }
+  };
+
+  const handleSelectionActions = () => {
+    const selectedCount = listRef.current?.getSelectedCount() || 0;
+    const selectedItems = listRef.current?.getSelectedItems() || [];
+
+    alert(
+      `Selected ${selectedCount} items: ${selectedItems.slice(0, 5).join(", ")}${selectedItems.length > 5 ? "..." : ""}`
+    );
+  };
+
+  return (
+    <div className="data-explorer">
+      <h2>Virtual Scrolling Data Explorer</h2>
+
+      <div className="controls">
+        <input
+          type="text"
+          placeholder="Search items..."
+          value={searchTerm}
+          onChange={handleSearch}
+          className="search-input"
+        />
+
+        <div className="scroll-controls">
+          <button onClick={() => listRef.current?.scrollToTop()}>Top</button>
+          <button onClick={() => listRef.current?.scrollToBottom()}>
+            Bottom
+          </button>
+          <button onClick={scrollToRandom}>Random Item</button>
+          <button onClick={scrollToExpensive}>Find Expensive</button>
+        </div>
+
+        <div className="selection-controls">
+          <button onClick={() => listRef.current?.selectAll()}>
+            Select All
+          </button>
+          <button onClick={() => listRef.current?.deselectAll()}>
+            Clear Selection
+          </button>
+          <button onClick={handleSelectionActions}>Show Selected</button>
+        </div>
+      </div>
+
+      <div className="list-info">
+        <p>
+          Showing {filteredItems.length} of {allItems.length} items
+        </p>
+      </div>
+
+      <VirtualScrollList
+        ref={listRef}
+        items={filteredItems}
+        itemHeight={80}
+        containerHeight={500}
+        renderItem={renderItem}
+        onItemClick={(item, index) => {
+          listRef.current?.toggleSelection(index);
+        }}
+      />
+    </div>
+  );
+};
+```
+
+<BackToTop />
+
+### Drawing Canvas Component
+
+```javascript
+import React, {
+  useImperativeHandle,
+  forwardRef,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
+
+const DrawingCanvas = forwardRef(
+  ({ width = 800, height = 600, backgroundColor = "#ffffff" }, ref) => {
+    const canvasRef = useRef(null);
+    const [isDrawing, setIsDrawing] = useState(false);
+    const [currentTool, setCurrentTool] = useState("pen");
+    const [currentColor, setCurrentColor] = useState("#000000");
+    const [lineWidth, setLineWidth] = useState(2);
+    const [history, setHistory] = useState([]);
+    const [historyIndex, setHistoryIndex] = useState(-1);
+
+    // Save current canvas state to history
+    const saveToHistory = useCallback(() => {
+      const canvas = canvasRef.current;
+      const imageData = canvas
+        .getContext("2d")
+        .getImageData(0, 0, canvas.width, canvas.height);
+      setHistory((prev) => {
+        const newHistory = prev.slice(0, historyIndex + 1);
+        newHistory.push(imageData);
+        return newHistory;
+      });
+      setHistoryIndex((prev) => prev + 1);
+    }, [historyIndex]);
+
+    useImperativeHandle(ref, () => ({
+      clear: () => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = backgroundColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        saveToHistory();
+      },
+      undo: () => {
+        if (historyIndex > 0) {
+          const canvas = canvasRef.current;
+          const ctx = canvas.getContext("2d");
+          const imageData = history[historyIndex - 1];
+          ctx.putImageData(imageData, 0, 0);
+          setHistoryIndex((prev) => prev - 1);
+        }
+      },
+      redo: () => {
+        if (historyIndex < history.length - 1) {
+          const canvas = canvasRef.current;
+          const ctx = canvas.getContext("2d");
+          const imageData = history[historyIndex + 1];
+          ctx.putImageData(imageData, 0, 0);
+          setHistoryIndex((prev) => prev + 1);
+        }
+      },
+      canUndo: () => historyIndex > 0,
+      canRedo: () => historyIndex < history.length - 1,
+      setTool: (tool) => setCurrentTool(tool),
+      setColor: (color) => setCurrentColor(color),
+      setLineWidth: (width) => setLineWidth(width),
+      getTool: () => currentTool,
+      getColor: () => currentColor,
+      getLineWidth: () => lineWidth,
+      exportAsImage: (format = "png") => {
+        const canvas = canvasRef.current;
+        return canvas.toDataURL(`image/${format}`);
+      },
+      exportAsBlob: (callback, format = "png", quality = 0.92) => {
+        const canvas = canvasRef.current;
+        canvas.toBlob(callback, `image/${format}`, quality);
+      },
+      loadImage: (imageSrc) => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            saveToHistory();
+            resolve();
+          };
+          img.onerror = reject;
+          img.src = imageSrc;
+        });
+      },
+      addText: (text, x, y, font = "16px Arial") => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        ctx.font = font;
+        ctx.fillStyle = currentColor;
+        ctx.fillText(text, x, y);
+        saveToHistory();
+      },
+      drawShape: (shape, startX, startY, endX, endY) => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+
+        ctx.strokeStyle = currentColor;
+        ctx.lineWidth = lineWidth;
+        ctx.beginPath();
+
+        switch (shape) {
+          case "rectangle":
+            ctx.rect(startX, startY, endX - startX, endY - startY);
+            break;
+          case "circle":
+            const radius = Math.sqrt(
+              (endX - startX) ** 2 + (endY - startY) ** 2
+            );
+            ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+            break;
+          case "line":
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
+            break;
+        }
+
+        ctx.stroke();
+        saveToHistory();
+      },
+      flood: (x, y, fillColor) => {
+        // Simple flood fill implementation
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        // This would need a more complex flood fill algorithm
+        // For demo purposes, we'll just fill a small area
+        ctx.fillStyle = fillColor;
+        ctx.fillRect(x - 10, y - 10, 20, 20);
+        saveToHistory();
+      },
+      getCanvasSize: () => ({ width, height }),
+      resizeCanvas: (newWidth, newHeight) => {
+        const canvas = canvasRef.current;
+        const tempCanvas = document.createElement("canvas");
+        const tempCtx = tempCanvas.getContext("2d");
+
+        // Save current content
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        tempCtx.drawImage(canvas, 0, 0);
+
+        // Resize main canvas
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+
+        // Restore content
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = backgroundColor;
+        ctx.fillRect(0, 0, newWidth, newHeight);
+        ctx.drawImage(tempCanvas, 0, 0);
+
+        saveToHistory();
+      },
+    }));
+
+    const startDrawing = useCallback(
+      (e) => {
+        if (currentTool === "pen" || currentTool === "eraser") {
+          setIsDrawing(true);
+          const canvas = canvasRef.current;
+          const rect = canvas.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+
+          const ctx = canvas.getContext("2d");
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+        }
+      },
+      [currentTool]
+    );
+
+    const draw = useCallback(
+      (e) => {
+        if (!isDrawing) return;
+
+        const canvas = canvasRef.current;
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const ctx = canvas.getContext("2d");
+
+        if (currentTool === "pen") {
+          ctx.globalCompositeOperation = "source-over";
+          ctx.strokeStyle = currentColor;
+        } else if (currentTool === "eraser") {
+          ctx.globalCompositeOperation = "destination-out";
+        }
+
+        ctx.lineWidth = lineWidth;
+        ctx.lineCap = "round";
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      },
+      [isDrawing, currentTool, currentColor, lineWidth]
+    );
+
+    const stopDrawing = useCallback(() => {
+      if (isDrawing) {
+        setIsDrawing(false);
+        saveToHistory();
+      }
+    }, [isDrawing, saveToHistory]);
+
+    // Initialize canvas
+    React.useEffect(() => {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      saveToHistory();
+    }, [backgroundColor, saveToHistory]);
+
+    return (
+      <div className="drawing-canvas-container">
+        <canvas
+          ref={canvasRef}
+          width={width}
+          height={height}
+          className="drawing-canvas"
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseLeave={stopDrawing}
+          style={{
+            border: "1px solid #ccc",
+            cursor: currentTool === "eraser" ? "crosshair" : "default",
+          }}
+        />
+      </div>
+    );
+  }
+);
+
+const DrawingApp = () => {
+  const canvasRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  const tools = [
+    { id: "pen", name: "Pen", icon: "✏️" },
+    { id: "eraser", name: "Eraser", icon: "🧽" },
+  ];
+
+  const colors = [
+    "#000000",
+    "#ff0000",
+    "#00ff00",
+    "#0000ff",
+    "#ffff00",
+    "#ff00ff",
+    "#00ffff",
+    "#ffa500",
+  ];
+
+  const handleToolChange = (tool) => {
+    canvasRef.current?.setTool(tool);
+  };
+
+  const handleColorChange = (color) => {
+    canvasRef.current?.setColor(color);
+  };
+
+  const handleLineWidthChange = (e) => {
+    canvasRef.current?.setLineWidth(parseInt(e.target.value));
+  };
+
+  const handleExport = () => {
+    const dataUrl = canvasRef.current?.exportAsImage("png");
+    const link = document.createElement("a");
+    link.download = "drawing.png";
+    link.href = dataUrl;
+    link.click();
+  };
+
+  const handleImport = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileLoad = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        canvasRef.current?.loadImage(event.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const addTextToCanvas = () => {
+    const text = prompt("Enter text:");
+    if (text) {
+      canvasRef.current?.addText(text, 100, 100, "24px Arial");
+    }
+  };
+
+  return (
+    <div className="drawing-app">
+      <h2>Drawing Canvas</h2>
+
+      <div className="toolbar">
+        <div className="tool-group">
+          <label>Tools:</label>
+          {tools.map((tool) => (
+            <button
+              key={tool.id}
+              onClick={() => handleToolChange(tool.id)}
+              className="tool-btn"
+              title={tool.name}
+            >
+              {tool.icon} {tool.name}
+            </button>
+          ))}
+        </div>
+
+        <div className="tool-group">
+          <label>Colors:</label>
+          {colors.map((color) => (
+            <button
+              key={color}
+              onClick={() => handleColorChange(color)}
+              className="color-btn"
+              style={{ backgroundColor: color }}
+              title={color}
+            />
+          ))}
+        </div>
+
+        <div className="tool-group">
+          <label>Line Width:</label>
+          <input
+            type="range"
+            min="1"
+            max="20"
+            defaultValue="2"
+            onChange={handleLineWidthChange}
+          />
+        </div>
+
+        <div className="tool-group">
+          <button onClick={() => canvasRef.current?.undo()}>↶ Undo</button>
+          <button onClick={() => canvasRef.current?.redo()}>↷ Redo</button>
+          <button onClick={() => canvasRef.current?.clear()}>🗑️ Clear</button>
+        </div>
+
+        <div className="tool-group">
+          <button onClick={addTextToCanvas}>📝 Add Text</button>
+          <button onClick={handleImport}>📁 Import</button>
+          <button onClick={handleExport}>💾 Export</button>
+        </div>
+      </div>
+
+      <DrawingCanvas
+        ref={canvasRef}
+        width={800}
+        height={600}
+        backgroundColor="#ffffff"
+      />
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileLoad}
+        style={{ display: "none" }}
+      />
     </div>
   );
 };

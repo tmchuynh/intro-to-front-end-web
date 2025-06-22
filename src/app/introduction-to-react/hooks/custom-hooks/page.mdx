@@ -1,0 +1,133 @@
+import BackToTop from "@/components/BackToTop";
+
+# Custom Hooks
+
+## Table of Contents
+
+## Overview
+
+Custom hooks in React allow you to extract component logic into reusable functions. They can use other hooks and encapsulate complex logic, making your components cleaner and more maintainable.
+
+## Benefits of Custom Hooks
+
+- **Reusability**: Share logic across components without duplicating code.
+- **Separation of Concerns**: Keep your components focused on rendering while encapsulating logic in hooks.
+- **Testing**: Easier to test logic in isolation.
+- **Readability**: Simplify component code by moving complex logic into hooks.
+
+### Why Use Custom Hooks?
+
+Custom hooks allow you to encapsulate and reuse stateful logic across multiple components. They help keep your components clean and focused on rendering, while the logic can be shared and maintained in one place.
+
+| Use Case                 | Example                                                                                    |
+| ------------------------ | ------------------------------------------------------------------------------------------ |
+| Form Handling            | `useForm` for managing form state and validation                                           |
+| API Calls                | `useFetch` for fetching data from an API                                                   |
+| Animation                | `useAnimation` for managing animations and transitions                                     |
+| Event Handling           | `useEventListener` for adding event listeners                                              |
+| State Management         | `useCounter` for managing a simple counter state                                           |
+| Performance Optimization | `useDebounce` for debouncing input changes                                                 |
+| Context Management       | `useTheme` for managing theme context                                                      |
+| Error Handling           | `useErrorBoundary` for catching errors in components                                       |
+| Subscription Management  | `useSubscription` for managing subscriptions to external data sources                      |
+| WebSocket Management     | `useWebSocket` for managing WebSocket connections                                          |
+| Local Storage            | `useLocalStorage` for managing state in local storage                                      |
+| Session Storage          | `useSessionStorage` for managing state in session storage                                  |
+| Custom Logic             | `useCustomLogic` for encapsulating any custom logic that doesn't fit into other categories |
+
+<BackToTop />
+## How to Create a Custom Hook
+
+### Step 1: Define the Hook
+
+```javascript
+import { useState, useEffect } from "react";
+function useCounter(initialValue = 0) {
+  const [count, setCount] = useState(initialValue);
+
+  const increment = () => setCount((prevCount) => prevCount + 1);
+  const decrement = () => setCount((prevCount) => prevCount - 1);
+  const reset = () => setCount(initialValue);
+
+  return { count, increment, decrement, reset };
+}
+```
+
+### Step 2: Use the Hook in a Component
+
+```javascript
+import React from "react";
+import useCounter from "./useCounter";
+function CounterComponent() {
+  const { count, increment, decrement, reset } = useCounter(0);
+
+  return (
+    <div>
+      <h1>Count: {count}</h1>
+      <button onClick={increment}>Increment</button>
+      <button onClick={decrement}>Decrement</button>
+      <button onClick={reset}>Reset</button>
+    </div>
+  );
+}
+export default CounterComponent;
+```
+
+## Best Practices for Custom Hooks
+
+- **Use Descriptive Names**: Name your hooks starting with `use` to indicate they are hooks (e.g., `useCounter`, `useFetch`).
+- **Keep Hooks Focused**: Each hook should have a single responsibility. Avoid combining unrelated logic in one hook.
+- **Use Other Hooks**: Custom hooks can use built-in hooks like `useState`, `useEffect`, and others to manage state and side effects.
+- **Return Values**: Return an object or array with the values and functions you want to expose from the hook.
+- **Documentation**: Document your custom hooks to explain their purpose, usage, and parameters.
+- **Testing**: Write tests for your custom hooks to ensure they behave as expected in different scenarios.
+- **Avoid Side Effects**: Custom hooks should not cause side effects directly. Use `useEffect` for side effects within the hook.
+- **Use Dependencies**: If your hook uses `useEffect`, ensure you provide a dependency array to control when the effect runs.
+- **Error Handling**: Implement error handling within your custom hooks to manage potential issues gracefully.
+
+## Example: Custom Hook for Fetching Data
+
+```javascript
+import { useState, useEffect } from "react";
+function useFetch(url) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Network response was not ok");
+        const result = await response.json();
+        setData(result);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [url]);
+  return { data, loading, error };
+}
+```
+
+```javascript
+import React from "react";
+import useFetch from "./useFetch";
+function DataFetchingComponent({ url }) {
+  const { data, loading, error } = useFetch(url);
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  return (
+    <div>
+      <h2>Data:</h2>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  );
+}
+export default DataFetchingComponent;
+```
+
+<BackToTop />

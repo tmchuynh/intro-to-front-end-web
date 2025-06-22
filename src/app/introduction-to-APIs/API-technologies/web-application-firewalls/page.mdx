@@ -6,27 +6,210 @@ import BackToTop from "@/components/BackToTop";
 
 ## Overview
 
-Web Application Firewalls (WAFs) are security systems designed to protect web applications by filtering and monitoring HTTP traffic between a web application and the Internet. They are essential for defending against common web threats such as SQL injection, cross-site scripting (XSS), and other vulnerabilities.
+Web Application Firewalls (WAFs) are sophisticated security systems that act as a protective barrier between web applications and the internet, analyzing and filtering HTTP/HTTPS traffic at the application layer (Layer 7) of the OSI model. Unlike traditional network firewalls that operate at lower layers, WAFs understand application protocols and can inspect the content of web requests and responses.
 
-WAFs operate at the application layer (Layer 7) of the OSI model, providing a shield against attacks that target web applications. They can be deployed as hardware appliances, software solutions, or cloud-based services.
+Modern WAFs have evolved beyond simple signature-based detection to incorporate machine learning, behavioral analysis, and real-time threat intelligence. They serve as the first line of defense against application-layer attacks, which account for over 80% of all cyber attacks according to recent security reports.
+
+### WAF Architecture Types
+
+#### **Reverse Proxy WAF**
+- Deployed between clients and web servers
+- Terminates client connections and establishes new connections to backend servers
+- Provides deep packet inspection and content modification capabilities
+- Most common deployment model for cloud-based WAFs
+
+#### **Transparent/Bridge Mode WAF**
+- Operates inline without changing network architecture
+- Inspects traffic without terminating connections
+- Minimal latency impact but limited content modification capabilities
+- Ideal for legacy applications with strict networking requirements
+
+#### **Out-of-Band WAF**
+- Receives traffic copies for analysis without disrupting the original flow
+- Provides monitoring and alerting but cannot block attacks in real-time
+- Used for compliance monitoring and forensic analysis
+- Minimal performance impact on production traffic
+
+### WAF Deployment Models
+
+#### **Hardware-Based WAFs**
+- **Pros**: High performance, dedicated resources, complete control
+- **Cons**: High capital costs, maintenance overhead, limited scalability
+- **Best For**: Large enterprises with dedicated security teams
+
+#### **Software-Based WAFs**
+- **Pros**: Flexible deployment, cost-effective, customizable
+- **Cons**: Resource sharing, performance dependent on host infrastructure
+- **Best For**: Organizations with existing server infrastructure
+
+#### **Cloud-Based WAFs**
+- **Pros**: Rapid deployment, automatic updates, global threat intelligence
+- **Cons**: Vendor dependency, potential latency, data sovereignty concerns
+- **Best For**: SaaS applications, global web presence, DevOps environments
+
+#### **Container/Microservices WAFs**
+- **Pros**: Native integration with containerized applications, API-first design
+- **Cons**: Complex configuration, service mesh overhead
+- **Best For**: Cloud-native applications, microservices architectures
 
 ### Key Features
 
-- **Traffic Filtering**: WAFs analyze incoming traffic to identify and block malicious requests based on predefined rules and policies.
-- **Custom Rules**: Users can create custom rules to address specific security needs or application behaviors.
-- **Threat Intelligence**: Many WAFs integrate threat intelligence feeds to stay updated on the latest vulnerabilities and attack patterns.
-- **Logging and Monitoring**: WAFs provide detailed logs and monitoring capabilities to track traffic patterns, detect anomalies, and respond to incidents.
-- **Rate Limiting**: They can limit the number of requests from a single IP address to prevent abuse and mitigate DDoS attacks.
-- **SSL/TLS Termination**: WAFs can handle SSL/TLS encryption, offloading the decryption process from the web server and improving performance.
-- **Bot Management**: Some WAFs include features to detect and manage bot traffic, distinguishing between legitimate users and automated scripts.
+#### **Traffic Analysis and Filtering**
+
+**Signature-Based Detection**
+- Pattern matching against known attack signatures
+- Regular expression-based rule engines
+- OWASP Core Rule Set (CRS) integration
+- Low false positive rates for known threats
+
+**Behavioral Analysis**
+- Machine learning algorithms for anomaly detection
+- Baseline establishment for normal traffic patterns
+- Adaptive threat detection for zero-day exploits
+- User and entity behavior analytics (UEBA)
+
+**Protocol Compliance**
+- HTTP/HTTPS protocol validation
+- Request size and rate limiting
+- Header field validation and sanitization
+- Content-type enforcement
+
+#### **Advanced Security Capabilities**
+
+**API Security**
+- OpenAPI/Swagger specification enforcement
+- JSON/XML schema validation
+- Rate limiting per API endpoint
+- OAuth and JWT token validation
+- GraphQL query depth and complexity analysis
+
+**Bot Management and Mitigation**
+- JavaScript challenge-response mechanisms
+- CAPTCHA integration for suspicious traffic
+- Device fingerprinting and reputation scoring
+- Legitimate bot whitelisting (search engines, monitoring tools)
+- Advanced bot behavior analysis using machine learning
+
+**DDoS Protection**
+- Layer 7 DDoS attack mitigation
+- Rate limiting with burst tolerance
+- Geo-blocking and IP reputation filtering
+- Challenge-response mechanisms for suspicious traffic
+- Traffic shaping and prioritization
+
+**Data Loss Prevention (DLP)**
+- Sensitive data pattern recognition (PII, credit cards, SSNs)
+- Response content filtering and masking
+- Data exfiltration prevention
+- Compliance reporting for data protection regulations
+
+#### **Performance and Optimization Features**
+
+**SSL/TLS Management**
+- SSL termination and offloading
+- Perfect Forward Secrecy (PFS) support
+- Certificate management and rotation
+- HSTS header injection
+- TLS 1.3 and HTTP/2 support
+
+**Content Optimization**
+- HTTP compression (gzip, brotli)
+- Image optimization and resizing
+- CSS and JavaScript minification
+- CDN integration and edge caching
+- Connection pooling and keep-alive optimization
+
+**Caching and Acceleration**
+- Static content caching with TTL controls
+- Dynamic content caching with cache tags
+- Edge-side includes (ESI) support
+- Purge and invalidation mechanisms
+- Bandwidth optimization
 
 ### Use Cases
 
-- **Protection Against OWASP Top Ten**: WAFs are designed to mitigate risks associated with the OWASP Top Ten vulnerabilities, including SQL injection, XSS, and CSRF (Cross-Site Request Forgery).
-- **Compliance Requirements**: Many industries require WAFs to meet compliance standards such as PCI DSS, HIPAA, and GDPR, which mandate specific security measures for web applications.
-- **API Security**: WAFs can protect APIs by filtering requests and responses, ensuring that only legitimate traffic reaches the API endpoints.
-- **E-commerce Security**: WAFs are commonly used in e-commerce applications to protect sensitive customer data, such as payment information and personal details, from cyber threats.
-- **Content Management Systems (CMS)**: WAFs can secure popular CMS platforms like WordPress, Drupal, and Joomla by preventing common vulnerabilities associated with these systems.
+#### **OWASP Top 10 Protection**
+
+**Injection Attacks**
+- SQL injection detection and prevention
+- NoSQL injection protection (MongoDB, CouchDB)
+- LDAP injection filtering
+- Command injection prevention
+- Code injection and script execution blocking
+
+**Broken Authentication and Session Management**
+- Brute force attack prevention
+- Session fixation protection
+- Credential stuffing mitigation
+- Multi-factor authentication bypass prevention
+- Session timeout enforcement
+
+**Cross-Site Scripting (XSS)**
+- Reflected XSS prevention with input sanitization
+- Stored XSS protection through output encoding
+- DOM-based XSS detection using JavaScript analysis
+- Content Security Policy (CSP) enforcement
+- Virtual patching for XSS vulnerabilities
+
+**Insecure Direct Object References**
+- Authorization bypass prevention
+- Parameter tampering detection
+- Directory traversal protection
+- File inclusion attack mitigation
+- Privilege escalation prevention
+
+#### **Industry-Specific Security Requirements**
+
+**Financial Services (PCI DSS Compliance)**
+- Payment card data protection
+- Cardholder data environment (CDE) security
+- Transaction monitoring and fraud detection
+- Regulatory audit trail maintenance
+- Real-time threat intelligence integration
+
+**Healthcare (HIPAA Compliance)**
+- Protected Health Information (PHI) security
+- Access logging and audit trails
+- Data encryption in transit and at rest
+- Patient portal security enhancement
+- Medical device communication protection
+
+**Government and Defense**
+- FISMA compliance requirements
+- Authority to Operate (ATO) security controls
+- Classification level enforcement
+- Insider threat detection
+- Advanced persistent threat (APT) protection
+
+**E-commerce and Retail**
+- Customer data protection
+- Shopping cart security
+- Payment gateway protection
+- Inventory management system security
+- Customer behavior analysis and fraud prevention
+
+#### **Modern Application Protection**
+
+**API Security**
+- RESTful API endpoint protection
+- GraphQL query complexity analysis
+- WebSocket connection security
+- Microservices communication protection
+- Third-party API integration security
+
+**Cloud-Native Applications**
+- Container and Kubernetes protection
+- Serverless function security
+- Cloud storage access control
+- Multi-cloud deployment protection
+- DevSecOps pipeline integration
+
+**Single Page Applications (SPAs)**
+- Client-side attack prevention
+- AJAX request validation
+- JSON API protection
+- Progressive Web App (PWA) security
+- Frontend framework security (React, Angular, Vue.js)
 
 ### Benefits
 
@@ -46,20 +229,1206 @@ WAFs operate at the application layer (Layer 7) of the OSI model, providing a sh
 
 ## Popular WAF Providers
 
-| Provider                                                                                                   | Description                                                                                                                                                                                                                                                                                                                                                                         |
-| ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [**Cloudflare WAF**](https://www.cloudflare.com/waf/)                                                      | A cloud-based WAF that provides comprehensive protection against web threats, including DDoS attacks, SQL injection, and XSS. It offers customizable rules, threat intelligence integration, and real-time monitoring.                                                                                                                                                              |
-| [**AWS WAF**](https://aws.amazon.com/waf/)                                                                 | A managed WAF service that protects web applications hosted on AWS. It allows users to create custom rules, integrates with AWS services, and provides detailed logging and monitoring capabilities.                                                                                                                                                                                |
-| [**Azure Web Application Firewall**](https://azure.microsoft.com/en-us/services/web-application-firewall/) | A cloud-based WAF service that protects web applications hosted on Microsoft Azure. It offers features like custom rules, bot management, and integration with Azure services for enhanced security.                                                                                                                                                                                |
-| [**Imperva WAF**](https://www.imperva.com/products/web-application-firewall/)                              | A comprehensive WAF solution that provides advanced threat protection, bot management, and compliance features. It offers both cloud-based and on-premises deployment options, making it suitable for various environments.                                                                                                                                                         |
-| [**F5 Advanced WAF**](https://www.f5.com/products/security/web-application-firewall)                       | An enterprise-grade WAF that provides advanced security features, including bot protection, API security, and DDoS mitigation. It can be deployed on-premises or in the cloud, offering flexibility for different deployment scenarios.                                                                                                                                             |
-| [**ModSecurity**](https://www.modsecurity.org/)                                                            | An open-source WAF that can be integrated with various web servers and application platforms. It provides a flexible rule engine for creating custom security rules and supports a wide range of web application security features.                                                                                                                                                 |
-| [**Barracuda WAF**](https://www.barracuda.com/products/web-application-firewall)                           | A WAF solution that provides comprehensive protection against web threats, including DDoS attacks, SQL injection, and XSS. It offers both cloud-based and on-premises deployment options, along with features like bot management and SSL/TLS termination.                                                                                                                          |
-| [**Sucuri WAF**](https://sucuri.net/products/web-application-firewall)                                     | A cloud-based WAF that provides protection against web threats, including malware, DDoS attacks, and brute force attacks. It offers features like real-time monitoring, malware scanning, and performance optimization for websites.                                                                                                                                                |
-| [**Akamai Kona Site Defender**](https://www.akamai.com/products/kona-site-defender)                        | A cloud-based WAF that provides advanced security features, including DDoS protection, bot management, and API security. It integrates with Akamai's global content delivery network (CDN) for enhanced performance and security.                                                                                                                                                   |
-| [**Signal Sciences**](https://snyk.io/products/signal-sciences/)                                           | A next-generation WAF that provides real-time protection against web threats, including DDoS attacks, SQL injection, and XSS. It offers features like real-time monitoring, custom rules, and integration with DevOps workflows for enhanced security in modern application environments.                                                                                           |
-| [**Fastly WAF**](https://www.fastly.com/products/web-application-firewall)                                 | A cloud-based WAF that provides real-time protection against web threats, including DDoS attacks, SQL injection, and XSS. It integrates with Fastly's content delivery network (CDN) for enhanced performance and security, offering features like custom rules, threat intelligence integration, and real-time monitoring.                                                         |
-| [**Radware AppWall**](https://www.radware.com/products/application-security/appwall/)                      | An enterprise-grade WAF that provides advanced security features, including bot protection, API security, and DDoS mitigation. It can be deployed on-premises or in the cloud, offering flexibility for different deployment scenarios. It also provides detailed logging and monitoring capabilities to track traffic patterns and detect anomalies.                               |
-| [**Citrix Web App Firewall**](https://www.citrix.com/products/citrix-web-app-firewall/)                    | A WAF solution that provides comprehensive protection against web threats, including DDoS attacks, SQL injection, and XSS. It offers both cloud-based and on-premises deployment options, along with features like bot management, SSL/TLS termination, and real-time monitoring. It integrates with Citrix's application delivery solutions for enhanced security and performance. |
+| Provider                                                                                                     | Description                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [**Cloudflare WAF**](https://www.cloudflare.com/waf/)                                                        | A cloud-based WAF that provides comprehensive protection against web threats, including DDoS attacks, SQL injection, and XSS. It offers customizable rules, threat intelligence integration, and real-time monitoring.                                                                                                                                                                             |
+| [**AWS WAF**](https://aws.amazon.com/waf/)                                                                   | A managed WAF service that protects web applications hosted on AWS. It allows users to create custom rules, integrates with AWS services, and provides detailed logging and monitoring capabilities.                                                                                                                                                                                               |
+| [**Azure Web Application Firewall**](https://azure.microsoft.com/en-us/services/web-application-firewall/)   | A cloud-based WAF service that protects web applications hosted on Microsoft Azure. It offers features like custom rules, bot management, and integration with Azure services for enhanced security.                                                                                                                                                                                               |
+| [**Imperva WAF**](https://www.imperva.com/products/web-application-firewall/)                                | A comprehensive WAF solution that provides advanced threat protection, bot management, and compliance features. It offers both cloud-based and on-premises deployment options, making it suitable for various environments.                                                                                                                                                                        |
+| [**F5 Advanced WAF**](https://www.f5.com/products/security/web-application-firewall)                         | An enterprise-grade WAF that provides advanced security features, including bot protection, API security, and DDoS mitigation. It can be deployed on-premises or in the cloud, offering flexibility for different deployment scenarios.                                                                                                                                                            |
+| [**ModSecurity**](https://www.modsecurity.org/)                                                              | An open-source WAF that can be integrated with various web servers and application platforms. It provides a flexible rule engine for creating custom security rules and supports a wide range of web application security features.                                                                                                                                                                |
+| [**Barracuda WAF**](https://www.barracuda.com/products/web-application-firewall)                             | A WAF solution that provides comprehensive protection against web threats, including DDoS attacks, SQL injection, and XSS. It offers both cloud-based and on-premises deployment options, along with features like bot management and SSL/TLS termination.                                                                                                                                         |
+| [**Sucuri WAF**](https://sucuri.net/products/web-application-firewall)                                       | A cloud-based WAF that provides protection against web threats, including malware, DDoS attacks, and brute force attacks. It offers features like real-time monitoring, malware scanning, and performance optimization for websites.                                                                                                                                                               |
+| [**Akamai Kona Site Defender**](https://www.akamai.com/products/kona-site-defender)                          | A cloud-based WAF that provides advanced security features, including DDoS protection, bot management, and API security. It integrates with Akamai's global content delivery network (CDN) for enhanced performance and security.                                                                                                                                                                  |
+| [**Signal Sciences**](https://snyk.io/products/signal-sciences/)                                             | A next-generation WAF that provides real-time protection against web threats, including DDoS attacks, SQL injection, and XSS. It offers features like real-time monitoring, custom rules, and integration with DevOps workflows for enhanced security in modern application environments.                                                                                                          |
+| [**Fastly WAF**](https://www.fastly.com/products/web-application-firewall)                                   | A cloud-based WAF that provides real-time protection against web threats, including DDoS attacks, SQL injection, and XSS. It integrates with Fastly's content delivery network (CDN) for enhanced performance and security, offering features like custom rules, threat intelligence integration, and real-time monitoring.                                                                        |
+| [**Radware AppWall**](https://www.radware.com/products/application-security/appwall/)                        | An enterprise-grade WAF that provides advanced security features, including bot protection, API security, and DDoS mitigation. It can be deployed on-premises or in the cloud, offering flexibility for different deployment scenarios. It also provides detailed logging and monitoring capabilities to track traffic patterns and detect anomalies.                                              |
+| [**Citrix Web App Firewall**](https://www.citrix.com/products/citrix-web-app-firewall/)                      | A WAF solution that provides comprehensive protection against web threats, including DDoS attacks, SQL injection, and XSS. It offers both cloud-based and on-premises deployment options, along with features like bot management, SSL/TLS termination, and real-time monitoring. It integrates with Citrix's application delivery solutions for enhanced security and performance.                |
+| [**Trustwave Web Application Firewall**](https://www.trustwave.com/en-us/products/web-application-firewall/) | A cloud-based WAF that provides protection against web threats, including malware, DDoS attacks, and brute force attacks. It offers features like real-time monitoring, malware scanning, and performance optimization for websites. Trustwave's WAF integrates with its broader security services for comprehensive web application protection.                                                   |
+| [**StackPath WAF**](https://www.stackpath.com/products/web-application-firewall/)                            | A cloud-based WAF that provides real-time protection against web threats, including DDoS attacks, SQL injection, and XSS. It integrates with StackPath's content delivery network (CDN) for enhanced performance and security, offering features like custom rules, threat intelligence integration, and real-time monitoring.                                                                     |
+| [**A10 Networks Thunder WAF**](https://www.a10networks.com/products/thunder-web-application-firewall/)       | An enterprise-grade WAF that provides advanced security features, including bot protection, API security, and DDoS mitigation. It can be deployed on-premises or in the cloud, offering flexibility for different deployment scenarios. It also provides detailed logging and monitoring capabilities to track traffic patterns and detect anomalies.                                              |
+| [**PerimeterX WAF**](https://www.perimeterx.com/products/web-application-firewall/)                          | A next-generation WAF that provides real-time protection against web threats, including DDoS attacks, SQL injection, and XSS. It offers features like real-time monitoring, custom rules, and integration with DevOps workflows for enhanced security in modern application environments. PerimeterX's WAF focuses on protecting user sessions and preventing account takeover attacks.            |
+| [**Signal Sciences WAF**](https://snyk.io/products/signal-sciences/)                                         | A next-generation WAF that provides real-time protection against web threats, including DDoS attacks, SQL injection, and XSS. It offers features like real-time monitoring, custom rules, and integration with DevOps workflows for enhanced security in modern application environments. Signal Sciences focuses on providing visibility into application security without impacting performance. |
+| [**WebKnight**](https://webknight.org/)                                                                      | An open-source WAF that provides basic protection against common web threats. It can be integrated with various web servers and application platforms, offering a flexible rule engine for creating custom security rules. WebKnight is suitable for smaller applications or environments where a lightweight WAF solution is sufficient.                                                          |
+| [**NAXSI**](https://naxsi.com/)                                                                              | An open-source WAF module for Nginx that provides protection against common web threats. It uses a whitelist approach to filter requests and can be customized with user-defined rules. NAXSI is suitable for environments using Nginx as a web server and offers a lightweight solution for basic web application security.                                                                       |
+| [**ModSecurity CRS**](https://coreruleset.org/)                                                              | A community-driven project that provides a set of open-source rules for ModSecurity, a widely used open-source WAF. The Core Rule Set (CRS) offers protection against common web threats and vulnerabilities, making it suitable for various web applications. It can be customized and extended to meet specific security needs.                                                                  |
 
-<BackToTop />
+## Implementation Examples
+
+### AWS WAF Configuration
+
+#### Comprehensive AWS WAF v2 Setup with CloudFormation
+
+```yaml
+# aws-waf-comprehensive.yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Comprehensive AWS WAF v2 setup with advanced security rules'
+
+Parameters:
+  ApplicationName:
+    Type: String
+    Default: 'WebApp'
+    Description: 'Name of the web application'
+  
+  CloudFrontDistributionId:
+    Type: String
+    Description: 'CloudFront distribution ID to associate with WAF'
+  
+  AllowedCountries:
+    Type: CommaDelimitedList
+    Default: 'US,CA,GB,DE,FR'
+    Description: 'List of allowed country codes'
+
+Resources:
+  # Main Web ACL
+  WebApplicationFirewall:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      Name: !Sub '${ApplicationName}-WebACL'
+      Scope: CLOUDFRONT
+      DefaultAction:
+        Allow: {}
+      Description: 'Comprehensive WAF for web application protection'
+      
+      Rules:
+        # Rule 1: AWS Managed Core Rule Set
+        - Name: AWSManagedRulesCommonRuleSet
+          Priority: 1
+          OverrideAction:
+            None: {}
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesCommonRuleSet
+              ExcludedRules:
+                - Name: SizeRestrictions_BODY
+                - Name: GenericRFI_BODY
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: CommonRuleSetMetric
+        
+        # Rule 2: SQL Injection Protection
+        - Name: AWSManagedRulesSQLiRuleSet
+          Priority: 2
+          OverrideAction:
+            None: {}
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesSQLiRuleSet
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: SQLiRuleSetMetric
+        
+        # Rule 3: Known Bad Inputs
+        - Name: AWSManagedRulesKnownBadInputsRuleSet
+          Priority: 3
+          OverrideAction:
+            None: {}
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesKnownBadInputsRuleSet
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: KnownBadInputsMetric
+        
+        # Rule 4: Geographic Blocking
+        - Name: GeographicRestrictionRule
+          Priority: 4
+          Action:
+            Block: {}
+          Statement:
+            NotStatement:
+              Statement:
+                GeoMatchStatement:
+                  CountryCodes: !Ref AllowedCountries
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: GeographicBlockMetric
+        
+        # Rule 5: Rate Limiting
+        - Name: RateLimitRule
+          Priority: 5
+          Action:
+            Block: {}
+          Statement:
+            RateBasedStatement:
+              Limit: 2000
+              AggregateKeyType: IP
+              ScopeDownStatement:
+                NotStatement:
+                  Statement:
+                    IPSetReferenceStatement:
+                      Arn: !GetAtt TrustedIPSet.Arn
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: RateLimitMetric
+        
+        # Rule 6: Bot Control
+        - Name: AWSManagedRulesBotControlRuleSet
+          Priority: 6
+          OverrideAction:
+            None: {}
+          Statement:
+            ManagedRuleGroupStatement:
+              VendorName: AWS
+              Name: AWSManagedRulesBotControlRuleSet
+              ManagedRuleGroupConfigs:
+                - AWSManagedRulesBotControlRuleSet:
+                    InspectionLevel: TARGETED
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: BotControlMetric
+        
+        # Rule 7: Custom API Protection
+        - Name: APIProtectionRule
+          Priority: 7
+          Action:
+            Block: {}
+          Statement:
+            AndStatement:
+              Statements:
+                - ByteMatchStatement:
+                    SearchString: '/api/'
+                    FieldToMatch:
+                      UriPath: {}
+                    TextTransformations:
+                      - Priority: 0
+                        Type: LOWERCASE
+                    PositionalConstraint: CONTAINS
+                - NotStatement:
+                    Statement:
+                      ByteMatchStatement:
+                        SearchString: 'application/json'
+                        FieldToMatch:
+                          SingleHeader:
+                            Name: 'content-type'
+                        TextTransformations:
+                          - Priority: 0
+                            Type: LOWERCASE
+                        PositionalConstraint: CONTAINS
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: APIProtectionMetric
+        
+        # Rule 8: Admin Path Protection
+        - Name: AdminPathProtection
+          Priority: 8
+          Action:
+            Block: {}
+          Statement:
+            AndStatement:
+              Statements:
+                - ByteMatchStatement:
+                    SearchString: '/admin'
+                    FieldToMatch:
+                      UriPath: {}
+                    TextTransformations:
+                      - Priority: 0
+                        Type: LOWERCASE
+                    PositionalConstraint: STARTS_WITH
+                - NotStatement:
+                    Statement:
+                      IPSetReferenceStatement:
+                        Arn: !GetAtt AdminIPSet.Arn
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: AdminPathMetric
+        
+        # Rule 9: Custom SQL Injection Detection
+        - Name: CustomSQLiDetection
+          Priority: 9
+          Action:
+            Block: {}
+          Statement:
+            OrStatement:
+              Statements:
+                - RegexMatchStatement:
+                    RegexString: '(?i)(union\s+select|select\s+.*\s+from|drop\s+table|insert\s+into|update\s+.*\s+set)'
+                    FieldToMatch:
+                      AllQueryArguments: {}
+                    TextTransformations:
+                      - Priority: 0
+                        Type: URL_DECODE
+                      - Priority: 1
+                        Type: HTML_ENTITY_DECODE
+                - RegexMatchStatement:
+                    RegexString: '(?i)(\'\s*or\s*\'|\'\s*and\s*\'|;\s*drop|;\s*delete|;\s*update)'
+                    FieldToMatch:
+                      Body: {}
+                    TextTransformations:
+                      - Priority: 0
+                        Type: URL_DECODE
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: CustomSQLiMetric
+        
+        # Rule 10: XSS Protection
+        - Name: CustomXSSProtection
+          Priority: 10
+          Action:
+            Block: {}
+          Statement:
+            RegexMatchStatement:
+              RegexString: '(?i)(<script|javascript:|vbscript:|onload=|onerror=|onclick=)'
+              FieldToMatch:
+                AllQueryArguments: {}
+              TextTransformations:
+                - Priority: 0
+                  Type: URL_DECODE
+                - Priority: 1
+                  Type: HTML_ENTITY_DECODE
+          VisibilityConfig:
+            SampledRequestsEnabled: true
+            CloudWatchMetricsEnabled: true
+            MetricName: CustomXSSMetric
+
+      Tags:
+        - Key: Environment
+          Value: Production
+        - Key: Application
+          Value: !Ref ApplicationName
+
+  # IP Sets for trusted IPs and admin access
+  TrustedIPSet:
+    Type: AWS::WAFv2::IPSet
+    Properties:
+      Name: !Sub '${ApplicationName}-TrustedIPs'
+      Scope: CLOUDFRONT
+      IPAddressVersion: IPV4
+      Addresses:
+        - '203.0.113.0/24'  # Office IP range
+        - '198.51.100.0/24' # Partner IP range
+      Description: 'Trusted IP addresses exempt from rate limiting'
+
+  AdminIPSet:
+    Type: AWS::WAFv2::IPSet
+    Properties:
+      Name: !Sub '${ApplicationName}-AdminIPs'
+      Scope: CLOUDFRONT
+      IPAddressVersion: IPV4
+      Addresses:
+        - '203.0.113.10/32'  # Admin workstation
+        - '203.0.113.11/32'  # Backup admin access
+      Description: 'Admin IP addresses allowed to access admin paths'
+
+  # CloudWatch Log Group for WAF logs
+  WAFLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/wafv2/${ApplicationName}'
+      RetentionInDays: 30
+
+  # WAF Logging Configuration
+  WAFLoggingConfig:
+    Type: AWS::WAFv2::LoggingConfiguration
+    Properties:
+      ResourceArn: !GetAtt WebApplicationFirewall.Arn
+      LogDestinationConfigs:
+        - !Sub '${WAFLogGroup.Arn}:*'
+      RedactedFields:
+        - SingleHeader:
+            Name: 'authorization'
+        - SingleHeader:
+            Name: 'cookie'
+      LoggingFilter:
+        DefaultBehavior: KEEP
+        Filters:
+          - Behavior: DROP
+            Conditions:
+              - ActionCondition:
+                  Action: ALLOW
+            Requirement: MEETS_ALL
+
+  # CloudWatch Alarms
+  HighBlockedRequestsAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${ApplicationName}-WAF-HighBlockedRequests'
+      AlarmDescription: 'High number of blocked requests detected'
+      MetricName: BlockedRequests
+      Namespace: AWS/WAFV2
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 3
+      Threshold: 100
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: WebACL
+          Value: !Sub '${ApplicationName}-WebACL'
+        - Name: Region
+          Value: CloudFront
+        - Name: Rule
+          Value: ALL
+
+  SQLiAttackAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub '${ApplicationName}-WAF-SQLiAttacks'
+      AlarmDescription: 'SQL injection attacks detected'
+      MetricName: BlockedRequests
+      Namespace: AWS/WAFV2
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 5
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: WebACL
+          Value: !Sub '${ApplicationName}-WebACL'
+        - Name: Region
+          Value: CloudFront
+        - Name: Rule
+          Value: AWSManagedRulesSQLiRuleSet
+
+Outputs:
+  WebACLArn:
+    Description: 'ARN of the Web ACL'
+    Value: !GetAtt WebApplicationFirewall.Arn
+    Export:
+      Name: !Sub '${AWS::StackName}-WebACL-Arn'
+
+  WebACLId:
+    Description: 'ID of the Web ACL'
+    Value: !Ref WebApplicationFirewall
+    Export:
+      Name: !Sub '${AWS::StackName}-WebACL-Id'
+```
+
+#### AWS WAF Custom Rule Engine with Lambda
+
+```python
+# waf-custom-rules.py
+import json
+import boto3
+import re
+import hashlib
+from typing import Dict, List, Any
+from datetime import datetime, timedelta
+
+class WAFCustomRuleEngine:
+    def __init__(self, web_acl_id: str, region: str = 'us-east-1'):
+        self.wafv2_client = boto3.client('wafv2', region_name=region)
+        self.cloudwatch = boto3.client('cloudwatch', region_name=region)
+        self.web_acl_id = web_acl_id
+        self.threat_patterns = self._load_threat_patterns()
+        
+    def _load_threat_patterns(self) -> Dict[str, List[str]]:
+        """Load threat detection patterns"""
+        return {
+            'sql_injection': [
+                r'(?i)(union\s+select|select\s+.*\s+from)',
+                r'(?i)(drop\s+table|truncate\s+table)',
+                r'(?i)(\'\s*or\s*1\s*=\s*1|\'\s*or\s*\'1\'=\'1)',
+                r'(?i)(exec\s*\(|execute\s*\()',
+                r'(?i)(information_schema|sys\.tables)'
+            ],
+            'xss': [
+                r'(?i)(<script[^>]*>.*?</script>)',
+                r'(?i)(javascript:|vbscript:|data:text/html)',
+                r'(?i)(onload\s*=|onerror\s*=|onclick\s*=)',
+                r'(?i)(<iframe[^>]*>|<object[^>]*>)',
+                r'(?i)(eval\s*\(|settimeout\s*\()'
+            ],
+            'command_injection': [
+                r'(?i)(;\s*cat\s+|;\s*ls\s+|;\s*pwd)',
+                r'(?i)(&&\s*cat|&&\s*ls|&&\s*pwd)',
+                r'(?i)(\|\s*cat|\|\s*ls|\|\s*pwd)',
+                r'(?i)(exec\s*\(|system\s*\(|shell_exec)',
+                r'(?i)(wget\s+|curl\s+|nc\s+)'
+            ],
+            'directory_traversal': [
+                r'(?i)(\.\.\/|\.\.\\)',
+                r'(?i)(%2e%2e%2f|%2e%2e%5c)',
+                r'(?i)(\/etc\/passwd|\/windows\/system32)',
+                r'(?i)(boot\.ini|web\.config)',
+                r'(?i)(\.\.%2f|\.\.%5c)'
+            ]
+        }
+    
+    def analyze_request(self, request_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze incoming request for threats"""
+        
+        threat_score = 0
+        detected_threats = []
+        request_details = {
+            'uri': request_data.get('uri', ''),
+            'query_string': request_data.get('queryString', ''),
+            'headers': request_data.get('headers', {}),
+            'body': request_data.get('body', ''),
+            'method': request_data.get('httpMethod', ''),
+            'source_ip': request_data.get('sourceIp', ''),
+            'user_agent': request_data.get('userAgent', '')
+        }
+        
+        # Analyze different components
+        for threat_type, patterns in self.threat_patterns.items():
+            for pattern in patterns:
+                # Check URI
+                if re.search(pattern, request_details['uri']):
+                    threat_score += 10
+                    detected_threats.append({
+                        'type': threat_type,
+                        'location': 'uri',
+                        'pattern': pattern,
+                        'severity': 'high'
+                    })
+                
+                # Check query string
+                if re.search(pattern, request_details['query_string']):
+                    threat_score += 8
+                    detected_threats.append({
+                        'type': threat_type,
+                        'location': 'query_string',
+                        'pattern': pattern,
+                        'severity': 'medium'
+                    })
+                
+                # Check request body
+                if re.search(pattern, request_details['body']):
+                    threat_score += 15
+                    detected_threats.append({
+                        'type': threat_type,
+                        'location': 'body',
+                        'pattern': pattern,
+                        'severity': 'critical'
+                    })
+        
+        # Check for suspicious patterns
+        threat_score += self._check_suspicious_patterns(request_details)
+        
+        return {
+            'threat_score': threat_score,
+            'detected_threats': detected_threats,
+            'recommendation': self._get_recommendation(threat_score),
+            'timestamp': datetime.utcnow().isoformat()
+        }
+    
+    def _check_suspicious_patterns(self, request_details: Dict[str, Any]) -> int:
+        """Check for additional suspicious patterns"""
+        score = 0
+        
+        # Check for unusual request sizes
+        if len(request_details['body']) > 10000:
+            score += 5
+        
+        # Check for unusual number of parameters
+        param_count = request_details['query_string'].count('&') + 1
+        if param_count > 20:
+            score += 3
+        
+        # Check for suspicious user agents
+        suspicious_agents = ['sqlmap', 'nikto', 'burp', 'acunetix', 'nessus']
+        user_agent = request_details['user_agent'].lower()
+        for agent in suspicious_agents:
+            if agent in user_agent:
+                score += 20
+        
+        # Check for rapid-fire requests (would need session tracking)
+        # This is a simplified version
+        ip_hash = hashlib.md5(request_details['source_ip'].encode()).hexdigest()
+        
+        return score
+    
+    def _get_recommendation(self, threat_score: int) -> str:
+        """Get recommendation based on threat score"""
+        if threat_score >= 30:
+            return 'BLOCK'
+        elif threat_score >= 15:
+            return 'CHALLENGE'
+        elif threat_score >= 5:
+            return 'MONITOR'
+        else:
+            return 'ALLOW'
+    
+    def create_custom_rule(self, rule_name: str, patterns: List[str], 
+                          priority: int, action: str = 'Block') -> str:
+        """Create a custom WAF rule"""
+        
+        # Build regex pattern
+        combined_pattern = '|'.join(f'({pattern})' for pattern in patterns)
+        
+        rule_definition = {
+            'Name': rule_name,
+            'Priority': priority,
+            'Action': {action: {}},
+            'Statement': {
+                'RegexMatchStatement': {
+                    'RegexString': combined_pattern,
+                    'FieldToMatch': {
+                        'AllQueryArguments': {}
+                    },
+                    'TextTransformations': [
+                        {'Priority': 0, 'Type': 'URL_DECODE'},
+                        {'Priority': 1, 'Type': 'HTML_ENTITY_DECODE'},
+                        {'Priority': 2, 'Type': 'LOWERCASE'}
+                    ]
+                }
+            },
+            'VisibilityConfig': {
+                'SampledRequestsEnabled': True,
+                'CloudWatchMetricsEnabled': True,
+                'MetricName': f'{rule_name}Metric'
+            }
+        }
+        
+        try:
+            # Get current Web ACL
+            response = self.wafv2_client.get_web_acl(
+                Scope='CLOUDFRONT',
+                Id=self.web_acl_id
+            )
+            
+            web_acl = response['WebACL']
+            rules = web_acl['Rules']
+            
+            # Add new rule
+            rules.append(rule_definition)
+            
+            # Update Web ACL
+            self.wafv2_client.update_web_acl(
+                Scope='CLOUDFRONT',
+                Id=self.web_acl_id,
+                Name=web_acl['Name'],
+                DefaultAction=web_acl['DefaultAction'],
+                Rules=rules,
+                LockToken=response['LockToken'],
+                VisibilityConfig=web_acl['VisibilityConfig']
+            )
+            
+            return f"Rule {rule_name} created successfully"
+            
+        except Exception as e:
+            return f"Error creating rule: {str(e)}"
+    
+    def monitor_and_adjust(self, time_period_hours: int = 24) -> Dict[str, Any]:
+        """Monitor WAF metrics and suggest adjustments"""
+        
+        end_time = datetime.utcnow()
+        start_time = end_time - timedelta(hours=time_period_hours)
+        
+        metrics = {}
+        
+        try:
+            # Get blocked requests metric
+            blocked_response = self.cloudwatch.get_metric_statistics(
+                Namespace='AWS/WAFV2',
+                MetricName='BlockedRequests',
+                Dimensions=[
+                    {'Name': 'WebACL', 'Value': self.web_acl_id},
+                    {'Name': 'Region', 'Value': 'CloudFront'}
+                ],
+                StartTime=start_time,
+                EndTime=end_time,
+                Period=3600,
+                Statistics=['Sum']
+            )
+            
+            # Get allowed requests metric
+            allowed_response = self.cloudwatch.get_metric_statistics(
+                Namespace='AWS/WAFV2',
+                MetricName='AllowedRequests',
+                Dimensions=[
+                    {'Name': 'WebACL', 'Value': self.web_acl_id},
+                    {'Name': 'Region', 'Value': 'CloudFront'}
+                ],
+                StartTime=start_time,
+                EndTime=end_time,
+                Period=3600,
+                Statistics=['Sum']
+            )
+            
+            total_blocked = sum(point['Sum'] for point in blocked_response['Datapoints'])
+            total_allowed = sum(point['Sum'] for point in allowed_response['Datapoints'])
+            total_requests = total_blocked + total_allowed
+            
+            metrics = {
+                'total_requests': total_requests,
+                'blocked_requests': total_blocked,
+                'allowed_requests': total_allowed,
+                'block_rate': (total_blocked / total_requests * 100) if total_requests > 0 else 0,
+                'time_period': f'{time_period_hours} hours'
+            }
+            
+            # Generate recommendations
+            recommendations = []
+            
+            if metrics['block_rate'] > 10:
+                recommendations.append("High block rate detected - review rules for false positives")
+            
+            if metrics['block_rate'] < 0.1:
+                recommendations.append("Very low block rate - consider enabling more restrictive rules")
+            
+            if total_requests == 0:
+                recommendations.append("No traffic detected - verify WAF configuration")
+            
+            metrics['recommendations'] = recommendations
+            
+        except Exception as e:
+            metrics['error'] = str(e)
+        
+        return metrics
+
+def lambda_handler(event, context):
+    """AWS Lambda handler for WAF custom rule processing"""
+    
+    # Initialize WAF rule engine
+    web_acl_id = event.get('web_acl_id')
+    rule_engine = WAFCustomRuleEngine(web_acl_id)
+    
+    # Process the request
+    if event.get('action') == 'analyze_request':
+        request_data = event.get('request_data', {})
+        analysis = rule_engine.analyze_request(request_data)
+        
+        return {
+            'statusCode': 200,
+            'body': json.dumps(analysis)
+        }
+    
+    elif event.get('action') == 'create_rule':
+        rule_name = event.get('rule_name')
+        patterns = event.get('patterns', [])
+        priority = event.get('priority', 100)
+        action = event.get('rule_action', 'Block')
+        
+        result = rule_engine.create_custom_rule(rule_name, patterns, priority, action)
+        
+        return {
+            'statusCode': 200,
+            'body': json.dumps({'result': result})
+        }
+    
+    elif event.get('action') == 'monitor':
+        time_period = event.get('time_period_hours', 24)
+        metrics = rule_engine.monitor_and_adjust(time_period)
+        
+        return {
+            'statusCode': 200,
+            'body': json.dumps(metrics)
+        }
+    
+    else:
+        return {
+            'statusCode': 400,
+            'body': json.dumps({'error': 'Invalid action specified'})
+        }
+
+# Example usage
+if __name__ == "__main__":
+    # Initialize the rule engine
+    engine = WAFCustomRuleEngine('your-web-acl-id')
+    
+    # Analyze a sample request
+    sample_request = {
+        'uri': '/api/users',
+        'queryString': 'id=1 OR 1=1',
+        'httpMethod': 'GET',
+        'sourceIp': '192.168.1.100',
+        'userAgent': 'Mozilla/5.0',
+        'body': '',
+        'headers': {'Content-Type': 'application/json'}
+    }
+    
+    analysis = engine.analyze_request(sample_request)
+    print("Threat Analysis:", json.dumps(analysis, indent=2))
+    
+    # Create a custom rule
+    sql_patterns = [
+        r'(?i)(union\s+select|select\s+.*\s+from)',
+        r'(?i)(\'\s*or\s*1\s*=\s*1)'
+    ]
+    
+    result = engine.create_custom_rule(
+        rule_name='CustomSQLiRule',
+        patterns=sql_patterns,
+        priority=50,
+        action='Block'
+    )
+    print("Rule Creation:", result)
+    
+    # Monitor metrics
+    metrics = engine.monitor_and_adjust(24)
+    print("Monitoring Results:", json.dumps(metrics, indent=2))
+```
+
+### ModSecurity Configuration
+
+#### Advanced ModSecurity Setup with OWASP CRS
+
+```apache
+# modsecurity-advanced.conf
+# Advanced ModSecurity configuration for Apache/Nginx
+
+# Basic configuration
+SecRuleEngine On
+SecRequestBodyAccess On
+SecResponseBodyAccess Off
+
+# Request body handling
+SecRequestBodyLimit 13107200
+SecRequestBodyNoFilesLimit 131072
+SecRequestBodyInMemoryLimit 131072
+SecRequestBodyLimitAction Reject
+
+# File uploads
+SecTmpDir /tmp/
+SecDataDir /tmp/
+SecUploadDir /opt/modsecurity/var/upload/
+SecUploadKeepFiles RelevantOnly
+SecUploadFileMode 0600
+
+# Debug and audit logging
+SecDebugLog /var/log/apache2/modsec_debug.log
+SecDebugLogLevel 0
+SecAuditEngine RelevantOnly
+SecAuditLogRelevantStatus "^(?:5|4(?!04))"
+SecAuditLogParts ABDEFHIJZ
+SecAuditLogType Serial
+SecAuditLog /var/log/apache2/modsec_audit.log
+
+# Sensor identification
+SecServerSignature "Apache/2.4.0 (Unix)"
+
+# Custom rule configurations
+Include /etc/modsecurity/crs/crs-setup.conf
+Include /etc/modsecurity/crs/rules/*.conf
+
+# Custom rules for specific application protection
+SecRule REQUEST_FILENAME "@beginsWith /api/" \
+    "id:1001,\
+    phase:1,\
+    block,\
+    msg:'API endpoint access without proper authentication',\
+    logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}',\
+    severity:'CRITICAL',\
+    ver:'1.0',\
+    maturity:'9',\
+    accuracy:'9',\
+    t:none,\
+    chain"
+    SecRule &REQUEST_HEADERS:Authorization "@eq 0" \
+        "setvar:'tx.anomaly_score=+%{tx.critical_anomaly_score}',\
+        setvar:'tx.%{rule.id}-POLICY-%{matched_var_name}=%{matched_var}'"
+
+# Advanced SQL injection detection
+SecRule ARGS "@detectSQLi" \
+    "id:1002,\
+    phase:2,\
+    block,\
+    msg:'SQL Injection Attack Detected via libinjection',\
+    logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}',\
+    severity:'CRITICAL',\
+    ver:'1.0',\
+    maturity:'9',\
+    accuracy:'9',\
+    t:none,\
+    t:urlDecodeUni,\
+    t:htmlEntityDecode,\
+    t:removeNulls,\
+    setvar:'tx.anomaly_score=+%{tx.critical_anomaly_score}',\
+    setvar:'tx.%{rule.id}-POLICY-%{matched_var_name}=%{matched_var}'"
+
+# XSS protection with enhanced detection
+SecRule ARGS "@detectXSS" \
+    "id:1003,\
+    phase:2,\
+    block,\
+    msg:'XSS Attack Detected via libinjection',\
+    logdata:'Matched Data: %{MATCHED_VAR} found within %{MATCHED_VAR_NAME}',\
+    severity:'CRITICAL',\
+    ver:'1.0',\
+    maturity:'9',\
+    accuracy:'9',\
+    t:none,\
+    t:urlDecodeUni,\
+    t:htmlEntityDecode,\
+    t:removeNulls,\
+    setvar:'tx.anomaly_score=+%{tx.critical_anomaly_score}',\
+    setvar:'tx.%{rule.id}-POLICY-%{matched_var_name}=%{matched_var}'"
+
+# Rate limiting based on IP
+SecAction \
+    "id:1004,\
+    phase:1,\
+    nolog,\
+    pass,\
+    initcol:ip=%{remote_addr},\
+    setvar:ip.requests_per_minute=+1,\
+    expirevar:ip.requests_per_minute=60"
+
+SecRule IP:REQUESTS_PER_MINUTE "@gt 60" \
+    "id:1005,\
+    phase:1,\
+    deny,\
+    status:429,\
+    msg:'Rate limit exceeded - too many requests per minute',\
+    logdata:'Client IP: %{remote_addr}, Requests: %{ip.requests_per_minute}',\
+    severity:'WARNING',\
+    setvar:'tx.anomaly_score=+%{tx.warning_anomaly_score}'"
+
+# Session-based rate limiting
+SecAction \
+    "id:1006,\
+    phase:1,\
+    nolog,\
+    pass,\
+    initcol:session=%{request_cookies.sessionid},\
+    setvar:session.requests_per_session=+1"
+
+SecRule SESSION:REQUESTS_PER_SESSION "@gt 1000" \
+    "id:1007,\
+    phase:1,\
+    deny,\
+    status:429,\
+    msg:'Session-based rate limit exceeded',\
+    logdata:'Session ID: %{request_cookies.sessionid}, Requests: %{session.requests_per_session}',\
+    severity:'WARNING'"
+
+# Geographic blocking (example for specific countries)
+SecGeoLookupDB /etc/modsecurity/geoip/GeoLite2-Country.mmdb
+
+SecRule GEO:COUNTRY_CODE "@pmFromFile /etc/modsecurity/blocked_countries.txt" \
+    "id:1008,\
+    phase:1,\
+    deny,\
+    status:403,\
+    msg:'Access denied from blocked country',\
+    logdata:'Country: %{geo.country_code}, IP: %{remote_addr}',\
+    severity:'WARNING'"
+
+# Admin panel protection
+SecRule REQUEST_FILENAME "@beginsWith /admin/" \
+    "id:1009,\
+    phase:1,\
+    block,\
+    msg:'Admin panel access from unauthorized IP',\
+    logdata:'IP: %{remote_addr}, URI: %{request_filename}',\
+    severity:'CRITICAL',\
+    chain"
+    SecRule REMOTE_ADDR "!@ipMatchFromFile /etc/modsecurity/admin_ips.txt"
+
+# File upload security
+SecRule FILES_TMPNAMES "@inspectFile /etc/modsecurity/util/runav.pl" \
+    "id:1010,\
+    phase:2,\
+    block,\
+    msg:'Malicious file upload detected',\
+    logdata:'File: %{matched_var}',\
+    severity:'CRITICAL'"
+
+# Custom anomaly scoring threshold
+SecRule TX:ANOMALY_SCORE "@ge %{tx.inbound_anomaly_score_threshold}" \
+    "id:1011,\
+    phase:2,\
+    deny,\
+    status:403,\
+    msg:'Inbound Anomaly Score Exceeded (Total Score: %{TX.ANOMALY_SCORE})',\
+    severity:'CRITICAL',\
+    ver:'1.0',\
+    maturity:'9',\
+    accuracy:'9'"
+
+# Response filtering for data leakage prevention
+SecRule RESPONSE_BODY "@pmFromFile /etc/modsecurity/sensitive_data_patterns.txt" \
+    "id:1012,\
+    phase:4,\
+    block,\
+    msg:'Sensitive data leakage detected in response',\
+    logdata:'Pattern matched: %{matched_var}',\
+    severity:'ERROR',\
+    sanitiseMatched"
+```
+
+#### ModSecurity with Machine Learning Integration
+
+```python
+# modsecurity-ml-integration.py
+import pickle
+import numpy as np
+import re
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+import json
+import logging
+from typing import Dict, List, Tuple
+
+class ModSecurityMLEngine:
+    def __init__(self, model_path: str = None):
+        self.vectorizer = TfidfVectorizer(
+            max_features=10000,
+            ngram_range=(1, 3),
+            analyzer='char_wb'
+        )
+        self.classifier = RandomForestClassifier(
+            n_estimators=100,
+            random_state=42,
+            class_weight='balanced'
+        )
+        self.model_path = model_path
+        
+        if model_path:
+            self.load_model()
+        
+        self.feature_extractors = {
+            'length_features': self._extract_length_features,
+            'char_features': self._extract_character_features,
+            'pattern_features': self._extract_pattern_features,
+            'entropy_features': self._extract_entropy_features
+        }
+    
+    def _extract_length_features(self, request: str) -> List[float]:
+        """Extract length-based features"""
+        return [
+            len(request),
+            len(request.split('/')),
+            len(request.split('&')),
+            len(request.split('=')),
+            request.count('%'),
+            max(len(param) for param in request.split('&')) if '&' in request else 0
+        ]
+    
+    def _extract_character_features(self, request: str) -> List[float]:
+        """Extract character distribution features"""
+        total_chars = len(request)
+        if total_chars == 0:
+            return [0] * 10
+        
+        return [
+            sum(1 for c in request if c.isalpha()) / total_chars,
+            sum(1 for c in request if c.isdigit()) / total_chars,
+            sum(1 for c in request if c in '!@#$%^&*()') / total_chars,
+            sum(1 for c in request if c in '<>"\'/') / total_chars,
+            sum(1 for c in request if c.isupper()) / total_chars,
+            sum(1 for c in request if c.islower()) / total_chars,
+            request.count('=') / total_chars,
+            request.count('&') / total_chars,
+            request.count('%') / total_chars,
+            request.count('+') / total_chars
+        ]
+    
+    def _extract_pattern_features(self, request: str) -> List[float]:
+        """Extract pattern-based features"""
+        patterns = {
+            'sql_keywords': r'(?i)(select|union|insert|update|delete|drop|create|alter)',
+            'xss_patterns': r'(?i)(<script|javascript:|onload|onerror|onclick)',
+            'file_inclusion': r'(?i)(\.\.\/|\.\.\\|\/etc\/|c:\\)',
+            'command_injection': r'(?i)(;|\||&|`|\$\()',
+            'hex_encoding': r'%[0-9a-fA-F]{2}',
+            'unicode_encoding': r'\\u[0-9a-fA-F]{4}',
+            'html_entities': r'&[a-zA-Z]+;',
+            'repeated_chars': r'(.)\1{5,}'
+        }
+        
+        features = []
+        for pattern in patterns.values():
+            matches = len(re.findall(pattern, request))
+            features.append(matches)
+        
+        return features
+    
+    def _extract_entropy_features(self, request: str) -> List[float]:
+        """Extract entropy-based features"""
+        if len(request) == 0:
+            return [0, 0]
+        
+        # Calculate Shannon entropy
+        char_counts = {}
+        for char in request:
+            char_counts[char] = char_counts.get(char, 0) + 1
+        
+        entropy = 0
+        total_chars = len(request)
+        for count in char_counts.values():
+            probability = count / total_chars
+            entropy -= probability * np.log2(probability)
+        
+        # Calculate normalized entropy
+        max_entropy = np.log2(len(char_counts)) if len(char_counts) > 1 else 0
+        normalized_entropy = entropy / max_entropy if max_entropy > 0 else 0
+        
+        return [entropy, normalized_entropy]
+    
+    def extract_features(self, request: str) -> np.ndarray:
+        """Extract all features from a request"""
+        all_features = []
+        
+        for extractor in self.feature_extractors.values():
+            features = extractor(request)
+            all_features.extend(features)
+        
+        return np.array(all_features)
+    
+    def train_model(self, training_data: List[Tuple[str, int]]):
+        """Train the ML model with labeled data"""
+        requests = [item[0] for item in training_data]
+        labels = [item[1] for item in training_data]
+        
+        # Extract features
+        feature_matrix = np.array([self.extract_features(req) for req in requests])
+        
+        # Add TF-IDF features
+        tfidf_features = self.vectorizer.fit_transform(requests)
+        
+        # Combine features
+        combined_features = np.hstack([feature_matrix, tfidf_features.toarray()])
+        
+        # Split data
+        X_train, X_test, y_train, y_test = train_test_split(
+            combined_features, labels, test_size=0.2, random_state=42
+        )
+        
+        # Train classifier
+        self.classifier.fit(X_train, y_train)
+        
+        # Evaluate
+        train_score = self.classifier.score(X_train, y_train)
+        test_score = self.classifier.score(X_test, y_test)
+        
+        logging.info(f"Training accuracy: {train_score:.3f}")
+        logging.info(f"Test accuracy: {test_score:.3f}")
+        
+        return {
+            'train_accuracy': train_score,
+            'test_accuracy': test_score,
+            'feature_importance': self.classifier.feature_importances_.tolist()
+        }
+    
+    def predict_threat(self, request: str) -> Dict[str, any]:
+        """Predict if a request is malicious"""
+        # Extract features
+        features = self.extract_features(request)
+        tfidf_features = self.vectorizer.transform([request])
+        
+        # Combine features
+        combined_features = np.hstack([features.reshape(1, -1), tfidf_features.toarray()])
+        
+        # Predict
+        prediction = self.classifier.predict(combined_features)[0]
+        probability = self.classifier.predict_proba(combined_features)[0]
+        
+        threat_probability = probability[1] if len(probability) > 1 else 0
+        
+        # Determine threat level
+        if threat_probability >= 0.9:
+            threat_level = 'CRITICAL'
+        elif threat_probability >= 0.7:
+            threat_level = 'HIGH'
+        elif threat_probability >= 0.5:
+            threat_level = 'MEDIUM'
+        elif threat_probability >= 0.3:
+            threat_level = 'LOW'
+        else:
+            threat_level = 'SAFE'
+        
+        return {
+            'is_malicious': bool(prediction),
+            'threat_probability': float(threat_probability),
+            'threat_level': threat_level,
+            'confidence': float(max(probability)),
+            'features': features.tolist()
+        }
+    
+    def save_model(self, path: str):
+        """Save the trained model"""
+        model_data = {
+            'vectorizer': self.vectorizer,
+            'classifier': self.classifier
+        }
+        
+        with open(path, 'wb') as f:
+            pickle.dump(model_data, f)
+    
+    def load_model(self):
+        """Load a trained model"""
+        try:
+            with open(self.model_path, 'rb') as f:
+                model_data = pickle.load(f)
+                self.vectorizer = model_data['vectorizer']
+                self.classifier = model_data['classifier']
+        except FileNotFoundError:
+            logging.warning(f"Model file {self.model_path} not found")
+
+# ModSecurity integration script
+def modsecurity_ml_hook(request_data: str) -> str:
+    """Hook function for ModSecurity to call ML engine"""
+    
+    # Initialize ML engine
+    ml_engine = ModSecurityMLEngine('/opt/modsecurity/models/threat_model.pkl')
+    
+    # Analyze request
+    result = ml_engine.predict_threat(request_data)
+    
+    # Return ModSecurity-compatible response
+    if result['is_malicious'] and result['threat_probability'] > 0.7:
+        return f"THREAT_DETECTED:{result['threat_level']}:{result['threat_probability']:.3f}"
+    else:
+        return f"SAFE:{result['threat_level']}:{result['threat_probability']:.3f}"
+
+# Training data preparation script
+def prepare_training_data() -> List[Tuple[str, int]]:
+    """Prepare training data from ModSecurity logs"""
+    
+    training_data = []
+    
+    # Malicious requests (label: 1)
+    malicious_requests = [
+        "/app/admin/index.php?id=1' OR '1'='1",
+        "/search.php?q=<script>alert('xss')</script>",
+        "/upload.php?file=../../etc/passwd",
+        "/api/users?id=1; DROP TABLE users;--",
+        "/login.php?user=admin&pass=admin' UNION SELECT password FROM users--"
+    ]
+    
+    for req in malicious_requests:
+        training_data.append((req, 1))
+    
+    # Benign requests (label: 0)
+    benign_requests = [
+        "/index.php?page=home",
+        "/search.php?q=python+programming",
+        "/api/users?id=123&format=json",
+        "/products.php?category=electronics&sort=price",
+        "/contact.php?name=John&email=john@example.com"
+    ]
+    
+    for req in benign_requests:
+        training_data.append((req, 0))
+    
+    return training_data
+
+# Example usage
+if __name__ == "__main__":
+    # Initialize and train the model
+    ml_engine = ModSecurityMLEngine()
+    
+    # Prepare training data
+    training_data = prepare_training_data()
+    
+    # Train the model
+    results = ml_engine.train_model(training_data)
+    print("Training results:", json.dumps(results, indent=2))
+    
+    # Save the model
+    ml_engine.save_model('/tmp/threat_model.pkl')
+    
+    # Test prediction
+    test_request = "/app/login.php?user=admin&pass=' OR '1'='1"
+    prediction = ml_engine.predict_threat(test_request)
+    print("Threat prediction:", json.dumps(prediction, indent=2))
+    
+    # Test ModSecurity hook
+    hook_result = modsecurity_ml_hook(test_request)
+    print("ModSecurity hook result:", hook_result)
+```

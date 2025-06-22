@@ -190,131 +190,1534 @@ useEffect(() => {
 - **Avoid Using `useEffect` for Component Logic**: Use `useEffect` primarily for side effects. Keep your component logic and state management separate to maintain clarity and separation of concerns.
 - **Avoid Overusing `useEffect`**: While `useEffect` is powerful, overusing it can lead to complex and hard-to-maintain code. Use it judiciously for side effects that cannot be handled during rendering.
 - **Avoid Using `useEffect` for Simple State Updates**: If you only need to update state based on user interactions, consider using event handlers instead of `useEffect`. UseEffect is best suited for side effects that involve external systems or APIs.
+  <BackToTop />
 
 ## Examples
 
-### Timer Example
+### Real-time Weather Dashboard with Geolocation
 
 ```javascript
 import React, { useState, useEffect } from "react";
-function TimerComponent() {
-  const [seconds, setSeconds] = useState(0);
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setSeconds((prevSeconds) => prevSeconds + 1);
-    }, 1000);
-    return () => clearInterval(timer); // Cleanup function to clear the interval
-  }, []); // Empty dependency array means this effect runs once on mount
-  return (
-    <div>
-      <h1>Timer: {seconds} seconds</h1>
-    </div>
-  );
-}
-export default TimerComponent;
-```
 
-In this example, a timer is set up to increment the seconds every second. The cleanup function clears the interval when the component unmounts or before the effect runs again.
-
-<BackToTop />
-
-### Data Fetching Example
-
-```javascript
-import React, { useState, useEffect } from "react";
-function FetchDataComponent() {
-  const [data, setData] = useState(null);
+function WeatherDashboard() {
+  const [weatherData, setWeatherData] = useState(null);
+  const [location, setLocation] = useState({ latitude: null, longitude: null });
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [autoRefresh, setAutoRefresh] = useState(true);
+
+  // Effect for getting user's geolocation
   useEffect(() => {
-    const fetchData = async () => {
+    let watchId;
+
+    const successCallback = (position) => {
+      setLocation({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      });
+      setError(null);
+    };
+
+    const errorCallback = (err) => {
+      setError(`Geolocation error: ${err.message}`);
+      setLoading(false);
+      // Fallback to a default location (New York City)
+      setLocation({ latitude: 40.7128, longitude: -74.006 });
+    };
+
+    if ("geolocation" in navigator) {
+      // Get initial position
+      navigator.geolocation.getCurrentPosition(successCallback, errorCallback, {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000, // 5 minutes
+      });
+
+      // Watch for position changes
+      watchId = navigator.geolocation.watchPosition(
+        successCallback,
+        errorCallback,
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000, // 1 minute
+        }
+      );
+    } else {
+      setError("Geolocation is not supported by this browser");
+      setLocation({ latitude: 40.7128, longitude: -74.006 });
+    }
+
+    // Cleanup function
+    return () => {
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
+  }, []);
+
+  // Effect for fetching weather data when location changes
+  useEffect(() => {
+    if (!location.latitude || !location.longitude) return;
+
+    const fetchWeatherData = async () => {
+      setLoading(true);
       try {
-        const response = await fetch("https://api.example.com/data");
-        const result = await response.json();
-        setData(result);
-      } catch (error) {
-        console.error("Error fetching data:", error);
+        // Mock API call - replace with real weather API
+        const response = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${location.latitude}&lon=${location.longitude}&appid=YOUR_API_KEY&units=metric`
+        );
+
+        if (!response.ok) {
+          throw new Error(`Weather API error: ${response.status}`);
+        }
+
+        // For demo purposes, using mock data
+        const mockData = {
+          name: "Current Location",
+          main: {
+            temp: Math.round(Math.random() * 30 + 5),
+            feels_like: Math.round(Math.random() * 30 + 5),
+            humidity: Math.round(Math.random() * 50 + 30),
+            pressure: Math.round(Math.random() * 50 + 1000),
+          },
+          weather: [
+            {
+              main: ["Clear", "Clouds", "Rain", "Snow"][
+                Math.floor(Math.random() * 4)
+              ],
+              description: "scattered clouds",
+              icon: "03d",
+            },
+          ],
+          wind: {
+            speed: Math.round(Math.random() * 20 + 5),
+            deg: Math.round(Math.random() * 360),
+          },
+          sys: {
+            sunrise: Date.now() - 6 * 60 * 60 * 1000,
+            sunset: Date.now() + 6 * 60 * 60 * 1000,
+          },
+        };
+
+        setWeatherData(mockData);
+        setLastUpdated(new Date());
+        setError(null);
+      } catch (err) {
+        setError(`Failed to fetch weather data: ${err.message}`);
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
-  }, []); // Effect runs once on mount
+
+    fetchWeatherData();
+  }, [location.latitude, location.longitude]);
+
+  // Effect for auto-refresh functionality
+  useEffect(() => {
+    if (!autoRefresh || !location.latitude || !location.longitude) return;
+
+    const interval = setInterval(() => {
+      // Trigger a re-fetch by updating a dependency
+      setLocation((prev) => ({ ...prev }));
+    }, 300000); // Refresh every 5 minutes
+
+    return () => clearInterval(interval);
+  }, [autoRefresh, location.latitude, location.longitude]);
+
+  // Effect for page visibility API to pause/resume updates
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setAutoRefresh(false);
+        console.log("Page hidden - pausing weather updates");
+      } else {
+        setAutoRefresh(true);
+        console.log("Page visible - resuming weather updates");
+        // Trigger immediate update when page becomes visible
+        if (location.latitude && location.longitude) {
+          setLocation((prev) => ({ ...prev }));
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [location.latitude, location.longitude]);
+
+  // Effect for keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (event.ctrlKey || event.metaKey) {
+        switch (event.key) {
+          case "r":
+            event.preventDefault();
+            if (location.latitude && location.longitude) {
+              setLocation((prev) => ({ ...prev }));
+            }
+            break;
+          case "t":
+            event.preventDefault();
+            setAutoRefresh((prev) => !prev);
+            break;
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [location.latitude, location.longitude]);
+
+  const formatTime = (timestamp) => {
+    return new Date(timestamp).toLocaleTimeString();
+  };
+
+  const getWeatherIcon = (weatherMain) => {
+    const icons = {
+      Clear: "☀️",
+      Clouds: "☁️",
+      Rain: "🌧️",
+      Snow: "❄️",
+    };
+    return icons[weatherMain] || "🌤️";
+  };
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          padding: "40px",
+          textAlign: "center",
+          fontFamily: "Arial, sans-serif",
+        }}
+      >
+        <div style={{ fontSize: "24px", marginBottom: "20px" }}>🌍</div>
+        <div>Loading weather data...</div>
+        <div style={{ fontSize: "12px", color: "#666", marginTop: "10px" }}>
+          Getting your location and fetching weather information
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      {loading ? <p>Loading...</p> : <pre>{JSON.stringify(data, null, 2)}</pre>}
+    <div
+      style={{
+        padding: "20px",
+        maxWidth: "800px",
+        margin: "0 auto",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          background: "linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)",
+          color: "white",
+          padding: "30px",
+          borderRadius: "15px",
+          marginBottom: "20px",
+          boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+        }}
+      >
+        <h1 style={{ margin: "0 0 20px 0", fontSize: "28px" }}>
+          Weather Dashboard 🌦️
+        </h1>
+
+        {error && (
+          <div
+            style={{
+              backgroundColor: "rgba(255,255,255,0.2)",
+              padding: "10px",
+              borderRadius: "8px",
+              marginBottom: "20px",
+              fontSize: "14px",
+            }}
+          >
+            ⚠️ {error}
+          </div>
+        )}
+
+        {weatherData && (
+          <div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "20px",
+              }}
+            >
+              <div style={{ fontSize: "60px", marginRight: "20px" }}>
+                {getWeatherIcon(weatherData.weather[0].main)}
+              </div>
+              <div>
+                <div style={{ fontSize: "48px", fontWeight: "bold" }}>
+                  {weatherData.main.temp}°C
+                </div>
+                <div style={{ fontSize: "18px", opacity: 0.9 }}>
+                  Feels like {weatherData.main.feels_like}°C
+                </div>
+                <div
+                  style={{
+                    fontSize: "16px",
+                    opacity: 0.8,
+                    textTransform: "capitalize",
+                  }}
+                >
+                  {weatherData.weather[0].description}
+                </div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+                gap: "15px",
+                marginBottom: "20px",
+              }}
+            >
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: "24px" }}>💧</div>
+                <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+                  {weatherData.main.humidity}%
+                </div>
+                <div style={{ fontSize: "14px", opacity: 0.8 }}>Humidity</div>
+              </div>
+
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: "24px" }}>🌪️</div>
+                <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+                  {weatherData.wind.speed} m/s
+                </div>
+                <div style={{ fontSize: "14px", opacity: 0.8 }}>Wind Speed</div>
+              </div>
+
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: "24px" }}>📊</div>
+                <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+                  {weatherData.main.pressure} hPa
+                </div>
+                <div style={{ fontSize: "14px", opacity: 0.8 }}>Pressure</div>
+              </div>
+
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontSize: "24px" }}>🌅</div>
+                <div style={{ fontSize: "16px", fontWeight: "bold" }}>
+                  {formatTime(weatherData.sys.sunrise)}
+                </div>
+                <div style={{ fontSize: "14px", opacity: 0.8 }}>Sunrise</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontSize: "12px",
+            opacity: 0.8,
+            borderTop: "1px solid rgba(255,255,255,0.3)",
+            paddingTop: "15px",
+          }}
+        >
+          <div>
+            📍 {location.latitude?.toFixed(4)}, {location.longitude?.toFixed(4)}
+          </div>
+          <div>
+            {lastUpdated && `Last updated: ${lastUpdated.toLocaleTimeString()}`}
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          gap: "10px",
+          justifyContent: "center",
+          flexWrap: "wrap",
+        }}
+      >
+        <button
+          onClick={() => setLocation((prev) => ({ ...prev }))}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#00b894",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer",
+            fontSize: "14px",
+          }}
+        >
+          🔄 Refresh Now
+        </button>
+
+        <button
+          onClick={() => setAutoRefresh((prev) => !prev)}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: autoRefresh ? "#e17055" : "#74b9ff",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer",
+            fontSize: "14px",
+          }}
+        >
+          {autoRefresh ? "⏸️ Pause Auto-refresh" : "▶️ Enable Auto-refresh"}
+        </button>
+      </div>
+
+      <div
+        style={{
+          marginTop: "20px",
+          padding: "15px",
+          backgroundColor: "#f8f9fa",
+          borderRadius: "8px",
+          fontSize: "12px",
+          color: "#666",
+        }}
+      >
+        <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
+          Keyboard Shortcuts:
+        </div>
+        <div>• Ctrl/Cmd + R: Refresh weather data</div>
+        <div>• Ctrl/Cmd + T: Toggle auto-refresh</div>
+        <div style={{ marginTop: "8px" }}>
+          Auto-refresh is {autoRefresh ? "enabled" : "disabled"}
+          {autoRefresh && " (updates every 5 minutes)"}
+        </div>
+      </div>
     </div>
   );
 }
-export default FetchDataComponent;
-```
 
-This example demonstrates how to fetch data from an API when the component mounts. The loading state is managed to show a loading message while the data is being fetched.
+export default WeatherDashboard;
+```
 
 <BackToTop />
 
-### Animation Example
+### Advanced Document Title and Meta Manager
 
 ```javascript
-import React, { useState, useEffect } from "react";
-function AnimationComponent() {
-  const [isAnimating, setIsAnimating] = useState(false);
+import React, { useState, useEffect, useRef } from "react";
+
+function DocumentManager() {
+  const [pageTitle, setPageTitle] = useState("Document Manager");
+  const [metaDescription, setMetaDescription] = useState(
+    "Advanced document management"
+  );
+  const [favicon, setFavicon] = useState("📄");
+  const [notifications, setNotifications] = useState([]);
+  const [isActive, setIsActive] = useState(true);
+  const [visitDuration, setVisitDuration] = useState(0);
+  const originalTitle = useRef(document.title);
+  const originalFavicon = useRef(null);
+  const startTime = useRef(Date.now());
+
+  // Effect for managing document title with activity status
   useEffect(() => {
-    const animation = () => {
-      console.log("Animation started");
-      setIsAnimating(true);
+    const updateTitle = () => {
+      if (isActive) {
+        document.title = pageTitle;
+      } else {
+        document.title = `💤 ${pageTitle} - Come back!`;
+      }
     };
-    const cleanup = () => {
-      console.log("Animation ended");
-      setIsAnimating(false);
-    };
-    window.addEventListener("animationstart", animation);
-    window.addEventListener("animationend", cleanup);
+
+    updateTitle();
+
+    // Cleanup: restore original title when component unmounts
     return () => {
-      window.removeEventListener("animationstart", animation);
-      window.removeEventListener("animationend", cleanup); // Cleanup function to remove event listeners
+      document.title = originalTitle.current;
     };
-  }, []); // Effect runs once on mount
+  }, [pageTitle, isActive]);
+
+  // Effect for managing meta description
+  useEffect(() => {
+    let metaTag = document.querySelector('meta[name="description"]');
+
+    if (!metaTag) {
+      metaTag = document.createElement("meta");
+      metaTag.name = "description";
+      document.head.appendChild(metaTag);
+    }
+
+    const originalDescription = metaTag.content;
+    metaTag.content = metaDescription;
+
+    // Cleanup: restore original description
+    return () => {
+      if (originalDescription) {
+        metaTag.content = originalDescription;
+      } else {
+        metaTag.remove();
+      }
+    };
+  }, [metaDescription]);
+
+  // Effect for managing favicon
+  useEffect(() => {
+    let linkTag = document.querySelector('link[rel="icon"]');
+
+    if (!linkTag) {
+      linkTag = document.createElement("link");
+      linkTag.rel = "icon";
+      document.head.appendChild(linkTag);
+    }
+
+    // Store original favicon on first run
+    if (!originalFavicon.current) {
+      originalFavicon.current = linkTag.href;
+    }
+
+    // Create emoji favicon
+    const canvas = document.createElement("canvas");
+    canvas.height = 64;
+    canvas.width = 64;
+    const context = canvas.getContext("2d");
+    context.font = "50px serif";
+    context.fillText(favicon, 0, 50);
+
+    linkTag.href = canvas.toDataURL();
+
+    // Cleanup: restore original favicon
+    return () => {
+      if (originalFavicon.current) {
+        linkTag.href = originalFavicon.current;
+      }
+    };
+  }, [favicon]);
+
+  // Effect for tracking page visibility and activity
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      setIsActive(!document.hidden);
+
+      if (document.hidden) {
+        addNotification("Page became inactive", "info");
+      } else {
+        addNotification("Page became active", "success");
+      }
+    };
+
+    const handleFocus = () => {
+      setIsActive(true);
+      addNotification("Window gained focus", "success");
+    };
+
+    const handleBlur = () => {
+      setIsActive(false);
+      addNotification("Window lost focus", "warning");
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("blur", handleBlur);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("blur", handleBlur);
+    };
+  }, []);
+
+  // Effect for tracking visit duration
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (isActive) {
+        setVisitDuration(Math.floor((Date.now() - startTime.current) / 1000));
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isActive]);
+
+  // Effect for browser storage sync
+  useEffect(() => {
+    const storageKey = "documentManagerSettings";
+
+    // Load settings from localStorage
+    const savedSettings = localStorage.getItem(storageKey);
+    if (savedSettings) {
+      try {
+        const settings = JSON.parse(savedSettings);
+        setPageTitle(settings.title || pageTitle);
+        setMetaDescription(settings.description || metaDescription);
+        setFavicon(settings.favicon || favicon);
+      } catch (error) {
+        console.error("Error loading settings:", error);
+      }
+    }
+
+    // Save settings to localStorage when they change
+    const settings = {
+      title: pageTitle,
+      description: metaDescription,
+      favicon: favicon,
+    };
+    localStorage.setItem(storageKey, JSON.stringify(settings));
+  }, [pageTitle, metaDescription, favicon]);
+
+  // Effect for keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.ctrlKey || event.metaKey) {
+        switch (event.key) {
+          case "1":
+            event.preventDefault();
+            setFavicon("🏠");
+            addNotification("Favicon changed to home", "info");
+            break;
+          case "2":
+            event.preventDefault();
+            setFavicon("⚙️");
+            addNotification("Favicon changed to settings", "info");
+            break;
+          case "3":
+            event.preventDefault();
+            setFavicon("📊");
+            addNotification("Favicon changed to analytics", "info");
+            break;
+          case "d":
+            event.preventDefault();
+            exportSettings();
+            break;
+          case "r":
+            event.preventDefault();
+            resetSettings();
+            break;
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  // Effect for beforeunload warning
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      if (visitDuration > 30) {
+        // If user has been on page for more than 30 seconds
+        event.preventDefault();
+        event.returnValue =
+          "Are you sure you want to leave? Your changes might not be saved.";
+        return event.returnValue;
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [visitDuration]);
+
+  const addNotification = (message, type = "info") => {
+    const notification = {
+      id: Date.now(),
+      message,
+      type,
+      timestamp: new Date().toLocaleTimeString(),
+    };
+
+    setNotifications((prev) => [notification, ...prev.slice(0, 4)]);
+
+    // Auto-remove notification after 3 seconds
+    setTimeout(() => {
+      setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
+    }, 3000);
+  };
+
+  const exportSettings = () => {
+    const settings = {
+      title: pageTitle,
+      description: metaDescription,
+      favicon: favicon,
+      exportedAt: new Date().toISOString(),
+    };
+
+    const blob = new Blob([JSON.stringify(settings, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "document-settings.json";
+    a.click();
+    URL.revokeObjectURL(url);
+
+    addNotification("Settings exported", "success");
+  };
+
+  const resetSettings = () => {
+    setPageTitle("Document Manager");
+    setMetaDescription("Advanced document management");
+    setFavicon("📄");
+    addNotification("Settings reset to defaults", "info");
+  };
+
+  const formatDuration = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}m ${secs}s`;
+    } else if (minutes > 0) {
+      return `${minutes}m ${secs}s`;
+    } else {
+      return `${secs}s`;
+    }
+  };
+
+  const emojiOptions = [
+    "📄",
+    "🏠",
+    "⚙️",
+    "📊",
+    "🎨",
+    "🔧",
+    "💼",
+    "🌟",
+    "🚀",
+    "💡",
+  ];
+
   return (
-    <div>
-      <h1>{isAnimating ? "Animating..." : "Not Animating"}</h1>
+    <div
+      style={{
+        padding: "20px",
+        maxWidth: "800px",
+        margin: "0 auto",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          background: isActive
+            ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+            : "#6c757d",
+          color: "white",
+          padding: "30px",
+          borderRadius: "15px",
+          marginBottom: "20px",
+          transition: "background 0.3s ease",
+        }}
+      >
+        <h1 style={{ margin: "0 0 10px 0" }}>{favicon} Document Manager</h1>
+        <div style={{ fontSize: "14px", opacity: 0.9 }}>
+          Status: {isActive ? "🟢 Active" : "🔴 Inactive"} | Visit Duration:{" "}
+          {formatDuration(visitDuration)}
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: "20px",
+          marginBottom: "20px",
+        }}
+      >
+        {/* Document Settings */}
+        <div
+          style={{
+            padding: "20px",
+            border: "1px solid #ddd",
+            borderRadius: "10px",
+            backgroundColor: "white",
+          }}
+        >
+          <h3 style={{ margin: "0 0 15px 0" }}>Document Settings</h3>
+
+          <div style={{ marginBottom: "15px" }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "5px",
+                fontWeight: "bold",
+              }}
+            >
+              Page Title:
+            </label>
+            <input
+              type="text"
+              value={pageTitle}
+              onChange={(e) => setPageTitle(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "8px",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: "15px" }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "5px",
+                fontWeight: "bold",
+              }}
+            >
+              Meta Description:
+            </label>
+            <textarea
+              value={metaDescription}
+              onChange={(e) => setMetaDescription(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "8px",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                height: "60px",
+                resize: "vertical",
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: "15px" }}>
+            <label
+              style={{
+                display: "block",
+                marginBottom: "5px",
+                fontWeight: "bold",
+              }}
+            >
+              Favicon:
+            </label>
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              {emojiOptions.map((emoji) => (
+                <button
+                  key={emoji}
+                  onClick={() => setFavicon(emoji)}
+                  style={{
+                    padding: "8px",
+                    fontSize: "20px",
+                    border:
+                      favicon === emoji
+                        ? "2px solid #667eea"
+                        : "1px solid #ddd",
+                    borderRadius: "4px",
+                    backgroundColor: favicon === emoji ? "#e3f2fd" : "white",
+                    cursor: "pointer",
+                  }}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <button
+              onClick={exportSettings}
+              style={{
+                padding: "8px 16px",
+                backgroundColor: "#28a745",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              📤 Export Settings
+            </button>
+            <button
+              onClick={resetSettings}
+              style={{
+                padding: "8px 16px",
+                backgroundColor: "#dc3545",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              🔄 Reset
+            </button>
+          </div>
+        </div>
+
+        {/* Activity Monitor */}
+        <div
+          style={{
+            padding: "20px",
+            border: "1px solid #ddd",
+            borderRadius: "10px",
+            backgroundColor: "white",
+          }}
+        >
+          <h3 style={{ margin: "0 0 15px 0" }}>Activity Monitor</h3>
+
+          <div style={{ marginBottom: "15px" }}>
+            <div
+              style={{
+                fontSize: "24px",
+                fontWeight: "bold",
+                color: isActive ? "#28a745" : "#dc3545",
+              }}
+            >
+              {isActive ? "🟢 Active" : "🔴 Inactive"}
+            </div>
+            <div style={{ fontSize: "14px", color: "#666" }}>
+              Page visibility status
+            </div>
+          </div>
+
+          <div style={{ marginBottom: "15px" }}>
+            <div style={{ fontSize: "20px", fontWeight: "bold" }}>
+              {formatDuration(visitDuration)}
+            </div>
+            <div style={{ fontSize: "14px", color: "#666" }}>Time on page</div>
+          </div>
+
+          <div>
+            <h4 style={{ margin: "0 0 10px 0", fontSize: "16px" }}>
+              Recent Activity:
+            </h4>
+            <div style={{ maxHeight: "120px", overflowY: "auto" }}>
+              {notifications.length === 0 ? (
+                <div
+                  style={{
+                    fontSize: "14px",
+                    color: "#666",
+                    fontStyle: "italic",
+                  }}
+                >
+                  No recent activity
+                </div>
+              ) : (
+                notifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                    style={{
+                      padding: "6px 0",
+                      borderBottom: "1px solid #eee",
+                      fontSize: "12px",
+                    }}
+                  >
+                    <div style={{ fontWeight: "bold" }}>
+                      {notification.message}
+                    </div>
+                    <div style={{ color: "#666" }}>
+                      {notification.timestamp}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Keyboard Shortcuts */}
+      <div
+        style={{
+          padding: "15px",
+          backgroundColor: "#f8f9fa",
+          borderRadius: "8px",
+          fontSize: "12px",
+        }}
+      >
+        <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
+          Keyboard Shortcuts:
+        </div>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: "5px",
+          }}
+        >
+          <div>• Ctrl/Cmd + 1/2/3: Change favicon</div>
+          <div>• Ctrl/Cmd + D: Export settings</div>
+          <div>• Ctrl/Cmd + R: Reset settings</div>
+        </div>
+      </div>
     </div>
   );
 }
-export default AnimationComponent;
-```
 
-This example shows how to handle animations by adding and removing event listeners for animation events. The cleanup function ensures that the event listeners are removed when the component unmounts or before the effect runs again.
+export default DocumentManager;
+```
 
 <BackToTop />
 
-### Subscription Example
+### Advanced Infinite Scroll with Virtual Loading
 
 ```javascript
-import React, { useState, useEffect } from "react";
-function SubscriptionComponent() {
-  const [data, setData] = useState(null);
+import React, { useState, useEffect, useRef, useCallback } from "react";
+
+function InfiniteScrollGallery() {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const [filter, setFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [viewMode, setViewMode] = useState("grid");
+  const observerRef = useRef();
+  const loadingRef = useRef();
+  const retryTimeoutRef = useRef();
+
+  // Mock data generator
+  const generateMockItems = useCallback((pageNum, itemsPerPage = 20) => {
+    const categories = [
+      "technology",
+      "nature",
+      "architecture",
+      "art",
+      "science",
+    ];
+    const colors = [
+      "#FF6B6B",
+      "#4ECDC4",
+      "#45B7D1",
+      "#96CEB4",
+      "#FFEAA7",
+      "#DDA0DD",
+      "#98D8C8",
+    ];
+
+    return Array.from({ length: itemsPerPage }, (_, index) => {
+      const id = (pageNum - 1) * itemsPerPage + index + 1;
+      const category =
+        categories[Math.floor(Math.random() * categories.length)];
+
+      return {
+        id,
+        title: `Item ${id}: ${category.charAt(0).toUpperCase() + category.slice(1)} Sample`,
+        description: `This is a detailed description for item ${id}. It contains interesting information about ${category} and related topics.`,
+        category,
+        image: `https://picsum.photos/300/200?random=${id}`,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        timestamp: new Date(
+          Date.now() - Math.random() * 10000000000
+        ).toISOString(),
+        author: `Author ${Math.floor(Math.random() * 10) + 1}`,
+        likes: Math.floor(Math.random() * 1000),
+        views: Math.floor(Math.random() * 5000),
+      };
+    });
+  }, []);
+
+  // Fetch items with error handling and retry logic
+  const fetchItems = useCallback(
+    async (pageNum, reset = false) => {
+      if (loading) return;
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        // Simulate network delay
+        await new Promise((resolve) =>
+          setTimeout(resolve, 1000 + Math.random() * 1000)
+        );
+
+        // Simulate occasional errors
+        if (Math.random() < 0.1) {
+          throw new Error("Network error occurred");
+        }
+
+        const newItems = generateMockItems(pageNum);
+
+        setItems((prev) => (reset ? newItems : [...prev, ...newItems]));
+        setHasMore(pageNum < 10); // Limit to 10 pages for demo
+      } catch (err) {
+        setError(err.message);
+
+        // Auto-retry after 3 seconds
+        retryTimeoutRef.current = setTimeout(() => {
+          fetchItems(pageNum, reset);
+        }, 3000);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [loading, generateMockItems]
+  );
+
+  // Initial load
   useEffect(() => {
-    const subscribe = () => {
-      console.log("Subscribed to data source");
-      // Simulate data subscription
-      setData({ message: "Data from subscription" });
-    };
-    subscribe();
+    fetchItems(1, true);
+    setPage(1);
+  }, []);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const currentObserver = observerRef.current;
+    const currentLoadingRef = loadingRef.current;
+
+    if (!currentLoadingRef) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const target = entries[0];
+        if (target.isIntersecting && hasMore && !loading) {
+          const nextPage = page + 1;
+          setPage(nextPage);
+          fetchItems(nextPage);
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "100px",
+      }
+    );
+
+    observer.observe(currentLoadingRef);
+    observerRef.current = observer;
+
     return () => {
-      console.log("Unsubscribed from data source"); // Cleanup function to unsubscribe
-      setData(null);
+      if (currentObserver) {
+        currentObserver.disconnect();
+      }
     };
-  }, []); // Effect runs once on mount
+  }, [hasMore, loading, page, fetchItems]);
+
+  // Scroll position restoration
+  useEffect(() => {
+    const savedScrollPosition = sessionStorage.getItem("galleryScrollPosition");
+    if (savedScrollPosition) {
+      window.scrollTo(0, parseInt(savedScrollPosition));
+      sessionStorage.removeItem("galleryScrollPosition");
+    }
+
+    const handleScroll = () => {
+      sessionStorage.setItem(
+        "galleryScrollPosition",
+        window.scrollY.toString()
+      );
+    };
+
+    const throttledScroll = throttle(handleScroll, 200);
+    window.addEventListener("scroll", throttledScroll);
+
+    return () => {
+      window.removeEventListener("scroll", throttledScroll);
+    };
+  }, []);
+
+  // Filter and search functionality
+  const filteredItems = items.filter((item) => {
+    const matchesFilter = filter === "all" || item.category === filter;
+    const matchesSearch =
+      searchTerm === "" ||
+      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return matchesFilter && matchesSearch;
+  });
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      switch (event.key) {
+        case "Home":
+          event.preventDefault();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          break;
+        case "End":
+          event.preventDefault();
+          window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth",
+          });
+          break;
+        case "r":
+          if (event.ctrlKey || event.metaKey) {
+            event.preventDefault();
+            handleRefresh();
+          }
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // Performance monitoring
+  useEffect(() => {
+    let frameCount = 0;
+    let lastTime = performance.now();
+
+    const measureFPS = () => {
+      frameCount++;
+      const currentTime = performance.now();
+
+      if (currentTime - lastTime >= 1000) {
+        console.log(`FPS: ${frameCount}`);
+        frameCount = 0;
+        lastTime = currentTime;
+      }
+
+      requestAnimationFrame(measureFPS);
+    };
+
+    const animationId = requestAnimationFrame(measureFPS);
+
+    return () => cancelAnimationFrame(animationId);
+  }, []);
+
+  // Utility functions
+  const throttle = (func, delay) => {
+    let timeoutId;
+    let lastExecTime = 0;
+
+    return function (...args) {
+      const currentTime = Date.now();
+
+      if (currentTime - lastExecTime > delay) {
+        func.apply(this, args);
+        lastExecTime = currentTime;
+      } else {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(
+          () => {
+            func.apply(this, args);
+            lastExecTime = Date.now();
+          },
+          delay - (currentTime - lastExecTime)
+        );
+      }
+    };
+  };
+
+  const handleRefresh = () => {
+    setItems([]);
+    setPage(1);
+    setError(null);
+    setHasMore(true);
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+    }
+    fetchItems(1, true);
+  };
+
+  const handleRetry = () => {
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+    }
+    fetchItems(page);
+  };
+
+  const categories = [
+    "all",
+    "technology",
+    "nature",
+    "architecture",
+    "art",
+    "science",
+  ];
+
   return (
-    <div>
-      <h1>Subscription Data: {data ? data.message : "No data"}</h1>
+    <div
+      style={{
+        padding: "20px",
+        maxWidth: "1200px",
+        margin: "0 auto",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          color: "white",
+          padding: "30px",
+          borderRadius: "15px",
+          marginBottom: "20px",
+        }}
+      >
+        <h1 style={{ margin: "0 0 15px 0" }}>Infinite Scroll Gallery</h1>
+        <div style={{ fontSize: "14px", opacity: 0.9 }}>
+          {items.length} items loaded • Page {page} • {filteredItems.length}{" "}
+          items shown
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div
+        style={{
+          display: "flex",
+          gap: "15px",
+          marginBottom: "20px",
+          flexWrap: "wrap",
+          alignItems: "center",
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Search items..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{
+            padding: "10px",
+            border: "1px solid #ddd",
+            borderRadius: "6px",
+            minWidth: "200px",
+          }}
+        />
+
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          style={{
+            padding: "10px",
+            border: "1px solid #ddd",
+            borderRadius: "6px",
+          }}
+        >
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </option>
+          ))}
+        </select>
+
+        <div style={{ display: "flex", gap: "5px" }}>
+          <button
+            onClick={() => setViewMode("grid")}
+            style={{
+              padding: "10px",
+              backgroundColor: viewMode === "grid" ? "#667eea" : "#f8f9fa",
+              color: viewMode === "grid" ? "white" : "#333",
+              border: "1px solid #ddd",
+              borderRadius: "6px",
+              cursor: "pointer",
+            }}
+          >
+            🔲 Grid
+          </button>
+          <button
+            onClick={() => setViewMode("list")}
+            style={{
+              padding: "10px",
+              backgroundColor: viewMode === "list" ? "#667eea" : "#f8f9fa",
+              color: viewMode === "list" ? "white" : "#333",
+              border: "1px solid #ddd",
+              borderRadius: "6px",
+              cursor: "pointer",
+            }}
+          >
+            📋 List
+          </button>
+        </div>
+
+        <button
+          onClick={handleRefresh}
+          style={{
+            padding: "10px 15px",
+            backgroundColor: "#28a745",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+          }}
+        >
+          🔄 Refresh
+        </button>
+      </div>
+
+      {/* Items Grid/List */}
+      <div
+        style={{
+          display: viewMode === "grid" ? "grid" : "flex",
+          gridTemplateColumns:
+            viewMode === "grid"
+              ? "repeat(auto-fill, minmax(300px, 1fr))"
+              : "none",
+          flexDirection: viewMode === "list" ? "column" : "none",
+          gap: "20px",
+          marginBottom: "20px",
+        }}
+      >
+        {filteredItems.map((item) => (
+          <ItemCard key={item.id} item={item} viewMode={viewMode} />
+        ))}
+      </div>
+
+      {/* Loading/Error States */}
+      <div ref={loadingRef} style={{ textAlign: "center", padding: "20px" }}>
+        {loading && (
+          <div>
+            <div style={{ fontSize: "24px", marginBottom: "10px" }}>⏳</div>
+            <div>Loading more items...</div>
+          </div>
+        )}
+
+        {error && (
+          <div
+            style={{
+              padding: "20px",
+              backgroundColor: "#ffebee",
+              border: "1px solid #ffcdd2",
+              borderRadius: "8px",
+              color: "#c62828",
+            }}
+          >
+            <div style={{ fontSize: "18px", marginBottom: "10px" }}>
+              ❌ Error loading items
+            </div>
+            <div style={{ marginBottom: "15px" }}>{error}</div>
+            <button
+              onClick={handleRetry}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#dc3545",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
+            >
+              🔄 Retry
+            </button>
+          </div>
+        )}
+
+        {!hasMore && !loading && !error && (
+          <div
+            style={{
+              padding: "20px",
+              color: "#666",
+              fontSize: "16px",
+            }}
+          >
+            🎉 You've reached the end! No more items to load.
+          </div>
+        )}
+      </div>
+
+      {/* Footer Info */}
+      <div
+        style={{
+          marginTop: "30px",
+          padding: "15px",
+          backgroundColor: "#f8f9fa",
+          borderRadius: "8px",
+          fontSize: "12px",
+          color: "#666",
+        }}
+      >
+        <div style={{ fontWeight: "bold", marginBottom: "8px" }}>
+          Performance Features:
+        </div>
+        <div>• Intersection Observer for efficient scroll detection</div>
+        <div>• Virtual loading with automatic retry on errors</div>
+        <div>• Scroll position restoration on page refresh</div>
+        <div>• Throttled scroll events for better performance</div>
+        <div>• Keyboard shortcuts: Home/End keys, Ctrl+R to refresh</div>
+      </div>
     </div>
   );
 }
-export default SubscriptionComponent;
-```
 
-This example demonstrates how to manage subscriptions to an external data source. The cleanup function ensures that the subscription is properly cleaned up when the component unmounts or before the effect runs again.
+// Memoized ItemCard component
+const ItemCard = React.memo(({ item, viewMode }) => {
+  return (
+    <div
+      style={{
+        border: "1px solid #ddd",
+        borderRadius: "10px",
+        overflow: "hidden",
+        backgroundColor: "white",
+        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+        transition: "transform 0.2s ease, box-shadow 0.2s ease",
+        cursor: "pointer",
+        display: viewMode === "list" ? "flex" : "block",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-2px)";
+        e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.15)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "0 4px 8px rgba(0,0,0,0.1)";
+      }}
+    >
+      <div
+        style={{
+          height: viewMode === "grid" ? "200px" : "120px",
+          backgroundColor: item.color,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "white",
+          fontSize: "18px",
+          fontWeight: "bold",
+          minWidth: viewMode === "list" ? "120px" : "auto",
+        }}
+      >
+        {item.category.charAt(0).toUpperCase()}
+      </div>
+
+      <div style={{ padding: "15px", flex: viewMode === "list" ? 1 : "none" }}>
+        <h3 style={{ margin: "0 0 8px 0", fontSize: "16px" }}>{item.title}</h3>
+        <p
+          style={{
+            margin: "0 0 10px 0",
+            color: "#666",
+            fontSize: "14px",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
+          {item.description}
+        </p>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontSize: "12px",
+            color: "#999",
+          }}
+        >
+          <span
+            style={{
+              padding: "3px 8px",
+              backgroundColor: item.color + "20",
+              borderRadius: "12px",
+              textTransform: "capitalize",
+            }}
+          >
+            {item.category}
+          </span>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <span>👍 {item.likes}</span>
+            <span>👁️ {item.views}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+export default InfiniteScrollGallery;
+```
 
 <BackToTop />
 

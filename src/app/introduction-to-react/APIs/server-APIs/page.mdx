@@ -6,387 +6,1227 @@ import BackToTop from "@/components/BackToTop";
 
 ## Overview
 
-Server APIs in React are used to handle server-side operations, such as fetching data from a database, processing requests, and managing server-side logic. These APIs allow you to build robust applications that can interact with a backend server, perform data manipulation, and respond to client requests efficiently.
+Server APIs in React refer to server-side rendering (SSR) capabilities and API endpoints that handle server-side operations. These include React's streaming server APIs like `renderToPipeableStream` and `renderToReadableStream`, which enable efficient server-side rendering, as well as backend API endpoints that handle data fetching, authentication, and business logic.
 
-Server APIs are essential for building dynamic applications that require real-time data updates, user authentication, and other server-side functionalities. They enable developers to create scalable and maintainable applications by separating the client-side and server-side logic.
+Server APIs are crucial for building modern web applications that require optimal performance, SEO optimization, and dynamic content delivery. They enable developers to render React components on the server, stream content progressively to clients, and handle complex server-side operations while maintaining clean separation between frontend and backend concerns.
+
+In the context of React and Next.js, server APIs encompass both React's SSR streaming APIs and backend API routes that can be created within the same application framework, providing a full-stack development experience.
 
 ### Core Concepts
 
-- **Server-Side Rendering (SSR)**: This technique allows you to render React components on the server before sending them to the client, improving performance and SEO.
-- **API Endpoints**: These are specific URLs that handle requests and responses between the client and server. They can be used to fetch data, submit forms, or perform other operations.
-- **Data Fetching**: Server APIs can be used to fetch data from databases or external services, allowing your application to display dynamic content based on user interactions or other criteria.
-- **Authentication**: Server APIs can handle user authentication and authorization, ensuring that only authorized users can access certain resources or perform specific actions.
+- **Server-Side Rendering (SSR)**: A technique that renders React components on the server before sending HTML to the client. This improves initial page load performance, enables better SEO by providing crawlable content, and ensures users see content immediately without waiting for JavaScript to execute.
+
+- **Streaming SSR**: Advanced server rendering that sends HTML in chunks as components become ready, rather than waiting for the entire page. This reduces Time to First Byte (TTFB) and allows progressive page loading.
+
+- **API Routes**: Server-side endpoints (in frameworks like Next.js) that handle HTTP requests, database operations, authentication, and business logic. These run on the server and can be accessed via standard HTTP methods (GET, POST, PUT, DELETE).
+
+- **Hydration**: The process where client-side React takes over server-rendered HTML, attaching event listeners and making the page interactive. React matches the server-rendered markup with client-side components.
+
+- **Data Fetching Strategies**: Server APIs enable various data fetching patterns including:
+
+  - Static Generation (SSG) with `getStaticProps`
+  - Server-Side Rendering with `getServerSideProps`
+  - Incremental Static Regeneration (ISR)
+  - API routes for dynamic data
+
+- **Edge Computing**: Modern server APIs can run at edge locations closer to users, reducing latency and improving performance through distributed computing.
 
 ### Advantages and Disadvantages
 
-- **Advantages**:
-  - Improved performance through server-side rendering.
-  - Enhanced security by keeping sensitive operations on the server.
-  - Ability to handle complex data operations and business logic.
-- **Disadvantages**:
-  - Increased complexity in managing server-side code.
-  - Potential for slower initial load times compared to static APIs.
+**Advantages:**
+
+- **Improved Performance**: Server-rendered pages load faster as users receive pre-rendered HTML instead of waiting for JavaScript to execute and render content
+- **Enhanced SEO**: Search engines can crawl and index server-rendered content more effectively, improving search rankings and social media previews
+- **Better Core Web Vitals**: SSR typically improves metrics like First Contentful Paint (FCP) and Largest Contentful Paint (LCP)
+- **Progressive Enhancement**: Applications work even with JavaScript disabled, providing better accessibility and reliability
+- **Reduced Client-Side Bundle Size**: Some rendering work is moved to the server, potentially reducing the JavaScript that needs to be downloaded
+- **Security Benefits**: Sensitive operations, API keys, and business logic remain on the server, reducing exposure to client-side vulnerabilities
+
+**Disadvantages:**
+
+- **Server Complexity**: Requires managing server infrastructure, scaling, and potential single points of failure
+- **Higher Server Costs**: Server-side rendering consumes more server resources compared to serving static files
+- **Time to Interactive (TTI) Considerations**: While initial content appears faster, the page may not be interactive until hydration completes
+- **Development Complexity**: Requires careful consideration of server vs. client code, isomorphic components, and state management
+- **Caching Challenges**: Dynamic server-rendered content is harder to cache effectively compared to static content
 
 ### When to Use Server APIs
 
-- When you need to fetch dynamic data from a database or external service.
-- When you require server-side rendering for better performance and SEO.
-- When you need to handle user authentication and authorization.
-- When you need to perform complex data manipulation or business logic that cannot be handled on the client side.
+**Ideal Use Cases:**
+
+- **E-commerce Applications**: Product catalogs, shopping carts, and checkout processes that require SEO and fast initial loads
+- **Content Management Systems**: Blogs, news sites, and documentation where content needs to be indexable and load quickly
+- **Dashboard Applications**: Admin panels and analytics dashboards that require authentication and real-time data
+- **Social Media Platforms**: User profiles, feeds, and content that benefit from SEO and social sharing previews
+- **Marketing Landing Pages**: Campaign pages that need optimal Core Web Vitals for conversion optimization
+
+**Technical Scenarios:**
+
+- When your application requires dynamic data that changes frequently (user-specific content, real-time updates)
+- When SEO is critical for organic traffic and search engine visibility
+- When you need to implement secure authentication flows and protect sensitive routes
+- When your application serves diverse geographic regions and can benefit from edge rendering
+- When you're building progressive web apps (PWAs) that need to work offline and with poor connectivity
+- When you need to integrate with databases, external APIs, or microservices that require server-side processing
+
+**Performance Considerations:**
+
+- Applications with heavy client-side JavaScript bundles that would benefit from server-side computation
+- When targeting users with slower devices or limited bandwidth who benefit from pre-rendered content
+- When Core Web Vitals and page speed are critical business metrics
 
   <BackToTop />
 
 ## `renderToPipeableStream`
 
-The `renderToPipeableStream` function is a part of React's server-side rendering capabilities. It allows you to render React components to a stream, which can be sent to the client in chunks. This is particularly useful for improving performance by allowing the client to start rendering content before the entire page is ready.
+The `renderToPipeableStream` function is React 18's primary server-side rendering API for Node.js environments. It renders React components to a pipeable Node.js stream, enabling sophisticated streaming SSR patterns. This function supports React's concurrent features including Suspense boundaries, selective hydration, and progressive rendering.
+
+Unlike traditional SSR that waits for the entire component tree to render, `renderToPipeableStream` can send HTML to the client in chunks, dramatically improving perceived performance and Time to First Byte (TTFB).
 
 ### Syntax
 
 ```javascript
 import { renderToPipeableStream } from "react-dom/server";
-const stream = renderToPipeableStream(<App />, {
-  onShellReady: () => {
-    // The shell is ready to be sent to the client
+
+const { pipe, abort } = renderToPipeableStream(element, {
+  onShellReady() {
+    // Called when the initial shell is ready
+    response.statusCode = 200;
+    response.setHeader("Content-Type", "text/html");
+    pipe(response);
   },
-  onError: (error) => {
-    console.error("Error during rendering:", error);
+  onShellError(error) {
+    // Called if the shell fails to render
+    response.statusCode = 500;
+    response.setHeader("Content-Type", "text/html");
+    response.send("<h1>Something went wrong</h1>");
+  },
+  onAllReady() {
+    // Called when everything including Suspense content is ready
+  },
+  onError(error) {
+    // Called for any error during rendering
+    console.error("Rendering error:", error);
   },
 });
 ```
 
 ### Parameters
 
-- `element`: The React element to render.
-- `options`: An object containing options for the rendering process, such as `onShellReady` and `onError`.
+- **`element`**: The root React element/component to render
+- **`options`**: Configuration object with the following callbacks:
+  - `onShellReady()`: Called when the initial HTML shell (everything above Suspense boundaries) is ready to stream
+  - `onShellError(error)`: Called if an error occurs while rendering the shell
+  - `onAllReady()`: Called when all content, including Suspense content, has finished rendering
+  - `onError(error)`: Called for any error during the rendering process
+  - `bootstrapScripts`: Array of script URLs to include in the document head
+  - `bootstrapModules`: Array of ES module script URLs to include
+  - `identifierPrefix`: String prefix for React-generated IDs to avoid conflicts
 
 ### Returns
 
-- A stream that can be piped to the response object in a server environment.
+An object containing:
 
-### Example
+- **`pipe(destination)`**: Method to pipe the stream to a writable stream (typically an HTTP response)
+- **`abort(reason)`**: Method to abort the rendering process
+
+### Example: E-commerce Product Page with Streaming
 
 ```javascript
 import { renderToPipeableStream } from "react-dom/server";
 import express from "express";
+import { ProductPage } from "./components/ProductPage";
+
 const app = express();
-app.get("/", (req, res) => {
-  const stream = renderToPipeableStream(<App />, {
-    onShellReady: () => {
-      res.writeHead(200, { "Content-Type": "text/html" });
-      stream.pipe(res);
-    },
-    onError: (error) => {
-      console.error("Error during rendering:", error);
-      res.status(500).send("Internal Server Error");
-    },
-  });
+
+app.get("/product/:id", async (req, res) => {
+  const productId = req.params.id;
+
+  const { pipe, abort } = renderToPipeableStream(
+    <ProductPage productId={productId} />,
+    {
+      onShellReady() {
+        // Send the initial page shell immediately
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        res.setHeader("Cache-Control", "no-cache");
+        pipe(res);
+      },
+      onShellError(error) {
+        // Handle shell rendering errors
+        console.error("Shell error:", error);
+        res.statusCode = 500;
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        res.send(`
+          <!DOCTYPE html>
+          <html>
+            <body>
+              <h1>Product Temporarily Unavailable</h1>
+              <p>Please try again later.</p>
+            </body>
+          </html>
+        `);
+      },
+      onAllReady() {
+        // All content including reviews, recommendations loaded
+        console.log("Complete page rendered for product:", productId);
+      },
+      onError(error) {
+        console.error("Streaming error:", error);
+      },
+      bootstrapScripts: ["/static/js/client.js"],
+      bootstrapModules: ["/static/js/app.mjs"],
+    }
+  );
+
+  // Set timeout to abort long-running renders
+  setTimeout(() => abort("Request timeout"), 10000);
 });
+
 app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
+  console.log("E-commerce server running on http://localhost:3000");
 });
 ```
 
 ### How It Works
 
-The `renderToPipeableStream` function renders the React component to a stream, allowing the server to send the initial HTML to the client as soon as the shell is ready. This reduces the time to first paint, improving the user experience by displaying content faster. The stream can be piped directly to the response object, enabling the client to start rendering the page while the server continues to process the remaining content.
+The `renderToPipeableStream` function implements React's streaming SSR architecture:
 
-#### Streaming more content as it loads
+1. **Shell Rendering**: React first renders the "shell" - the HTML structure above any Suspense boundaries. This includes navigation, layout, and immediately available content.
 
-To stream more content as it loads, you can use the `onShellReady` callback to send the initial HTML and then continue to write additional content to the response as it becomes available. This allows for a more dynamic user experience, where users can see parts of the page while other parts are still being processed.
+2. **Progressive Streaming**: Once the shell is ready, it's immediately sent to the client via `onShellReady`. Users see the page structure and can start interacting with available elements.
+
+3. **Suspense Content**: Components wrapped in Suspense boundaries that are still loading (e.g., fetching data) are rendered as fallback content initially.
+
+4. **Concurrent Rendering**: As suspended components resolve, React continues streaming additional HTML chunks to replace fallback content.
+
+5. **Client Hydration**: React on the client progressively hydrates the streamed content, making it interactive as each chunk arrives.
+
+This approach provides several performance benefits:
+
+- **Faster TTFB**: Initial shell renders quickly without waiting for all data
+- **Improved FCP**: Users see content immediately, even while other parts load
+- **Better UX**: Progressive loading feels more responsive than blank loading screens
+- **SEO Benefits**: Search engines can crawl the initial shell content immediately
+
+#### Streaming Real-Time Dashboard Content
 
 ```javascript
 import { renderToPipeableStream } from "react-dom/server";
 import express from "express";
+import { AdminDashboard } from "./components/AdminDashboard";
+
 const app = express();
-app.get("/", (req, res) => {
-  const stream = renderToPipeableStream(<App />, {
-    onShellReady: () => {
-      res.writeHead(200, { "Content-Type": "text/html" });
-      stream.pipe(res);
-      // Simulate loading more content
-      setTimeout(() => {
-        res.write("<div>More content loaded...</div>");
-      }, 2000);
-    },
-    onError: (error) => {
-      console.error("Error during rendering:", error);
-      res.status(500).send("Internal Server Error");
-    },
+
+app.get("/admin/dashboard", authenticateUser, (req, res) => {
+  const userRole = req.user.role;
+
+  const { pipe, abort } = renderToPipeableStream(
+    <AdminDashboard userRole={userRole} />,
+    {
+      onShellReady() {
+        // Send navigation and basic layout immediately
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        res.setHeader("Cache-Control", "private, no-cache");
+        pipe(res);
+      },
+      onError(error) {
+        console.error("Dashboard streaming error:", error);
+        // Continue streaming even if some widgets fail
+      },
+      bootstrapScripts: ["/static/js/dashboard.js"],
+      bootstrapModules: ["/static/js/real-time-updates.mjs"],
+    }
+  );
+
+  // In this example, the dashboard shell loads immediately with:
+  // - Navigation bar
+  // - Sidebar menu
+  // - Widget placeholders
+  //
+  // Then streams in:
+  // - User-specific analytics (wrapped in Suspense)
+  // - Real-time metrics (wrapped in Suspense)
+  // - Chart data (wrapped in Suspense)
+  // - Recent activity feed (wrapped in Suspense)
+
+  // Cleanup on client disconnect
+  req.on("close", () => {
+    abort("Client disconnected");
   });
 });
-app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
-});
+
+function authenticateUser(req, res, next) {
+  // Authentication middleware
+  // Populate req.user
+  next();
+}
 ```
 
-In this example, the server sends the initial HTML to the client and then simulates loading more content after a delay. This demonstrates how you can continue to stream additional content as it becomes available,providing a more interactive experience for users.
-
-#### Using `renderToPipeableStream` with `<Suspense>`
-
-To use `renderToPipeableStream` with `<Suspense>`, you can wrap your components in a `<Suspense>` boundary. This allows you to handle loading states and display fallback content while the main content is being rendered.
+#### Using `renderToPipeableStream` with `<Suspense>` for Data Fetching
 
 ```javascript
 import { renderToPipeableStream } from "react-dom/server";
 import React, { Suspense } from "react";
 import express from "express";
+import { BlogPost } from "./components/BlogPost";
+import { CommentSection } from "./components/CommentSection";
+import { RelatedPosts } from "./components/RelatedPosts";
+
 const app = express();
-app.get("/", (req, res) => {
-  const stream = renderToPipeableStream(
-    <Suspense fallback={<div>Loading...</div>}>
-      <App />
-    </Suspense>,
+
+app.get("/blog/:slug", (req, res) => {
+  const postSlug = req.params.slug;
+
+  const { pipe, abort } = renderToPipeableStream(
+    <html>
+      <head>
+        <title>Blog - {postSlug}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
+      <body>
+        <nav>
+          <h1>My Blog</h1>
+        </nav>
+
+        <main>
+          {/* Main blog post loads immediately - no Suspense */}
+          <BlogPost slug={postSlug} />
+
+          {/* Comments load progressively */}
+          <Suspense
+            fallback={
+              <div className="loading-comments">
+                <div className="skeleton-loader">Loading comments...</div>
+              </div>
+            }
+          >
+            <CommentSection postSlug={postSlug} />
+          </Suspense>
+
+          {/* Related posts load independently */}
+          <Suspense
+            fallback={
+              <div className="loading-related">
+                <div className="skeleton-grid">Loading related posts...</div>
+              </div>
+            }
+          >
+            <RelatedPosts currentSlug={postSlug} />
+          </Suspense>
+        </main>
+
+        <script src="/static/js/blog-interactions.js" />
+      </body>
+    </html>,
     {
-      onShellReady: () => {
-        res.writeHead(200, { "Content-Type": "text/html" });
-        stream.pipe(res);
+      onShellReady() {
+        // Shell includes nav, main post content, and loading skeletons
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        res.setHeader("Cache-Control", "public, max-age=300"); // 5 min cache
+        pipe(res);
       },
-      onError: (error) => {
-        console.error("Error during rendering:", error);
-        res.status(500).send("Internal Server Error");
+      onError(error) {
+        console.error(`Blog post error for ${postSlug}:`, error);
       },
     }
   );
+
+  // Handle request timeout
+  setTimeout(() => abort("Blog request timeout"), 8000);
 });
+
 app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
+  console.log("Blog server running on http://localhost:3000");
 });
 ```
 
-In this example, the `<App />` component is wrapped in a `<Suspense>` boundary, allowing you to display a loading state while the main content is being rendered. The `fallback` prop specifies what to show while the content is loading, providing a better user experience by indicating that something is happening in the background.
+In this enhanced example:
+
+- **Immediate Shell**: Navigation and main blog post render immediately without Suspense
+- **Progressive Comments**: Comment section streams in when database queries complete
+- **Independent Related Posts**: Related posts load separately and may arrive before or after comments
+- **Fallback UI**: Skeleton loaders provide visual feedback during loading
+- **SEO Optimized**: Main content is immediately available for search engines
+- **Caching Strategy**: Appropriate cache headers for blog content
 
 <BackToTop />
 
 ## `renderToReadableStream`
 
-The `renderToReadableStream` function is another part of React's server-side rendering capabilities. It allows you to render React components to a readable stream, which can be consumed by the client.
+The `renderToReadableStream` function is React's modern server-side rendering API designed for Web Streams environments, including Cloudflare Workers, Deno, and other edge computing platforms. It returns a Web Streams API `ReadableStream` instead of a Node.js stream, making it compatible with modern runtime environments that support Web Standards.
+
+This function provides similar streaming capabilities to `renderToPipeableStream` but is optimized for environments that support the Web Streams API, enabling deployment to edge locations and serverless platforms.
 
 ### Syntax
 
 ```javascript
 import { renderToReadableStream } from "react-dom/server";
-const stream = renderToReadableStream(<App />, {
-  onError: (error) => {
-    console.error("Error during rendering:", error);
+
+const stream = await renderToReadableStream(element, {
+  onError(error) {
+    console.error("Rendering error:", error);
   },
+  bootstrapScripts: ["/static/js/client.js"],
+  bootstrapModules: ["/static/js/app.mjs"],
+  identifierPrefix: "react-ssr-",
 });
 ```
 
 ### Parameters
 
-- `element`: The React element to render.
-- `options`: An object containing options for the rendering process, such as `onError`.
+- **`element`**: The root React element/component to render
+- **`options`**: Configuration object (optional) with properties:
+  - `onError(error)`: Callback for handling rendering errors
+  - `bootstrapScripts`: Array of script URLs to include before React hydration
+  - `bootstrapModules`: Array of ES module URLs to include
+  - `identifierPrefix`: Prefix for React-generated HTML IDs
+  - `signal`: AbortSignal for cancelling the render
 
 ### Returns
 
-- A readable stream that can be consumed by the client.
+A **Promise** that resolves to a `ReadableStream` containing the rendered HTML. Unlike `renderToPipeableStream`, this function is asynchronous and returns a promise.
 
-### Example
+### Example: Cloudflare Workers Edge SSR
 
 ```javascript
 import { renderToReadableStream } from "react-dom/server";
-import express from "express";
-const app = express();
-app.get("/", (req, res) => {
-  const stream = renderToReadableStream(<App />, {
-    onError: (error) => {
-      console.error("Error during rendering:", error);
-      res.status(500).send("Internal Server Error");
-    },
-  });
-  res.writeHead(200, { "Content-Type": "text/html" });
-  stream.pipe(res);
-});
-app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
-});
+import { ProductCatalog } from "./components/ProductCatalog";
+
+export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+
+    // Handle product catalog requests
+    if (url.pathname.startsWith("/catalog")) {
+      const searchParams = url.searchParams;
+      const category = searchParams.get("category") || "all";
+      const page = parseInt(searchParams.get("page")) || 1;
+
+      try {
+        const stream = await renderToReadableStream(
+          <ProductCatalog
+            category={category}
+            page={page}
+            userCountry={request.cf?.country}
+          />,
+          {
+            onError(error) {
+              console.error("Edge SSR error:", error);
+              // Continue rendering with error boundaries
+            },
+            bootstrapScripts: ["/static/js/catalog-client.js"],
+            bootstrapModules: ["/static/js/search-enhancement.mjs"],
+          }
+        );
+
+        return new Response(stream, {
+          status: 200,
+          headers: {
+            "Content-Type": "text/html; charset=utf-8",
+            "Cache-Control": "public, max-age=300, s-maxage=600",
+            "X-Rendered-At": "edge",
+            Vary: "Accept-Encoding",
+          },
+        });
+      } catch (error) {
+        console.error("Catalog rendering failed:", error);
+        return new Response("<h1>Catalog Temporarily Unavailable</h1>", {
+          status: 500,
+          headers: { "Content-Type": "text/html" },
+        });
+      }
+    }
+
+    // Handle other routes...
+    return new Response("Not Found", { status: 404 });
+  },
+};
 ```
 
 ### How It Works
 
-The `renderToReadableStream` function renders the React component to a readable stream, which can be consumed by the client. This allows the server to send the initial HTML to the client as soon as the shell is ready, improving performance and reducing the time to first paint. The readable stream can be piped directly to the response object, enabling the client to start rendering the page while the server continues to process the remaining content.
+The `renderToReadableStream` function implements streaming SSR using the Web Streams API:
+
+1. **Async Rendering**: The function returns a Promise that resolves when the initial shell is ready to stream
+2. **Web Streams Compatibility**: Uses `ReadableStream` instead of Node.js streams, making it compatible with modern runtime environments
+3. **Edge Computing**: Optimized for deployment to edge locations like Cloudflare Workers, Vercel Edge Functions, and Deno Deploy
+4. **Concurrent Features**: Supports all React 18 concurrent features including Suspense, selective hydration, and progressive enhancement
+
+**Key Differences from `renderToPipeableStream`:**
+
+- Returns a Promise instead of providing callback-based APIs
+- Uses Web Streams instead of Node.js streams
+- Better suited for edge computing environments
+- Simpler API surface with fewer callback options
+- Automatic error handling in many edge platforms
 
 #### Rendering a React tree as HTML to a Readable Web Stream
 
-To render a React tree as HTML to a Readable Web Stream, you can use the `renderToReadableStream` function in conjunction with the `ReadableStream` API. This allows you to create a stream that can be consumed by the client, providing a more efficient way to deliver content.
+```javascript
+import { renderToReadableStream } from "react-dom/server";
+import { NewsArticle } from "./components/NewsArticle";
+
+// Deno Deploy example
+Deno.serve(async (request) => {
+  const url = new URL(request.url);
+  const articleId = url.pathname.split("/")[2];
+
+  if (url.pathname.startsWith("/news/") && articleId) {
+    try {
+      // Create abort controller for request timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      const stream = await renderToReadableStream(
+        <html lang="en">
+          <head>
+            <meta charSet="utf-8" />
+            <meta
+              name="viewport"
+              content="width=device-width, initial-scale=1"
+            />
+            <title>Breaking News</title>
+          </head>
+          <body>
+            <header>
+              <nav>Latest News</nav>
+            </header>
+            <main>
+              <NewsArticle
+                articleId={articleId}
+                userLocation={request.headers.get("cf-ipcountry")}
+              />
+            </main>
+            <script type="module" src="/js/news-interactions.js" />
+          </body>
+        </html>,
+        {
+          signal: controller.signal,
+          onError(error) {
+            console.error(`News article ${articleId} error:`, error);
+          },
+          bootstrapModules: ["/js/article-enhancements.mjs"],
+        }
+      );
+
+      clearTimeout(timeoutId);
+
+      return new Response(stream, {
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+          "Cache-Control": "public, max-age=180, stale-while-revalidate=300",
+          "X-Rendered-At": new Date().toISOString(),
+        },
+      });
+    } catch (error) {
+      if (error.name === "AbortError") {
+        return new Response("Request timeout", { status: 504 });
+      }
+      throw error;
+    }
+  }
+
+  return new Response("Not found", { status: 404 });
+});
+```
+
+This example demonstrates:
+
+- **Modern Runtime**: Using Deno with Web Standards APIs
+- **Request Handling**: Parsing URLs and extracting parameters
+- **Timeout Management**: Using AbortController for request timeouts
+- **Location-Aware**: Utilizing edge request headers for personalization
+- **Performance Headers**: Implementing proper caching strategies
+- **Error Boundaries**: Graceful error handling and fallbacks
+
+#### Error Handling and Monitoring in Edge Environments
 
 ```javascript
 import { renderToReadableStream } from "react-dom/server";
-import { ReadableStream } from "web-streams-polyfill/ponyfill";
-import express from "express";
-const app = express();
-app.get("/", (req, res) => {
-  const stream = renderToReadableStream(<App />, {
-    onError: (error) => {
-      console.error("Error during rendering:", error);
-      res.status(500).send("Internal Server Error");
-    },
-  });
-  res.writeHead(200, { "Content-Type": "text/html" });
-  stream
-    .pipeTo(
-      new ReadableStream({
-        start(controller) {
-          stream.on("data", (chunk) => {
-            controller.enqueue(chunk);
+import { UserDashboard } from "./components/UserDashboard";
+
+// Vercel Edge Function example with comprehensive error handling
+export default async function handler(request) {
+  const url = new URL(request.url);
+  const userId = url.searchParams.get("user");
+
+  // Validate request
+  if (!userId) {
+    return new Response("User ID required", { status: 400 });
+  }
+
+  try {
+    // Set up error tracking
+    const errors = [];
+    let renderCompleted = false;
+
+    const stream = await renderToReadableStream(
+      <UserDashboard
+        userId={userId}
+        theme={url.searchParams.get("theme") || "light"}
+      />,
+      {
+        onError(error) {
+          // Collect errors but don't stop rendering
+          errors.push({
+            message: error.message,
+            stack: error.stack,
+            timestamp: Date.now(),
+            userId,
+            component: error.componentStack,
           });
-          stream.on("end", () => {
-            controller.close();
+
+          // Log to monitoring service (e.g., Sentry, DataDog)
+          console.error("Dashboard SSR error:", {
+            userId,
+            error: error.message,
+            url: url.pathname,
           });
         },
-      })
-    )
-    .then(
-      () => {
-        console.log("Stream finished successfully");
-      },
-      (error) => {
-        console.error("Stream error:", error);
+        bootstrapScripts: ["/js/dashboard-client.js"],
+        identifierPrefix: `user-${userId}-`,
       }
     );
-});
-app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
-});
+
+    renderCompleted = true;
+
+    const response = new Response(stream, {
+      status: 200,
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "private, no-cache",
+        "X-User-ID": userId,
+        "X-Render-Errors": errors.length.toString(),
+      },
+    });
+
+    // Log successful renders for analytics
+    if (errors.length === 0) {
+      console.log(`Dashboard rendered successfully for user ${userId}`);
+    }
+
+    return response;
+  } catch (error) {
+    // Handle catastrophic rendering failures
+    console.error("Dashboard render failed completely:", {
+      userId,
+      error: error.message,
+      stack: error.stack,
+    });
+
+    // Return fallback HTML
+    return new Response(
+      `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Dashboard Unavailable</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+        </head>
+        <body>
+          <div style="text-align: center; padding: 50px;">
+            <h1>Dashboard Temporarily Unavailable</h1>
+            <p>We're experiencing technical difficulties. Please try again in a few moments.</p>
+            <button onclick="window.location.reload()">Retry</button>
+          </div>
+        </body>
+      </html>
+    `,
+      {
+        status: 503,
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+          "Retry-After": "30",
+        },
+      }
+    );
+  }
+}
 ```
 
-In this example, the `renderToReadableStream` function is used to render the React component to a readable stream. The `ReadableStream` API is then used to consume the stream, allowing the server to send the initial HTML to the client as soon as the shell is ready. This approach provides a more efficient way to deliver content, reducing the time to first paint and improving the overall user experience.
+This example showcases:
 
-#### Logging crashes on the server
-
-To log crashes on the server when using `renderToReadableStream`, you can use the `onError` callback to capture any errors that occur during the rendering process. This allows you to log the errors and handle them appropriately, ensuring that your application remains stable and provides useful feedback for debugging.
-
-```javascript
-import { renderToReadableStream } from "react-dom/server";
-import express from "express";
-const app = express();
-app.get("/", (req, res) => {
-  const stream = renderToReadableStream(<App />, {
-    onError: (error) => {
-      console.error("Error during rendering:", error);
-      res.status(500).send("Internal Server Error");
-    },
-  });
-  res.writeHead(200, { "Content-Type": "text/html" });
-  stream.pipe(res).catch((error) => {
-    console.error("Stream error:", error);
-    res.status(500).send("Internal Server Error");
-  });
-});
-app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
-});
-```
-
-In this example, the `onError` callback is used to log any errors that occur during the rendering process. Additionally, the `catch` method is used to handle any errors that occur while piping the stream to the response. This ensures that any crashes or errors are logged, providing useful information for debugging and maintaining the stability of your application.
+- **Error Collection**: Gathering errors without stopping the render process
+- **Monitoring Integration**: Structured logging for external monitoring services
+- **Graceful Degradation**: Fallback HTML when rendering fails completely
+- **Performance Tracking**: Monitoring successful renders and error rates
+- **User Context**: Including user information in error logs for debugging
+- **Recovery Mechanisms**: Retry buttons and appropriate HTTP status codes
 
 <BackToTop />
 
 ## `renderToStaticMarkup`
 
-The `renderToStaticMarkup` function is used to render React components to static HTML markup. It is particularly useful for generating static pages that do not require interactivity or dynamic updates. This function is often used in scenarios where you want to pre-render content on the server and send it to the client as static HTML.
+The `renderToStaticMarkup` function renders React components to static HTML strings without any React-specific attributes, event handlers, or client-side features. This function is ideal for generating static content, email templates, or content that will never require client-side interactivity.
 
-**CAUTION**
+**Important Considerations:**
 
-> The `renderToStaticMarkup` function does not include React-specific attributes or event handlers in the generated HTML. It produces a static representation of the React component, which means that the resulting HTML will not have any React-specific features like hydration or event handling. This is suitable for static content that does not require interactivity or dynamic updates.
+> `renderToStaticMarkup` strips away all React functionality from the output. The resulting HTML contains no `data-reactroot` attributes, no event handlers, and cannot be hydrated by React on the client. This makes it perfect for truly static content but unsuitable for interactive applications.
+
+### Key Differences from `renderToString`:
+
+- **No React Attributes**: Removes React-specific DOM attributes
+- **Smaller Output**: Generates cleaner, lighter HTML
+- **No Hydration Support**: Cannot be made interactive with client-side React
+- **Perfect for Static Content**: Ideal for emails, static pages, or content exports
 
 ### Syntax
 
 ```javascript
 import { renderToStaticMarkup } from "react-dom/server";
-const html = renderToStaticMarkup(<App />);
+
+const htmlString = renderToStaticMarkup(element);
 ```
 
 ### Parameters
 
-- `element`: The React element to render.
+- **`element`**: The React element/component to render to static HTML
 
 ### Returns
 
-- A string containing the static HTML markup of the rendered React component.
+A **string** containing clean HTML markup without React-specific attributes or functionality.
 
-### Example
+### Example: Email Template Generation
 
 ```javascript
 import { renderToStaticMarkup } from "react-dom/server";
 import express from "express";
+
+// Email template components
+const WelcomeEmail = ({ userName, activationLink, companyName }) => (
+  <html>
+    <head>
+      <meta charSet="utf-8" />
+      <title>Welcome to {companyName}</title>
+      <style>{`
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #007bff; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f9f9f9; }
+        .button { 
+          display: inline-block; 
+          background: #28a745; 
+          color: white; 
+          padding: 12px 24px; 
+          text-decoration: none; 
+          border-radius: 4px;
+          margin: 20px 0;
+        }
+        .footer { padding: 20px; text-align: center; color: #666; font-size: 12px; }
+      `}</style>
+    </head>
+    <body>
+      <div className="container">
+        <div className="header">
+          <h1>Welcome to {companyName}!</h1>
+        </div>
+        <div className="content">
+          <p>Hello {userName},</p>
+          <p>
+            Thank you for signing up! We're excited to have you join our
+            community. To get started, please activate your account by clicking
+            the button below:
+          </p>
+          <div style={{ textAlign: "center" }}>
+            <a href={activationLink} className="button">
+              Activate Your Account
+            </a>
+          </div>
+          <p>
+            If the button doesn't work, copy and paste this link into your
+            browser:
+            <br />
+            <a href={activationLink}>{activationLink}</a>
+          </p>
+          <p>
+            If you didn't create an account, you can safely ignore this email.
+          </p>
+        </div>
+        <div className="footer">
+          <p>&copy; 2024 {companyName}. All rights reserved.</p>
+          <p>123 Business St, City, State 12345</p>
+        </div>
+      </div>
+    </body>
+  </html>
+);
+
 const app = express();
-app.get("/", (req, res) => {
-  const html = renderToStaticMarkup(<App />);
-  res.writeHead(200, { "Content-Type": "text/html" });
-  res.end(html);
+
+// API endpoint for sending welcome emails
+app.post("/api/send-welcome-email", async (req, res) => {
+  const { userName, email, userId } = req.body;
+
+  try {
+    // Generate activation link
+    const activationToken = generateActivationToken(userId);
+    const activationLink = `${process.env.APP_URL}/activate?token=${activationToken}`;
+
+    // Render email HTML
+    const emailHtml = renderToStaticMarkup(
+      <WelcomeEmail
+        userName={userName}
+        activationLink={activationLink}
+        companyName="TechStart Inc"
+      />
+    );
+
+    // Send email using your preferred service (SendGrid, AWS SES, etc.)
+    await sendEmail({
+      to: email,
+      subject: "Welcome to TechStart Inc - Activate Your Account",
+      html: emailHtml,
+    });
+
+    res.json({ success: true, message: "Welcome email sent successfully" });
+  } catch (error) {
+    console.error("Email sending failed:", error);
+    res.status(500).json({ success: false, error: "Failed to send email" });
+  }
 });
-app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
-});
+
+function generateActivationToken(userId) {
+  // Implementation for generating secure activation tokens
+  return `token_${userId}_${Date.now()}`;
+}
+
+async function sendEmail({ to, subject, html }) {
+  // Implementation for your email service
+  console.log(`Sending email to ${to} with subject: ${subject}`);
+  // Actual email sending logic here
+}
 ```
 
 ### How It Works
 
-The `renderToStaticMarkup` function renders the React component to static HTML markup, which can be sent to the client as a response. This is useful for generating static pages that do not require interactivity or dynamic updates. The resulting HTML can be served directly to the client, improving performance and reducing the load on the server.
+The `renderToStaticMarkup` function performs a complete React render cycle but removes all interactive capabilities:
+
+1. **Component Rendering**: Executes the full React component lifecycle, including hooks and state initialization
+2. **HTML Generation**: Converts the virtual DOM to clean HTML strings
+3. **Attribute Stripping**: Removes React-specific attributes like `data-reactroot`, `data-react-checksum`
+4. **Event Handler Removal**: Strips all event handlers and interactive functionality
+5. **Clean Output**: Produces minimal, semantic HTML suitable for static consumption
+
+**Performance Characteristics:**
+
+- **Synchronous**: Renders the entire component tree before returning
+- **Memory Efficient**: No need to maintain React state or event listeners
+- **Fast Execution**: No overhead from React's runtime features
+- **Small Output**: Cleaner HTML with smaller file sizes
+
+**Common Use Cases:**
+
+- Email templates and newsletters
+- PDF generation from React components
+- Static site generation for non-interactive content
+- Content export features
+- Server-side content for third-party integrations
 
 #### Rendering a React tree as static HTML
 
-To render a React tree as static HTML, you can use the `renderToStaticMarkup` function in conjunction with a server framework like Express. This allows you to generate static HTML pages that can be served to the client without requiring any client-side JavaScript for rendering.
-
 ```javascript
 import { renderToStaticMarkup } from "react-dom/server";
-import express from "express";
-const app = express();
-app.get("/", (req, res) => {
-  const html = renderToStaticMarkup(<App />);
-  res.writeHead(200, { "Content-Type": "text/html" });
-  res.end(html);
-});
-app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
-});
+import fs from "fs/promises";
+import path from "path";
+
+// Component for generating static documentation
+const DocumentationPage = ({ title, sections, lastUpdated }) => (
+  <html lang="en">
+    <head>
+      <meta charSet="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>{title} - Documentation</title>
+      <style>{`
+        body { 
+          font-family: system-ui, -apple-system, sans-serif; 
+          line-height: 1.6; 
+          max-width: 800px; 
+          margin: 0 auto; 
+          padding: 20px;
+          color: #333;
+        }
+        h1 { color: #2563eb; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; }
+        h2 { color: #1f2937; margin-top: 30px; }
+        pre { 
+          background: #f3f4f6; 
+          padding: 15px; 
+          border-radius: 6px; 
+          overflow-x: auto;
+          border-left: 4px solid #3b82f6;
+        }
+        code { 
+          background: #f3f4f6; 
+          padding: 2px 6px; 
+          border-radius: 3px; 
+          font-size: 0.9em;
+        }
+        .updated { color: #6b7280; font-size: 0.9em; font-style: italic; }
+        .toc { 
+          background: #f9fafb; 
+          padding: 20px; 
+          border-radius: 8px; 
+          margin: 20px 0;
+        }
+        .toc ul { margin: 0; }
+        .toc a { text-decoration: none; color: #2563eb; }
+        .toc a:hover { text-decoration: underline; }
+      `}</style>
+    </head>
+    <body>
+      <header>
+        <h1>{title}</h1>
+        <p className="updated">
+          Last updated: {new Date(lastUpdated).toLocaleDateString()}
+        </p>
+      </header>
+
+      <nav className="toc">
+        <h3>Table of Contents</h3>
+        <ul>
+          {sections.map((section, index) => (
+            <li key={index}>
+              <a href={`#section-${index}`}>{section.title}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <main>
+        {sections.map((section, index) => (
+          <section key={index} id={`section-${index}`}>
+            <h2>{section.title}</h2>
+            <div dangerouslySetInnerHTML={{ __html: section.content }} />
+          </section>
+        ))}
+      </main>
+
+      <footer>
+        <hr />
+        <p>
+          Generated on {new Date().toLocaleString()} |
+          <a href="/docs">Back to Documentation Home</a>
+        </p>
+      </footer>
+    </body>
+  </html>
+);
+
+// Static site generator function
+async function generateStaticDocs() {
+  const docsData = {
+    title: "API Reference Guide",
+    lastUpdated: Date.now(),
+    sections: [
+      {
+        title: "Getting Started",
+        content: `
+          <p>Welcome to our API documentation. This guide will help you integrate with our services.</p>
+          <pre><code>npm install @company/api-client</code></pre>
+        `,
+      },
+      {
+        title: "Authentication",
+        content: `
+          <p>All API requests require authentication using API keys.</p>
+          <pre><code>const client = new ApiClient({
+  apiKey: 'your-api-key'
+});</code></pre>
+        `,
+      },
+      {
+        title: "Rate Limits",
+        content: `
+          <p>API requests are limited to 1000 requests per hour per API key.</p>
+          <p>Rate limit headers are included in all responses:</p>
+          <ul>
+            <li><code>X-RateLimit-Limit</code>: Request limit per hour</li>
+            <li><code>X-RateLimit-Remaining</code>: Requests remaining</li>
+            <li><code>X-RateLimit-Reset</code>: Reset time as Unix timestamp</li>
+          </ul>
+        `,
+      },
+    ],
+  };
+
+  try {
+    // Generate static HTML
+    const staticHtml = renderToStaticMarkup(
+      <DocumentationPage {...docsData} />
+    );
+
+    // Ensure output directory exists
+    await fs.mkdir("dist/docs", { recursive: true });
+
+    // Write static file
+    const outputPath = path.join("dist/docs", "api-reference.html");
+    await fs.writeFile(outputPath, `<!DOCTYPE html>\n${staticHtml}`, "utf8");
+
+    console.log(`✅ Static documentation generated: ${outputPath}`);
+    console.log(`📄 File size: ${(await fs.stat(outputPath)).size} bytes`);
+
+    return outputPath;
+  } catch (error) {
+    console.error("❌ Failed to generate static documentation:", error);
+    throw error;
+  }
+}
+
+// Usage in build script
+if (import.meta.url === `file://${process.argv[1]}`) {
+  generateStaticDocs()
+    .then((filePath) => {
+      console.log(`Documentation ready at: ${filePath}`);
+    })
+    .catch((error) => {
+      console.error("Build failed:", error);
+      process.exit(1);
+    });
+}
 ```
 
-In this example, the `renderToStaticMarkup` function is used to render the `<App />` component to static HTML markup. The resulting HTML is then sent to the client as a response. This approach is useful for generating static pages that do not require interactivity or dynamic updates, allowing you to serve content quickly and efficiently.
+This comprehensive example demonstrates:
+
+- **Static Site Generation**: Converting React components to static HTML files
+- **File System Operations**: Writing generated content to disk
+- **Styled Components**: Including CSS within the HTML for self-contained documents
+- **Content Management**: Structured data transformation to HTML
+- **Build Automation**: Integration with build processes and CI/CD pipelines
+- **Performance Optimization**: Minimal HTML output for fast loading
 
 <BackToTop />
 
 ## `renderToString`
 
-The `renderToString` function is used to render React components to a string of HTML. It is commonly used for server-side rendering (SSR) to generate the initial HTML content that can be sent to the client. This function allows you to render React components on the server and send the resulting HTML to the client, improving performance and SEO.
+The `renderToString` function is React's traditional server-side rendering API that converts React components into HTML strings with full React functionality preserved. Unlike `renderToStaticMarkup`, this function includes React-specific attributes that enable client-side hydration, making the server-rendered content interactive once React loads on the client.
 
-**CAUTION**
+**Important Considerations:**
 
-> The `renderToString` function does not handle streaming or progressive rendering. It generates the entire HTML content in one go, which may not be suitable for large applications or components that require incremental updates.
+> `renderToString` is a legacy synchronous API that blocks until the entire component tree is rendered. For modern applications, prefer `renderToPipeableStream` or `renderToReadableStream` which provide better performance through streaming and don't block the server thread.
+
+### Key Features:
+
+- **Hydration Support**: Includes React attributes needed for client-side hydration
+- **Full React Functionality**: Preserves component state and lifecycle methods
+- **Synchronous Rendering**: Blocks until complete (can impact server performance)
+- **Legacy Compatibility**: Maintains compatibility with older React applications
 
 ### Syntax
 
 ```javascript
 import { renderToString } from "react-dom/server";
-const html = renderToString(<App />);
+
+const htmlString = renderToString(element);
 ```
 
 ### Parameters
 
-- `element`: The React element to render.
+- **`element`**: The React element/component to render to an HTML string
 
 ### Returns
 
-- A string containing the HTML representation of the rendered React component.
+A **string** containing HTML with React-specific attributes that enable client-side hydration.
 
-### Example
+### Example: Legacy SSR with Client Hydration
 
 ```javascript
 import { renderToString } from "react-dom/server";
 import express from "express";
+import path from "path";
+import fs from "fs";
+
+// Simple blog post component
+const BlogPost = ({ post, comments }) => {
+  const [showComments, setShowComments] = React.useState(false);
+
+  return (
+    <article>
+      <header>
+        <h1>{post.title}</h1>
+        <p className="meta">
+          By {post.author} on {new Date(post.publishedAt).toLocaleDateString()}
+        </p>
+      </header>
+
+      <div className="content">
+        <p>{post.excerpt}</p>
+        <div dangerouslySetInnerHTML={{ __html: post.content }} />
+      </div>
+
+      <footer>
+        <button
+          onClick={() => setShowComments(!showComments)}
+          className="toggle-comments"
+        >
+          {showComments ? "Hide" : "Show"} Comments ({comments.length})
+        </button>
+
+        {showComments && (
+          <section className="comments">
+            <h3>Comments</h3>
+            {comments.map((comment) => (
+              <div key={comment.id} className="comment">
+                <strong>{comment.author}</strong>
+                <p>{comment.text}</p>
+                <time>{new Date(comment.createdAt).toLocaleDateString()}</time>
+              </div>
+            ))}
+          </section>
+        )}
+      </footer>
+    </article>
+  );
+};
+
 const app = express();
-app.get("/", (req, res) => {
-  const html = renderToString(<App />);
-  res.writeHead(200, { "Content-Type": "text/html" });
-  res.end(html);
+
+// Serve static assets
+app.use("/static", express.static("public"));
+
+// Blog post route with traditional SSR
+app.get("/blog/:slug", async (req, res) => {
+  try {
+    const slug = req.params.slug;
+
+    // Fetch data (simulated)
+    const post = await fetchBlogPost(slug);
+    const comments = await fetchComments(slug);
+
+    if (!post) {
+      return res.status(404).send("Post not found");
+    }
+
+    // Render React component to string
+    const reactHtml = renderToString(
+      <BlogPost post={post} comments={comments} />
+    );
+
+    // Create complete HTML document
+    const fullHtml = `
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>${post.title} - My Blog</title>
+          <meta name="description" content="${post.excerpt}">
+          <meta property="og:title" content="${post.title}">
+          <meta property="og:description" content="${post.excerpt}">
+          <meta property="og:type" content="article">
+          <link rel="stylesheet" href="/static/css/blog.css">
+        </head>
+        <body>
+          <nav>
+            <a href="/">Home</a>
+            <a href="/blog">Blog</a>
+          </nav>
+          
+          <main id="root">${reactHtml}</main>
+          
+          <!-- Pass server data to client -->
+          <script>
+            window.__INITIAL_DATA__ = ${JSON.stringify({ post, comments })};
+          </script>
+          
+          <!-- React and your app bundle -->
+          <script crossorigin src="/static/js/react.production.min.js"></script>
+          <script crossorigin src="/static/js/react-dom.production.min.js"></script>
+          <script src="/static/js/blog-client.js"></script>
+        </body>
+      </html>
+    `;
+
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.setHeader("Cache-Control", "public, max-age=300"); // 5 minute cache
+    res.send(fullHtml);
+  } catch (error) {
+    console.error(`Blog post render error for ${req.params.slug}:`, error);
+    res.status(500).send("Internal Server Error");
+  }
 });
+
+// Simulated data fetching functions
+async function fetchBlogPost(slug) {
+  // In real app: query database, CMS, or external API
+  const posts = {
+    "react-ssr-guide": {
+      id: 1,
+      title: "Complete Guide to React Server-Side Rendering",
+      slug: "react-ssr-guide",
+      author: "Jane Developer",
+      publishedAt: "2024-01-15",
+      excerpt:
+        "Learn how to implement SSR in React applications for better performance and SEO.",
+      content:
+        "<p>Server-side rendering has become essential for modern React applications...</p>",
+    },
+  };
+
+  return posts[slug] || null;
+}
+
+async function fetchComments(slug) {
+  // Simulated comments data
+  return [
+    {
+      id: 1,
+      author: "Alice",
+      text: "Great article! Very helpful for understanding SSR.",
+      createdAt: "2024-01-16",
+    },
+    {
+      id: 2,
+      author: "Bob",
+      text: "Thanks for the detailed examples.",
+      createdAt: "2024-01-17",
+    },
+  ];
+}
+
 app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
+  console.log("Blog server running on http://localhost:3000");
 });
 ```
 
 ### How It Works
 
-The `renderToString` function renders the React component to a string of HTML, which can be sent to the client as a response. This is useful for server-side rendering, where you want to generate the initial HTML content on the server and send it to the client. The resulting HTML can be served directly to the client, improving performance and SEO by providing a fully rendered page that can be indexed by search engines.
+The `renderToString` function performs synchronous server-side rendering with hydration support:
+
+1. **Complete Rendering**: Renders the entire component tree synchronously, blocking until finished
+2. **React Attributes**: Adds React-specific DOM attributes like `data-reactroot` for hydration markers
+3. **State Serialization**: Captures initial component state that can be transferred to the client
+4. **HTML Generation**: Produces HTML that matches what React would render on the client
+5. **Hydration Preparation**: Creates markup that React can "hydrate" on the client side
+
+**Hydration Process:**
+When the HTML reaches the client, React can attach event listeners and restore interactivity through hydration:
+
+```javascript
+// Client-side hydration (blog-client.js)
+import { hydrateRoot } from "react-dom/client";
+
+// Get server data
+const initialData = window.__INITIAL_DATA__;
+
+// Hydrate the server-rendered content
+const container = document.getElementById("root");
+hydrateRoot(container, <BlogPost {...initialData} />);
+```
+
+**Performance Considerations:**
+
+- **Blocking Nature**: Server thread is blocked until entire render completes
+- **Memory Usage**: Holds entire component tree in memory during rendering
+- **Large Applications**: Can cause timeouts for complex component hierarchies
+- **Modern Alternative**: Consider `renderToPipeableStream` for better performance
+
+**Migration Path:**
+For applications using `renderToString`, consider upgrading to streaming APIs:
+
+- Replace `renderToString` with `renderToPipeableStream` for Node.js
+- Use `renderToReadableStream` for edge computing environments
+- Implement proper error boundaries and loading states
 
 <BackToTop />

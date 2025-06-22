@@ -32,10 +32,10 @@ export default function NavigationSection({
     <div>
       <button
         onClick={onToggle}
-        className={`flex justify-between items-center mb-3 w-full font-semibold text-left text-xs uppercase tracking-wider transition-colors ${
+        className={`flex justify-between items-center mb-3 w-full  font-semibold text-left text-xs uppercase tracking-wider transition-colors ${
           isOpen
-            ? "text-emerald-600 dark:text-emerald-400"
-            : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+            ? "text-sidebar-active-text"
+            : "text-sidebar-text hover:text-sidebar-text-secondary "
         }`}
       >
         {title}
@@ -112,9 +112,7 @@ function NavigationItem({
         <button
           onClick={onToggle}
           className={`flex justify-between items-center px-3 py-2 w-full font-medium text-left text-sm transition-colors rounded-md ${
-            isExpanded
-              ? "text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30"
-              : "text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800"
+            isExpanded ? "bg-primary/50" : "hover:bg-sidebar-border"
           }`}
         >
           {item.title}
@@ -169,7 +167,7 @@ function NavigationItem({
     <li>
       <Link
         href={item.href}
-        className="block hover:bg-gray-100 dark:hover:bg-gray-800 px-3 py-2 rounded-md text-gray-700 text-sm dark:text-gray-300 transition-colors"
+        className="block ml-1 px-3 py-2 hover:bg-sidebar-border rounded-md text-sm transition-colors"
       >
         {item.title}
       </Link>

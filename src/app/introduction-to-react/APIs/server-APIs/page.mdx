@@ -1,0 +1,392 @@
+import BackToTop from "@/components/BackToTop";
+
+# Server APIs
+
+## Table of Contents
+
+## Overview
+
+Server APIs in React are used to handle server-side operations, such as fetching data from a database, processing requests, and managing server-side logic. These APIs allow you to build robust applications that can interact with a backend server, perform data manipulation, and respond to client requests efficiently.
+
+Server APIs are essential for building dynamic applications that require real-time data updates, user authentication, and other server-side functionalities. They enable developers to create scalable and maintainable applications by separating the client-side and server-side logic.
+
+### Core Concepts
+
+- **Server-Side Rendering (SSR)**: This technique allows you to render React components on the server before sending them to the client, improving performance and SEO.
+- **API Endpoints**: These are specific URLs that handle requests and responses between the client and server. They can be used to fetch data, submit forms, or perform other operations.
+- **Data Fetching**: Server APIs can be used to fetch data from databases or external services, allowing your application to display dynamic content based on user interactions or other criteria.
+- **Authentication**: Server APIs can handle user authentication and authorization, ensuring that only authorized users can access certain resources or perform specific actions.
+
+### Advantages and Disadvantages
+
+- **Advantages**:
+  - Improved performance through server-side rendering.
+  - Enhanced security by keeping sensitive operations on the server.
+  - Ability to handle complex data operations and business logic.
+- **Disadvantages**:
+  - Increased complexity in managing server-side code.
+  - Potential for slower initial load times compared to static APIs.
+
+### When to Use Server APIs
+
+- When you need to fetch dynamic data from a database or external service.
+- When you require server-side rendering for better performance and SEO.
+- When you need to handle user authentication and authorization.
+- When you need to perform complex data manipulation or business logic that cannot be handled on the client side.
+
+  <BackToTop />
+
+## `renderToPipeableStream`
+
+The `renderToPipeableStream` function is a part of React's server-side rendering capabilities. It allows you to render React components to a stream, which can be sent to the client in chunks. This is particularly useful for improving performance by allowing the client to start rendering content before the entire page is ready.
+
+### Syntax
+
+```javascript
+import { renderToPipeableStream } from "react-dom/server";
+const stream = renderToPipeableStream(<App />, {
+  onShellReady: () => {
+    // The shell is ready to be sent to the client
+  },
+  onError: (error) => {
+    console.error("Error during rendering:", error);
+  },
+});
+```
+
+### Parameters
+
+- `element`: The React element to render.
+- `options`: An object containing options for the rendering process, such as `onShellReady` and `onError`.
+
+### Returns
+
+- A stream that can be piped to the response object in a server environment.
+
+### Example
+
+```javascript
+import { renderToPipeableStream } from "react-dom/server";
+import express from "express";
+const app = express();
+app.get("/", (req, res) => {
+  const stream = renderToPipeableStream(<App />, {
+    onShellReady: () => {
+      res.writeHead(200, { "Content-Type": "text/html" });
+      stream.pipe(res);
+    },
+    onError: (error) => {
+      console.error("Error during rendering:", error);
+      res.status(500).send("Internal Server Error");
+    },
+  });
+});
+app.listen(3000, () => {
+  console.log("Server is running on http://localhost:3000");
+});
+```
+
+### How It Works
+
+The `renderToPipeableStream` function renders the React component to a stream, allowing the server to send the initial HTML to the client as soon as the shell is ready. This reduces the time to first paint, improving the user experience by displaying content faster. The stream can be piped directly to the response object, enabling the client to start rendering the page while the server continues to process the remaining content.
+
+#### Streaming more content as it loads
+
+To stream more content as it loads, you can use the `onShellReady` callback to send the initial HTML and then continue to write additional content to the response as it becomes available. This allows for a more dynamic user experience, where users can see parts of the page while other parts are still being processed.
+
+```javascript
+import { renderToPipeableStream } from "react-dom/server";
+import express from "express";
+const app = express();
+app.get("/", (req, res) => {
+  const stream = renderToPipeableStream(<App />, {
+    onShellReady: () => {
+      res.writeHead(200, { "Content-Type": "text/html" });
+      stream.pipe(res);
+      // Simulate loading more content
+      setTimeout(() => {
+        res.write("<div>More content loaded...</div>");
+      }, 2000);
+    },
+    onError: (error) => {
+      console.error("Error during rendering:", error);
+      res.status(500).send("Internal Server Error");
+    },
+  });
+});
+app.listen(3000, () => {
+  console.log("Server is running on http://localhost:3000");
+});
+```
+
+In this example, the server sends the initial HTML to the client and then simulates loading more content after a delay. This demonstrates how you can continue to stream additional content as it becomes available,providing a more interactive experience for users.
+
+#### Using `renderToPipeableStream` with `<Suspense>`
+
+To use `renderToPipeableStream` with `<Suspense>`, you can wrap your components in a `<Suspense>` boundary. This allows you to handle loading states and display fallback content while the main content is being rendered.
+
+```javascript
+import { renderToPipeableStream } from "react-dom/server";
+import React, { Suspense } from "react";
+import express from "express";
+const app = express();
+app.get("/", (req, res) => {
+  const stream = renderToPipeableStream(
+    <Suspense fallback={<div>Loading...</div>}>
+      <App />
+    </Suspense>,
+    {
+      onShellReady: () => {
+        res.writeHead(200, { "Content-Type": "text/html" });
+        stream.pipe(res);
+      },
+      onError: (error) => {
+        console.error("Error during rendering:", error);
+        res.status(500).send("Internal Server Error");
+      },
+    }
+  );
+});
+app.listen(3000, () => {
+  console.log("Server is running on http://localhost:3000");
+});
+```
+
+In this example, the `<App />` component is wrapped in a `<Suspense>` boundary, allowing you to display a loading state while the main content is being rendered. The `fallback` prop specifies what to show while the content is loading, providing a better user experience by indicating that something is happening in the background.
+
+<BackToTop />
+
+## `renderToReadableStream`
+
+The `renderToReadableStream` function is another part of React's server-side rendering capabilities. It allows you to render React components to a readable stream, which can be consumed by the client.
+
+### Syntax
+
+```javascript
+import { renderToReadableStream } from "react-dom/server";
+const stream = renderToReadableStream(<App />, {
+  onError: (error) => {
+    console.error("Error during rendering:", error);
+  },
+});
+```
+
+### Parameters
+
+- `element`: The React element to render.
+- `options`: An object containing options for the rendering process, such as `onError`.
+
+### Returns
+
+- A readable stream that can be consumed by the client.
+
+### Example
+
+```javascript
+import { renderToReadableStream } from "react-dom/server";
+import express from "express";
+const app = express();
+app.get("/", (req, res) => {
+  const stream = renderToReadableStream(<App />, {
+    onError: (error) => {
+      console.error("Error during rendering:", error);
+      res.status(500).send("Internal Server Error");
+    },
+  });
+  res.writeHead(200, { "Content-Type": "text/html" });
+  stream.pipe(res);
+});
+app.listen(3000, () => {
+  console.log("Server is running on http://localhost:3000");
+});
+```
+
+### How It Works
+
+The `renderToReadableStream` function renders the React component to a readable stream, which can be consumed by the client. This allows the server to send the initial HTML to the client as soon as the shell is ready, improving performance and reducing the time to first paint. The readable stream can be piped directly to the response object, enabling the client to start rendering the page while the server continues to process the remaining content.
+
+#### Rendering a React tree as HTML to a Readable Web Stream
+
+To render a React tree as HTML to a Readable Web Stream, you can use the `renderToReadableStream` function in conjunction with the `ReadableStream` API. This allows you to create a stream that can be consumed by the client, providing a more efficient way to deliver content.
+
+```javascript
+import { renderToReadableStream } from "react-dom/server";
+import { ReadableStream } from "web-streams-polyfill/ponyfill";
+import express from "express";
+const app = express();
+app.get("/", (req, res) => {
+  const stream = renderToReadableStream(<App />, {
+    onError: (error) => {
+      console.error("Error during rendering:", error);
+      res.status(500).send("Internal Server Error");
+    },
+  });
+  res.writeHead(200, { "Content-Type": "text/html" });
+  stream
+    .pipeTo(
+      new ReadableStream({
+        start(controller) {
+          stream.on("data", (chunk) => {
+            controller.enqueue(chunk);
+          });
+          stream.on("end", () => {
+            controller.close();
+          });
+        },
+      })
+    )
+    .then(
+      () => {
+        console.log("Stream finished successfully");
+      },
+      (error) => {
+        console.error("Stream error:", error);
+      }
+    );
+});
+app.listen(3000, () => {
+  console.log("Server is running on http://localhost:3000");
+});
+```
+
+In this example, the `renderToReadableStream` function is used to render the React component to a readable stream. The `ReadableStream` API is then used to consume the stream, allowing the server to send the initial HTML to the client as soon as the shell is ready. This approach provides a more efficient way to deliver content, reducing the time to first paint and improving the overall user experience.
+
+#### Logging crashes on the server
+
+To log crashes on the server when using `renderToReadableStream`, you can use the `onError` callback to capture any errors that occur during the rendering process. This allows you to log the errors and handle them appropriately, ensuring that your application remains stable and provides useful feedback for debugging.
+
+```javascript
+import { renderToReadableStream } from "react-dom/server";
+import express from "express";
+const app = express();
+app.get("/", (req, res) => {
+  const stream = renderToReadableStream(<App />, {
+    onError: (error) => {
+      console.error("Error during rendering:", error);
+      res.status(500).send("Internal Server Error");
+    },
+  });
+  res.writeHead(200, { "Content-Type": "text/html" });
+  stream.pipe(res).catch((error) => {
+    console.error("Stream error:", error);
+    res.status(500).send("Internal Server Error");
+  });
+});
+app.listen(3000, () => {
+  console.log("Server is running on http://localhost:3000");
+});
+```
+
+In this example, the `onError` callback is used to log any errors that occur during the rendering process. Additionally, the `catch` method is used to handle any errors that occur while piping the stream to the response. This ensures that any crashes or errors are logged, providing useful information for debugging and maintaining the stability of your application.
+
+<BackToTop />
+
+## `renderToStaticMarkup`
+
+The `renderToStaticMarkup` function is used to render React components to static HTML markup. It is particularly useful for generating static pages that do not require interactivity or dynamic updates. This function is often used in scenarios where you want to pre-render content on the server and send it to the client as static HTML.
+
+**CAUTION**
+
+> The `renderToStaticMarkup` function does not include React-specific attributes or event handlers in the generated HTML. It produces a static representation of the React component, which means that the resulting HTML will not have any React-specific features like hydration or event handling. This is suitable for static content that does not require interactivity or dynamic updates.
+
+### Syntax
+
+```javascript
+import { renderToStaticMarkup } from "react-dom/server";
+const html = renderToStaticMarkup(<App />);
+```
+
+### Parameters
+
+- `element`: The React element to render.
+
+### Returns
+
+- A string containing the static HTML markup of the rendered React component.
+
+### Example
+
+```javascript
+import { renderToStaticMarkup } from "react-dom/server";
+import express from "express";
+const app = express();
+app.get("/", (req, res) => {
+  const html = renderToStaticMarkup(<App />);
+  res.writeHead(200, { "Content-Type": "text/html" });
+  res.end(html);
+});
+app.listen(3000, () => {
+  console.log("Server is running on http://localhost:3000");
+});
+```
+
+### How It Works
+
+The `renderToStaticMarkup` function renders the React component to static HTML markup, which can be sent to the client as a response. This is useful for generating static pages that do not require interactivity or dynamic updates. The resulting HTML can be served directly to the client, improving performance and reducing the load on the server.
+
+#### Rendering a React tree as static HTML
+
+To render a React tree as static HTML, you can use the `renderToStaticMarkup` function in conjunction with a server framework like Express. This allows you to generate static HTML pages that can be served to the client without requiring any client-side JavaScript for rendering.
+
+```javascript
+import { renderToStaticMarkup } from "react-dom/server";
+import express from "express";
+const app = express();
+app.get("/", (req, res) => {
+  const html = renderToStaticMarkup(<App />);
+  res.writeHead(200, { "Content-Type": "text/html" });
+  res.end(html);
+});
+app.listen(3000, () => {
+  console.log("Server is running on http://localhost:3000");
+});
+```
+
+In this example, the `renderToStaticMarkup` function is used to render the `<App />` component to static HTML markup. The resulting HTML is then sent to the client as a response. This approach is useful for generating static pages that do not require interactivity or dynamic updates, allowing you to serve content quickly and efficiently.
+
+<BackToTop />
+
+## `renderToString`
+
+The `renderToString` function is used to render React components to a string of HTML. It is commonly used for server-side rendering (SSR) to generate the initial HTML content that can be sent to the client. This function allows you to render React components on the server and send the resulting HTML to the client, improving performance and SEO.
+
+**CAUTION**
+
+> The `renderToString` function does not handle streaming or progressive rendering. It generates the entire HTML content in one go, which may not be suitable for large applications or components that require incremental updates.
+
+### Syntax
+
+```javascript
+import { renderToString } from "react-dom/server";
+const html = renderToString(<App />);
+```
+
+### Parameters
+
+- `element`: The React element to render.
+
+### Returns
+
+- A string containing the HTML representation of the rendered React component.
+
+### Example
+
+```javascript
+import { renderToString } from "react-dom/server";
+import express from "express";
+const app = express();
+app.get("/", (req, res) => {
+  const html = renderToString(<App />);
+  res.writeHead(200, { "Content-Type": "text/html" });
+  res.end(html);
+});
+app.listen(3000, () => {
+  console.log("Server is running on http://localhost:3000");
+});
+```
+
+### How It Works
+
+The `renderToString` function renders the React component to a string of HTML, which can be sent to the client as a response. This is useful for server-side rendering, where you want to generate the initial HTML content on the server and send it to the client. The resulting HTML can be served directly to the client, improving performance and SEO by providing a fully rendered page that can be indexed by search engines.
+
+<BackToTop />

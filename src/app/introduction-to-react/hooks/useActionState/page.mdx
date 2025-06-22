@@ -6,196 +6,896 @@ import BackToTop from "@/components/BackToTop";
 
 ## Overview
 
-The `useActionState` hook is a custom React hook that allows you to manage the state of actions in your application. It provides a way to handle asynchronous operations, such as API calls or other side effects, while keeping track of the loading and error states.
-It is particularly useful for managing the state of actions that can be triggered by user interactions, such as form submissions or button clicks.
+The `useActionState` hook is an official React hook introduced in React 19 that provides a streamlined way to manage state updates triggered by form actions. It's specifically designed to work with React's new form action patterns and Server Actions, offering built-in support for pending states, optimistic updates, and error handling.
 
-This hook simplifies the process of managing action states by providing a consistent interface for starting actions, handling success and error states, and resetting the state when necessary. It helps you keep your components clean and focused on rendering UI, while delegating the state management logic to the hook.
+This hook bridges the gap between client-side state management and server-side form submissions, making it easier to build responsive forms that provide immediate feedback while handling asynchronous operations. It's particularly powerful when combined with React Server Components and Server Actions.
+
+**Key Features:**
+
+- **Automatic Pending States**: Tracks when form actions are in progress
+- **Optimistic Updates**: Allows immediate UI updates before server confirmation
+- **Error Boundaries**: Built-in error handling for failed actions
+- **Server Integration**: Seamlessly works with Server Actions and form submissions
+- **Type Safety**: Full TypeScript support with proper type inference
 
 #### Benefits of using `useActionState`:
 
-- **Simplified State Management**: It abstracts the complexity of managing loading and error states, allowing you to focus on the core logic of your application.
-- **Improved User Experience**: By providing feedback on the status of actions, it enhances the user experience by indicating when an action is in progress or has failed.
-- **Reusability**: The hook can be reused across different components, promoting consistency in how actions are handled throughout your application.
-- **Separation of Concerns**: It separates the logic of managing action states from the UI components, making your code cleaner and easier to maintain.
-- **Flexibility**: It allows you to define custom initial states and provides methods to update the state based on the lifecycle of the action.
+- **Simplified Form Handling**: Automatically manages pending states for form submissions without manual state tracking
+- **Enhanced User Experience**: Provides immediate feedback through pending states and optimistic updates
+- **Server Action Integration**: Works seamlessly with React Server Components and Server Actions
+- **Progressive Enhancement**: Forms work even without JavaScript, then enhance with interactivity
+- **Built-in Error Handling**: Automatically captures and exposes action errors to the UI
+- **Type Safety**: Strong TypeScript integration with proper type inference for state and actions
+- **Performance Optimized**: Minimal re-renders and efficient state updates
 
 #### When to use `useActionState`:
 
-- When you need to manage the state of asynchronous actions in your application.
-- When you want to provide feedback to users about the status of actions, such as loading indicators or error messages.
-- When you want to simplify the management of action states in your components.
-- When you want to encapsulate the logic of handling actions in a reusable way.
-- When you want to keep your components clean and focused on rendering UI, while delegating state management to the hook.
-- When you want to handle complex action states that involve loading, error, and data management in a consistent manner.
-- When you want to improve the maintainability of your code by separating action state management from UI logic.
+- **Form Submissions**: When building forms that submit data to the server via Server Actions
+- **Optimistic Updates**: When you want to update the UI immediately before server confirmation
+- **Progressive Enhancement**: When building forms that work without JavaScript but enhance with it
+- **Server State Management**: When managing state that involves server-side operations
+- **Complex Form Flows**: Multi-step forms or forms with dependent actions
+- **Real-time Feedback**: When users need immediate feedback about action status
+- **Error Recovery**: When you need robust error handling for form submissions
 
 ### Syntax
 
 ```javascript
-const [state, action] = useActionState(initialState);
+const [state, formAction, isPending] = useActionState(
+  action,
+  initialState,
+  permalink
+);
 ```
 
 ### Parameters
 
-- `initialState`: The initial state of the action, which can be an object containing properties like `loading`, `error`, and `data`.
+- **`action`**: A function that will be called when the form is submitted or button is pressed. The function receives the previous state and form data as arguments.
+- **`initialState`**: The initial value you want the state to be. Can be any serializable value.
+- **`permalink`** (optional): A string containing the unique page URL that this form modifies. Used for progressive enhancement.
 
 ### Returns
 
-- An array containing:
-  - `state`: The current state of the action, including properties like `loading`, `error`, and `data`.
-  - `action`: An object containing methods to update the state, such as `start`, `success`, and `error`.
-    <BackToTop />
+An array containing three elements:
+
+- **`state`**: The current state value. Initially set to `initialState`, then updated to the return value of the action.
+- **`formAction`**: A new action that can be passed to a form's `action` prop or button's `formAction` prop.
+- **`isPending`**: A boolean indicating whether there's a pending transition (the action is currently running).
+  <BackToTop />
 
 ## Common Use Cases
 
-- **Form Submissions**: Managing the state of form submissions, including loading indicators and error messages.
-- **API Calls**: Handling the state of API calls, such as fetching data or submitting data to a server.
-- **User Interactions**: Managing the state of user interactions, such as button clicks or other events that trigger actions in your application.
-- **Loading Indicators**: Providing visual feedback to users when actions are in progress, such as showing a spinner or disabling buttons.
-- **Error Handling**: Capturing and displaying error messages when actions fail, allowing users to understand what went wrong.
-- **Data Management**: Keeping track of data returned from actions, such as API responses, and updating the UI accordingly.
+- **Contact Forms**: Managing form submissions with immediate feedback and error handling
+- **User Registration**: Multi-step signup processes with validation and server communication
+- **E-commerce Actions**: Add to cart, checkout, and payment processing with optimistic updates
+- **Content Management**: Creating, updating, and deleting posts or comments
+- **File Uploads**: Progress tracking and error handling for file upload operations
+- **Search Interfaces**: Live search with debouncing and result management
+- **Settings Updates**: User preference changes with immediate UI feedback
+- **Social Features**: Like/unlike, follow/unfollow with optimistic updates
+- **Data Entry Forms**: Complex forms with validation and dependent fields
+- **Bulk Operations**: Multiple item selection and batch processing with progress indicators
 
 ## How It Works
 
-The `useActionState` hook works by maintaining an internal state that tracks the status of an action. It provides methods to update this state based on the lifecycle of the action, such as when it starts, succeeds, or fails. The hook returns the current state and the action methods, allowing you to easily manage and respond to changes in the action's status.
+The `useActionState` hook manages the lifecycle of form actions and provides reactive state updates:
 
-### Initial Render
+### Action Lifecycle
 
-When the hook is first called, it initializes the state with the provided `initialState`. This state typically includes properties like `loading`, `error`, and `data`.
+1. **Initial State**: The hook starts with the provided `initialState`
+2. **Action Trigger**: When the form is submitted or button clicked, the action function is called
+3. **Pending State**: `isPending` becomes `true` while the action executes
+4. **State Update**: The returned value from the action becomes the new `state`
+5. **Completion**: `isPending` becomes `false` when the action completes
 
-### Action Methods
+### Action Function Signature
 
-The `action` object returned by the hook contains methods to update the state:
+The action function receives two parameters:
 
-- `start`: Call this method to set the `loading` state to `true` and reset any previous `error` state.
-- `success`: Call this method to set the `loading` state to `false`, clear any `error` state, and update the `data` with the result of the action.
-- `error`: Call this method to set the `loading` state to `false` and update the `error` state with the provided error message.
-- `reset`: Call this method to reset the state to the initial state, clearing any `loading`, `error`, or `data` values.
-- `setData`: Call this method to update the `data` state with a new value without changing the `loading` or `error` states.
-- `setError`: Call this method to update the `error` state with a new error message without changing the `loading` or `data` states.
-- `setLoading`: Call this method to update the `loading` state to a specific boolean value.
-- `setState`: Call this method to update the entire state object with a new state, allowing for more complex state updates.
-- `getState`: Call this method to retrieve the current state of the action.
-- `getLoading`: Call this method to retrieve the current loading state.
-- `getError`: Call this method to retrieve the current error state.
-- `getData`: Call this method to retrieve the current data state.
-- `getAction`: Call this method to retrieve the action methods, allowing you to access them outside of the hook's context.
-- `getInitialState`: Call this method to retrieve the initial state of the action, which can be useful for resetting the state or comparing against the current state.
-- `getInitialLoading`: Call this method to retrieve the initial loading state, which can be useful for determining if the action was initially in a loading state.
-- `getInitialError`: Call this method to retrieve the initial error state, which can be useful for determining if the action was initially in an error state.
-- `getInitialData`: Call this method to retrieve the initial data state, which can be useful for determining if the action was initially in a data state.
-- `getInitialAction`: Call this method to retrieve the initial action methods, which can be useful for resetting the action state or comparing against the current action methods.
+```javascript
+async function myAction(prevState, formData) {
+  // prevState: the current state value
+  // formData: FormData object containing form field values
+
+  try {
+    // Perform async operation
+    const result = await submitToServer(formData);
+    return { success: true, data: result };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+```
+
+### State Management Patterns
+
+**Error Handling Pattern:**
+
+```javascript
+// Action returns error state
+return { error: "Something went wrong", data: null };
+
+// Component renders error
+{
+  state.error && <div className="error">{state.error}</div>;
+}
+```
+
+**Success Feedback Pattern:**
+
+```javascript
+// Action returns success state
+return { success: true, message: "Saved successfully!" };
+
+// Component shows success message
+{
+  state.success && <div className="success">{state.message}</div>;
+}
+```
+
+**Progressive Enhancement:**
+
+- Forms work without JavaScript through the `permalink` parameter
+- JavaScript enhances the experience with immediate feedback
+- Server Actions handle both cases seamlessly
 
 ## What to Avoid
 
-- Avoid using `useActionState` for synchronous actions, as it is designed for managing asynchronous operations.
-- Avoid directly mutating the state returned by the hook; always use the provided action methods to update the state.
-- Avoid using the hook in non-functional components, as it relies on React's hooks system, which is only available in functional components.
+- **Don't use for client-only state**: `useActionState` is designed for actions that interact with servers, not local component state
+- **Avoid blocking UI updates**: Don't prevent users from interacting with the form while actions are pending unless necessary
+- **Don't ignore error states**: Always handle and display errors returned from actions
+- **Avoid overusing optimistic updates**: Only use optimistic updates when you're confident the action will succeed
+- **Don't bypass form validation**: Always validate data both client-side and server-side
+- **Avoid complex state shapes**: Keep the state structure simple and focused on the action's purpose
+- **Don't forget progressive enhancement**: Ensure forms work without JavaScript when using the `permalink` parameter
 
   <BackToTop />
 
 ## Examples
 
-### Basic Usage
+### Basic Contact Form with Server Action
 
 ```javascript
-import React from "react";
-import { useActionState } from "your-hook-library";
-const MyComponent = () => {
-  const [state, action] = useActionState({
-    loading: false,
+"use client";
+import { useActionState } from "react";
+
+// Server Action (would be in a separate file)
+async function submitContactForm(prevState, formData) {
+  const name = formData.get("name");
+  const email = formData.get("email");
+  const message = formData.get("message");
+
+  // Validate input
+  if (!name || !email || !message) {
+    return {
+      error: "All fields are required",
+      success: false,
+    };
+  }
+
+  try {
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Simulate random failure for demo
+    if (Math.random() > 0.7) {
+      throw new Error("Server temporarily unavailable");
+    }
+
+    return {
+      success: true,
+      message: "Thank you for your message! We'll get back to you soon.",
+      submittedAt: new Date().toISOString(),
+    };
+  } catch (error) {
+    return {
+      error: error.message,
+      success: false,
+    };
+  }
+}
+
+function ContactForm() {
+  const [state, formAction, isPending] = useActionState(submitContactForm, {
+    success: false,
     error: null,
-    data: null,
+    message: null,
   });
 
-  const handleSubmit = async () => {
-    action.start();
-    try {
-      const response = await fetch("/api/data");
-      const data = await response.json();
-      action.success(data);
-    } catch (error) {
-      action.error(error.message);
-    }
-  };
-
   return (
-    <div>
-      <button onClick={handleSubmit} disabled={state.loading}>
-        {state.loading ? "Loading..." : "Submit"}
-      </button>
-      {state.error && <p>Error: {state.error}</p>}
-      {state.data && <p>Data: {JSON.stringify(state.data)}</p>}
+    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-4">Contact Us</h2>
+
+      <form action={formAction} className="space-y-4">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium mb-1">
+            Name *
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isPending}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium mb-1">
+            Email *
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isPending}
+          />
+        </div>
+
+        <div>
+          <label htmlFor="message" className="block text-sm font-medium mb-1">
+            Message *
+          </label>
+          <textarea
+            id="message"
+            name="message"
+            rows={4}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isPending}
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={isPending}
+          className={`w-full py-2 px-4 rounded-md font-medium transition-colors ${
+            isPending
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 text-white"
+          }`}
+        >
+          {isPending ? (
+            <span className="flex items-center justify-center">
+              <svg
+                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  className="opacity-25"
+                />
+                <path
+                  fill="currentColor"
+                  className="opacity-75"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              Sending...
+            </span>
+          ) : (
+            "Send Message"
+          )}
+        </button>
+      </form>
+
+      {/* Status Messages */}
+      {state.error && (
+        <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md">
+          <p className="font-medium">Error:</p>
+          <p>{state.error}</p>
+        </div>
+      )}
+
+      {state.success && (
+        <div className="mt-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-md">
+          <p className="font-medium">Success!</p>
+          <p>{state.message}</p>
+        </div>
+      )}
     </div>
   );
-};
+}
 ```
 
 <BackToTop />
-### Form Submission Example
+### E-commerce Add to Cart with Optimistic Updates
 
 ```javascript
-import React, { useState } from "react";
-import { useActionState } from "your-hook-library";
-const FormComponent = () => {
-  const [formData, setFormData] = useState({ name: "", email: "" });
-  const [state, action] = useActionState({
-    loading: false,
+"use client";
+import { useActionState, useOptimistic } from "react";
+
+// Server Action for adding items to cart
+async function addToCart(prevState, formData) {
+  const productId = formData.get("productId");
+  const quantity = parseInt(formData.get("quantity"));
+
+  try {
+    // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, 800));
+
+    // Simulate server validation
+    if (quantity > 10) {
+      throw new Error("Maximum quantity is 10 items");
+    }
+
+    // Add to cart logic
+    const cartItem = {
+      productId,
+      quantity,
+      addedAt: new Date().toISOString(),
+    };
+
+    return {
+      success: true,
+      cartItem,
+      message: `Added ${quantity} item(s) to cart`,
+      cartCount: prevState.cartCount + quantity,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message,
+      cartCount: prevState.cartCount,
+    };
+  }
+}
+
+function ProductCard({ product }) {
+  const [state, formAction, isPending] = useActionState(addToCart, {
+    success: false,
     error: null,
-    data: null,
+    cartCount: 0,
+    message: null,
   });
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  // Optimistic updates for immediate UI feedback
+  const [optimisticCartCount, addOptimistic] = useOptimistic(
+    state.cartCount,
+    (currentCount, optimisticValue) => currentCount + optimisticValue
+  );
+
+  const handleAddToCart = async (formData) => {
+    const quantity = parseInt(formData.get("quantity"));
+
+    // Optimistically update the cart count
+    addOptimistic(quantity);
+
+    // Trigger the server action
+    formAction(formData);
   };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    action.start();
-    try {
-      const response = await fetch("/api/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
-      action.success(data);
-    } catch (error) {
-      action.error(error.message);
+
+  return (
+    <div className="bg-white rounded-lg shadow-md p-6 max-w-sm">
+      <img
+        src={product.image}
+        alt={product.name}
+        className="w-full h-48 object-cover rounded-md mb-4"
+      />
+
+      <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
+      <p className="text-gray-600 mb-2">{product.description}</p>
+      <p className="text-2xl font-bold text-green-600 mb-4">${product.price}</p>
+
+      <form action={handleAddToCart} className="space-y-4">
+        <input type="hidden" name="productId" value={product.id} />
+
+        <div className="flex items-center space-x-2">
+          <label htmlFor="quantity" className="text-sm font-medium">
+            Quantity:
+          </label>
+          <select
+            name="quantity"
+            id="quantity"
+            defaultValue="1"
+            className="border border-gray-300 rounded-md px-2 py-1"
+            disabled={isPending}
+          >
+            {[1, 2, 3, 4, 5].map((num) => (
+              <option key={num} value={num}>
+                {num}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <button
+          type="submit"
+          disabled={isPending}
+          className={`w-full py-2 px-4 rounded-md font-medium transition-all duration-200 ${
+            isPending
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg"
+          }`}
+        >
+          {isPending ? (
+            <span className="flex items-center justify-center">
+              <svg
+                className="animate-spin h-4 w-4 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  className="opacity-25"
+                />
+                <path
+                  fill="currentColor"
+                  className="opacity-75"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
+              </svg>
+              Adding to Cart...
+            </span>
+          ) : (
+            "Add to Cart"
+          )}
+        </button>
+      </form>
+
+      {/* Cart Counter */}
+      {optimisticCartCount > 0 && (
+        <div className="mt-3 text-center">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            Cart: {optimisticCartCount} items
+          </span>
+        </div>
+      )}
+
+      {/* Status Messages */}
+      {state.error && (
+        <div className="mt-3 p-2 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm">
+          {state.error}
+        </div>
+      )}
+
+      {state.success && state.message && (
+        <div className="mt-3 p-2 bg-green-100 border border-green-400 text-green-700 rounded-md text-sm">
+          {state.message}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+### Multi-Step User Registration Form
+
+```javascript
+"use client";
+import { useActionState, useState } from "react";
+
+// Server Action for processing registration steps
+async function processRegistrationStep(prevState, formData) {
+  const step = parseInt(formData.get("step"));
+  const action = formData.get("action");
+
+  try {
+    switch (step) {
+      case 1: {
+        const email = formData.get("email");
+        const password = formData.get("password");
+
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          return { ...prevState, error: "Please enter a valid email address" };
+        }
+
+        if (password.length < 8) {
+          return {
+            ...prevState,
+            error: "Password must be at least 8 characters",
+          };
+        }
+
+        // Simulate email availability check
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        if (email === "taken@example.com") {
+          return { ...prevState, error: "This email is already registered" };
+        }
+
+        return {
+          ...prevState,
+          step: 2,
+          formData: { ...prevState.formData, email, password },
+          error: null,
+        };
+      }
+
+      case 2: {
+        if (action === "back") {
+          return { ...prevState, step: 1, error: null };
+        }
+
+        const firstName = formData.get("firstName");
+        const lastName = formData.get("lastName");
+        const phone = formData.get("phone");
+
+        if (!firstName || !lastName) {
+          return { ...prevState, error: "First and last name are required" };
+        }
+
+        return {
+          ...prevState,
+          step: 3,
+          formData: { ...prevState.formData, firstName, lastName, phone },
+          error: null,
+        };
+      }
+
+      case 3: {
+        if (action === "back") {
+          return { ...prevState, step: 2, error: null };
+        }
+
+        const preferences = {
+          newsletter: formData.get("newsletter") === "on",
+          notifications: formData.get("notifications") === "on",
+          marketingEmails: formData.get("marketingEmails") === "on",
+        };
+
+        // Final registration
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        // Simulate potential failure
+        if (Math.random() > 0.8) {
+          throw new Error("Registration failed. Please try again.");
+        }
+
+        return {
+          ...prevState,
+          step: 4,
+          formData: { ...prevState.formData, preferences },
+          error: null,
+          success: true,
+          userId: Math.random().toString(36).substr(2, 9),
+        };
+      }
+
+      default:
+        return prevState;
+    }
+  } catch (error) {
+    return { ...prevState, error: error.message };
+  }
+}
+
+function MultiStepRegistration() {
+  const [state, formAction, isPending] = useActionState(
+    processRegistrationStep,
+    {
+      step: 1,
+      formData: {},
+      error: null,
+      success: false,
+      userId: null,
+    }
+  );
+
+  const renderStep = () => {
+    switch (state.step) {
+      case 1:
+        return (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold">Create Your Account</h2>
+            <p className="text-gray-600">Step 1 of 3: Account Credentials</p>
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium mb-1">
+                Email Address *
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                defaultValue={state.formData.email || ""}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                disabled={isPending}
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium mb-1"
+              >
+                Password *
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                minLength={8}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                disabled={isPending}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Must be at least 8 characters
+              </p>
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold">Personal Information</h2>
+            <p className="text-gray-600">Step 2 of 3: Tell us about yourself</p>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="firstName"
+                  className="block text-sm font-medium mb-1"
+                >
+                  First Name *
+                </label>
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  required
+                  defaultValue={state.formData.firstName || ""}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                  disabled={isPending}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="lastName"
+                  className="block text-sm font-medium mb-1"
+                >
+                  Last Name *
+                </label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  required
+                  defaultValue={state.formData.lastName || ""}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                  disabled={isPending}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium mb-1">
+                Phone Number (Optional)
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                defaultValue={state.formData.phone || ""}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                disabled={isPending}
+              />
+            </div>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold">Communication Preferences</h2>
+            <p className="text-gray-600">
+              Step 3 of 3: Choose your preferences
+            </p>
+
+            <div className="space-y-3">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="newsletter"
+                  className="h-4 w-4 text-blue-600 rounded"
+                  disabled={isPending}
+                />
+                <span className="ml-2 text-sm">
+                  Subscribe to our weekly newsletter
+                </span>
+              </label>
+
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="notifications"
+                  defaultChecked
+                  className="h-4 w-4 text-blue-600 rounded"
+                  disabled={isPending}
+                />
+                <span className="ml-2 text-sm">
+                  Receive important account notifications
+                </span>
+              </label>
+
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="marketingEmails"
+                  className="h-4 w-4 text-blue-600 rounded"
+                  disabled={isPending}
+                />
+                <span className="ml-2 text-sm">
+                  Receive promotional offers and updates
+                </span>
+              </label>
+            </div>
+          </div>
+        );
+
+      case 4:
+        return (
+          <div className="text-center space-y-4">
+            <div className="text-green-600 text-6xl">✓</div>
+            <h2 className="text-2xl font-bold text-green-600">
+              Registration Complete!
+            </h2>
+            <p className="text-gray-600">
+              Welcome! Your account has been created successfully.
+            </p>
+            <p className="text-sm text-gray-500">User ID: {state.userId}</p>
+            <button
+              type="button"
+              onClick={() => (window.location.href = "/login")}
+              className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700"
+            >
+              Continue to Login
+            </button>
+          </div>
+        );
+
+      default:
+        return null;
     }
   };
+
+  if (state.step === 4) {
+    return (
+      <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+        {renderStep()}
+      </div>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        name="name"
-        value={formData.name}
-        onChange={handleChange}
-        placeholder="Name"
-      />
-      <input
-        type="email"
-        name="email"
-        value={formData.email}
-        onChange={handleChange}
-        placeholder="Email"
-      />
-      <button type="submit" disabled={state.loading}>
-        {state.loading ? "Submitting..." : "Submit"}
-      </button>
-      {state.error && <p>Error: {state.error}</p>}
-      {state.data && <p>Success: {JSON.stringify(state.data)}</p>}
-    </form>
+    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+      {/* Progress Indicator */}
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-2">
+          {[1, 2, 3].map((stepNumber) => (
+            <div
+              key={stepNumber}
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                stepNumber <= state.step
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 text-gray-600"
+              }`}
+            >
+              {stepNumber}
+            </div>
+          ))}
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div
+            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${(state.step / 3) * 100}%` }}
+          />
+        </div>
+      </div>
+
+      <form action={formAction} className="space-y-6">
+        <input type="hidden" name="step" value={state.step} />
+
+        {renderStep()}
+
+        {/* Error Message */}
+        {state.error && (
+          <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-sm">
+            {state.error}
+          </div>
+        )}
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between">
+          {state.step > 1 && (
+            <button
+              type="submit"
+              name="action"
+              value="back"
+              disabled={isPending}
+              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+            >
+              Back
+            </button>
+          )}
+
+          <button
+            type="submit"
+            disabled={isPending}
+            className={`px-6 py-2 rounded-md font-medium transition-colors ${
+              isPending
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700 text-white"
+            } ${state.step === 1 ? "w-full" : "ml-auto"}`}
+          >
+            {isPending ? (
+              <span className="flex items-center justify-center">
+                <svg
+                  className="animate-spin h-4 w-4 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    className="opacity-25"
+                  />
+                  <path
+                    fill="currentColor"
+                    className="opacity-75"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                Processing...
+              </span>
+            ) : state.step === 3 ? (
+              "Complete Registration"
+            ) : (
+              "Continue"
+            )}
+          </button>
+        </div>
+      </form>
+    </div>
   );
-};
+}
 ```
 
 <BackToTop />
 
 ## Best Practices
 
-- **Use Descriptive State Names**: When defining the initial state, use descriptive names for properties like `loading`, `error`, and `data` to make the code more readable.
-- **Handle Errors Gracefully**: Always handle errors in your action methods to provide feedback to users when something goes wrong.
-- **Keep State Management Simple**: Use the `useActionState` hook to manage the state of actions in a simple and consistent way, avoiding unnecessary complexity in your components.
-- **Reuse the Hook**: If you find yourself managing similar action states in multiple components, consider creating a custom hook that encapsulates the logic of `useActionState` to promote reusability and maintainability.
-- **Test Your Actions**: Write tests for your action methods to ensure they behave as expected, especially when handling loading and error states.
-- **Use the Hook in Functional Components**: Ensure that you are using the `useActionState` hook within functional components, as it relies on React's hooks system.
-  <BackToTop />
+- **Design Clear Action Signatures**: Create action functions with predictable inputs and outputs for better maintainability
+- **Implement Comprehensive Error Handling**: Always return meaningful error messages that help users understand what went wrong
+- **Use Optimistic Updates Judiciously**: Only implement optimistic updates when you're confident the action will succeed most of the time
+- **Provide Immediate Feedback**: Use the `isPending` state to show loading indicators and disable form elements during submission
+- **Structure State Consistently**: Use consistent state shapes across different actions to make your components more predictable
+- **Validate Both Client and Server Side**: Never rely solely on client-side validation; always validate on the server as well
+- **Handle Edge Cases**: Consider scenarios like network failures, timeouts, and unexpected server responses
+- **Implement Progressive Enhancement**: Ensure your forms work without JavaScript when using the `permalink` parameter
+- **Test Action Flows**: Write comprehensive tests for your action functions, including success, error, and edge cases
+- **Monitor Performance**: Track action completion times and error rates to identify potential issues
+- **Use TypeScript**: Leverage TypeScript for better type safety and developer experience with action state management
+
+### Advanced Tips
+
+- **Debounce Rapid Submissions**: Prevent users from accidentally submitting forms multiple times
+- **Implement Retry Logic**: For transient failures, consider automatic retry mechanisms
+- **Cache Action Results**: Cache successful action results to improve perceived performance
+- **Use Error Boundaries**: Wrap forms in error boundaries to gracefully handle unexpected errors
+- **Implement Timeout Handling**: Set reasonable timeouts for long-running actions
+- **Log Action Analytics**: Track user interactions and action success rates for insights
+
+<BackToTop />

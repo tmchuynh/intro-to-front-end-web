@@ -19,7 +19,7 @@ export default function Button({
   onClick,
 }: ButtonProps) {
   const baseClasses =
-    "inline-flex items-center gap-2 font-medium transition-colors";
+    "inline items-center gap-2 font-medium h-7 transition-colors";
 
   const variantClasses = {
     default:

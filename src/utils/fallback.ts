@@ -263,14 +263,6 @@ export const fallbackNav = [
         href: "/security",
       },
       {
-        title: "Storage Solutions",
-        href: "/storage-solutions",
-      },
-      {
-        title: "GraphQL",
-        href: "/graphql",
-      },
-      {
         title: "Introduction To APIs",
         href: "/introduction-to-APIs",
         children: [

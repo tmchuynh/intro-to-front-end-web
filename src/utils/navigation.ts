@@ -79,7 +79,6 @@ function categorizeNavigationItems(
     developer_tools: [] as NavigationItem[],
     core_technologies: [] as NavigationItem[],
     design: [] as NavigationItem[],
-    projects: [] as NavigationItem[],
     utilities: [] as NavigationItem[],
     advanced: [] as NavigationItem[],
     advanced_projects: [] as NavigationItem[],
@@ -104,12 +103,10 @@ function categorizeNavigationItems(
 
       // Check for other framework/library sections
       if (
-        path.includes("introduction-to-graphql") ||
         path.includes("introduction-to-frameworks") ||
         path.includes("introduction-to-typescript") ||
         path.includes("introduction-to-react") ||
         path.includes("introduction-to-next") ||
-        title.includes("graphql") ||
         title.includes("framework") ||
         title.includes("library") ||
         title.includes("typescript") ||
@@ -151,24 +148,18 @@ function categorizeNavigationItems(
         return "design";
       }
 
-      // Check for project sections
+      // Check for advanced project sections
       if (
-        path.includes("quiz-app") ||
+        path.includes("advancing") ||
+        path.includes("blog-website") ||
+        path.includes("ecommerce-platform") ||
+        title.includes("blog") ||
+        title.includes("ecommerce") ||
+        title.includes("advancing") ||
+        path.includes("project") ||
         path.includes("website-portfolio") ||
         title.includes("project") ||
         title.includes("portfolio")
-      ) {
-        return "projects";
-      }
-
-      // Check for advanced project sections
-      if (
-        path.includes("blog-website") ||
-        path.includes("ecommerce-platform") ||
-        path.includes("advancing") ||
-        title.includes("blog") ||
-        title.includes("ecommerce") ||
-        title.includes("advancing")
       ) {
         return "advanced_projects";
       }
@@ -191,8 +182,6 @@ function categorizeNavigationItems(
       path.includes("performance") ||
       path.includes("security") ||
       path.includes("storage-solutions") ||
-      path.includes("graphql") ||
-      path.includes("introduction-to-graphql") ||
       path.includes("frameworks") ||
       path.includes("introduction-to-frameworks") ||
       path.includes("libraries") ||
@@ -203,7 +192,6 @@ function categorizeNavigationItems(
       path.includes("next.js") ||
       path.includes("introduction-to-next") ||
       title.includes("performance") ||
-      title.includes("graphql") ||
       title.includes("security") ||
       title.includes("storage") ||
       title.includes("apis") ||
@@ -234,7 +222,11 @@ function categorizeNavigationItems(
       path.includes("ecommerce-platform") ||
       title.includes("blog") ||
       title.includes("ecommerce") ||
-      title.includes("advancing")
+      title.includes("advancing") ||
+      path.includes("project") ||
+      path.includes("website-portfolio") ||
+      title.includes("project") ||
+      title.includes("portfolio")
     ) {
       return "advanced_projects";
     } else if (
@@ -255,14 +247,6 @@ function categorizeNavigationItems(
       title.includes("jquery")
     ) {
       return "core_technologies";
-    } else if (
-      path.includes("quiz-app") ||
-      path.includes("project") ||
-      path.includes("website-portfolio") ||
-      title.includes("project") ||
-      title.includes("portfolio")
-    ) {
-      return "projects";
     } else if (
       path.includes("ux-ui-design") ||
       path.includes("design") ||
@@ -324,13 +308,6 @@ function categorizeNavigationItems(
     });
   }
 
-  if (categories.projects.length > 0) {
-    sections.push({
-      title: "Projects",
-      items: categories.projects,
-    });
-  }
-
   if (categories.utilities.length > 0) {
     sections.push({
       title: "Utilities & Tools",
@@ -347,7 +324,7 @@ function categorizeNavigationItems(
 
   if (categories.advanced_projects.length > 0) {
     sections.push({
-      title: "Advanced Projects",
+      title: "Projects",
       items: categories.advanced_projects,
     });
   }
@@ -403,12 +380,17 @@ function getPriority(title: string): number {
     return 5;
   if (normalizedTitle.includes("vocabulary")) return 6;
   if (
+    normalizedTitle.includes("security") ||
+    normalizedTitle.includes("performance")
+  )
+    return 999;
+  if (
     normalizedTitle.includes("bonus") ||
     normalizedTitle.includes("libraries") ||
     normalizedTitle.includes("frameworks")
   )
     return 9999; // Always at the bottom
-  return 999; // Default priority for other items
+  return 99; // Default priority for other items
 }
 
 // Helper function to sort navigation items with priority logic

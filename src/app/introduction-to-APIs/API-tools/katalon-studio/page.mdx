@@ -1,0 +1,200 @@
+import BackToTop from "@/components/BackToTop";
+import Button from "@/components/Button";
+import { FaChevronRight } from "react-icons/fa";
+
+# Katalon Studio
+
+## Table of Contents
+
+## Introduction
+
+[Katalon Studio](https://katalon.com/download-studio-free) is an all-in-one test automation platform designed to support robust, scalable testing across web, mobile, API, and desktop applications. Built on top of the open-source Selenium and Appium frameworks, Katalon Studio offers a streamlined experience with a low-code environment, making it accessible to testers of all skill levels—whether you're a manual QA engineer transitioning to automation or an experienced SDET working with complex test suites.
+
+Katalon Studio combines a rich set of built-in features with an intuitive interface, enabling users to quickly create, execute, and maintain automated tests without the need to write extensive code. It supports advanced testing practices such as data-driven testing, test object management, and integration with CI/CD tools like Jenkins, Azure DevOps, and Git. Additionally, its support for scripting in Groovy allows flexibility for power users who need to customize or extend the default capabilities.
+
+The platform also includes capabilities for API testing, allowing teams to validate endpoints, automate workflows, and perform end-to-end functional testing in one unified workspace. With Katalon TestOps, users gain access to test analytics, execution reports, and centralized test management—further enhancing visibility and collaboration across teams.
+
+Katalon Studio is ideal for organizations looking to accelerate software delivery without compromising quality. It bridges the gap between manual testing and full-scale automation, offering a practical, cost-effective solution for teams adopting agile and DevOps practices.
+
+### Key Features
+
+| Feature                                                            | Description                                                                                     |
+| ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| **Hybrid project support**                                         | Supports API, web, and mobile testing in a single project.                                      |
+| **Schema validation**                                              | Validate API responses against predefined schemas (JSON, XML).                                  |
+| **Flexible parameterization**                                      | Use data-driven testing with CSV, Excel, or database sources.                                   |
+| **Test efficiently with an AI-enabled low-code approach**          | Use AI to generate test cases and reduce manual effort.                                         |
+| **Broad protocol and import**                                      | Supports REST, SOAP, GraphQL, and more. Import API definitions from OpenAPI, Swagger, and WSDL. |
+| **Built-in reporting**                                             | Generate detailed test reports with execution history and logs.                                 |
+| **Unified automation testing platform across web, mobile and API** | Test web, mobile, and API applications in a single platform.                                    |
+| **CI/CD integration**                                              | Integrate with CI/CD tools like Jenkins, GitLab, and Azure DevOps for continuous testing.       |
+| **Cross-platform support**                                         | Available on Windows, macOS, and Linux.                                                         |
+
+### Pricing
+
+| Plan         | Price (per user/month) | Features                                                                                             |
+| ------------ | ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| **Free**     | $0                     | Basic features, unlimited test execution, up to 5 test cases, local execution only.                  |
+| **Premium**  | $208                   | Unlimited test cases, cloud execution, advanced reporting, integrations, and collaboration features. |
+| **Ultimate** | $708                   | All Premium features, plus advanced analytics, priority support, and enterprise-grade security.      |
+| **Runtime**  | $1,708                 | All Ultimate features, plus runtime engine for enterprise CI/CD integration and dedicated support.   |
+
+<BackToTop />
+
+## Using Katalon Studio
+
+### Creating a New Test Case
+
+Creating a new test case in Katalon Studio is straightforward and allows you to define the steps needed to test your API endpoints effectively. You can create test cases for various scenarios, including positive and negative tests, to ensure comprehensive coverage.
+
+- Open Katalon Studio
+- Click on **File** <FaChevronRight className="inline"/> **New** <FaChevronRight className="inline"/> **Test Case**
+- Enter the test case name and description
+- Click <Button variant="tertiary" className="mx-1">Ok</Button> to create the test case
+
+### Setting Up the Test Case
+
+- In the test case editor, you can add steps to define the API request
+- Use the <Button variant="tertiary" className="mx-1">Add</Button> button to insert steps such as:
+  - **Send Request**: Configure the HTTP method, URL, headers, and body
+  - **Verify Response**: Add assertions to validate the response status code, headers, and body content
+- Use the **Data Binding** feature to parameterize your test case with data from external sources (e.g., CSV, Excel)
+
+### Writing Assertions
+
+Assertions in Katalon Studio allow you to validate the expected outcomes of your API requests. You can use built-in keywords or write custom Groovy scripts to perform assertions on the response data.
+
+- Use the `Verify` keyword to check the response status code, headers, and body content
+
+```groovy
+// Example assertion to verify the response status code
+import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
+import com.kms.katalon.core.webservice.keyword.WSBuiltInKeywords as WS
+WS.verifyResponseStatusCode(findTestObject('API/YourTestObject'), 200)
+// Example assertion to verify a specific field in the response body
+WS.verifyElementPropertyValue(findTestObject('API/YourTestObject'), 'data.id', 12345)
+```
+
+### Running the Test Case
+
+- To run the test case, click on the **Run** button in the toolbar
+- Select the desired execution environment (e.g., local, remote, cloud)
+- Katalon Studio will execute the test case and display the results in the **Log Viewer**
+- Review the execution logs to see the status of each step, including any assertions that passed or failed
+- You can also view the response details, including headers and body content, to analyze the API response
+  <BackToTop />
+
+### Organizing Test Cases
+
+Organizing your test cases in Katalon Studio is essential for maintaining a clean and manageable project structure. You can create folders to group related test cases, making it easier to navigate and execute tests.
+
+- Right-click on the **Test Cases** folder in the **Test Explorer**
+- Select <Button variant="tertiary" className="mx-1">New Folder</Button>
+- Enter a name for the folder (e.g., "API Tests")
+- Drag and drop test cases into the newly created folder to organize them logically
+
+#### Using Test Suite Collections
+
+Test Suite Collections in Katalon Studio allow you to group multiple test suites and run them together. This is useful for executing a set of related tests, such as regression tests or smoke tests.
+
+- Right-click on the **Test Suite Collections** folder in the **Test Explorer**
+- Select <Button variant="tertiary" className="mx-1">New Test Suite Collection</Button>
+- Enter a name for the collection (e.g., "API Regression Tests")
+- Add existing test suites to the collection by dragging and dropping them into the collection
+- You can also configure execution settings, such as parallel execution or environment variables, for the test suite collection
+- To run the test suite collection, right-click on it and select <Button variant="tertiary" className="mx-1">Run</Button>
+- Katalon Studio will execute all the test suites in the collection and provide a summary of the results in the **Log Viewer**
+
+#### Managing Test Cases and Test Suites
+
+Katalon Studio provides a user-friendly interface for managing test cases and test suites. You can easily create, edit, and delete test cases, as well as organize them into test suites for better management.
+
+- To edit a test case, double-click on it in the **Test Explorer** to open the test case editor
+- You can modify the test steps, assertions, and data bindings as needed
+- To delete a test case, right-click on it in the **Test Explorer** and select <Button variant="tertiary" className="mx-1">Delete</Button>
+- To create a new test suite, right-click on the **Test Suites** folder in the **Test Explorer**
+- Select <Button variant="tertiary" className="mx-1">New Test Suite</Button>
+- Enter a name for the test suite and click <Button variant="tertiary" className="mx-1">Ok</Button>
+- In the test suite editor, you can add test cases by dragging and dropping them from the **Test Explorer**
+- You can also configure the execution settings for the test suite, such as parallel execution or environment variables
+- To run a test suite, right-click on it in the **Test Explorer** and select <Button variant="tertiary" className="mx-1">Run</Button>
+- Katalon Studio will execute all the test cases in the suite and provide a summary of the results in the **Log Viewer**
+
+#### Using Test Objects
+
+Test objects in Katalon Studio represent the API endpoints you want to test. You can create test objects for each endpoint, specifying the HTTP method, URL, headers, and body content.
+
+- Right-click on the **Object Repository** folder in the **Test Explorer**
+- Select <Button variant="tertiary" className="mx-1">New</Button>
+- Choose <Button variant="tertiary" className="mx-1">Test Object</Button>
+- Enter a name for the test object (e.g., "Get User")
+- In the test object editor, specify the HTTP method (GET, POST, PUT, DELETE, etc.), URL, headers, and body content
+- You can also add parameters to the test object to make it reusable for different scenarios
+- Save the test object, and it will be available in the **Object Repository** for use in your test cases
+- To use the test object in a test case, drag and drop it from the **Object Repository** into the test case editor
+  <BackToTop />
+
+### Using Groovy Scripts
+
+Katalon Studio supports Groovy scripting, allowing you to write custom scripts for advanced test scenarios. You can use Groovy to manipulate data, perform complex assertions, or integrate with external libraries.
+
+- In the test case editor, click on the **Script** tab to switch to the Groovy script editor
+- Write your Groovy code to perform the desired actions, such as sending API requests, parsing responses, or validating data
+- You can use Katalon Studio's built-in keywords and methods to interact with the API and perform assertions
+- For example, you can use `WS.sendRequest()` to send an API request and `WS.verifyResponseStatusCode()` to validate the response status code
+
+#### Using Data-Driven Testing
+
+Data-driven testing in Katalon Studio allows you to run the same test case with multiple sets of input data. This is useful for testing different scenarios without duplicating test cases.
+
+- Create a data file (CSV, Excel, or database) containing the input data
+- In the test case editor, click on the **Data Binding** tab
+- Select the data file and map the columns to the variables in your test case
+- Use the Data Binding feature to parameterize your test case with data from external sources (e.g., CSV, Excel)
+
+```groovy
+// Example of using data-driven testing with a CSV file
+import com.kms.katalon.core.testdata.TestDataFactory as TestDataFactory
+TestData data = TestDataFactory.findTestData('Data Files/YourDataFile')
+for (int i = 1; i <= data.getRowNumbers(); i++) {
+    String name = data.getValue('Name', i)
+    String email = data.getValue('Email', i)
+
+    // Use the variables in your API request
+    WS.sendRequest(findTestObject('API/YourTestObject', [('name') : name, ('email') : email]))
+}
+```
+
+<BackToTop />
+
+### Generating Reports
+
+Katalon Studio provides built-in reporting capabilities to help you analyze test results and track the quality of your API endpoints. You can generate detailed reports that include execution history, logs, and assertions.
+
+- After running your test cases, navigate to the **Reports** tab
+- Select the report type (e.g., HTML, PDF, JUnit)
+- Click on the <Button variant="tertiary" className="mx-1">Generate</Button> button to create the report
+- Review the report to see the execution results, including passed and failed assertions, response times, and any errors encountered during testing
+- You can also export the report to share with your team or stakeholders
+
+### Integrating with CI/CD
+
+Katalon Studio can be easily integrated into your CI/CD pipeline to automate API testing as part of your software delivery process. You can use Katalon TestOps to manage test execution, track results, and generate reports.
+
+- Set up Katalon TestOps to connect with your CI/CD tool (e.g., Jenkins, GitLab, Azure DevOps)
+- Configure the test execution settings, including the test cases to run and the environment variables
+- Use the Katalon CLI to execute tests from the command line as part of your CI/CD pipeline
+- Monitor test execution results in Katalon TestOps and generate reports for stakeholders
+
+## Best Practices for API Testing with Katalon Studio
+
+- **Organize Test Cases**: Group related test cases into folders for better organization and maintainability.
+- **Use Descriptive Names**: Name your test cases and test objects descriptively to make it easier to understand their purpose.
+- **Implement Error Handling**: Use try-catch blocks in your Groovy scripts to handle errors gracefully and log meaningful messages.
+- **Regularly Update Test Data**: Keep your test data files up to date to ensure accurate testing.
+- **Leverage Katalon TestOps**: Use Katalon TestOps for centralized test management, analytics, and collaboration across teams.
+- **Version Control**: Use version control systems (e.g., Git) to manage your test cases and configurations, allowing for better collaboration and rollback capabilities.
+- **Continuous Learning**: Stay updated with Katalon Studio's latest features and best practices to enhance your API testing skills.
+- **Community and Support**: Engage with the Katalon community for support, share knowledge, and learn from others' experiences. Katalon provides extensive documentation, forums, and webinars to help users get the most out of the platform.
+
+<BackToTop />

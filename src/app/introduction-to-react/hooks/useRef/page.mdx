@@ -45,10 +45,23 @@ export default MyComponent;
 - **Accessing DOM Elements**: You can use `useRef` to get a reference to a DOM element and perform actions like focusing an input field, scrolling to an element, or measuring its dimensions.
 - **Storing Previous Values**: You can use `useRef` to keep track of previous values without triggering re-renders. This is useful for comparing current and previous props or state values.
 - **Integrating with Third-Party Libraries**: When working with libraries that require direct DOM manipulation, such as D3.js or jQuery, `useRef` provides a way to access the DOM nodes directly without interfering with React's rendering process.
+- **Creating Mutable Objects**: You can use `useRef` to create mutable objects that can hold any value, such as timers, counters, or flags, which do not need to trigger re-renders when changed.
+- **Managing Focus**: You can use `useRef` to manage focus in forms or interactive components, allowing you to programmatically focus elements when needed.
+- **Handling Animations**: You can use `useRef` to store references to elements involved in animations, allowing you to control their properties without causing re-renders.
+- **Implementing Custom Hooks**: You can use `useRef` in custom hooks to manage internal state or references that do not need to trigger re-renders.
+- **Tracking Component Lifecycle**: You can use `useRef` to track whether a component has mounted or unmounted, which can be useful for cleanup operations or avoiding memory leaks.
 
 ## How It Works
 
 The `useRef` hook returns a mutable object with a `current` property. You can assign a value to `current`, and it will persist across renders without causing the component to re-render. When you assign a DOM element to `current`, you can access its properties and methods directly.
+
+### Initial Render
+
+When you first call `useRef`, it initializes the `current` property to the value you provide. If no initial value is provided, it defaults to `null`.
+
+### Subsequent Renders
+
+On subsequent renders, the `current` property retains its value from the previous render. This means you can update `current` without triggering a re-render of the component.
 
 ## What to Avoid
 
@@ -59,81 +72,1600 @@ The `useRef` hook returns a mutable object with a `current` property. You can as
 
 ## Examples
 
-### Accessing a DOM Element
+### Advanced Video Player with Custom Controls
+
+This example demonstrates creating a custom video player with advanced controls using `useRef` for direct DOM manipulation:
 
 ```javascript
-import React, { useRef } from "react";
-const TimerComponent = () => {
-  const timerRef = useRef(null);
-  const startTimer = () => {
-    timerRef.current = setInterval(() => {
-      console.log("Timer running");
-    }, 1000);
-  };
-  const stopTimer = () => {
-    clearInterval(timerRef.current);
-    timerRef.current = null;
-  };
-  return (
-    <div>
-      <button onClick={startTimer}>Start Timer</button>
-      <button onClick={stopTimer}>Stop Timer</button>
-    </div>
-  );
-};
-export default TimerComponent;
-```
+import React, { useRef, useState, useEffect } from "react";
 
-  <BackToTop />
-### Storing Previous Values
-```javascript
-import React, { useState, useRef, useEffect } from "react";
-const PreviousValueComponent = ({ value }) => {
-  const prevValueRef = useRef();
+const VideoPlayer = ({ src, poster }) => {
+  const videoRef = useRef(null);
+  const progressRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [playbackRate, setPlaybackRate] = useState(1);
+
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (isPlaying) {
+      video.pause();
+    } else {
+      video.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleSeek = (e) => {
+    const video = videoRef.current;
+    const progress = progressRef.current;
+    const rect = progress.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const newTime = (clickX / rect.width) * duration;
+    video.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
+  const handleVolumeChange = (e) => {
+    const newVolume = parseFloat(e.target.value);
+    videoRef.current.volume = newVolume;
+    setVolume(newVolume);
+  };
+
+  const handlePlaybackRateChange = (rate) => {
+    videoRef.current.playbackRate = rate;
+    setPlaybackRate(rate);
+  };
+
+  const skipTime = (seconds) => {
+    const video = videoRef.current;
+    video.currentTime = Math.max(
+      0,
+      Math.min(duration, video.currentTime + seconds)
+    );
+  };
+
   useEffect(() => {
-    prevValueRef.current = value; // Store the current value in the ref
-  }, [value]);
-  const prevValue = prevValueRef.current; // Access the previous value
-  return (
-    <div>
-      <p>Current Value: {value}</p>
-      <p>Previous Value: {prevValue}</p>
-    </div>
-  );
-};
-export default PreviousValueComponent;
-```
-  <BackToTop />
-### Integrating with Third-Party Libraries
-```javascript
-import React, { useRef, useEffect } from "react";
-const ChartComponent = () => {
-  const chartRef = useRef(null);
-  useEffect(() => {
-    const chart = new Chart(chartRef.current, {
-      type: "line",
-      data: {
-        labels: ["January", "February", "March"],
-        datasets: [
-          {
-            label: "My Dataset",
-            data: [65, 59, 80],
-            fill: false,
-            borderColor: "rgb(75, 192, 192)",
-            tension: 0.1,
-          },
-        ],
-      },
-    });
+    const video = videoRef.current;
+
+    const updateTime = () => setCurrentTime(video.currentTime);
+    const updateDuration = () => setDuration(video.duration);
+    const handleEnded = () => setIsPlaying(false);
+
+    video.addEventListener("timeupdate", updateTime);
+    video.addEventListener("loadedmetadata", updateDuration);
+    video.addEventListener("ended", handleEnded);
+
     return () => {
-      chart.destroy(); // Clean up the chart instance on unmount
+      video.removeEventListener("timeupdate", updateTime);
+      video.removeEventListener("loadedmetadata", updateDuration);
+      video.removeEventListener("ended", handleEnded);
     };
   }, []);
-  return <canvas ref={chartRef} />;
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  };
+
+  return (
+    <div className="video-player">
+      <video
+        ref={videoRef}
+        src={src}
+        poster={poster}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        style={{ width: "100%", height: "auto" }}
+      />
+
+      <div className="controls">
+        <button onClick={togglePlay}>{isPlaying ? "⏸️" : "▶️"}</button>
+
+        <button onClick={() => skipTime(-10)}>⏪ 10s</button>
+        <button onClick={() => skipTime(10)}>10s ⏩</button>
+
+        <div
+          className="progress-container"
+          style={{ flex: 1, margin: "0 10px" }}
+        >
+          <div
+            ref={progressRef}
+            className="progress-bar"
+            onClick={handleSeek}
+            style={{
+              height: "8px",
+              background: "#ddd",
+              borderRadius: "4px",
+              cursor: "pointer",
+              position: "relative",
+            }}
+          >
+            <div
+              className="progress-filled"
+              style={{
+                width: `${(currentTime / duration) * 100}%`,
+                height: "100%",
+                background: "#007bff",
+                borderRadius: "4px",
+              }}
+            />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              fontSize: "12px",
+            }}
+          >
+            <span>{formatTime(currentTime)}</span>
+            <span>{formatTime(duration)}</span>
+          </div>
+        </div>
+
+        <div
+          className="volume-control"
+          style={{ display: "flex", alignItems: "center" }}
+        >
+          <span>🔊</span>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            value={volume}
+            onChange={handleVolumeChange}
+            style={{ marginLeft: "5px" }}
+          />
+        </div>
+
+        <select
+          value={playbackRate}
+          onChange={(e) => handlePlaybackRateChange(parseFloat(e.target.value))}
+        >
+          <option value={0.5}>0.5x</option>
+          <option value={0.75}>0.75x</option>
+          <option value={1}>1x</option>
+          <option value={1.25}>1.25x</option>
+          <option value={1.5}>1.5x</option>
+          <option value={2}>2x</option>
+        </select>
+      </div>
+    </div>
+  );
 };
-export default ChartComponent;
+
+export default VideoPlayer;
 ```
-  <BackToTop />
+
+<BackToTop />
+
+### Infinite Scroll with Intersection Observer
+
+This example shows how to implement infinite scrolling using `useRef` with the Intersection Observer API:
+
+```javascript
+import React, { useRef, useState, useEffect, useCallback } from "react";
+
+const InfiniteScrollList = () => {
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const observerRef = useRef(null);
+  const loadingRef = useRef(null);
+
+  // Simulate API call
+  const fetchItems = useCallback(async (pageNum) => {
+    setLoading(true);
+
+    // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    const newItems = Array.from({ length: 20 }, (_, index) => ({
+      id: (pageNum - 1) * 20 + index + 1,
+      title: `Item ${(pageNum - 1) * 20 + index + 1}`,
+      description: `This is the description for item ${(pageNum - 1) * 20 + index + 1}`,
+      image: `https://picsum.photos/300/200?random=${(pageNum - 1) * 20 + index + 1}`,
+    }));
+
+    // Simulate end of data after page 5
+    if (pageNum >= 5) {
+      setHasMore(false);
+      setItems((prev) => [...prev, ...newItems.slice(0, 10)]);
+    } else {
+      setItems((prev) => [...prev, ...newItems]);
+    }
+
+    setLoading(false);
+  }, []);
+
+  // Set up intersection observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          setPage((prev) => prev + 1);
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    observerRef.current = observer;
+
+    if (loadingRef.current) {
+      observer.observe(loadingRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [hasMore, loading]);
+
+  // Fetch items when page changes
+  useEffect(() => {
+    fetchItems(page);
+  }, [page, fetchItems]);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  return (
+    <div className="infinite-scroll-container">
+      <div
+        className="header"
+        style={{
+          position: "sticky",
+          top: 0,
+          background: "white",
+          padding: "20px",
+          borderBottom: "1px solid #eee",
+        }}
+      >
+        <h2>Infinite Scroll Demo</h2>
+        <button onClick={scrollToTop} style={{ marginLeft: "10px" }}>
+          Scroll to Top
+        </button>
+      </div>
+
+      <div
+        className="items-grid"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+          gap: "20px",
+          padding: "20px",
+        }}
+      >
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className="item-card"
+            style={{
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              overflow: "hidden",
+              transition: "transform 0.2s",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => (e.target.style.transform = "scale(1.02)")}
+            onMouseLeave={(e) => (e.target.style.transform = "scale(1)")}
+          >
+            <img
+              src={item.image}
+              alt={item.title}
+              style={{ width: "100%", height: "200px", objectFit: "cover" }}
+              loading="lazy"
+            />
+            <div style={{ padding: "15px" }}>
+              <h3 style={{ margin: "0 0 10px 0", fontSize: "18px" }}>
+                {item.title}
+              </h3>
+              <p style={{ margin: 0, color: "#666", fontSize: "14px" }}>
+                {item.description}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Loading indicator and intersection target */}
+      <div
+        ref={loadingRef}
+        style={{
+          padding: "20px",
+          textAlign: "center",
+          minHeight: "60px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {loading && (
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div
+              style={{
+                width: "20px",
+                height: "20px",
+                border: "2px solid #f3f3f3",
+                borderTop: "2px solid #007bff",
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite",
+              }}
+            />
+            <span>Loading more items...</span>
+          </div>
+        )}
+        {!hasMore && !loading && (
+          <p style={{ color: "#666", fontStyle: "italic" }}>
+            You've reached the end! Total items loaded: {items.length}
+          </p>
+        )}
+      </div>
+
+      <style jsx>{`
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default InfiniteScrollList;
+```
+
+<BackToTop />
+
+### Advanced Form with Dynamic Fields and Auto-Save
+
+This example demonstrates using `useRef` for form management, auto-save functionality, and dynamic field manipulation:
+
+```javascript
+import React, { useRef, useState, useEffect, useCallback } from "react";
+
+const DynamicForm = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    addresses: [{ street: "", city: "", zipCode: "" }],
+    skills: [""],
+    preferences: {
+      newsletter: false,
+      notifications: true,
+      theme: "light",
+    },
+  });
+
+  const [errors, setErrors] = useState({});
+  const [saveStatus, setSaveStatus] = useState("saved"); // saved, saving, error
+  const [isDirty, setIsDirty] = useState(false);
+
+  // Refs for form elements and functionality
+  const formRef = useRef(null);
+  const autoSaveTimerRef = useRef(null);
+  const firstErrorRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const nameInputRef = useRef(null);
+
+  // Auto-save functionality
+  const saveForm = useCallback(async () => {
+    if (!isDirty) return;
+
+    setSaveStatus("saving");
+
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Save to localStorage as backup
+      localStorage.setItem("dynamicFormData", JSON.stringify(formData));
+
+      setSaveStatus("saved");
+      setIsDirty(false);
+      console.log("Form auto-saved:", formData);
+    } catch (error) {
+      setSaveStatus("error");
+      console.error("Auto-save failed:", error);
+    }
+  }, [formData, isDirty]);
+
+  // Set up auto-save timer
+  useEffect(() => {
+    if (isDirty) {
+      // Clear existing timer
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+
+      // Set new timer for 3 seconds
+      autoSaveTimerRef.current = setTimeout(saveForm, 3000);
+    }
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [formData, isDirty, saveForm]);
+
+  // Load saved data on mount
+  useEffect(() => {
+    const savedData = localStorage.getItem("dynamicFormData");
+    if (savedData) {
+      setFormData(JSON.parse(savedData));
+    }
+
+    // Focus name input on mount
+    if (nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, []);
+
+  const updateFormData = (path, value) => {
+    setFormData((prev) => {
+      const newData = { ...prev };
+      const keys = path.split(".");
+      let current = newData;
+
+      for (let i = 0; i < keys.length - 1; i++) {
+        const key = keys[i];
+        const arrayMatch = key.match(/(\w+)\[(\d+)\]/);
+
+        if (arrayMatch) {
+          const [, arrayKey, index] = arrayMatch;
+          if (!current[arrayKey]) current[arrayKey] = [];
+          if (!current[arrayKey][index]) current[arrayKey][index] = {};
+          current = current[arrayKey][index];
+        } else {
+          if (!current[key]) current[key] = {};
+          current = current[key];
+        }
+      }
+
+      const lastKey = keys[keys.length - 1];
+      const arrayMatch = lastKey.match(/(\w+)\[(\d+)\]/);
+
+      if (arrayMatch) {
+        const [, arrayKey, index] = arrayMatch;
+        if (!current[arrayKey]) current[arrayKey] = [];
+        current[arrayKey][index] = value;
+      } else {
+        current[lastKey] = value;
+      }
+
+      return newData;
+    });
+    setIsDirty(true);
+  };
+
+  const addAddress = () => {
+    setFormData((prev) => ({
+      ...prev,
+      addresses: [...prev.addresses, { street: "", city: "", zipCode: "" }],
+    }));
+    setIsDirty(true);
+  };
+
+  const removeAddress = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      addresses: prev.addresses.filter((_, i) => i !== index),
+    }));
+    setIsDirty(true);
+  };
+
+  const addSkill = () => {
+    setFormData((prev) => ({
+      ...prev,
+      skills: [...prev.skills, ""],
+    }));
+    setIsDirty(true);
+  };
+
+  const removeSkill = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      skills: prev.skills.filter((_, i) => i !== index),
+    }));
+    setIsDirty(true);
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Email is invalid";
+
+    formData.addresses.forEach((address, index) => {
+      if (!address.street.trim()) {
+        newErrors[`addresses[${index}].street`] = "Street is required";
+      }
+      if (!address.city.trim()) {
+        newErrors[`addresses[${index}].city`] = "City is required";
+      }
+    });
+
+    setErrors(newErrors);
+
+    // Focus first error field
+    if (Object.keys(newErrors).length > 0) {
+      const firstErrorField = Object.keys(newErrors)[0];
+      const errorElement = formRef.current?.querySelector(
+        `[name="${firstErrorField}"]`
+      );
+      if (errorElement) {
+        errorElement.focus();
+        firstErrorRef.current = errorElement;
+      }
+    }
+
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
+
+    setSaveStatus("saving");
+
+    try {
+      // Simulate API submission
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      alert("Form submitted successfully!");
+      setSaveStatus("saved");
+      setIsDirty(false);
+
+      // Clear form
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        addresses: [{ street: "", city: "", zipCode: "" }],
+        skills: [""],
+        preferences: {
+          newsletter: false,
+          notifications: true,
+          theme: "light",
+        },
+      });
+
+      localStorage.removeItem("dynamicFormData");
+    } catch (error) {
+      setSaveStatus("error");
+      alert("Submission failed. Please try again.");
+    }
+  };
+
+  const exportFormData = () => {
+    const dataStr = JSON.stringify(formData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "form-data.json";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const importFormData = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileImport = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const importedData = JSON.parse(event.target.result);
+        setFormData(importedData);
+        setIsDirty(true);
+        alert("Form data imported successfully!");
+      } catch (error) {
+        alert("Invalid file format. Please select a valid JSON file.");
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  return (
+    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "20px" }}>
+      {/* Status bar */}
+      <div
+        style={{
+          padding: "10px",
+          marginBottom: "20px",
+          borderRadius: "4px",
+          backgroundColor:
+            saveStatus === "saved"
+              ? "#d4edda"
+              : saveStatus === "saving"
+                ? "#fff3cd"
+                : "#f8d7da",
+          color:
+            saveStatus === "saved"
+              ? "#155724"
+              : saveStatus === "saving"
+                ? "#856404"
+                : "#721c24",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <span>
+          {saveStatus === "saved" && "✅ All changes saved"}
+          {saveStatus === "saving" && "💾 Saving changes..."}
+          {saveStatus === "error" && "❌ Save failed"}
+        </span>
+        <div>
+          <button
+            type="button"
+            onClick={exportFormData}
+            style={{ marginRight: "10px" }}
+          >
+            Export Data
+          </button>
+          <button type="button" onClick={importFormData}>
+            Import Data
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            onChange={handleFileImport}
+            style={{ display: "none" }}
+          />
+        </div>
+      </div>
+
+      <form ref={formRef} onSubmit={handleSubmit}>
+        <h2>Dynamic Form with Auto-Save</h2>
+
+        {/* Basic Information */}
+        <fieldset
+          style={{
+            marginBottom: "20px",
+            padding: "15px",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+          }}
+        >
+          <legend>Basic Information</legend>
+
+          <div style={{ marginBottom: "15px" }}>
+            <label>Name *</label>
+            <input
+              ref={nameInputRef}
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={(e) => updateFormData("name", e.target.value)}
+              style={{
+                width: "100%",
+                padding: "8px",
+                borderColor: errors.name ? "#dc3545" : "#ddd",
+                borderWidth: "1px",
+                borderStyle: "solid",
+                borderRadius: "4px",
+              }}
+            />
+            {errors.name && (
+              <span style={{ color: "#dc3545", fontSize: "14px" }}>
+                {errors.name}
+              </span>
+            )}
+          </div>
+
+          <div style={{ marginBottom: "15px" }}>
+            <label>Email *</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={(e) => updateFormData("email", e.target.value)}
+              style={{
+                width: "100%",
+                padding: "8px",
+                borderColor: errors.email ? "#dc3545" : "#ddd",
+                borderWidth: "1px",
+                borderStyle: "solid",
+                borderRadius: "4px",
+              }}
+            />
+            {errors.email && (
+              <span style={{ color: "#dc3545", fontSize: "14px" }}>
+                {errors.email}
+              </span>
+            )}
+          </div>
+
+          <div style={{ marginBottom: "15px" }}>
+            <label>Phone</label>
+            <input
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={(e) => updateFormData("phone", e.target.value)}
+              style={{
+                width: "100%",
+                padding: "8px",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+              }}
+            />
+          </div>
+        </fieldset>
+
+        {/* Dynamic Addresses */}
+        <fieldset
+          style={{
+            marginBottom: "20px",
+            padding: "15px",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+          }}
+        >
+          <legend>Addresses</legend>
+
+          {formData.addresses.map((address, index) => (
+            <div
+              key={index}
+              style={{
+                marginBottom: "15px",
+                padding: "10px",
+                backgroundColor: "#f8f9fa",
+                borderRadius: "4px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "10px",
+                }}
+              >
+                <h4>Address {index + 1}</h4>
+                {formData.addresses.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeAddress(index)}
+                    style={{ color: "#dc3545" }}
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "2fr 1fr 1fr",
+                  gap: "10px",
+                }}
+              >
+                <div>
+                  <label>Street *</label>
+                  <input
+                    type="text"
+                    name={`addresses[${index}].street`}
+                    value={address.street}
+                    onChange={(e) =>
+                      updateFormData(
+                        `addresses[${index}].street`,
+                        e.target.value
+                      )
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "8px",
+                      borderColor: errors[`addresses[${index}].street`]
+                        ? "#dc3545"
+                        : "#ddd",
+                      borderWidth: "1px",
+                      borderStyle: "solid",
+                      borderRadius: "4px",
+                    }}
+                  />
+                  {errors[`addresses[${index}].street`] && (
+                    <span style={{ color: "#dc3545", fontSize: "14px" }}>
+                      {errors[`addresses[${index}].street`]}
+                    </span>
+                  )}
+                </div>
+
+                <div>
+                  <label>City *</label>
+                  <input
+                    type="text"
+                    name={`addresses[${index}].city`}
+                    value={address.city}
+                    onChange={(e) =>
+                      updateFormData(`addresses[${index}].city`, e.target.value)
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "8px",
+                      borderColor: errors[`addresses[${index}].city`]
+                        ? "#dc3545"
+                        : "#ddd",
+                      borderWidth: "1px",
+                      borderStyle: "solid",
+                      borderRadius: "4px",
+                    }}
+                  />
+                  {errors[`addresses[${index}].city`] && (
+                    <span style={{ color: "#dc3545", fontSize: "14px" }}>
+                      {errors[`addresses[${index}].city`]}
+                    </span>
+                  )}
+                </div>
+
+                <div>
+                  <label>Zip Code</label>
+                  <input
+                    type="text"
+                    name={`addresses[${index}].zipCode`}
+                    value={address.zipCode}
+                    onChange={(e) =>
+                      updateFormData(
+                        `addresses[${index}].zipCode`,
+                        e.target.value
+                      )
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "8px",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={addAddress}
+            style={{ marginTop: "10px" }}
+          >
+            + Add Address
+          </button>
+        </fieldset>
+
+        {/* Dynamic Skills */}
+        <fieldset
+          style={{
+            marginBottom: "20px",
+            padding: "15px",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+          }}
+        >
+          <legend>Skills</legend>
+
+          {formData.skills.map((skill, index) => (
+            <div
+              key={index}
+              style={{
+                display: "flex",
+                gap: "10px",
+                marginBottom: "10px",
+                alignItems: "center",
+              }}
+            >
+              <input
+                type="text"
+                value={skill}
+                onChange={(e) =>
+                  updateFormData(`skills[${index}]`, e.target.value)
+                }
+                placeholder={`Skill ${index + 1}`}
+                style={{
+                  flex: 1,
+                  padding: "8px",
+                  border: "1px solid #ddd",
+                  borderRadius: "4px",
+                }}
+              />
+              {formData.skills.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeSkill(index)}
+                  style={{ color: "#dc3545" }}
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={addSkill}
+            style={{ marginTop: "10px" }}
+          >
+            + Add Skill
+          </button>
+        </fieldset>
+
+        {/* Preferences */}
+        <fieldset
+          style={{
+            marginBottom: "20px",
+            padding: "15px",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+          }}
+        >
+          <legend>Preferences</legend>
+
+          <div style={{ marginBottom: "10px" }}>
+            <label>
+              <input
+                type="checkbox"
+                checked={formData.preferences.newsletter}
+                onChange={(e) =>
+                  updateFormData("preferences.newsletter", e.target.checked)
+                }
+                style={{ marginRight: "8px" }}
+              />
+              Subscribe to newsletter
+            </label>
+          </div>
+
+          <div style={{ marginBottom: "10px" }}>
+            <label>
+              <input
+                type="checkbox"
+                checked={formData.preferences.notifications}
+                onChange={(e) =>
+                  updateFormData("preferences.notifications", e.target.checked)
+                }
+                style={{ marginRight: "8px" }}
+              />
+              Enable notifications
+            </label>
+          </div>
+
+          <div>
+            <label>Theme:</label>
+            <select
+              value={formData.preferences.theme}
+              onChange={(e) =>
+                updateFormData("preferences.theme", e.target.value)
+              }
+              style={{ marginLeft: "10px", padding: "4px" }}
+            >
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="auto">Auto</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <div style={{ textAlign: "center" }}>
+          <button
+            type="submit"
+            disabled={saveStatus === "saving"}
+            style={{
+              padding: "12px 24px",
+              fontSize: "16px",
+              backgroundColor: "#007bff",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: saveStatus === "saving" ? "not-allowed" : "pointer",
+              opacity: saveStatus === "saving" ? 0.6 : 1,
+            }}
+          >
+            {saveStatus === "saving" ? "Submitting..." : "Submit Form"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default DynamicForm;
+```
+
+<BackToTop />
+
+### Interactive Canvas Drawing App
+
+This example demonstrates using `useRef` for creating an interactive drawing application with multiple tools and features:
+
+```javascript
+import React, { useRef, useState, useEffect, useCallback } from "react";
+
+const DrawingCanvas = () => {
+  const canvasRef = useRef(null);
+  const contextRef = useRef(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [tool, setTool] = useState("pen");
+  const [lineWidth, setLineWidth] = useState(2);
+  const [color, setColor] = useState("#000000");
+  const [history, setHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const downloadLinkRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  // Drawing state
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+  const [shapes, setShapes] = useState([]);
+  const [currentShape, setCurrentShape] = useState(null);
+
+  // Initialize canvas
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+
+    // Set canvas size
+    canvas.width = 800;
+    canvas.height = 600;
+
+    // Configure context
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.strokeStyle = color;
+    context.lineWidth = lineWidth;
+
+    // Fill with white background
+    context.fillStyle = "white";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    contextRef.current = context;
+
+    // Save initial state
+    saveState();
+  }, []);
+
+  // Update context when tool settings change
+  useEffect(() => {
+    if (contextRef.current) {
+      contextRef.current.strokeStyle = color;
+      contextRef.current.lineWidth = lineWidth;
+      contextRef.current.globalCompositeOperation =
+        tool === "eraser" ? "destination-out" : "source-over";
+    }
+  }, [color, lineWidth, tool]);
+
+  const saveState = useCallback(() => {
+    const canvas = canvasRef.current;
+    const imageData = canvas.toDataURL();
+
+    setHistory((prev) => {
+      const newHistory = prev.slice(0, historyIndex + 1);
+      newHistory.push(imageData);
+
+      // Limit history to 50 states
+      if (newHistory.length > 50) {
+        newHistory.shift();
+        setHistoryIndex((prev) => prev - 1);
+      }
+
+      return newHistory;
+    });
+
+    setHistoryIndex((prev) => prev + 1);
+  }, [historyIndex]);
+
+  const undo = () => {
+    if (historyIndex > 0) {
+      const canvas = canvasRef.current;
+      const context = contextRef.current;
+      const img = new Image();
+
+      img.onload = () => {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(img, 0, 0);
+      };
+
+      img.src = history[historyIndex - 1];
+      setHistoryIndex((prev) => prev - 1);
+    }
+  };
+
+  const redo = () => {
+    if (historyIndex < history.length - 1) {
+      const canvas = canvasRef.current;
+      const context = contextRef.current;
+      const img = new Image();
+
+      img.onload = () => {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(img, 0, 0);
+      };
+
+      img.src = history[historyIndex + 1];
+      setHistoryIndex((prev) => prev + 1);
+    }
+  };
+
+  const getMousePos = (e) => {
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+    };
+  };
+
+  const startDrawing = (e) => {
+    const pos = getMousePos(e);
+    setIsDrawing(true);
+    setStartPos(pos);
+
+    const context = contextRef.current;
+
+    if (tool === "pen" || tool === "eraser") {
+      context.beginPath();
+      context.moveTo(pos.x, pos.y);
+    } else if (tool === "rectangle" || tool === "circle" || tool === "line") {
+      setCurrentShape({
+        type: tool,
+        startX: pos.x,
+        startY: pos.y,
+        endX: pos.x,
+        endY: pos.y,
+        color,
+        lineWidth,
+      });
+    } else if (tool === "text") {
+      const text = prompt("Enter text:");
+      if (text) {
+        context.font = `${lineWidth * 10}px Arial`;
+        context.fillStyle = color;
+        context.fillText(text, pos.x, pos.y);
+        saveState();
+      }
+    }
+  };
+
+  const draw = (e) => {
+    if (!isDrawing) return;
+
+    const pos = getMousePos(e);
+    const context = contextRef.current;
+
+    if (tool === "pen" || tool === "eraser") {
+      context.lineTo(pos.x, pos.y);
+      context.stroke();
+    } else if (tool === "rectangle" || tool === "circle" || tool === "line") {
+      setCurrentShape((prev) => ({
+        ...prev,
+        endX: pos.x,
+        endY: pos.y,
+      }));
+    }
+  };
+
+  const stopDrawing = () => {
+    if (!isDrawing) return;
+
+    setIsDrawing(false);
+
+    if (tool === "pen" || tool === "eraser") {
+      contextRef.current.closePath();
+    } else if (currentShape) {
+      drawShape(currentShape);
+      setCurrentShape(null);
+    }
+
+    saveState();
+  };
+
+  const drawShape = (shape) => {
+    const context = contextRef.current;
+    const { startX, startY, endX, endY, color, lineWidth } = shape;
+
+    context.strokeStyle = color;
+    context.lineWidth = lineWidth;
+    context.globalCompositeOperation = "source-over";
+
+    context.beginPath();
+
+    switch (shape.type) {
+      case "rectangle":
+        context.rect(startX, startY, endX - startX, endY - startY);
+        break;
+      case "circle":
+        const radius = Math.sqrt(
+          Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2)
+        );
+        context.arc(startX, startY, radius, 0, 2 * Math.PI);
+        break;
+      case "line":
+        context.moveTo(startX, startY);
+        context.lineTo(endX, endY);
+        break;
+    }
+
+    context.stroke();
+  };
+
+  // Draw preview of current shape
+  useEffect(() => {
+    if (currentShape) {
+      const canvas = canvasRef.current;
+      const context = contextRef.current;
+
+      // Temporarily save the current canvas state
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+      // Draw the preview
+      drawShape(currentShape);
+
+      // This will be cleared on the next draw or when drawing stops
+      requestAnimationFrame(() => {
+        context.putImageData(imageData, 0, 0);
+        drawShape(currentShape);
+      });
+    }
+  }, [currentShape]);
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    const context = contextRef.current;
+
+    context.fillStyle = "white";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    saveState();
+  };
+
+  const downloadImage = () => {
+    const canvas = canvasRef.current;
+    const dataURL = canvas.toDataURL("image/png");
+
+    const link = downloadLinkRef.current;
+    link.href = dataURL;
+    link.download = "drawing.png";
+    link.click();
+  };
+
+  const uploadImage = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = canvasRef.current;
+        const context = contextRef.current;
+
+        // Clear canvas and draw the uploaded image
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = "white";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Scale image to fit canvas while maintaining aspect ratio
+        const scale = Math.min(
+          canvas.width / img.width,
+          canvas.height / img.height
+        );
+        const width = img.width * scale;
+        const height = img.height * scale;
+        const x = (canvas.width - width) / 2;
+        const y = (canvas.height - height) / 2;
+
+        context.drawImage(img, x, y, width, height);
+        saveState();
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case "z":
+            e.preventDefault();
+            if (e.shiftKey) {
+              redo();
+            } else {
+              undo();
+            }
+            break;
+          case "s":
+            e.preventDefault();
+            downloadImage();
+            break;
+        }
+      }
+
+      // Tool shortcuts
+      switch (e.key) {
+        case "p":
+          setTool("pen");
+          break;
+        case "e":
+          setTool("eraser");
+          break;
+        case "r":
+          setTool("rectangle");
+          break;
+        case "c":
+          setTool("circle");
+          break;
+        case "l":
+          setTool("line");
+          break;
+        case "t":
+          setTool("text");
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [historyIndex, history.length]);
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "20px",
+      }}
+    >
+      <h2>Interactive Drawing Canvas</h2>
+
+      {/* Toolbar */}
+      <div
+        style={{
+          display: "flex",
+          gap: "15px",
+          marginBottom: "20px",
+          padding: "15px",
+          backgroundColor: "#f8f9fa",
+          borderRadius: "8px",
+          flexWrap: "wrap",
+          alignItems: "center",
+        }}
+      >
+        {/* Tools */}
+        <div style={{ display: "flex", gap: "5px" }}>
+          {[
+            { id: "pen", label: "✏️ Pen (P)", title: "Pen tool" },
+            { id: "eraser", label: "🧽 Eraser (E)", title: "Eraser tool" },
+            { id: "rectangle", label: "◼️ Rect (R)", title: "Rectangle tool" },
+            { id: "circle", label: "⭕ Circle (C)", title: "Circle tool" },
+            { id: "line", label: "📏 Line (L)", title: "Line tool" },
+            { id: "text", label: "📝 Text (T)", title: "Text tool" },
+          ].map(({ id, label, title }) => (
+            <button
+              key={id}
+              onClick={() => setTool(id)}
+              title={title}
+              style={{
+                padding: "8px 12px",
+                backgroundColor: tool === id ? "#007bff" : "white",
+                color: tool === id ? "white" : "black",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "12px",
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Color and Size */}
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <label>
+            Color:
+            <input
+              type="color"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              style={{ marginLeft: "5px", width: "40px", height: "30px" }}
+            />
+          </label>
+
+          <label>
+            Size:
+            <input
+              type="range"
+              min="1"
+              max="50"
+              value={lineWidth}
+              onChange={(e) => setLineWidth(parseInt(e.target.value))}
+              style={{ marginLeft: "5px", width: "80px" }}
+            />
+            <span style={{ marginLeft: "5px", fontSize: "12px" }}>
+              {lineWidth}px
+            </span>
+          </label>
+        </div>
+
+        {/* Actions */}
+        <div style={{ display: "flex", gap: "5px" }}>
+          <button
+            onClick={undo}
+            disabled={historyIndex <= 0}
+            title="Undo (Ctrl+Z)"
+            style={{
+              padding: "8px 12px",
+              backgroundColor: "white",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+              cursor: historyIndex <= 0 ? "not-allowed" : "pointer",
+              opacity: historyIndex <= 0 ? 0.5 : 1,
+            }}
+          >
+            ↶ Undo
+          </button>
+
+          <button
+            onClick={redo}
+            disabled={historyIndex >= history.length - 1}
+            title="Redo (Ctrl+Shift+Z)"
+            style={{
+              padding: "8px 12px",
+              backgroundColor: "white",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+              cursor:
+                historyIndex >= history.length - 1 ? "not-allowed" : "pointer",
+              opacity: historyIndex >= history.length - 1 ? 0.5 : 1,
+            }}
+          >
+            ↷ Redo
+          </button>
+
+          <button
+            onClick={clearCanvas}
+            title="Clear canvas"
+            style={{
+              padding: "8px 12px",
+              backgroundColor: "#dc3545",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            🗑️ Clear
+          </button>
+
+          <button
+            onClick={uploadImage}
+            title="Upload image"
+            style={{
+              padding: "8px 12px",
+              backgroundColor: "#28a745",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            📁 Upload
+          </button>
+
+          <button
+            onClick={downloadImage}
+            title="Download (Ctrl+S)"
+            style={{
+              padding: "8px 12px",
+              backgroundColor: "#007bff",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            💾 Download
+          </button>
+        </div>
+      </div>
+
+      {/* Canvas */}
+      <div
+        style={{
+          border: "2px solid #ddd",
+          borderRadius: "8px",
+          overflow: "hidden",
+        }}
+      >
+        <canvas
+          ref={canvasRef}
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseOut={stopDrawing}
+          style={{
+            cursor: tool === "eraser" ? "crosshair" : "pointer",
+            display: "block",
+            maxWidth: "100%",
+            height: "auto",
+          }}
+        />
+      </div>
+
+      {/* Instructions */}
+      <div
+        style={{
+          marginTop: "20px",
+          padding: "15px",
+          backgroundColor: "#e9ecef",
+          borderRadius: "8px",
+          maxWidth: "800px",
+          fontSize: "14px",
+        }}
+      >
+        <h4>Keyboard Shortcuts:</h4>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: "10px",
+          }}
+        >
+          <div>• P: Pen tool</div>
+          <div>• E: Eraser tool</div>
+          <div>• R: Rectangle tool</div>
+          <div>• C: Circle tool</div>
+          <div>• L: Line tool</div>
+          <div>• T: Text tool</div>
+          <div>• Ctrl+Z: Undo</div>
+          <div>• Ctrl+Shift+Z: Redo</div>
+          <div>• Ctrl+S: Download</div>
+        </div>
+      </div>
+
+      {/* Hidden elements */}
+      <a ref={downloadLinkRef} style={{ display: "none" }} />
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        style={{ display: "none" }}
+      />
+    </div>
+  );
+};
+
+export default DrawingCanvas;
+```
+
+<BackToTop />
 
 ## Best Practices
 

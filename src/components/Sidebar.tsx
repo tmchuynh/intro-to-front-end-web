@@ -89,18 +89,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div
-            className="flex items-center justify-between p-4 border-b h-16"
-            style={{ borderColor: "var(--sidebar-border)" }}
-          >
+          <div className="flex items-center justify-between p-4 border-sidebar-border border-b h-16">
             <Link href="/" className="flex items-center space-x-2">
               <div className="flex items-center justify-center bg-primary rounded-lg h-8 w-8">
                 <span className="font-bold text-lg text-white">W</span>
               </div>
-              <span
-                className="font-bold text-xl"
-                style={{ color: "var(--sidebar-text)" }}
-              >
+              <span className="font-bold text-sidebar-text text-xl">
                 Web Intro
               </span>
             </Link>

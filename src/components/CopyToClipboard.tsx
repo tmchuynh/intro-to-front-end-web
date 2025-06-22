@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { BsClipboard2CheckFill, BsClipboard2Fill } from "react-icons/bs";
 import Button from "./Button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 interface CopyButtonProps {
   textToCopy: string;
@@ -62,7 +63,14 @@ function CopyButton({ textToCopy }: CopyButtonProps) {
       {copied ? (
         <BsClipboard2CheckFill className="h-4 w-4 text-primary" />
       ) : (
-        <BsClipboard2Fill className="h-4 w-4 text-foreground hover:text-primary" />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <BsClipboard2Fill className="h-4 w-4 text-foreground hover:text-primary" />
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Copy to Clipboard</p>
+          </TooltipContent>
+        </Tooltip>
       )}
     </Button>
   );

@@ -96,12 +96,10 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
           {/* Mobile logo - only visible when sidebar is closed */}
           <div className="lg:hidden ml-2">
             <div className="flex items-center space-x-2">
-              <div className="flex items-center justify-center bg-emerald-500 rounded-md h-6 w-6">
+              <div className="flex items-center justify-center bg-primary rounded-md h-6 w-6">
                 <span className="font-bold text-sm text-white">W</span>
               </div>
-              <span className="font-bold text-gray-900 text-lg dark:text-white">
-                Web Intro
-              </span>
+              <span className="font-bold text-lg">Web Intro</span>
             </div>
           </div>
         </div>

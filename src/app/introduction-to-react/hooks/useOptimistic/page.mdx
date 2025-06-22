@@ -67,6 +67,18 @@ const useOptimistic = (initialValue) => {
 
 <BackToTop />
 
+## Common Use Cases
+
+- **Form Submissions**: When submitting a form, you can use `useOptimistic` to immediately update the UI with the new form data while waiting for the server response.
+- **List Management**: When adding or removing items from a list, you can use `useOptimistic` to update the list immediately, providing a responsive user experience while waiting for the server confirmation.
+- **Real-time Updates**: When implementing real-time updates, such as chat messages or notifications, you can use `useOptimistic` to update the UI immediately with new messages or notifications, providing a seamless user experience.
+- **Social Media Interactions**: When liking, sharing, or commenting on posts, you can use `useOptimistic` to update the UI immediately with the new interaction while waiting for the server confirmation.
+- **Shopping Cart Management**: When adding or removing items from a shopping cart, you can use `useOptimistic` to update the cart immediately, providing a responsive user experience while waiting for the server confirmation.
+- **Collaborative Applications**: In applications where multiple users can interact with the same data, such as collaborative documents or real-time dashboards, you can use `useOptimistic` to update the UI immediately with changes made by other users while waiting for the server confirmation.
+- **Pagination and Infinite Scrolling**: When loading more data in a paginated or infinite scrolling list, you can use `useOptimistic` to update the UI immediately with the new data while waiting for the server confirmation.
+- **Search Results**: When performing a search, you can use `useOptimistic` to update the search results immediately with the new data while waiting for the server confirmation.
+- **Notifications**: When displaying notifications, you can use `useOptimistic` to update the UI immediately with new notifications while waiting for the server confirmation.
+
 ### How It Works
 
 #### Initial Render
@@ -85,12 +97,6 @@ When the `optimisticUpdate` function is called with a new value, it sets the loa
 On subsequent renders, the `useOptimistic` hook maintains the current value, loading state, and error state. If the `optimisticUpdate` function is called again, it will follow the same process of updating the value, setting the loading state, and simulating a server request. The UI will reflect the current value, loading state, and any error messages as needed.
 
 <BackToTop />
-
-## Common Use Cases
-
-- **Form Submissions**: When submitting a form, you can use `useOptimistic` to immediately update the UI with the new form data while waiting for the server response.
-- **List Management**: When adding or removing items from a list, you can use `useOptimistic` to update the list immediately, providing a responsive user experience while waiting for the server confirmation.
-- **Real-time Updates**: When implementing real-time updates, such as chat messages or notifications, you can use `useOptimistic` to update the UI immediately with new messages or notifications, providing a seamless user experience.
 
 ## What to Expect
 
@@ -112,64 +118,1116 @@ When using the `useOptimistic` hook, you can expect the following behavior:
 
 ## Examples
 
-### Basic Usage
+### Social Media Post Interaction
 
 ```javascript
-import React from "react";
-import useOptimistic from "./useOptimistic";
-const MyComponent = () => {
-  const { value, loading, error, optimisticUpdate } = useOptimistic([]);
+import React, { useState } from "react";
 
-  const handleAddItem = () => {
-    optimisticUpdate([...value, "New Item"]);
+const useOptimisticSocialPost = (initialPost) => {
+  const [post, setPost] = useState(initialPost);
+  const [pendingActions, setPendingActions] = useState(new Set());
+  const [errors, setErrors] = useState({});
+
+  const optimisticLike = async () => {
+    const actionId = `like-${Date.now()}`;
+    setPendingActions((prev) => new Set([...prev, actionId]));
+
+    const originalLiked = post.isLiked;
+    const originalCount = post.likeCount;
+
+    // Optimistic update
+    setPost((prev) => ({
+      ...prev,
+      isLiked: !prev.isLiked,
+      likeCount: prev.isLiked ? prev.likeCount - 1 : prev.likeCount + 1,
+    }));
+
+    try {
+      // Simulate API call
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          Math.random() > 0.8 ? reject(new Error("Network error")) : resolve();
+        }, 800);
+      });
+
+      // Success - optimistic update was correct
+      setErrors((prev) => ({ ...prev, like: null }));
+    } catch (error) {
+      // Revert optimistic update
+      setPost((prev) => ({
+        ...prev,
+        isLiked: originalLiked,
+        likeCount: originalCount,
+      }));
+      setErrors((prev) => ({
+        ...prev,
+        like: "Failed to update like. Please try again.",
+      }));
+    } finally {
+      setPendingActions((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(actionId);
+        return newSet;
+      });
+    }
+  };
+
+  const optimisticShare = async () => {
+    const actionId = `share-${Date.now()}`;
+    setPendingActions((prev) => new Set([...prev, actionId]));
+
+    const originalCount = post.shareCount;
+
+    // Optimistic update
+    setPost((prev) => ({
+      ...prev,
+      shareCount: prev.shareCount + 1,
+      userShared: true,
+    }));
+
+    try {
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          Math.random() > 0.7 ? reject(new Error("Share failed")) : resolve();
+        }, 1200);
+      });
+
+      setErrors((prev) => ({ ...prev, share: null }));
+    } catch (error) {
+      // Revert optimistic update
+      setPost((prev) => ({
+        ...prev,
+        shareCount: originalCount,
+        userShared: false,
+      }));
+      setErrors((prev) => ({
+        ...prev,
+        share: "Failed to share post. Please try again.",
+      }));
+    } finally {
+      setPendingActions((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(actionId);
+        return newSet;
+      });
+    }
+  };
+
+  const optimisticComment = async (commentText) => {
+    const actionId = `comment-${Date.now()}`;
+    setPendingActions((prev) => new Set([...prev, actionId]));
+
+    const tempComment = {
+      id: `temp-${Date.now()}`,
+      text: commentText,
+      author: "You",
+      timestamp: new Date().toISOString(),
+      isPending: true,
+    };
+
+    // Optimistic update
+    setPost((prev) => ({
+      ...prev,
+      comments: [...prev.comments, tempComment],
+      commentCount: prev.commentCount + 1,
+    }));
+
+    try {
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          Math.random() > 0.6
+            ? reject(new Error("Comment failed"))
+            : resolve({
+                id: `real-${Date.now()}`,
+                text: commentText,
+                author: "You",
+                timestamp: new Date().toISOString(),
+              });
+        }, 1000);
+      });
+
+      // Replace temp comment with real one
+      setPost((prev) => ({
+        ...prev,
+        comments: prev.comments.map((comment) =>
+          comment.id === tempComment.id
+            ? { ...comment, isPending: false, id: `real-${Date.now()}` }
+            : comment
+        ),
+      }));
+      setErrors((prev) => ({ ...prev, comment: null }));
+    } catch (error) {
+      // Remove failed comment
+      setPost((prev) => ({
+        ...prev,
+        comments: prev.comments.filter(
+          (comment) => comment.id !== tempComment.id
+        ),
+        commentCount: prev.commentCount - 1,
+      }));
+      setErrors((prev) => ({
+        ...prev,
+        comment: "Failed to post comment. Please try again.",
+      }));
+    } finally {
+      setPendingActions((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(actionId);
+        return newSet;
+      });
+    }
+  };
+
+  return {
+    post,
+    pendingActions,
+    errors,
+    optimisticLike,
+    optimisticShare,
+    optimisticComment,
+    isLoading: pendingActions.size > 0,
+  };
+};
+
+const SocialMediaPost = ({ initialPost }) => {
+  const {
+    post,
+    errors,
+    optimisticLike,
+    optimisticShare,
+    optimisticComment,
+    isLoading,
+  } = useOptimisticSocialPost(initialPost);
+
+  const [commentText, setCommentText] = useState("");
+
+  const handleCommentSubmit = (e) => {
+    e.preventDefault();
+    if (commentText.trim()) {
+      optimisticComment(commentText.trim());
+      setCommentText("");
+    }
   };
 
   return (
-    <div>
-      <h1>Optimistic Updates Example</h1>
-      <button onClick={handleAddItem} disabled={loading}>
-        {loading ? "Adding..." : "Add Item"}
-      </button>
-      {error && <p>Error: {error}</p>}
-      <ul>
-        {value.map((item, index) => (
-          <li key={index}>{item}</li>
-        ))}
-      </ul>
+    <div className="social-post">
+      <div className="post-header">
+        <img
+          src={post.author.avatar}
+          alt={post.author.name}
+          className="avatar"
+        />
+        <div>
+          <h3>{post.author.name}</h3>
+          <p className="timestamp">
+            {new Date(post.timestamp).toLocaleString()}
+          </p>
+        </div>
+      </div>
+
+      <div className="post-content">
+        <p>{post.content}</p>
+        {post.image && (
+          <img src={post.image} alt="Post content" className="post-image" />
+        )}
+      </div>
+
+      <div className="post-actions">
+        <button
+          onClick={optimisticLike}
+          className={`action-btn ${post.isLiked ? "liked" : ""}`}
+          disabled={isLoading}
+        >
+          {post.isLiked ? "❤️" : "🤍"} {post.likeCount}
+        </button>
+
+        <button
+          onClick={optimisticShare}
+          className="action-btn"
+          disabled={isLoading}
+        >
+          🔄 {post.shareCount}
+        </button>
+
+        <span className="comment-count">💬 {post.commentCount}</span>
+      </div>
+
+      {(errors.like || errors.share) && (
+        <div className="error-messages">
+          {errors.like && <p className="error">{errors.like}</p>}
+          {errors.share && <p className="error">{errors.share}</p>}
+        </div>
+      )}
+
+      <div className="comments-section">
+        <form onSubmit={handleCommentSubmit} className="comment-form">
+          <input
+            type="text"
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            placeholder="Write a comment..."
+            disabled={isLoading}
+          />
+          <button type="submit" disabled={!commentText.trim() || isLoading}>
+            Post
+          </button>
+        </form>
+
+        {errors.comment && <p className="error">{errors.comment}</p>}
+
+        <div className="comments-list">
+          {post.comments.map((comment) => (
+            <div
+              key={comment.id}
+              className={`comment ${comment.isPending ? "pending" : ""}`}
+            >
+              <strong>{comment.author}:</strong> {comment.text}
+              {comment.isPending && (
+                <span className="pending-indicator">⏳</span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
-export default MyComponent;
 ```
 
 <BackToTop />
 
-### Advanced Usage with Error Handling
+### E-commerce Shopping Cart
 
 ```javascript
-import React from "react";
-import useOptimistic from "./useOptimistic";
-const MyComponent = () => {
-  const { value, loading, error, optimisticUpdate } = useOptimistic([]);
-  const handleAddItem = () => {
-    optimisticUpdate([...value, "New Item"]);
+import React, { useState, useCallback } from "react";
+
+const useOptimisticCart = (initialCart) => {
+  const [cart, setCart] = useState(initialCart);
+  const [pendingOperations, setPendingOperations] = useState(new Map());
+  const [errors, setErrors] = useState({});
+
+  const createOperation = useCallback((type, productId) => {
+    const operationId = `${type}-${productId}-${Date.now()}`;
+    setPendingOperations(
+      (prev) => new Map([...prev, [operationId, { type, productId }]])
+    );
+    return operationId;
+  }, []);
+
+  const completeOperation = useCallback((operationId, success = true) => {
+    setPendingOperations((prev) => {
+      const newMap = new Map(prev);
+      newMap.delete(operationId);
+      return newMap;
+    });
+  }, []);
+
+  const optimisticAddToCart = async (product, quantity = 1) => {
+    const operationId = createOperation("add", product.id);
+
+    // Store original state for potential rollback
+    const originalCart = { ...cart };
+
+    // Optimistic update
+    setCart((prev) => {
+      const existingItem = prev.items.find(
+        (item) => item.product.id === product.id
+      );
+
+      if (existingItem) {
+        return {
+          ...prev,
+          items: prev.items.map((item) =>
+            item.product.id === product.id
+              ? { ...item, quantity: item.quantity + quantity }
+              : item
+          ),
+          totalItems: prev.totalItems + quantity,
+          totalPrice: prev.totalPrice + product.price * quantity,
+        };
+      } else {
+        return {
+          ...prev,
+          items: [...prev.items, { product, quantity }],
+          totalItems: prev.totalItems + quantity,
+          totalPrice: prev.totalPrice + product.price * quantity,
+        };
+      }
+    });
+
+    try {
+      // Simulate API call with inventory check
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          // Simulate out of stock scenario
+          if (Math.random() > 0.85) {
+            reject(new Error("Product is out of stock"));
+          } else if (Math.random() > 0.9) {
+            reject(new Error("Network error"));
+          } else {
+            resolve();
+          }
+        }, 800);
+      });
+
+      setErrors((prev) => ({ ...prev, [product.id]: null }));
+    } catch (error) {
+      // Rollback optimistic update
+      setCart(originalCart);
+      setErrors((prev) => ({
+        ...prev,
+        [product.id]: `Failed to add ${product.name}: ${error.message}`,
+      }));
+    } finally {
+      completeOperation(operationId);
+    }
   };
+
+  const optimisticUpdateQuantity = async (productId, newQuantity) => {
+    const operationId = createOperation("update", productId);
+
+    const originalCart = { ...cart };
+    const item = cart.items.find((item) => item.product.id === productId);
+
+    if (!item) return;
+
+    // Optimistic update
+    if (newQuantity <= 0) {
+      // Remove item
+      setCart((prev) => ({
+        ...prev,
+        items: prev.items.filter((item) => item.product.id !== productId),
+        totalItems: prev.totalItems - item.quantity,
+        totalPrice: prev.totalPrice - item.product.price * item.quantity,
+      }));
+    } else {
+      // Update quantity
+      const quantityDiff = newQuantity - item.quantity;
+      setCart((prev) => ({
+        ...prev,
+        items: prev.items.map((item) =>
+          item.product.id === productId
+            ? { ...item, quantity: newQuantity }
+            : item
+        ),
+        totalItems: prev.totalItems + quantityDiff,
+        totalPrice: prev.totalPrice + item.product.price * quantityDiff,
+      }));
+    }
+
+    try {
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          Math.random() > 0.9 ? reject(new Error("Update failed")) : resolve();
+        }, 600);
+      });
+
+      setErrors((prev) => ({ ...prev, [productId]: null }));
+    } catch (error) {
+      // Rollback
+      setCart(originalCart);
+      setErrors((prev) => ({
+        ...prev,
+        [productId]: `Failed to update quantity: ${error.message}`,
+      }));
+    } finally {
+      completeOperation(operationId);
+    }
+  };
+
+  const optimisticApplyCoupon = async (couponCode) => {
+    const operationId = createOperation("coupon", couponCode);
+
+    const originalCart = { ...cart };
+
+    // Optimistic update - assume 10% discount
+    const discountAmount = cart.totalPrice * 0.1;
+    setCart((prev) => ({
+      ...prev,
+      coupon: { code: couponCode, discount: discountAmount },
+      totalPrice: prev.totalPrice - discountAmount,
+    }));
+
+    try {
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (couponCode.toLowerCase() === "invalid") {
+            reject(new Error("Invalid coupon code"));
+          } else if (Math.random() > 0.8) {
+            reject(new Error("Coupon expired"));
+          } else {
+            // Return actual discount amount
+            resolve({ discount: cart.totalPrice * 0.15 }); // Better discount!
+          }
+        }, 1000);
+      });
+
+      // Update with actual discount
+      const actualDiscount = cart.totalPrice * 0.15;
+      setCart((prev) => ({
+        ...prev,
+        coupon: { code: couponCode, discount: actualDiscount },
+        totalPrice: originalCart.totalPrice - actualDiscount,
+      }));
+
+      setErrors((prev) => ({ ...prev, coupon: null }));
+    } catch (error) {
+      // Rollback
+      setCart(originalCart);
+      setErrors((prev) => ({ ...prev, coupon: error.message }));
+    } finally {
+      completeOperation(operationId);
+    }
+  };
+
+  const isOperationPending = (type, productId) => {
+    return Array.from(pendingOperations.values()).some(
+      (op) => op.type === type && op.productId === productId
+    );
+  };
+
+  return {
+    cart,
+    errors,
+    optimisticAddToCart,
+    optimisticUpdateQuantity,
+    optimisticApplyCoupon,
+    isOperationPending,
+    hasAnyPendingOperation: pendingOperations.size > 0,
+  };
+};
+
+const ShoppingCart = ({ initialCart, products }) => {
+  const {
+    cart,
+    errors,
+    optimisticAddToCart,
+    optimisticUpdateQuantity,
+    optimisticApplyCoupon,
+    isOperationPending,
+  } = useOptimisticCart(initialCart);
+
+  const [couponCode, setCouponCode] = useState("");
+
+  const handleAddToCart = (product) => {
+    optimisticAddToCart(product, 1);
+  };
+
+  const handleQuantityChange = (productId, change) => {
+    const item = cart.items.find((item) => item.product.id === productId);
+    if (item) {
+      optimisticUpdateQuantity(productId, item.quantity + change);
+    }
+  };
+
+  const handleCouponSubmit = (e) => {
+    e.preventDefault();
+    if (couponCode.trim()) {
+      optimisticApplyCoupon(couponCode.trim());
+      setCouponCode("");
+    }
+  };
+
   return (
-    <div>
-      <h1>Optimistic Updates Example</h1>
-      <button onClick={handleAddItem} disabled={loading}>
-        {loading ? "Adding..." : "Add Item"}
-      </button>
-      {error && <p>Error: {error}</p>}
-      <ul>
-        {value.map((item, index) => (
-          <li key={index}>{item}</li>
-        ))}
-      </ul>
+    <div className="shopping-cart">
+      <h2>Shopping Cart</h2>
+
+      {/* Available Products */}
+      <div className="products-section">
+        <h3>Available Products</h3>
+        <div className="products-grid">
+          {products.map((product) => (
+            <div key={product.id} className="product-card">
+              <img src={product.image} alt={product.name} />
+              <h4>{product.name}</h4>
+              <p>${product.price}</p>
+              <button
+                onClick={() => handleAddToCart(product)}
+                disabled={isOperationPending("add", product.id)}
+                className="add-to-cart-btn"
+              >
+                {isOperationPending("add", product.id)
+                  ? "Adding..."
+                  : "Add to Cart"}
+              </button>
+              {errors[product.id] && (
+                <p className="error">{errors[product.id]}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Cart Items */}
+      <div className="cart-section">
+        <h3>Cart Items ({cart.totalItems})</h3>
+
+        {cart.items.length === 0 ? (
+          <p>Your cart is empty</p>
+        ) : (
+          <div className="cart-items">
+            {cart.items.map((item) => (
+              <div key={item.product.id} className="cart-item">
+                <img src={item.product.image} alt={item.product.name} />
+                <div className="item-details">
+                  <h4>{item.product.name}</h4>
+                  <p>${item.product.price} each</p>
+                </div>
+
+                <div className="quantity-controls">
+                  <button
+                    onClick={() => handleQuantityChange(item.product.id, -1)}
+                    disabled={isOperationPending("update", item.product.id)}
+                  >
+                    -
+                  </button>
+                  <span
+                    className={
+                      isOperationPending("update", item.product.id)
+                        ? "updating"
+                        : ""
+                    }
+                  >
+                    {item.quantity}
+                  </span>
+                  <button
+                    onClick={() => handleQuantityChange(item.product.id, 1)}
+                    disabled={isOperationPending("update", item.product.id)}
+                  >
+                    +
+                  </button>
+                </div>
+
+                <div className="item-total">
+                  ${(item.product.price * item.quantity).toFixed(2)}
+                </div>
+
+                {errors[item.product.id] && (
+                  <p className="error">{errors[item.product.id]}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Coupon Section */}
+        <div className="coupon-section">
+          <form onSubmit={handleCouponSubmit}>
+            <input
+              type="text"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value)}
+              placeholder="Enter coupon code"
+              disabled={isOperationPending("coupon", couponCode)}
+            />
+            <button
+              type="submit"
+              disabled={
+                !couponCode.trim() || isOperationPending("coupon", couponCode)
+              }
+            >
+              {isOperationPending("coupon", couponCode)
+                ? "Applying..."
+                : "Apply Coupon"}
+            </button>
+          </form>
+
+          {errors.coupon && <p className="error">{errors.coupon}</p>}
+
+          {cart.coupon && (
+            <div className="coupon-applied">
+              ✓ Coupon "{cart.coupon.code}" applied: -$
+              {cart.coupon.discount.toFixed(2)}
+            </div>
+          )}
+        </div>
+
+        {/* Cart Summary */}
+        <div className="cart-summary">
+          <div className="summary-line">
+            <span>Subtotal:</span>
+            <span>
+              ${(cart.totalPrice + (cart.coupon?.discount || 0)).toFixed(2)}
+            </span>
+          </div>
+
+          {cart.coupon && (
+            <div className="summary-line discount">
+              <span>Discount ({cart.coupon.code}):</span>
+              <span>-${cart.coupon.discount.toFixed(2)}</span>
+            </div>
+          )}
+
+          <div className="summary-line total">
+            <span>Total:</span>
+            <span>${cart.totalPrice.toFixed(2)}</span>
+          </div>
+
+          <button className="checkout-btn" disabled={cart.items.length === 0}>
+            Proceed to Checkout
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
-export default MyComponent;
+```
+
+<BackToTop />
+
+### Real-time Collaborative Todo List
+
+```javascript
+import React, { useState, useEffect } from "react";
+
+const useOptimisticTodoList = (initialTodos, userId) => {
+  const [todos, setTodos] = useState(initialTodos);
+  const [pendingChanges, setPendingChanges] = useState(new Map());
+  const [conflicts, setConflicts] = useState(new Map());
+  const [syncStatus, setSyncStatus] = useState("idle");
+
+  // Simulate receiving real-time updates from other users
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Simulate random updates from other users
+      if (Math.random() > 0.95) {
+        const randomTodo = todos[Math.floor(Math.random() * todos.length)];
+        if (randomTodo && !pendingChanges.has(randomTodo.id)) {
+          // Simulate someone else editing a todo
+          const serverUpdate = {
+            ...randomTodo,
+            text: randomTodo.text + " (edited by teammate)",
+            lastModified: new Date().toISOString(),
+            lastModifiedBy: "teammate@example.com",
+          };
+          handleServerUpdate(serverUpdate);
+        }
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [todos, pendingChanges]);
+
+  const handleServerUpdate = (serverTodo) => {
+    setTodos((prev) =>
+      prev.map((todo) => (todo.id === serverTodo.id ? serverTodo : todo))
+    );
+
+    // Check for conflicts
+    if (pendingChanges.has(serverTodo.id)) {
+      setConflicts(
+        (prev) =>
+          new Map([
+            ...prev,
+            [
+              serverTodo.id,
+              {
+                local: pendingChanges.get(serverTodo.id),
+                server: serverTodo,
+                timestamp: Date.now(),
+              },
+            ],
+          ])
+      );
+    }
+  };
+
+  const optimisticAdd = async (todoText) => {
+    const tempId = `temp-${Date.now()}`;
+    const newTodo = {
+      id: tempId,
+      text: todoText,
+      completed: false,
+      createdAt: new Date().toISOString(),
+      createdBy: userId,
+      lastModified: new Date().toISOString(),
+      lastModifiedBy: userId,
+      isPending: true,
+    };
+
+    // Optimistic update
+    setTodos((prev) => [...prev, newTodo]);
+    setPendingChanges((prev) => new Map([...prev, [tempId, newTodo]]));
+
+    try {
+      setSyncStatus("syncing");
+
+      // Simulate server request
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (Math.random() > 0.9) {
+            reject(new Error("Failed to create todo"));
+          } else {
+            resolve({
+              ...newTodo,
+              id: `real-${Date.now()}`,
+              isPending: false,
+            });
+          }
+        }, 1000);
+      });
+
+      // Replace temp todo with real one
+      const realId = `real-${Date.now()}`;
+      setTodos((prev) =>
+        prev.map((todo) =>
+          todo.id === tempId ? { ...todo, id: realId, isPending: false } : todo
+        )
+      );
+
+      setPendingChanges((prev) => {
+        const newMap = new Map(prev);
+        newMap.delete(tempId);
+        return newMap;
+      });
+
+      setSyncStatus("synced");
+    } catch (error) {
+      // Remove failed todo
+      setTodos((prev) => prev.filter((todo) => todo.id !== tempId));
+      setPendingChanges((prev) => {
+        const newMap = new Map(prev);
+        newMap.delete(tempId);
+        return newMap;
+      });
+      setSyncStatus("error");
+
+      // Auto-retry after 3 seconds
+      setTimeout(() => {
+        setSyncStatus("idle");
+      }, 3000);
+    }
+  };
+
+  const optimisticUpdate = async (todoId, updates) => {
+    const originalTodo = todos.find((todo) => todo.id === todoId);
+    if (!originalTodo) return;
+
+    const updatedTodo = {
+      ...originalTodo,
+      ...updates,
+      lastModified: new Date().toISOString(),
+      lastModifiedBy: userId,
+      isPending: true,
+    };
+
+    // Optimistic update
+    setTodos((prev) =>
+      prev.map((todo) => (todo.id === todoId ? updatedTodo : todo))
+    );
+    setPendingChanges((prev) => new Map([...prev, [todoId, updatedTodo]]));
+
+    try {
+      setSyncStatus("syncing");
+
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (Math.random() > 0.85) {
+            reject(new Error("Update failed"));
+          } else {
+            resolve();
+          }
+        }, 800);
+      });
+
+      // Confirm update
+      setTodos((prev) =>
+        prev.map((todo) =>
+          todo.id === todoId ? { ...todo, isPending: false } : todo
+        )
+      );
+
+      setPendingChanges((prev) => {
+        const newMap = new Map(prev);
+        newMap.delete(todoId);
+        return newMap;
+      });
+
+      setSyncStatus("synced");
+    } catch (error) {
+      // Revert optimistic update
+      setTodos((prev) =>
+        prev.map((todo) => (todo.id === todoId ? originalTodo : todo))
+      );
+
+      setPendingChanges((prev) => {
+        const newMap = new Map(prev);
+        newMap.delete(todoId);
+        return newMap;
+      });
+
+      setSyncStatus("error");
+      setTimeout(() => setSyncStatus("idle"), 3000);
+    }
+  };
+
+  const optimisticDelete = async (todoId) => {
+    const originalTodo = todos.find((todo) => todo.id === todoId);
+    if (!originalTodo) return;
+
+    // Optimistic update - hide the todo
+    setTodos((prev) =>
+      prev.map((todo) =>
+        todo.id === todoId ? { ...todo, isDeleting: true } : todo
+      )
+    );
+
+    try {
+      setSyncStatus("syncing");
+
+      await new Promise((resolve, reject) => {
+        setTimeout(() => {
+          Math.random() > 0.9 ? reject(new Error("Delete failed")) : resolve();
+        }, 600);
+      });
+
+      // Actually remove the todo
+      setTodos((prev) => prev.filter((todo) => todo.id !== todoId));
+      setSyncStatus("synced");
+    } catch (error) {
+      // Revert - show the todo again
+      setTodos((prev) =>
+        prev.map((todo) =>
+          todo.id === todoId ? { ...todo, isDeleting: false } : todo
+        )
+      );
+      setSyncStatus("error");
+      setTimeout(() => setSyncStatus("idle"), 3000);
+    }
+  };
+
+  const resolveConflict = (todoId, resolution) => {
+    const conflict = conflicts.get(todoId);
+    if (!conflict) return;
+
+    const resolvedTodo =
+      resolution === "local" ? conflict.local : conflict.server;
+
+    setTodos((prev) =>
+      prev.map((todo) =>
+        todo.id === todoId ? { ...resolvedTodo, isPending: false } : todo
+      )
+    );
+
+    setConflicts((prev) => {
+      const newMap = new Map(prev);
+      newMap.delete(todoId);
+      return newMap;
+    });
+
+    if (resolution === "local") {
+      // Re-sync the local version
+      optimisticUpdate(todoId, {});
+    }
+  };
+
+  return {
+    todos,
+    pendingChanges: pendingChanges.size,
+    conflicts,
+    syncStatus,
+    optimisticAdd,
+    optimisticUpdate,
+    optimisticDelete,
+    resolveConflict,
+  };
+};
+
+const CollaborativeTodoList = ({ initialTodos, currentUser }) => {
+  const {
+    todos,
+    pendingChanges,
+    conflicts,
+    syncStatus,
+    optimisticAdd,
+    optimisticUpdate,
+    optimisticDelete,
+    resolveConflict,
+  } = useOptimisticTodoList(initialTodos, currentUser.email);
+
+  const [newTodoText, setNewTodoText] = useState("");
+  const [editingTodo, setEditingTodo] = useState(null);
+
+  const handleAddTodo = (e) => {
+    e.preventDefault();
+    if (newTodoText.trim()) {
+      optimisticAdd(newTodoText.trim());
+      setNewTodoText("");
+    }
+  };
+
+  const handleToggleComplete = (todo) => {
+    optimisticUpdate(todo.id, { completed: !todo.completed });
+  };
+
+  const handleStartEdit = (todo) => {
+    setEditingTodo({ ...todo });
+  };
+
+  const handleSaveEdit = () => {
+    if (editingTodo && editingTodo.text.trim()) {
+      optimisticUpdate(editingTodo.id, { text: editingTodo.text.trim() });
+      setEditingTodo(null);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingTodo(null);
+  };
+
+  const getSyncStatusIndicator = () => {
+    switch (syncStatus) {
+      case "syncing":
+        return "🔄 Syncing...";
+      case "synced":
+        return "✅ Synced";
+      case "error":
+        return "❌ Sync error";
+      default:
+        return "⚪ Ready";
+    }
+  };
+
+  return (
+    <div className="collaborative-todo-list">
+      <div className="header">
+        <h2>Team Todo List</h2>
+        <div className="sync-status">
+          {getSyncStatusIndicator()}
+          {pendingChanges > 0 && (
+            <span className="pending-count">({pendingChanges} pending)</span>
+          )}
+        </div>
+      </div>
+
+      {/* Conflict Resolution */}
+      {conflicts.size > 0 && (
+        <div className="conflicts-section">
+          <h3>⚠️ Conflicts Detected</h3>
+          {Array.from(conflicts.entries()).map(([todoId, conflict]) => (
+            <div key={todoId} className="conflict-resolution">
+              <p>
+                Todo "{conflict.local.text}" was modified by both you and{" "}
+                {conflict.server.lastModifiedBy}
+              </p>
+              <div className="conflict-options">
+                <div className="option">
+                  <strong>Your version:</strong> {conflict.local.text}
+                  <button onClick={() => resolveConflict(todoId, "local")}>
+                    Keep Mine
+                  </button>
+                </div>
+                <div className="option">
+                  <strong>Their version:</strong> {conflict.server.text}
+                  <button onClick={() => resolveConflict(todoId, "server")}>
+                    Keep Theirs
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Add Todo Form */}
+      <form onSubmit={handleAddTodo} className="add-todo-form">
+        <input
+          type="text"
+          value={newTodoText}
+          onChange={(e) => setNewTodoText(e.target.value)}
+          placeholder="Add a new todo..."
+          disabled={syncStatus === "syncing"}
+        />
+        <button
+          type="submit"
+          disabled={!newTodoText.trim() || syncStatus === "syncing"}
+        >
+          Add Todo
+        </button>
+      </form>
+
+      {/* Todo List */}
+      <div className="todos-list">
+        {todos.map((todo) => (
+          <div
+            key={todo.id}
+            className={`todo-item ${todo.completed ? "completed" : ""} ${todo.isPending ? "pending" : ""} ${todo.isDeleting ? "deleting" : ""}`}
+          >
+            <div className="todo-content">
+              <input
+                type="checkbox"
+                checked={todo.completed}
+                onChange={() => handleToggleComplete(todo)}
+                disabled={todo.isPending || todo.isDeleting}
+              />
+
+              {editingTodo && editingTodo.id === todo.id ? (
+                <div className="edit-mode">
+                  <input
+                    type="text"
+                    value={editingTodo.text}
+                    onChange={(e) =>
+                      setEditingTodo({ ...editingTodo, text: e.target.value })
+                    }
+                    onKeyPress={(e) => e.key === "Enter" && handleSaveEdit()}
+                  />
+                  <button onClick={handleSaveEdit}>Save</button>
+                  <button onClick={handleCancelEdit}>Cancel</button>
+                </div>
+              ) : (
+                <div className="todo-text">
+                  <span>{todo.text}</span>
+                  {todo.isPending && (
+                    <span className="pending-indicator">⏳</span>
+                  )}
+                  {todo.isDeleting && (
+                    <span className="deleting-indicator">🗑️</span>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="todo-meta">
+              <small>
+                {todo.lastModifiedBy === currentUser.email
+                  ? "You"
+                  : todo.lastModifiedBy}{" "}
+                • {new Date(todo.lastModified).toLocaleTimeString()}
+              </small>
+            </div>
+
+            <div className="todo-actions">
+              {!editingTodo && !todo.isDeleting && (
+                <>
+                  <button
+                    onClick={() => handleStartEdit(todo)}
+                    disabled={todo.isPending}
+                    className="edit-btn"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={() => optimisticDelete(todo.id)}
+                    disabled={todo.isPending}
+                    className="delete-btn"
+                  >
+                    🗑️
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {todos.length === 0 && (
+        <div className="empty-state">
+          <p>No todos yet. Add one above to get started!</p>
+        </div>
+      )}
+    </div>
+  );
+};
 ```
 
 <BackToTop />
@@ -180,4 +1238,8 @@ export default MyComponent;
 - Handle loading and error states appropriately to provide feedback to the user during optimistic updates.
 - Ensure that the optimistic updates do not lead to inconsistent state if the server response fails, by reverting to the initial value or handling errors gracefully.
 - Test the optimistic updates thoroughly to ensure that they work as expected and provide a smooth user experience.
+- Use the `isLoading` state to disable buttons or show loading indicators while the optimistic update is in progress.
+- Consider using a unique identifier for each optimistic operation to manage pending actions and avoid conflicts.
+- Implement conflict resolution strategies if multiple users can modify the same data concurrently, such as showing a conflict message and allowing the user to choose which version to keep.
+
   <BackToTop />

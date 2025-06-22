@@ -40,6 +40,7 @@ It can be particularly useful when you have complex custom hooks that manage sta
 - **Asynchronous Operations**: If your custom hook performs asynchronous operations, use `useDebugValue` to show the current status (e.g., loading, error, success) in the DevTools.
 - **Performance Monitoring**: Use `useDebugValue` to monitor the performance of custom hooks by displaying relevant metrics in React DevTools.
 - **Error Handling**: When your custom hook handles errors, use `useDebugValue` to display error messages or statuses in the DevTools.
+  <BackToTop />
 
 ## How It Works
 
@@ -72,29 +73,907 @@ When the component using the custom hook is rendered, `useDebugValue` will displ
 - Avoid using `useDebugValue` in components that do not use custom hooks, as it is specifically designed for custom hooks.
 - Avoid using `useDebugValue` in performance-critical paths, as it may introduce a slight overhead due to the additional rendering in React DevTools.
 - Avoid using `useDebugValue` for values that are not relevant for debugging, as it may clutter the React DevTools with unnecessary information.
+  <BackToTop />
 
 ## Examples
 
+### Advanced State Machine Hook with Debug Visualization
+
 ```javascript
-import { useDebugValue, useState } from "react";
-function useCustomHook() {
-  const [state, setState] = useState("Initial State");
-  // Use useDebugValue to display the current state in React DevTools
-  useDebugValue(state, (value) => `Current State: ${value}`);
-  return [state, setState];
+import { useDebugValue, useState, useCallback, useRef, useEffect } from "react";
+
+function useStateMachine(config) {
+  const [currentState, setCurrentState] = useState(config.initial);
+  const [context, setContext] = useState(config.context || {});
+  const [history, setHistory] = useState([config.initial]);
+  const [transitionCount, setTransitionCount] = useState(0);
+  const lastTransition = useRef(null);
+  const startTime = useRef(Date.now());
+
+  // Complex debug value showing multiple aspects of state machine
+  useDebugValue(
+    { currentState, context, transitionCount, history },
+    ({ currentState, context, transitionCount, history }) => {
+      const uptime = Math.floor((Date.now() - startTime.current) / 1000);
+      const contextKeys = Object.keys(context);
+      const stateHistory = history.slice(-3).join(" → ");
+
+      return `🔄 State: ${currentState} | Context: {${contextKeys.join(", ")}} | Transitions: ${transitionCount} | History: ${stateHistory} | Uptime: ${uptime}s`;
+    }
+  );
+
+  const transition = useCallback(
+    (event, payload = {}) => {
+      const stateConfig = config.states[currentState];
+      if (!stateConfig || !stateConfig.on || !stateConfig.on[event]) {
+        console.warn(
+          `No transition defined for event "${event}" in state "${currentState}"`
+        );
+        return false;
+      }
+
+      const transition = stateConfig.on[event];
+      const nextState =
+        typeof transition === "string" ? transition : transition.target;
+      const actions = typeof transition === "object" ? transition.actions : [];
+
+      // Update context if actions are defined
+      let newContext = { ...context };
+      if (actions && Array.isArray(actions)) {
+        actions.forEach((action) => {
+          if (typeof action === "function") {
+            newContext = action(newContext, payload);
+          }
+        });
+      }
+
+      // Record transition details
+      lastTransition.current = {
+        from: currentState,
+        to: nextState,
+        event,
+        payload,
+        timestamp: Date.now(),
+      };
+
+      setCurrentState(nextState);
+      setContext(newContext);
+      setHistory((prev) => [...prev, nextState].slice(-10)); // Keep last 10 states
+      setTransitionCount((prev) => prev + 1);
+
+      return true;
+    },
+    [currentState, context, config]
+  );
+
+  const reset = useCallback(() => {
+    setCurrentState(config.initial);
+    setContext(config.context || {});
+    setHistory([config.initial]);
+    setTransitionCount(0);
+    lastTransition.current = null;
+    startTime.current = Date.now();
+  }, [config]);
+
+  const canTransition = useCallback(
+    (event) => {
+      const stateConfig = config.states[currentState];
+      return !!(stateConfig && stateConfig.on && stateConfig.on[event]);
+    },
+    [currentState, config]
+  );
+
+  return {
+    currentState,
+    context,
+    history,
+    transitionCount,
+    lastTransition: lastTransition.current,
+    transition,
+    reset,
+    canTransition,
+    isInState: (state) => currentState === state,
+    getAvailableEvents: () => {
+      const stateConfig = config.states[currentState];
+      return stateConfig && stateConfig.on ? Object.keys(stateConfig.on) : [];
+    },
+  };
+}
+
+// Example usage component
+function TrafficLightDemo() {
+  const trafficLight = useStateMachine({
+    initial: "red",
+    context: {
+      cycles: 0,
+      emergencyMode: false,
+      lastMaintenance: Date.now(),
+    },
+    states: {
+      red: {
+        on: {
+          TIMER: {
+            target: "green",
+            actions: [
+              (context) => ({ ...context, cycles: context.cycles + 1 }),
+            ],
+          },
+          EMERGENCY: "emergency",
+        },
+      },
+      green: {
+        on: {
+          TIMER: "yellow",
+          EMERGENCY: "emergency",
+        },
+      },
+      yellow: {
+        on: {
+          TIMER: "red",
+          EMERGENCY: "emergency",
+        },
+      },
+      emergency: {
+        on: {
+          CLEAR: "red",
+          RESET: {
+            target: "red",
+            actions: [(context) => ({ ...context, emergencyMode: false })],
+          },
+        },
+      },
+    },
+  });
+
+  useEffect(() => {
+    if (trafficLight.currentState !== "emergency") {
+      const timer = setTimeout(
+        () => {
+          trafficLight.transition("TIMER");
+        },
+        trafficLight.currentState === "yellow" ? 2000 : 3000
+      );
+
+      return () => clearTimeout(timer);
+    }
+  }, [trafficLight.currentState]);
+
+  return (
+    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+      <h3>Traffic Light State Machine Demo</h3>
+      <div
+        style={{
+          fontSize: "60px",
+          textAlign: "center",
+          marginBottom: "20px",
+        }}
+      >
+        {trafficLight.currentState === "red" && "🔴"}
+        {trafficLight.currentState === "yellow" && "🟡"}
+        {trafficLight.currentState === "green" && "🟢"}
+        {trafficLight.currentState === "emergency" && "🚨"}
+      </div>
+
+      <div style={{ textAlign: "center" }}>
+        <p>
+          Current State: <strong>{trafficLight.currentState}</strong>
+        </p>
+        <p>Cycles Completed: {trafficLight.context.cycles}</p>
+        <p>Total Transitions: {trafficLight.transitionCount}</p>
+
+        <div
+          style={{
+            marginTop: "20px",
+            display: "flex",
+            gap: "10px",
+            justifyContent: "center",
+          }}
+        >
+          <button onClick={() => trafficLight.transition("EMERGENCY")}>
+            🚨 Emergency
+          </button>
+          <button onClick={() => trafficLight.transition("CLEAR")}>
+            ✅ Clear
+          </button>
+          <button onClick={trafficLight.reset}>🔄 Reset</button>
+        </div>
+      </div>
+    </div>
+  );
 }
 ```
 
+<BackToTop />
+
+### Performance Monitoring Hook with Real-time Metrics
+
 ```javascript
-import { useDebugValue, useState } from "react";
-function useAsyncData() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  // Use useDebugValue to display the loading status in React DevTools
+import { useDebugValue, useCallback, useRef, useEffect, useState } from "react";
+
+function usePerformanceMonitor(componentName, options = {}) {
+  const renderCount = useRef(0);
+  const mountTime = useRef(Date.now());
+  const lastRenderTime = useRef(Date.now());
+  const renderTimes = useRef([]);
+  const [memoryUsage, setMemoryUsage] = useState(null);
+  const [slowRenders, setSlowRenders] = useState(0);
+  const observerRef = useRef(null);
+
+  const {
+    slowRenderThreshold = 16, // 16ms for 60fps
+    maxRenderHistory = 50,
+    trackMemory = true,
+    trackDOMObserver = true,
+  } = options;
+
+  // Increment render count on every render
+  renderCount.current += 1;
+  const currentRenderTime = Date.now();
+  const renderDuration = currentRenderTime - lastRenderTime.current;
+
+  // Track render performance
+  if (renderCount.current > 1) {
+    renderTimes.current.push(renderDuration);
+    if (renderTimes.current.length > maxRenderHistory) {
+      renderTimes.current.shift();
+    }
+
+    if (renderDuration > slowRenderThreshold) {
+      setSlowRenders((prev) => prev + 1);
+    }
+  }
+
+  lastRenderTime.current = currentRenderTime;
+
+  // Calculate performance metrics
+  const averageRenderTime =
+    renderTimes.current.length > 0
+      ? renderTimes.current.reduce((a, b) => a + b, 0) /
+        renderTimes.current.length
+      : 0;
+
+  const maxRenderTime =
+    renderTimes.current.length > 0 ? Math.max(...renderTimes.current) : 0;
+
+  const uptime = currentRenderTime - mountTime.current;
+
+  // Complex debug value with performance insights
   useDebugValue(
-    loading ? "Loading..." : error ? `Error: ${error}` : "Data Loaded"
+    {
+      componentName,
+      renderCount: renderCount.current,
+      averageRenderTime,
+      maxRenderTime,
+      slowRenders,
+      uptime,
+      memoryUsage,
+      renderTimes: renderTimes.current,
+    },
+    (metrics) => {
+      const {
+        componentName,
+        renderCount,
+        averageRenderTime,
+        maxRenderTime,
+        slowRenders,
+        uptime,
+        memoryUsage,
+      } = metrics;
+
+      const performanceGrade = getPerformanceGrade(
+        averageRenderTime,
+        slowRenders,
+        renderCount
+      );
+      const memoryInfo = memoryUsage
+        ? ` | Memory: ${(memoryUsage.usedJSHeapSize / 1024 / 1024).toFixed(1)}MB`
+        : "";
+
+      return `⚡ ${componentName} | Renders: ${renderCount} | Avg: ${averageRenderTime.toFixed(1)}ms | Max: ${maxRenderTime.toFixed(1)}ms | Slow: ${slowRenders} | Grade: ${performanceGrade} | Uptime: ${(uptime / 1000).toFixed(1)}s${memoryInfo}`;
+    }
   );
-  return { data, loading, error, setData };
+
+  // Memory usage tracking
+  useEffect(() => {
+    if (!trackMemory || !window.performance || !window.performance.memory)
+      return;
+
+    const interval = setInterval(() => {
+      setMemoryUsage({
+        usedJSHeapSize: window.performance.memory.usedJSHeapSize,
+        totalJSHeapSize: window.performance.memory.totalJSHeapSize,
+        jsHeapSizeLimit: window.performance.memory.jsHeapSizeLimit,
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [trackMemory]);
+
+  // DOM mutation observer for tracking DOM changes
+  useEffect(() => {
+    if (!trackDOMObserver) return;
+
+    const domMutationCount = useRef(0);
+
+    const observer = new MutationObserver((mutations) => {
+      domMutationCount.current += mutations.length;
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeOldValue: true,
+      characterData: true,
+      characterDataOldValue: true,
+    });
+
+    observerRef.current = { observer, domMutationCount };
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [trackDOMObserver]);
+
+  // Helper function to calculate performance grade
+  function getPerformanceGrade(avgRenderTime, slowRenderCount, totalRenders) {
+    const slowRenderRatio =
+      totalRenders > 0 ? slowRenderCount / totalRenders : 0;
+
+    if (avgRenderTime < 8 && slowRenderRatio < 0.1) return "🟢 A+";
+    if (avgRenderTime < 12 && slowRenderRatio < 0.2) return "🟢 A";
+    if (avgRenderTime < 16 && slowRenderRatio < 0.3) return "🟡 B";
+    if (avgRenderTime < 24 && slowRenderRatio < 0.4) return "🟡 C";
+    if (avgRenderTime < 32 && slowRenderRatio < 0.5) return "🟠 D";
+    return "🔴 F";
+  }
+
+  const logPerformanceReport = useCallback(() => {
+    console.group(`🔍 Performance Report: ${componentName}`);
+    console.log(`Total Renders: ${renderCount.current}`);
+    console.log(`Average Render Time: ${averageRenderTime.toFixed(2)}ms`);
+    console.log(`Max Render Time: ${maxRenderTime.toFixed(2)}ms`);
+    console.log(
+      `Slow Renders: ${slowRenders}/${renderCount.current} (${((slowRenders / renderCount.current) * 100).toFixed(1)}%)`
+    );
+    console.log(`Component Uptime: ${(uptime / 1000).toFixed(1)}s`);
+
+    if (memoryUsage) {
+      console.log(
+        `Memory Usage: ${(memoryUsage.usedJSHeapSize / 1024 / 1024).toFixed(1)}MB / ${(memoryUsage.totalJSHeapSize / 1024 / 1024).toFixed(1)}MB`
+      );
+    }
+
+    if (observerRef.current) {
+      console.log(
+        `DOM Mutations Observed: ${observerRef.current.domMutationCount.current}`
+      );
+    }
+
+    console.log(`Recent Render Times:`, renderTimes.current.slice(-10));
+    console.groupEnd();
+  }, [
+    componentName,
+    averageRenderTime,
+    maxRenderTime,
+    slowRenders,
+    uptime,
+    memoryUsage,
+  ]);
+
+  const getMetrics = useCallback(() => {
+    return {
+      renderCount: renderCount.current,
+      averageRenderTime,
+      maxRenderTime,
+      slowRenders,
+      uptime,
+      memoryUsage,
+      recentRenderTimes: renderTimes.current.slice(-10),
+      performanceGrade: getPerformanceGrade(
+        averageRenderTime,
+        slowRenders,
+        renderCount.current
+      ),
+      domMutations: observerRef.current
+        ? observerRef.current.domMutationCount.current
+        : 0,
+    };
+  }, [averageRenderTime, maxRenderTime, slowRenders, uptime, memoryUsage]);
+
+  return {
+    renderCount: renderCount.current,
+    averageRenderTime,
+    maxRenderTime,
+    slowRenders,
+    uptime,
+    memoryUsage,
+    logPerformanceReport,
+    getMetrics,
+  };
+}
+
+// Example usage component
+function PerformanceTestComponent() {
+  const [items, setItems] = useState(Array.from({ length: 100 }, (_, i) => i));
+  const [filter, setFilter] = useState("");
+
+  const perf = usePerformanceMonitor("PerformanceTestComponent", {
+    slowRenderThreshold: 10,
+    trackMemory: true,
+    trackDOMObserver: true,
+  });
+
+  const filteredItems = items.filter((item) =>
+    item.toString().includes(filter)
+  );
+
+  // Simulate expensive operation
+  const expensiveOperation = () => {
+    const start = Date.now();
+    while (Date.now() - start < 5) {
+      // Simulate work
+    }
+  };
+
+  if (Math.random() < 0.1) {
+    expensiveOperation(); // Randomly cause slow renders for demo
+  }
+
+  return (
+    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+      <h3>Performance Monitoring Demo</h3>
+
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          type="text"
+          placeholder="Filter items..."
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          style={{ padding: "8px", marginRight: "10px" }}
+        />
+        <button onClick={() => setItems((prev) => [...prev, prev.length])}>
+          Add Item
+        </button>
+        <button onClick={perf.logPerformanceReport}>
+          📊 Log Performance Report
+        </button>
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))",
+          gap: "10px",
+        }}
+      >
+        {filteredItems.map((item) => (
+          <div
+            key={item}
+            style={{
+              padding: "10px",
+              backgroundColor: "#f0f0f0",
+              borderRadius: "4px",
+              textAlign: "center",
+            }}
+          >
+            Item {item}
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginTop: "20px", fontSize: "12px", color: "#666" }}>
+        Renders: {perf.renderCount} | Avg: {perf.averageRenderTime.toFixed(1)}ms
+        | Slow: {perf.slowRenders} | Items: {filteredItems.length}
+      </div>
+    </div>
+  );
 }
 ```
+
+<BackToTop />
+
+### Advanced API Cache Hook with Request Deduplication
+
+```javascript
+import { useDebugValue, useState, useEffect, useRef, useCallback } from "react";
+
+function useAdvancedAPICache(options = {}) {
+  const cache = useRef(new Map());
+  const activeRequests = useRef(new Map());
+  const requestStats = useRef({
+    totalRequests: 0,
+    cacheHits: 0,
+    cacheMisses: 0,
+    failedRequests: 0,
+    deduplicatedRequests: 0,
+  });
+  const [lastRequest, setLastRequest] = useState(null);
+  const [cacheSize, setCacheSize] = useState(0);
+
+  const {
+    defaultTTL = 300000, // 5 minutes
+    maxCacheSize = 100,
+    retryAttempts = 3,
+    retryDelay = 1000,
+    enableDeduplication = true,
+    enableMetrics = true,
+  } = options;
+
+  // Complex debug value showing cache performance and state
+  useDebugValue(
+    {
+      cache: cache.current,
+      activeRequests: activeRequests.current,
+      requestStats: requestStats.current,
+      lastRequest,
+      cacheSize,
+    },
+    ({ requestStats, lastRequest, cacheSize, activeRequests }) => {
+      const hitRate =
+        requestStats.totalRequests > 0
+          ? (
+              (requestStats.cacheHits / requestStats.totalRequests) *
+              100
+            ).toFixed(1)
+          : "0";
+
+      const activeCount = activeRequests.size;
+      const lastReq = lastRequest
+        ? `${lastRequest.method} ${lastRequest.url}`
+        : "None";
+      const efficiency =
+        requestStats.totalRequests > 0
+          ? requestStats.deduplicatedRequests + requestStats.cacheHits
+          : 0;
+
+      return `🗄️ Cache: ${cacheSize}/${maxCacheSize} | Hit Rate: ${hitRate}% | Active: ${activeCount} | Efficiency: ${efficiency} saved requests | Last: ${lastReq}`;
+    }
+  );
+
+  // Cache cleanup effect
+  useEffect(() => {
+    const cleanup = () => {
+      const now = Date.now();
+      let removedCount = 0;
+
+      for (const [key, entry] of cache.current.entries()) {
+        if (now > entry.expiresAt) {
+          cache.current.delete(key);
+          removedCount++;
+        }
+      }
+
+      if (removedCount > 0) {
+        setCacheSize(cache.current.size);
+      }
+    };
+
+    const interval = setInterval(cleanup, 60000); // Cleanup every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  const generateCacheKey = useCallback((url, options = {}) => {
+    const { method = "GET", body, headers } = options;
+    const keyParts = [method, url];
+
+    if (body) {
+      keyParts.push(typeof body === "string" ? body : JSON.stringify(body));
+    }
+
+    if (headers) {
+      keyParts.push(JSON.stringify(headers));
+    }
+
+    return keyParts.join("|");
+  }, []);
+
+  const evictOldEntries = useCallback(() => {
+    if (cache.current.size >= maxCacheSize) {
+      // Remove oldest entries (LRU-like behavior)
+      const entries = Array.from(cache.current.entries());
+      entries.sort((a, b) => a[1].accessedAt - b[1].accessedAt);
+
+      const toRemove = entries.slice(0, Math.floor(maxCacheSize * 0.2)); // Remove 20%
+      toRemove.forEach(([key]) => cache.current.delete(key));
+
+      setCacheSize(cache.current.size);
+    }
+  }, [maxCacheSize]);
+
+  const fetchWithRetry = useCallback(
+    async (url, options, attempt = 1) => {
+      try {
+        const response = await fetch(url, options);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        return response;
+      } catch (error) {
+        if (attempt < retryAttempts) {
+          await new Promise((resolve) =>
+            setTimeout(resolve, retryDelay * attempt)
+          );
+          return fetchWithRetry(url, options, attempt + 1);
+        }
+        throw error;
+      }
+    },
+    [retryAttempts, retryDelay]
+  );
+
+  const request = useCallback(
+    async (url, options = {}, cacheOptions = {}) => {
+      const cacheKey = generateCacheKey(url, options);
+      const now = Date.now();
+      const ttl = cacheOptions.ttl || defaultTTL;
+
+      requestStats.current.totalRequests++;
+
+      setLastRequest({
+        url,
+        method: options.method || "GET",
+        timestamp: now,
+        cacheKey,
+      });
+
+      // Check cache first
+      const cached = cache.current.get(cacheKey);
+      if (cached && now < cached.expiresAt) {
+        cached.accessedAt = now; // Update access time for LRU
+        requestStats.current.cacheHits++;
+        return { data: cached.data, fromCache: true, cacheKey };
+      }
+
+      // Check for active request deduplication
+      if (enableDeduplication && activeRequests.current.has(cacheKey)) {
+        requestStats.current.deduplicatedRequests++;
+        const activePromise = activeRequests.current.get(cacheKey);
+        return activePromise;
+      }
+
+      // Make new request
+      requestStats.current.cacheMisses++;
+
+      const requestPromise = (async () => {
+        try {
+          const response = await fetchWithRetry(url, options);
+          const data = await response.json();
+
+          // Cache the result
+          evictOldEntries();
+          cache.current.set(cacheKey, {
+            data,
+            expiresAt: now + ttl,
+            accessedAt: now,
+            createdAt: now,
+          });
+          setCacheSize(cache.current.size);
+
+          return { data, fromCache: false, cacheKey };
+        } catch (error) {
+          requestStats.current.failedRequests++;
+          throw error;
+        } finally {
+          activeRequests.current.delete(cacheKey);
+        }
+      })();
+
+      if (enableDeduplication) {
+        activeRequests.current.set(cacheKey, requestPromise);
+      }
+
+      return requestPromise;
+    },
+    [
+      generateCacheKey,
+      defaultTTL,
+      evictOldEntries,
+      fetchWithRetry,
+      enableDeduplication,
+    ]
+  );
+
+  const invalidateCache = useCallback((pattern) => {
+    if (typeof pattern === "string") {
+      // Exact match
+      cache.current.delete(pattern);
+    } else if (pattern instanceof RegExp) {
+      // Regex pattern
+      for (const key of cache.current.keys()) {
+        if (pattern.test(key)) {
+          cache.current.delete(key);
+        }
+      }
+    } else {
+      // Clear all
+      cache.current.clear();
+    }
+    setCacheSize(cache.current.size);
+  }, []);
+
+  const getCacheStats = useCallback(() => {
+    const entries = Array.from(cache.current.entries());
+    const now = Date.now();
+
+    return {
+      ...requestStats.current,
+      cacheSize: cache.current.size,
+      activeRequests: activeRequests.current.size,
+      hitRate:
+        requestStats.current.totalRequests > 0
+          ? (requestStats.current.cacheHits /
+              requestStats.current.totalRequests) *
+            100
+          : 0,
+      entries: entries.map(([key, entry]) => ({
+        key,
+        age: now - entry.createdAt,
+        timeToExpiry: entry.expiresAt - now,
+        accessCount: entry.accessCount || 1,
+      })),
+    };
+  }, []);
+
+  const prefetch = useCallback(
+    async (urls, options = {}) => {
+      const promises = urls.map((url) =>
+        request(url, options, { ttl: options.ttl || defaultTTL }).catch(
+          (error) => ({ error, url })
+        )
+      );
+
+      return Promise.all(promises);
+    },
+    [request, defaultTTL]
+  );
+
+  return {
+    request,
+    invalidateCache,
+    getCacheStats,
+    prefetch,
+    cacheSize,
+    lastRequest,
+    stats: requestStats.current,
+  };
+}
+
+// Example usage component
+function APICacheDemo() {
+  const apiCache = useAdvancedAPICache({
+    defaultTTL: 10000, // 10 seconds for demo
+    maxCacheSize: 5,
+    enableDeduplication: true,
+  });
+
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchPosts = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Simulate multiple rapid requests (deduplication test)
+      const promises = Array(3)
+        .fill()
+        .map(() =>
+          apiCache.request(
+            "https://jsonplaceholder.typicode.com/posts?_limit=5"
+          )
+        );
+
+      const results = await Promise.all(promises);
+      setPosts(results[0].data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSpecificPost = async (id) => {
+    try {
+      const result = await apiCache.request(
+        `https://jsonplaceholder.typicode.com/posts/${id}`
+      );
+      console.log(`Post ${id}:`, result);
+    } catch (err) {
+      console.error(`Error fetching post ${id}:`, err);
+    }
+  };
+
+  const prefetchPosts = async () => {
+    const urls = Array.from(
+      { length: 5 },
+      (_, i) => `https://jsonplaceholder.typicode.com/posts/${i + 1}`
+    );
+
+    const results = await apiCache.prefetch(urls);
+    console.log("Prefetch results:", results);
+  };
+
+  return (
+    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
+      <h3>Advanced API Cache Demo</h3>
+
+      <div
+        style={{
+          marginBottom: "20px",
+          display: "flex",
+          gap: "10px",
+          flexWrap: "wrap",
+        }}
+      >
+        <button onClick={fetchPosts} disabled={loading}>
+          {loading ? "Loading..." : "Fetch Posts (x3 concurrent)"}
+        </button>
+        <button
+          onClick={() => fetchSpecificPost(Math.floor(Math.random() * 10) + 1)}
+        >
+          Fetch Random Post
+        </button>
+        <button onClick={prefetchPosts}>Prefetch Posts 1-5</button>
+        <button onClick={() => apiCache.invalidateCache()}>Clear Cache</button>
+        <button onClick={() => console.log(apiCache.getCacheStats())}>
+          Log Cache Stats
+        </button>
+      </div>
+
+      {error && (
+        <div style={{ color: "red", marginBottom: "20px" }}>Error: {error}</div>
+      )}
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: "15px",
+        }}
+      >
+        {posts.map((post) => (
+          <div
+            key={post.id}
+            style={{
+              padding: "15px",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              backgroundColor: "#f9f9f9",
+            }}
+          >
+            <h4 style={{ margin: "0 0 10px 0" }}>{post.title}</h4>
+            <p style={{ margin: 0, fontSize: "14px", color: "#666" }}>
+              {post.body.substring(0, 100)}...
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div
+        style={{
+          marginTop: "20px",
+          padding: "15px",
+          backgroundColor: "#f0f0f0",
+          borderRadius: "8px",
+          fontSize: "12px",
+        }}
+      >
+        <div>
+          <strong>Cache Performance:</strong>
+        </div>
+        <div>Size: {apiCache.cacheSize} entries</div>
+        <div>Total Requests: {apiCache.stats.totalRequests}</div>
+        <div>Cache Hits: {apiCache.stats.cacheHits}</div>
+        <div>Deduplicated: {apiCache.stats.deduplicatedRequests}</div>
+        <div>Failed: {apiCache.stats.failedRequests}</div>
+      </div>
+    </div>
+  );
+}
+```
+
+<BackToTop />

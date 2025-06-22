@@ -21,6 +21,7 @@ It is often used in conjunction with `useMemo` to optimize performance in functi
 - When you have a callback function that is passed to a child component and you want to prevent unnecessary re-renders.
 - When you have a function that is expensive to create and you want to avoid recreating it on every render.
 - When you want to ensure that a function reference remains stable across renders, especially when using it as a dependency in other hooks like `useEffect` or `useMemo`.
+  <BackToTop />
 
 ### Syntax
 
@@ -63,64 +64,1473 @@ To use `useCallback`, you first need to import it from the React library and the
 - **Ignoring Dependencies**: Ensure that you include all necessary dependencies in the dependency array. Failing to do so can lead to stale closures and bugs in your application.
 - **Using `useCallback` for Simple Functions**: If a function is simple and does not cause performance issues, it may not be necessary to use `useCallback`. Use it judiciously for functions that are expensive to create or that are passed to child components that rely on reference equality.
 - **Using `useCallback` for Non-Callback Functions**: `useCallback` is specifically designed for memoizing callback functions. Using it for non-callback functions can lead to confusion and is not its intended use case.
+  <BackToTop />
 
 ## Examples
 
+### Optimized Search with Debouncing
+
 ```javascript
-import React, { useState, useCallback } from "react";
-const Counter = () => {
-  const [count, setCount] = useState(0);
-  const increment = useCallback(() => {
-    setCount((prevCount) => prevCount + 1);
-  }, []); // No dependencies, so the function reference remains stable
+import React, { useState, useCallback, useEffect, useMemo } from "react";
+
+const SearchableUserList = () => {
+  const [users, setUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [searchHistory, setSearchHistory] = useState([]);
+
+  // Mock user data
+  const allUsers = useMemo(
+    () => [
+      {
+        id: 1,
+        name: "Alice Johnson",
+        email: "alice@example.com",
+        role: "Developer",
+        department: "Engineering",
+      },
+      {
+        id: 2,
+        name: "Bob Smith",
+        email: "bob@example.com",
+        role: "Designer",
+        department: "Creative",
+      },
+      {
+        id: 3,
+        name: "Charlie Brown",
+        email: "charlie@example.com",
+        role: "Manager",
+        department: "Operations",
+      },
+      {
+        id: 4,
+        name: "Diana Prince",
+        email: "diana@example.com",
+        role: "Developer",
+        department: "Engineering",
+      },
+      {
+        id: 5,
+        name: "Edward Norton",
+        email: "edward@example.com",
+        role: "Analyst",
+        department: "Data Science",
+      },
+      {
+        id: 6,
+        name: "Fiona Green",
+        email: "fiona@example.com",
+        role: "Designer",
+        department: "Creative",
+      },
+      {
+        id: 7,
+        name: "George Wilson",
+        email: "george@example.com",
+        role: "Developer",
+        department: "Engineering",
+      },
+      {
+        id: 8,
+        name: "Helen Davis",
+        email: "helen@example.com",
+        role: "Manager",
+        department: "HR",
+      },
+    ],
+    []
+  );
+
+  // Memoized search function that won't recreate on every render
+  const performSearch = useCallback(
+    async (term) => {
+      if (!term.trim()) {
+        setUsers([]);
+        return;
+      }
+
+      setLoading(true);
+
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      const filtered = allUsers.filter(
+        (user) =>
+          user.name.toLowerCase().includes(term.toLowerCase()) ||
+          user.email.toLowerCase().includes(term.toLowerCase()) ||
+          user.role.toLowerCase().includes(term.toLowerCase()) ||
+          user.department.toLowerCase().includes(term.toLowerCase())
+      );
+
+      setUsers(filtered);
+      setLoading(false);
+
+      // Add to search history if not already present
+      setSearchHistory((prev) => {
+        const newHistory = prev.filter((item) => item !== term);
+        return [term, ...newHistory].slice(0, 5); // Keep last 5 searches
+      });
+    },
+    [allUsers]
+  );
+
+  // Debounced search effect
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      performSearch(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm, performSearch]);
+
+  // Memoized clear search function
+  const clearSearch = useCallback(() => {
+    setSearchTerm("");
+    setUsers([]);
+    setSearchHistory([]);
+  }, []);
+
+  // Memoized search from history function
+  const searchFromHistory = useCallback((term) => {
+    setSearchTerm(term);
+  }, []);
+
+  // Memoized filter by department function
+  const filterByDepartment = useCallback(
+    (department) => {
+      const filtered = allUsers.filter(
+        (user) => user.department === department
+      );
+      setUsers(filtered);
+      setSearchTerm(`department:${department}`);
+    },
+    [allUsers]
+  );
+
+  const departments = useMemo(() => {
+    const depts = new Set(allUsers.map((user) => user.department));
+    return Array.from(depts);
+  }, [allUsers]);
+
   return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={increment}>Increment</button>
+    <div
+      style={{
+        padding: "20px",
+        maxWidth: "800px",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <h2>User Search with Advanced Filtering</h2>
+
+      {/* Search Input */}
+      <div style={{ marginBottom: "20px" }}>
+        <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search users by name, email, role, or department..."
+            style={{
+              flex: 1,
+              padding: "12px",
+              border: "1px solid #ddd",
+              borderRadius: "6px",
+              fontSize: "14px",
+            }}
+          />
+          <button
+            onClick={clearSearch}
+            style={{
+              padding: "12px 20px",
+              backgroundColor: "#dc3545",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+            }}
+          >
+            Clear
+          </button>
+        </div>
+
+        {/* Department Quick Filters */}
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          <span
+            style={{ fontSize: "14px", color: "#666", alignSelf: "center" }}
+          >
+            Quick filters:
+          </span>
+          {departments.map((dept) => (
+            <button
+              key={dept}
+              onClick={() => filterByDepartment(dept)}
+              style={{
+                padding: "6px 12px",
+                backgroundColor: "#f8f9fa",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                fontSize: "12px",
+                cursor: "pointer",
+              }}
+            >
+              {dept}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Search History */}
+      {searchHistory.length > 0 && (
+        <div style={{ marginBottom: "20px" }}>
+          <h4 style={{ margin: "0 0 8px 0", fontSize: "14px", color: "#666" }}>
+            Recent Searches:
+          </h4>
+          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+            {searchHistory.map((term, index) => (
+              <button
+                key={index}
+                onClick={() => searchFromHistory(term)}
+                style={{
+                  padding: "4px 8px",
+                  backgroundColor: "#e9ecef",
+                  border: "1px solid #ced4da",
+                  borderRadius: "3px",
+                  fontSize: "11px",
+                  cursor: "pointer",
+                }}
+              >
+                {term}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <div style={{ textAlign: "center", padding: "20px", color: "#666" }}>
+          Searching users...
+        </div>
+      )}
+
+      {/* Results */}
+      <div>
+        {!loading && searchTerm && (
+          <h4 style={{ margin: "0 0 15px 0" }}>
+            Found {users.length} user{users.length !== 1 ? "s" : ""} for "
+            {searchTerm}"
+          </h4>
+        )}
+
+        <div style={{ display: "grid", gap: "12px" }}>
+          {users.map((user) => (
+            <UserCard key={user.id} user={user} />
+          ))}
+        </div>
+
+        {!loading && searchTerm && users.length === 0 && (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "40px",
+              color: "#666",
+              backgroundColor: "#f8f9fa",
+              borderRadius: "6px",
+            }}
+          >
+            No users found matching your search criteria.
+          </div>
+        )}
+      </div>
     </div>
   );
 };
-export default Counter;
-```
 
-```javascript
-import React, { useState, useCallback } from "react";
-const ExpensiveComponent = React.memo(({ onClick }) => {
-  console.log("ExpensiveComponent rendered");
-  return <button onClick={onClick}>Click Me</button>;
+// Memoized UserCard component to prevent unnecessary re-renders
+const UserCard = React.memo(({ user }) => {
+  return (
+    <div
+      style={{
+        padding: "16px",
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+        backgroundColor: "white",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <div>
+          <h3 style={{ margin: "0 0 4px 0", fontSize: "16px" }}>{user.name}</h3>
+          <p style={{ margin: "0 0 4px 0", color: "#666", fontSize: "14px" }}>
+            {user.email}
+          </p>
+          <div style={{ display: "flex", gap: "12px", fontSize: "13px" }}>
+            <span
+              style={{
+                padding: "2px 8px",
+                backgroundColor: "#e3f2fd",
+                borderRadius: "12px",
+                color: "#1976d2",
+              }}
+            >
+              {user.role}
+            </span>
+            <span
+              style={{
+                padding: "2px 8px",
+                backgroundColor: "#f3e5f5",
+                borderRadius: "12px",
+                color: "#7b1fa2",
+              }}
+            >
+              {user.department}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 });
-const ParentComponent = () => {
-  const [count, setCount] = useState(0);
-  const increment = useCallback(() => {
-    setCount((prevCount) => prevCount + 1);
-  }, []); // No dependencies, so the function reference remains stable
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <ExpensiveComponent onClick={increment} />
-    </div>
-  );
-};
-export default ParentComponent;
+
+export default SearchableUserList;
 ```
 
+<BackToTop />
+
+### Dynamic Form Builder with Validation
+
 ```javascript
-import React, { useState, useCallback } from "react";
-const FetchDataComponent = () => {
-  const [data, setData] = useState(null);
-  const fetchData = useCallback(async () => {
-    const response = await fetch("https://api.example.com/data");
-    const result = await response.json();
-    setData(result);
-  }, []); // No dependencies, so the function reference remains stable
+import React, { useState, useCallback, useMemo } from "react";
+
+const DynamicFormBuilder = () => {
+  const [formFields, setFormFields] = useState([
+    {
+      id: 1,
+      type: "text",
+      label: "First Name",
+      name: "firstName",
+      required: true,
+      value: "",
+    },
+    {
+      id: 2,
+      type: "email",
+      label: "Email",
+      name: "email",
+      required: true,
+      value: "",
+    },
+  ]);
+  const [formData, setFormData] = useState({});
+  const [errors, setErrors] = useState({});
+  const [submissionHistory, setSubmissionHistory] = useState([]);
+
+  // Available field types
+  const fieldTypes = useMemo(
+    () => [
+      { value: "text", label: "Text Input" },
+      { value: "email", label: "Email" },
+      { value: "number", label: "Number" },
+      { value: "tel", label: "Phone" },
+      { value: "password", label: "Password" },
+      { value: "textarea", label: "Text Area" },
+      { value: "select", label: "Dropdown" },
+      { value: "checkbox", label: "Checkbox" },
+      { value: "radio", label: "Radio Button" },
+      { value: "date", label: "Date" },
+    ],
+    []
+  );
+
+  // Memoized validation function
+  const validateField = useCallback((field, value) => {
+    const errors = [];
+
+    if (field.required && (!value || value.toString().trim() === "")) {
+      errors.push(`${field.label} is required`);
+    }
+
+    if (value && field.type === "email") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) {
+        errors.push("Please enter a valid email address");
+      }
+    }
+
+    if (value && field.type === "number") {
+      if (isNaN(value)) {
+        errors.push("Please enter a valid number");
+      }
+      if (field.min && parseFloat(value) < field.min) {
+        errors.push(`Minimum value is ${field.min}`);
+      }
+      if (field.max && parseFloat(value) > field.max) {
+        errors.push(`Maximum value is ${field.max}`);
+      }
+    }
+
+    if (value && field.type === "tel") {
+      const phoneRegex = /^\+?[\d\s\-\(\)]+$/;
+      if (!phoneRegex.test(value)) {
+        errors.push("Please enter a valid phone number");
+      }
+    }
+
+    if (value && field.minLength && value.length < field.minLength) {
+      errors.push(`Minimum length is ${field.minLength} characters`);
+    }
+
+    if (value && field.maxLength && value.length > field.maxLength) {
+      errors.push(`Maximum length is ${field.maxLength} characters`);
+    }
+
+    return errors;
+  }, []);
+
+  // Memoized field value update function
+  const updateFieldValue = useCallback(
+    (fieldName, value) => {
+      setFormData((prev) => ({ ...prev, [fieldName]: value }));
+
+      // Real-time validation
+      const field = formFields.find((f) => f.name === fieldName);
+      if (field) {
+        const fieldErrors = validateField(field, value);
+        setErrors((prev) => ({
+          ...prev,
+          [fieldName]: fieldErrors.length > 0 ? fieldErrors : undefined,
+        }));
+      }
+    },
+    [formFields, validateField]
+  );
+
+  // Memoized add field function
+  const addField = useCallback(() => {
+    const newId = Math.max(...formFields.map((f) => f.id), 0) + 1;
+    const newField = {
+      id: newId,
+      type: "text",
+      label: `Field ${newId}`,
+      name: `field${newId}`,
+      required: false,
+      value: "",
+    };
+    setFormFields((prev) => [...prev, newField]);
+  }, [formFields]);
+
+  // Memoized remove field function
+  const removeField = useCallback((fieldId) => {
+    setFormFields((prev) => {
+      const updated = prev.filter((f) => f.id !== fieldId);
+      const removedField = prev.find((f) => f.id === fieldId);
+      if (removedField) {
+        setFormData((current) => {
+          const { [removedField.name]: removed, ...rest } = current;
+          return rest;
+        });
+        setErrors((current) => {
+          const { [removedField.name]: removed, ...rest } = current;
+          return rest;
+        });
+      }
+      return updated;
+    });
+  }, []);
+
+  // Memoized update field config function
+  const updateFieldConfig = useCallback((fieldId, config) => {
+    setFormFields((prev) =>
+      prev.map((field) =>
+        field.id === fieldId ? { ...field, ...config } : field
+      )
+    );
+  }, []);
+
+  // Memoized form submission function
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+
+      // Validate all fields
+      const allErrors = {};
+      formFields.forEach((field) => {
+        const value = formData[field.name];
+        const fieldErrors = validateField(field, value);
+        if (fieldErrors.length > 0) {
+          allErrors[field.name] = fieldErrors;
+        }
+      });
+
+      setErrors(allErrors);
+
+      if (Object.keys(allErrors).length === 0) {
+        // Submit form
+        const submission = {
+          id: Date.now(),
+          timestamp: new Date().toISOString(),
+          data: { ...formData },
+          fields: formFields.map((f) => ({
+            id: f.id,
+            label: f.label,
+            type: f.type,
+          })),
+        };
+
+        setSubmissionHistory((prev) => [submission, ...prev.slice(0, 4)]); // Keep last 5
+        setFormData({});
+        alert("Form submitted successfully!");
+      }
+    },
+    [formFields, formData, validateField]
+  );
+
+  // Memoized clear form function
+  const clearForm = useCallback(() => {
+    setFormData({});
+    setErrors({});
+  }, []);
+
   return (
-    <div>
-      <button onClick={fetchData}>Fetch Data</button>
-      {data && <pre>{JSON.stringify(data, null, 2)}</pre>}
+    <div
+      style={{
+        padding: "20px",
+        maxWidth: "1000px",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <h2>Dynamic Form Builder</h2>
+
+      <div
+        style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "30px" }}
+      >
+        {/* Form Builder */}
+        <div>
+          <h3>Form Builder</h3>
+
+          <button
+            onClick={addField}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#28a745",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              marginBottom: "20px",
+            }}
+          >
+            Add Field
+          </button>
+
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "15px" }}
+          >
+            {formFields.map((field) => (
+              <FieldBuilder
+                key={field.id}
+                field={field}
+                fieldTypes={fieldTypes}
+                onUpdate={(config) => updateFieldConfig(field.id, config)}
+                onRemove={() => removeField(field.id)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Form Preview */}
+        <div>
+          <h3>Form Preview</h3>
+
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              padding: "20px",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
+              backgroundColor: "#f8f9fa",
+            }}
+          >
+            {formFields.map((field) => (
+              <FormField
+                key={field.id}
+                field={field}
+                value={formData[field.name] || ""}
+                error={errors[field.name]}
+                onChange={(value) => updateFieldValue(field.name, value)}
+              />
+            ))}
+
+            <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+              <button
+                type="submit"
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#007bff",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                }}
+              >
+                Submit Form
+              </button>
+              <button
+                type="button"
+                onClick={clearForm}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#6c757d",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                }}
+              >
+                Clear
+              </button>
+            </div>
+          </form>
+
+          {/* Submission History */}
+          {submissionHistory.length > 0 && (
+            <div style={{ marginTop: "30px" }}>
+              <h4>Recent Submissions</h4>
+              {submissionHistory.map((submission) => (
+                <div
+                  key={submission.id}
+                  style={{
+                    padding: "10px",
+                    border: "1px solid #ddd",
+                    borderRadius: "6px",
+                    marginBottom: "10px",
+                    backgroundColor: "white",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "#666",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    {new Date(submission.timestamp).toLocaleString()}
+                  </div>
+                  <pre
+                    style={{ fontSize: "12px", margin: 0, overflowX: "auto" }}
+                  >
+                    {JSON.stringify(submission.data, null, 2)}
+                  </pre>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
-export default FetchDataComponent;
+
+// Memoized FieldBuilder component
+const FieldBuilder = React.memo(({ field, fieldTypes, onUpdate, onRemove }) => {
+  const handleConfigChange = useCallback(
+    (key, value) => {
+      onUpdate({ [key]: value });
+    },
+    [onUpdate]
+  );
+
+  return (
+    <div
+      style={{
+        padding: "15px",
+        border: "1px solid #ddd",
+        borderRadius: "6px",
+        backgroundColor: "white",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "10px",
+        }}
+      >
+        <h4 style={{ margin: 0, fontSize: "14px" }}>Field #{field.id}</h4>
+        <button
+          onClick={onRemove}
+          style={{
+            padding: "2px 8px",
+            backgroundColor: "#dc3545",
+            color: "white",
+            border: "none",
+            borderRadius: "3px",
+            fontSize: "12px",
+            cursor: "pointer",
+          }}
+        >
+          Remove
+        </button>
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "10px",
+          fontSize: "12px",
+        }}
+      >
+        <div>
+          <label>Label:</label>
+          <input
+            type="text"
+            value={field.label}
+            onChange={(e) => handleConfigChange("label", e.target.value)}
+            style={{ width: "100%", padding: "4px" }}
+          />
+        </div>
+
+        <div>
+          <label>Name:</label>
+          <input
+            type="text"
+            value={field.name}
+            onChange={(e) => handleConfigChange("name", e.target.value)}
+            style={{ width: "100%", padding: "4px" }}
+          />
+        </div>
+
+        <div>
+          <label>Type:</label>
+          <select
+            value={field.type}
+            onChange={(e) => handleConfigChange("type", e.target.value)}
+            style={{ width: "100%", padding: "4px" }}
+          >
+            {fieldTypes.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+            <input
+              type="checkbox"
+              checked={field.required || false}
+              onChange={(e) => handleConfigChange("required", e.target.checked)}
+            />
+            Required
+          </label>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+// Memoized FormField component
+const FormField = React.memo(({ field, value, error, onChange }) => {
+  const handleChange = useCallback(
+    (e) => {
+      const newValue =
+        field.type === "checkbox" ? e.target.checked : e.target.value;
+      onChange(newValue);
+    },
+    [field.type, onChange]
+  );
+
+  const inputStyle = {
+    width: "100%",
+    padding: "8px",
+    border: `1px solid ${error ? "#dc3545" : "#ddd"}`,
+    borderRadius: "4px",
+    fontSize: "14px",
+  };
+
+  return (
+    <div style={{ marginBottom: "15px" }}>
+      <label
+        style={{ display: "block", marginBottom: "5px", fontWeight: "bold" }}
+      >
+        {field.label}
+        {field.required && <span style={{ color: "#dc3545" }}>*</span>}
+      </label>
+
+      {field.type === "textarea" ? (
+        <textarea
+          value={value}
+          onChange={handleChange}
+          style={{ ...inputStyle, height: "80px" }}
+        />
+      ) : field.type === "select" ? (
+        <select value={value} onChange={handleChange} style={inputStyle}>
+          <option value="">Select an option</option>
+          <option value="option1">Option 1</option>
+          <option value="option2">Option 2</option>
+          <option value="option3">Option 3</option>
+        </select>
+      ) : field.type === "checkbox" ? (
+        <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <input
+            type="checkbox"
+            checked={value || false}
+            onChange={handleChange}
+          />
+          {field.label}
+        </label>
+      ) : (
+        <input
+          type={field.type}
+          value={value}
+          onChange={handleChange}
+          style={inputStyle}
+        />
+      )}
+
+      {error && (
+        <div style={{ marginTop: "5px", fontSize: "12px", color: "#dc3545" }}>
+          {error.map((err, index) => (
+            <div key={index}>{err}</div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+});
+
+export default DynamicFormBuilder;
+```
+
+<BackToTop />
+
+### Real-time Chat Application with Message Management
+
+```javascript
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  useMemo,
+} from "react";
+
+const ChatApplication = () => {
+  const [messages, setMessages] = useState([]);
+  const [currentMessage, setCurrentMessage] = useState("");
+  const [currentUser, setCurrentUser] = useState("User1");
+  const [typingUsers, setTypingUsers] = useState(new Set());
+  const [onlineUsers, setOnlineUsers] = useState(
+    new Set(["User1", "User2", "Alice", "Bob"])
+  );
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedMessageId, setSelectedMessageId] = useState(null);
+  const messagesEndRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
+
+  // Mock users
+  const users = useMemo(
+    () => ({
+      User1: { name: "John Doe", avatar: "👨‍💻", color: "#007bff" },
+      User2: { name: "Jane Smith", avatar: "👩‍🎨", color: "#28a745" },
+      Alice: { name: "Alice Johnson", avatar: "👩‍💼", color: "#dc3545" },
+      Bob: { name: "Bob Wilson", avatar: "👨‍🔬", color: "#fd7e14" },
+    }),
+    []
+  );
+
+  // Simulate receiving messages
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (Math.random() > 0.7) {
+        const otherUsers = Object.keys(users).filter((u) => u !== currentUser);
+        const randomUser =
+          otherUsers[Math.floor(Math.random() * otherUsers.length)];
+        const randomMessages = [
+          "Hey everyone! How's it going?",
+          "Just finished a great project!",
+          "Anyone up for a coffee break?",
+          "The weather is amazing today!",
+          "Working on something exciting 🚀",
+        ];
+
+        addMessage(
+          randomMessages[Math.floor(Math.random() * randomMessages.length)],
+          randomUser
+        );
+      }
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, [currentUser]);
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Memoized add message function
+  const addMessage = useCallback(
+    (text, userId = currentUser, type = "text") => {
+      const newMessage = {
+        id: Date.now() + Math.random(),
+        text,
+        userId,
+        timestamp: new Date().toISOString(),
+        type,
+        reactions: {},
+        edited: false,
+      };
+
+      setMessages((prev) => [...prev, newMessage]);
+    },
+    [currentUser]
+  );
+
+  // Memoized send message function
+  const sendMessage = useCallback(
+    (e) => {
+      e.preventDefault();
+
+      if (!currentMessage.trim()) return;
+
+      // Handle commands
+      if (currentMessage.startsWith("/")) {
+        handleCommand(currentMessage);
+      } else {
+        addMessage(currentMessage);
+      }
+
+      setCurrentMessage("");
+
+      // Stop typing indicator
+      setTypingUsers((prev) => {
+        const updated = new Set(prev);
+        updated.delete(currentUser);
+        return updated;
+      });
+    },
+    [currentMessage, addMessage, currentUser]
+  );
+
+  // Memoized command handler
+  const handleCommand = useCallback(
+    (command) => {
+      const [cmd, ...args] = command.slice(1).split(" ");
+
+      switch (cmd.toLowerCase()) {
+        case "clear":
+          setMessages([]);
+          addMessage("Chat cleared", currentUser, "system");
+          break;
+        case "help":
+          addMessage(
+            "Available commands: /clear, /help, /users, /nick [name]",
+            currentUser,
+            "system"
+          );
+          break;
+        case "users":
+          const userList = Array.from(onlineUsers)
+            .map((u) => users[u]?.name || u)
+            .join(", ");
+          addMessage(`Online users: ${userList}`, currentUser, "system");
+          break;
+        case "nick":
+          if (args.length > 0) {
+            const newNick = args.join(" ");
+            addMessage(
+              `${users[currentUser]?.name || currentUser} changed their name to ${newNick}`,
+              currentUser,
+              "system"
+            );
+            // In a real app, you'd update the user's name
+          }
+          break;
+        default:
+          addMessage(`Unknown command: ${cmd}`, currentUser, "system");
+      }
+    },
+    [currentUser, onlineUsers, users, addMessage]
+  );
+
+  // Memoized typing handler
+  const handleTyping = useCallback(
+    (e) => {
+      setCurrentMessage(e.target.value);
+
+      // Add typing indicator
+      setTypingUsers((prev) => new Set([...prev, currentUser]));
+
+      // Clear previous timeout
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+
+      // Set new timeout to remove typing indicator
+      typingTimeoutRef.current = setTimeout(() => {
+        setTypingUsers((prev) => {
+          const updated = new Set(prev);
+          updated.delete(currentUser);
+          return updated;
+        });
+      }, 2000);
+    },
+    [currentUser]
+  );
+
+  // Memoized message editing
+  const editMessage = useCallback((messageId, newText) => {
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === messageId
+          ? {
+              ...msg,
+              text: newText,
+              edited: true,
+              editedAt: new Date().toISOString(),
+            }
+          : msg
+      )
+    );
+    setSelectedMessageId(null);
+  }, []);
+
+  // Memoized message deletion
+  const deleteMessage = useCallback((messageId) => {
+    setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
+    setSelectedMessageId(null);
+  }, []);
+
+  // Memoized reaction handler
+  const addReaction = useCallback(
+    (messageId, emoji) => {
+      setMessages((prev) =>
+        prev.map((msg) => {
+          if (msg.id === messageId) {
+            const reactions = { ...msg.reactions };
+            if (reactions[emoji]) {
+              if (reactions[emoji].includes(currentUser)) {
+                reactions[emoji] = reactions[emoji].filter(
+                  (u) => u !== currentUser
+                );
+                if (reactions[emoji].length === 0) {
+                  delete reactions[emoji];
+                }
+              } else {
+                reactions[emoji] = [...reactions[emoji], currentUser];
+              }
+            } else {
+              reactions[emoji] = [currentUser];
+            }
+            return { ...msg, reactions };
+          }
+          return msg;
+        })
+      );
+    },
+    [currentUser]
+  );
+
+  // Memoized filtered messages
+  const filteredMessages = useMemo(() => {
+    if (!searchTerm) return messages;
+    return messages.filter(
+      (msg) =>
+        msg.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        users[msg.userId]?.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [messages, searchTerm, users]);
+
+  // Memoized clear search
+  const clearSearch = useCallback(() => {
+    setSearchTerm("");
+  }, []);
+
+  return (
+    <div
+      style={{
+        height: "600px",
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+        display: "flex",
+        fontFamily: "Arial, sans-serif",
+        backgroundColor: "white",
+      }}
+    >
+      {/* Sidebar */}
+      <div
+        style={{
+          width: "250px",
+          borderRight: "1px solid #ddd",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {/* User Selector */}
+        <div style={{ padding: "15px", borderBottom: "1px solid #ddd" }}>
+          <label
+            style={{
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: "bold",
+            }}
+          >
+            Switch User:
+          </label>
+          <select
+            value={currentUser}
+            onChange={(e) => setCurrentUser(e.target.value)}
+            style={{ width: "100%", padding: "6px" }}
+          >
+            {Object.entries(users).map(([id, user]) => (
+              <option key={id} value={id}>
+                {user.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Search */}
+        <div style={{ padding: "15px", borderBottom: "1px solid #ddd" }}>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search messages..."
+              style={{ flex: 1, padding: "6px" }}
+            />
+            {searchTerm && (
+              <button
+                onClick={clearSearch}
+                style={{
+                  padding: "6px",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                ×
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Online Users */}
+        <div style={{ padding: "15px", flex: 1 }}>
+          <h4 style={{ margin: "0 0 10px 0" }}>
+            Online Users ({onlineUsers.size})
+          </h4>
+          {Array.from(onlineUsers).map((userId) => (
+            <div
+              key={userId}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "6px 0",
+                color: userId === currentUser ? users[userId]?.color : "#666",
+              }}
+            >
+              <span>{users[userId]?.avatar}</span>
+              <span style={{ fontSize: "14px" }}>
+                {users[userId]?.name || userId}
+              </span>
+              {userId === currentUser && (
+                <span style={{ fontSize: "12px" }}>(You)</span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Chat Area */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        {/* Messages */}
+        <div
+          style={{
+            flex: 1,
+            overflow: "auto",
+            padding: "15px",
+            backgroundColor: "#f8f9fa",
+          }}
+        >
+          {filteredMessages.map((message) => (
+            <ChatMessage
+              key={message.id}
+              message={message}
+              user={users[message.userId]}
+              isOwn={message.userId === currentUser}
+              isSelected={selectedMessageId === message.id}
+              onSelect={() => setSelectedMessageId(message.id)}
+              onEdit={(newText) => editMessage(message.id, newText)}
+              onDelete={() => deleteMessage(message.id)}
+              onReact={(emoji) => addReaction(message.id, emoji)}
+            />
+          ))}
+
+          {/* Typing Indicators */}
+          {Array.from(typingUsers)
+            .filter((u) => u !== currentUser)
+            .map((userId) => (
+              <div
+                key={userId}
+                style={{
+                  padding: "8px 0",
+                  fontSize: "12px",
+                  color: "#666",
+                  fontStyle: "italic",
+                }}
+              >
+                {users[userId]?.avatar} {users[userId]?.name} is typing...
+              </div>
+            ))}
+
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Message Input */}
+        <form
+          onSubmit={sendMessage}
+          style={{
+            padding: "15px",
+            borderTop: "1px solid #ddd",
+            backgroundColor: "white",
+          }}
+        >
+          <div style={{ display: "flex", gap: "10px" }}>
+            <input
+              type="text"
+              value={currentMessage}
+              onChange={handleTyping}
+              placeholder="Type a message... (try /help for commands)"
+              style={{
+                flex: 1,
+                padding: "10px",
+                border: "1px solid #ddd",
+                borderRadius: "6px",
+                fontSize: "14px",
+              }}
+            />
+            <button
+              type="submit"
+              disabled={!currentMessage.trim()}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: currentMessage.trim() ? "#007bff" : "#ccc",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                cursor: currentMessage.trim() ? "pointer" : "not-allowed",
+              }}
+            >
+              Send
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// Memoized ChatMessage component
+const ChatMessage = React.memo(
+  ({
+    message,
+    user,
+    isOwn,
+    isSelected,
+    onSelect,
+    onEdit,
+    onDelete,
+    onReact,
+  }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editText, setEditText] = useState(message.text);
+
+    const handleEdit = useCallback(
+      (e) => {
+        e.preventDefault();
+        if (editText.trim() && editText !== message.text) {
+          onEdit(editText);
+        }
+        setIsEditing(false);
+      },
+      [editText, message.text, onEdit]
+    );
+
+    const reactions = ["👍", "❤️", "😂", "😮", "😢", "🎉"];
+
+    return (
+      <div
+        style={{
+          marginBottom: "12px",
+          padding: "8px",
+          borderRadius: "8px",
+          backgroundColor: isSelected
+            ? "#e3f2fd"
+            : message.type === "system"
+              ? "#fff3cd"
+              : "white",
+          border: isSelected ? "2px solid #007bff" : "1px solid #eee",
+          cursor: "pointer",
+        }}
+        onClick={onSelect}
+      >
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: "4px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span>{user?.avatar}</span>
+            <strong style={{ color: user?.color, fontSize: "14px" }}>
+              {user?.name || message.userId}
+            </strong>
+            <span style={{ fontSize: "11px", color: "#666" }}>
+              {new Date(message.timestamp).toLocaleTimeString()}
+            </span>
+            {message.edited && (
+              <span style={{ fontSize: "10px", color: "#999" }}>(edited)</span>
+            )}
+          </div>
+
+          {isOwn && isSelected && !isEditing && message.type !== "system" && (
+            <div style={{ display: "flex", gap: "4px" }}>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsEditing(true);
+                }}
+                style={{
+                  padding: "2px 6px",
+                  fontSize: "10px",
+                  backgroundColor: "#ffc107",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "3px",
+                  cursor: "pointer",
+                }}
+              >
+                Edit
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete();
+                }}
+                style={{
+                  padding: "2px 6px",
+                  fontSize: "10px",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "3px",
+                  cursor: "pointer",
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          )}
+        </div>
+
+        {isEditing ? (
+          <form onSubmit={handleEdit} style={{ display: "flex", gap: "8px" }}>
+            <input
+              type="text"
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              style={{ flex: 1, padding: "4px" }}
+              autoFocus
+            />
+            <button
+              type="submit"
+              style={{ padding: "4px 8px", fontSize: "12px" }}
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              style={{ padding: "4px 8px", fontSize: "12px" }}
+            >
+              Cancel
+            </button>
+          </form>
+        ) : (
+          <div style={{ fontSize: "14px", marginBottom: "8px" }}>
+            {message.text}
+          </div>
+        )}
+
+        {/* Reactions */}
+        {Object.keys(message.reactions).length > 0 && (
+          <div style={{ display: "flex", gap: "4px", marginBottom: "8px" }}>
+            {Object.entries(message.reactions).map(([emoji, userIds]) => (
+              <span
+                key={emoji}
+                style={{
+                  padding: "2px 6px",
+                  backgroundColor: "#f0f0f0",
+                  borderRadius: "12px",
+                  fontSize: "12px",
+                  cursor: "pointer",
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReact(emoji);
+                }}
+              >
+                {emoji} {userIds.length}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Reaction Buttons */}
+        {isSelected && message.type !== "system" && (
+          <div style={{ display: "flex", gap: "4px" }}>
+            {reactions.map((emoji) => (
+              <button
+                key={emoji}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReact(emoji);
+                }}
+                style={{
+                  padding: "2px 4px",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                }}
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+);
+
+export default ChatApplication;
 ```
 
 ## Best Practices
@@ -131,3 +1541,4 @@ export default FetchDataComponent;
 - **Test Performance**: Use performance profiling tools to determine if using `useCallback` provides a significant performance improvement in your application. If not, it may be better to avoid it for simplicity.
 - **Document Usage**: Clearly document the purpose of using `useCallback` in your code to help other developers understand its necessity and avoid confusion.
 - **Avoid Unnecessary Complexity**: Keep your code simple and avoid adding unnecessary complexity by using `useCallback` for every function. Focus on memoizing functions that are expensive to create or that are passed to child components that rely on reference equality.
+  <BackToTop />

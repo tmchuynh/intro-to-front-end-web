@@ -1,0 +1,1163 @@
+import BackToTop from "@/components/BackToTop";
+
+# Components
+
+## Table of Contents
+
+This is an example of a deeply nested navigation item to demonstrate the recursive accordion functionality.
+
+## Components Overview
+
+Components are the building blocks of React applications. They allow you to create reusable UI elements that can be composed together to build complex user interfaces. Components can be either functional or class-based, and they can manage their own state and props.
+
+Components encapsulate logic and presentation, making it easier to maintain and scale applications. They can be nested within each other, allowing for a hierarchical structure that reflects the UI layout.
+Components can be reused across different parts of the application, promoting code reusability and separation of concerns. This modular approach makes it easier to manage and update the codebase as the application grows.
+
+Components can also accept inputs (props) and manage their own internal state, allowing them to be dynamic and interactive. This enables developers to create responsive user interfaces that can change based on user interactions or external data.
+
+React components can be defined using either JavaScript functions or ES6 classes. Functional components are simpler and more concise, while class components provide additional features such as lifecycle methods and state management.
+
+Components can be defined using either JavaScript functions or ES6 classes. Functional components are simpler and more concise, while class components provide additional features such as lifecycle methods and state management. Functional components are typically used for presentational purposes, while class components are often used for more complex logic and state management. However, with the introduction of hooks in React, functional components can now also manage state and sideeffects, making them more powerful and versatile.
+
+Components can be categorized into two main types: functional components and class components. Functional components are simpler and easier to read, while class components provide more features like lifecycle methods.
+
+## Props and State Management in React
+
+React components can manage their own data using props and state. Understanding how to use props and state effectively is crucial for building dynamic and interactive user interfaces.
+
+### Props
+
+Props (short for properties) are used to pass data from a parent component to a child component. They are read-only and cannot be modified by the child component. Props allow you to create dynamic and reusable components by passing different data to them.
+Props are passed to components as attributes in JSX and can be accessed within the component using the `props` object.
+
+```javascript
+import React from "react";
+function MyComponent(props) {
+  return <div>Hello, {props.name}!</div>;
+}
+export default MyComponent;
+```
+
+In this example, `MyComponent` is a functional component that takes `props` as an argument and renders a `div` element with a greeting message. The `name` prop is accessed using `props.name`.
+This component can be used in another component like this:
+
+```javascript
+import React from "react";
+import MyComponent from "./MyComponent";
+function App() {
+  return <MyComponent name="John" />;
+}
+export default App;
+```
+
+In this example, the `App` component uses the `MyComponent` component and passes the `name` prop with the value "John". The `MyComponent` will render "Hello, John!" when it is rendered.
+
+### State
+
+State is a built-in object in React that allows components to manage their own data. It can be used to store dynamic data that can change over time, such as user input or fetched data from an API. State is mutable and can be updated using the `setState` method in class components or the `useState` hook in functional components.
+State is an object that holds the data that affects the rendering of a component. When the state changes, React re-renders the component to reflect the new state. This allows for dynamic and interactive user interfaces.
+
+```javascript
+import React, { useState } from "react";
+function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <div>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>Click me</button>
+    </div>
+}
+export default Counter;
+```
+
+In this example, the `Counter` component uses the `useState` hook to manage the `count` state. The `useState` hook returns an array with the current state value and a function to update the state. The `setCount` function is used to update the state when the button is clicked. The component re-renders whenever the state changes, displaying the updated count.
+
+```javascript
+import React, { Component } from "react";
+class Counter extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { count: 0 };
+  }
+  handleClick = () => {
+    this.setState({ count: this.state.count + 1 });
+  };
+  render() {
+    return (
+      <div>
+        <p>You clicked {this.state.count} times</p>
+        <button onClick={this.handleClick}>Click me</button>
+      </div>
+    );
+  }
+}
+export default Counter;
+```
+
+In this example, the `Counter` component is a class component that manages its own state using the `state` object. The `constructor` initializes the state with a `count` property set to 0. The `handleClick` method is used to update the state when the button is clicked. The component re-renders whenever the state changes, displaying the updated count.
+
+<BackToTop />
+
+## Creating Components
+
+React applications are built using components, which are reusable pieces of UI that can be composed together to create complex user interfaces. Components can be either class-based or functional, with functional components being the preferred approach in modern React development.
+
+React components can be categorized into two main types: functional components and class components. Functional components are simpler and easier to read, while class components provide more features like lifecycle methods and state management. Understanding how to create and use components is essential for building React applications.
+
+### Functional Components
+
+Functional components are typically used for presentational purposes, while class components are often used for more complex logic and state management. However, with the introduction of hooks in React, functional components can now also manage state and side effects, making them more powerful and versatile.
+
+```javascript
+import React from "react";
+function MyComponent(props) {
+  return <div>Hello, {props.name}!</div>;
+}
+export default MyComponent;
+```
+
+Here, `MyComponent` is a functional component that takes `props` as an argument and renders a `div` element with a greeting message. The `name` prop is accessed using `props.name`.
+
+This component can be used in another component like this:
+
+```javascript
+import React from "react";
+import MyComponent from "./MyComponent";
+function App() {
+  return <MyComponent name="John" />;
+}
+export default App;
+```
+
+### Class Components
+
+Class components are ES6 classes that extend the `React.Component` class. They can have their own state and lifecycle methods, but they are less commonly used in modern React development due to the introduction of hooks.
+
+```javascript
+import React, { Component } from "react";
+class MyComponent extends Component {
+  render() {
+    return <div>Hello, {this.props.name}!</div>;
+  }
+}
+export default MyComponent;
+```
+
+In this example, `MyComponent` is a class component that extends `React.Component`. It has a `render` method that returns JSX. The `name` prop is accessed using `this.props.name`.
+
+### Component Composition
+
+Component composition is a fundamental concept in React where you build complex UIs by combining simpler components. This approach promotes reusability and maintainability.
+
+```javascript
+import React from "react";
+
+// Simple components
+function Avatar({ src, alt, size = "medium" }) {
+  const sizeClasses = {
+    small: "w-8 h-8",
+    medium: "w-12 h-12",
+    large: "w-16 h-16",
+  };
+
+  return (
+    <img src={src} alt={alt} className={`rounded-full ${sizeClasses[size]}`} />
+  );
+}
+
+function UserInfo({ name, email }) {
+  return (
+    <div className="ml-3">
+      <h3 className="text-lg font-semibold">{name}</h3>
+      <p className="text-gray-600">{email}</p>
+    </div>
+  );
+}
+
+// Composed component
+function UserCard({ user }) {
+  return (
+    <div className="flex items-center p-4 border rounded-lg shadow-sm">
+      <Avatar src={user.avatarUrl} alt={user.name} size="large" />
+      <UserInfo name={user.name} email={user.email} />
+    </div>
+  );
+}
+
+export default UserCard;
+```
+
+### Higher-Order Components (HOC)
+
+Higher-Order Components are functions that take a component and return a new component with enhanced functionality. They're useful for code reuse and cross-cutting concerns.
+
+```javascript
+import React from "react";
+
+// HOC for adding loading state
+function withLoading(WrappedComponent) {
+  return function WithLoadingComponent(props) {
+    if (props.isLoading) {
+      return (
+        <div className="flex justify-center items-center p-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        </div>
+      );
+    }
+
+    return <WrappedComponent {...props} />;
+  };
+}
+
+// Original component
+function UserList({ users }) {
+  return (
+    <div>
+      {users.map((user) => (
+        <div key={user.id} className="p-2 border-b">
+          {user.name}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Enhanced component with loading functionality
+const UserListWithLoading = withLoading(UserList);
+
+// Usage
+function App() {
+  const [users, setUsers] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    fetchUsers().then((data) => {
+      setUsers(data);
+      setIsLoading(false);
+    });
+  }, []);
+
+  return <UserListWithLoading users={users} isLoading={isLoading} />;
+}
+```
+<BackToTop />
+
+
+## Server vs Client Components
+
+In React, components can be categorized into server components and client components based on where they are rendered.
+
+### Server Components
+
+Server components are rendered on the server and sent to the client as HTML. They can fetch data from APIs or databases and render the initial UI before sending it to the client. This approach improves performance and SEO by reducing the amount of JavaScript that needs to be executed on the client side.
+
+```javascript
+// Server Component (Next.js 13+ App Router)
+import { Suspense } from "react";
+
+async function ServerUserList() {
+  // This runs on the server
+  const users = await fetch("https://api.example.com/users", {
+    cache: "force-cache", // This will cache the data
+  }).then((res) => res.json());
+
+  return (
+    <div>
+      <h2>Users (Server-rendered)</h2>
+      <ul>
+        {users.map((user) => (
+          <li key={user.id}>
+            {user.name} - {user.email}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// Usage with Suspense
+function App() {
+  return (
+    <div>
+      <Suspense fallback={<div>Loading users...</div>}>
+        <ServerUserList />
+      </Suspense>
+    </div>
+  );
+}
+```
+
+### Client Components
+
+Client components run in the browser and can handle user interactions, maintain state, and use browser APIs. They must be marked with the `'use client'` directive at the top of the file in frameworks like Next.js 13+.
+
+```javascript
+"use client";
+
+import { useState, useEffect } from "react";
+
+function ClientCounter() {
+  const [count, setCount] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Access browser APIs
+    document.title = `Count: ${count}`;
+  }, [count]);
+
+  if (!mounted) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div>
+      <h2>Interactive Counter (Client-rendered)</h2>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+      <button onClick={() => setCount(count - 1)}>Decrement</button>
+    </div>
+  );
+}
+```
+
+### Hybrid Approach
+
+You can combine server and client components to optimize performance and user experience:
+
+```javascript
+// Server Component
+async function BlogPost({ postId }) {
+  const post = await fetch(`/api/posts/${postId}`).then((res) => res.json());
+
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      <p className="text-gray-600">Published: {post.publishedAt}</p>
+      <div className="prose">{post.content}</div>
+
+      {/* Client component for interactions */}
+      <LikeButton postId={postId} initialLikes={post.likes} />
+      <Comments postId={postId} />
+    </article>
+  );
+}
+
+// Client Component
+("use client");
+function LikeButton({ postId, initialLikes }) {
+  const [likes, setLikes] = useState(initialLikes);
+  const [isLiking, setIsLiking] = useState(false);
+
+  const handleLike = async () => {
+    setIsLiking(true);
+    try {
+      const response = await fetch(`/api/posts/${postId}/like`, {
+        method: "POST",
+      });
+      const data = await response.json();
+      setLikes(data.likes);
+    } finally {
+      setIsLiking(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleLike}
+      disabled={isLiking}
+      className="bg-red-500 text-white p-2 rounded"
+    >
+      ❤️ {likes} {isLiking ? "..." : ""}
+    </button>
+  );
+}
+```
+<BackToTop />
+
+## Component Patterns and Best Practices
+
+### Render Props Pattern
+
+The render props pattern is a technique for sharing code between components using a prop whose value is a function.
+
+```javascript
+import React, { useState } from "react";
+
+// Component with render prop
+function DataFetcher({ url, render }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  React.useEffect(() => {
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        setData(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError(error);
+        setLoading(false);
+      });
+  }, [url]);
+
+  return render({ data, loading, error });
+}
+
+// Usage
+function UserProfile({ userId }) {
+  return (
+    <DataFetcher
+      url={`/api/users/${userId}`}
+      render={({ data, loading, error }) => {
+        if (loading) return <div>Loading...</div>;
+        if (error) return <div>Error: {error.message}</div>;
+
+        return (
+          <div>
+            <h2>{data.name}</h2>
+            <p>{data.email}</p>
+          </div>
+        );
+      }}
+    />
+  );
+}
+```
+
+### Compound Components Pattern
+
+Compound components work together to form a complete UI, similar to HTML `<select>` and `<option>` elements.
+
+```javascript
+import React, { createContext, useContext, useState } from "react";
+
+// Context for sharing state between compound components
+const AccordionContext = createContext();
+
+function Accordion({ children, defaultOpen = null }) {
+  const [openItem, setOpenItem] = useState(defaultOpen);
+
+  return (
+    <AccordionContext.Provider value={{ openItem, setOpenItem }}>
+      <div className="border rounded-lg overflow-hidden">{children}</div>
+    </AccordionContext.Provider>
+  );
+}
+
+function AccordionItem({ id, children }) {
+  return <div className="border-b last:border-b-0">{children}</div>;
+}
+
+function AccordionHeader({ id, children }) {
+  const { openItem, setOpenItem } = useContext(AccordionContext);
+  const isOpen = openItem === id;
+
+  return (
+    <button
+      className={`w-full text-left p-4 font-semibold ${
+        isOpen ? "bg-blue-50" : "hover:bg-gray-50"
+      }`}
+      onClick={() => setOpenItem(isOpen ? null : id)}
+    >
+      <span className="flex justify-between items-center">
+        {children}
+        <span
+          className={`transform transition-transform ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        >
+          ▼
+        </span>
+      </span>
+    </button>
+  );
+}
+
+function AccordionPanel({ id, children }) {
+  const { openItem } = useContext(AccordionContext);
+  const isOpen = openItem === id;
+
+  return (
+    <div
+      className={`overflow-hidden transition-all ${
+        isOpen ? "max-h-96 p-4" : "max-h-0"
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
+
+// Attach sub-components to main component
+Accordion.Item = AccordionItem;
+Accordion.Header = AccordionHeader;
+Accordion.Panel = AccordionPanel;
+
+// Usage
+function FAQ() {
+  return (
+    <Accordion defaultOpen="item1">
+      <Accordion.Item id="item1">
+        <Accordion.Header id="item1">What is React?</Accordion.Header>
+        <Accordion.Panel id="item1">
+          React is a JavaScript library for building user interfaces.
+        </Accordion.Panel>
+      </Accordion.Item>
+
+      <Accordion.Item id="item2">
+        <Accordion.Header id="item2">How do I get started?</Accordion.Header>
+        <Accordion.Panel id="item2">
+          You can start by creating a new React app using Create React App.
+        </Accordion.Panel>
+      </Accordion.Item>
+    </Accordion>
+  );
+}
+```
+<BackToTop />
+
+### Container/Presentational Components Pattern
+
+Separate logic (container) from presentation (presentational) components:
+
+```javascript
+// Presentational Component - only handles UI
+function UserListPresentation({
+  users,
+  onUserSelect,
+  selectedUserId,
+  loading,
+}) {
+  if (loading) {
+    return <div className="text-center">Loading users...</div>;
+  }
+
+  return (
+    <div className="grid gap-4">
+      {users.map((user) => (
+        <div
+          key={user.id}
+          className={`p-4 border rounded cursor-pointer transition-colors ${
+            selectedUserId === user.id
+              ? "border-blue-500 bg-blue-50"
+              : "hover:bg-gray-50"
+          }`}
+          onClick={() => onUserSelect(user.id)}
+        >
+          <h3 className="font-semibold">{user.name}</h3>
+          <p className="text-gray-600">{user.email}</p>
+          <p className="text-sm text-gray-500">{user.role}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Container Component - handles logic and state
+function UserListContainer() {
+  const [users, setUsers] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUsers()
+      .then((data) => {
+        setUsers(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch users:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  const handleUserSelect = (userId) => {
+    setSelectedUserId(userId);
+    // Additional logic like navigation, analytics, etc.
+    console.log("User selected:", userId);
+  };
+
+  return (
+    <UserListPresentation
+      users={users}
+      onUserSelect={handleUserSelect}
+      selectedUserId={selectedUserId}
+      loading={loading}
+    />
+  );
+}
+```
+<BackToTop />
+
+## Performance Optimization
+
+### React.memo
+
+`React.memo` is a higher-order component that memoizes the result of a component, preventing unnecessary re-renders when props haven't changed.
+
+```javascript
+import React, { memo, useState } from "react";
+
+// Expensive component that we want to optimize
+const ExpensiveUserCard = memo(function UserCard({ user, onEdit }) {
+  console.log("UserCard rendered for:", user.name);
+
+  // Simulate expensive computation
+  const expensiveValue = React.useMemo(() => {
+    return user.posts.reduce((sum, post) => sum + post.likes, 0);
+  }, [user.posts]);
+
+  return (
+    <div className="p-4 border rounded">
+      <h3>{user.name}</h3>
+      <p>Total likes: {expensiveValue}</p>
+      <button onClick={() => onEdit(user.id)}>Edit</button>
+    </div>
+  );
+});
+
+// Parent component
+function UserList() {
+  const [users, setUsers] = useState([
+    { id: 1, name: "Alice", posts: [{ likes: 10 }, { likes: 5 }] },
+    { id: 2, name: "Bob", posts: [{ likes: 15 }, { likes: 20 }] },
+  ]);
+  const [count, setCount] = useState(0);
+
+  const handleEdit = (userId) => {
+    console.log("Editing user:", userId);
+  };
+
+  return (
+    <div>
+      <button onClick={() => setCount(count + 1)}>Count: {count}</button>
+
+      {users.map((user) => (
+        <ExpensiveUserCard key={user.id} user={user} onEdit={handleEdit} />
+      ))}
+    </div>
+  );
+}
+```
+<BackToTop />
+
+### useMemo and useCallback
+
+These hooks help optimize performance by memoizing values and functions:
+
+```javascript
+import React, { useState, useMemo, useCallback } from "react";
+
+function OptimizedComponent({ items, filter }) {
+  const [sortOrder, setSortOrder] = useState("asc");
+
+  // Memoize expensive calculations
+  const filteredAndSortedItems = useMemo(() => {
+    console.log("Recalculating filtered and sorted items");
+
+    const filtered = items.filter((item) =>
+      item.name.toLowerCase().includes(filter.toLowerCase())
+    );
+
+    return filtered.sort((a, b) => {
+      const comparison = a.name.localeCompare(b.name);
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
+  }, [items, filter, sortOrder]);
+
+  // Memoize callback functions
+  const handleSort = useCallback(() => {
+    setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+  }, []);
+
+  const handleItemClick = useCallback((itemId) => {
+    console.log("Item clicked:", itemId);
+  }, []);
+
+  return (
+    <div>
+      <button onClick={handleSort}>
+        Sort {sortOrder === "asc" ? "↑" : "↓"}
+      </button>
+
+      <div className="mt-4">
+        {filteredAndSortedItems.map((item) => (
+          <ItemCard key={item.id} item={item} onClick={handleItemClick} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const ItemCard = memo(function ItemCard({ item, onClick }) {
+  return (
+    <div
+      className="p-2 border-b cursor-pointer hover:bg-gray-50"
+      onClick={() => onClick(item.id)}
+    >
+      {item.name}
+    </div>
+  );
+});
+```
+<BackToTop />
+
+## Component Lifecycle
+
+React component lifecycle refers to the series of methods and events that occur from the birth of a component (its creation) to its death (removal from the UI). Understanding the component lifecycle is essential for managing resources, optimizing performance, and integrating with other parts of your application.
+
+### Class Component Lifecycle
+
+Class components have a well-defined lifecycle with specific methods that are called at different stages:
+
+1. **Mounting**: The phase when an instance of a component is being created and inserted into the DOM.
+
+   - `constructor`: Initialization of state and binding of methods.
+   - `static getDerivedStateFromProps`: Syncing state with props before rendering.
+   - `render`: Describing the UI structure.
+   - `componentDidMount`: Fetching data, adding event listeners, or any setup that requires DOM nodes.
+
+2. **Updating**: The phase when a component is being re-rendered as a result of changes to either its props or state.
+
+   - `static getDerivedStateFromProps`: (same as above)
+   - `shouldComponentUpdate`: Optimizing performance by preventing unnecessary renders.
+   - `render`: (same as above)
+   - `getSnapshotBeforeUpdate`: Capturing some information from the DOM before it is potentially changed.
+   - `componentDidUpdate`: Responding to prop or state changes (e.g., network requests).
+
+3. **Unmounting**: The phase when a component is being removed from the DOM.
+
+   - `componentWillUnmount`: Cleanup (e.g., invalidating timers, canceling network requests).
+
+4. **Error Handling**: The phase when an error occurs in a descendant component.
+   - `componentDidCatch`: Catching and handling errors.
+
+```javascript
+import React, { Component } from "react";
+
+class MyComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { data: null };
+    console.log("Constructor: Component is being constructed");
+  }
+
+  static getDerivedStateFromProps(nextProps, nextState) {
+    console.log("getDerivedStateFromProps: Derived state from props");
+    // Return new state based on props
+    return null;
+  }
+
+  componentDidMount() {
+    console.log("componentDidMount: Component did mount");
+    // Fetch data or perform setup
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log("shouldComponentUpdate: Decide whether to re-render");
+    // Return true or false
+    return true;
+  }
+
+  getSnapshotBeforeUpdate(prevProps, prevState) {
+    console.log("getSnapshotBeforeUpdate: Capture info before update");
+    // Return a value to be passed to componentDidUpdate
+    return null;
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log("componentDidUpdate: Component did update");
+    // Respond to prop or state changes
+  }
+
+  componentWillUnmount() {
+    console.log("componentWillUnmount: Cleanup before unmounting");
+    // Cleanup tasks
+  }
+
+  render() {
+    console.log("Render: Render the component");
+    return <div>My Component</div>;
+  }
+}
+```
+<BackToTop />
+
+### Functional Component Lifecycle with Hooks
+
+Functional components use hooks to manage lifecycle events:
+
+- `useEffect`: Performs side effects in function components, similar to `componentDidMount`, `componentDidUpdate`, and `componentWillUnmount` in class components.
+
+```javascript
+import React, { useState, useEffect } from "react";
+
+function MyFunctionalComponent() {
+  const [count, setCount] = useState(0);
+
+  useEffect(
+    () => {
+      console.log("Component did mount or update");
+
+      // Effect: Subscribe to a data source
+      const subscription = dataSource.subscribe((data) => {
+        // Handle new data
+      });
+
+      return () => {
+        console.log("Component will unmount or update");
+        // Cleanup: Unsubscribe from the data source
+        subscription.unsubscribe();
+      };
+    },
+    [
+      /* dependencies */
+    ]
+  );
+
+  return <div>Count: {count}</div>;
+}
+```
+
+### Summary of Lifecycle Methods
+
+| Lifecycle Method | Class Component        | Functional Component (Hooks)   |
+| ---------------- | ---------------------- | ------------------------------ |
+| Initialization   | `constructor`          | -                              |
+| Mounting         | `componentDidMount`    | `useEffect` (with empty deps)  |
+| Updating         | `componentDidUpdate`   | `useEffect` (with deps)        |
+| Unmounting       | `componentWillUnmount` | `useEffect` (cleanup function) |
+| Error Handling   | `componentDidCatch`    | -                              |
+
+### Common Use Cases for Lifecycle Methods
+
+- **Fetching data**: `componentDidMount`, `componentDidUpdate`, `useEffect`
+- **Subscribing to events**: `componentDidMount`, `componentWillUnmount`, `useEffect`
+- **Manual DOM manipulations**: `componentDidMount`, `componentDidUpdate`, `useEffect`
+- **Timers and intervals**: `componentDidMount`, `componentWillUnmount`, `useEffect`
+- **Logging and analytics**: `componentDidMount`, `componentDidUpdate`, `useEffect`
+
+
+<BackToTop />
+
+## Error Boundaries
+
+Error boundaries are React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed.
+
+### Creating an Error Boundary
+
+```javascript
+import React from "react";
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    // Update state so the next render will show the fallback UI
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // Log error to error reporting service
+    console.error("Error caught by boundary:", error, errorInfo);
+
+    this.setState({
+      error: error,
+      errorInfo: errorInfo,
+    });
+
+    // You can also log the error to an error reporting service here
+    // logErrorToService(error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-4 border border-red-500 bg-red-50 rounded">
+          <h2 className="text-red-700 font-bold">Something went wrong!</h2>
+          <details className="mt-2 text-sm">
+            <summary className="cursor-pointer text-red-600">
+              Click to see error details
+            </summary>
+            <pre className="mt-2 text-xs bg-red-100 p-2 rounded overflow-auto">
+              {this.state.error && this.state.error.toString()}
+              {this.state.errorInfo.componentStack}
+            </pre>
+          </details>
+          <button
+            className="mt-3 bg-red-500 text-white px-4 py-2 rounded"
+            onClick={() =>
+              this.setState({ hasError: false, error: null, errorInfo: null })
+            }
+          >
+            Try Again
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+// Functional Error Boundary using react-error-boundary library
+import { ErrorBoundary as ReactErrorBoundary } from "react-error-boundary";
+
+function ErrorFallback({ error, resetErrorBoundary }) {
+  return (
+    <div className="p-4 border border-red-500 bg-red-50 rounded">
+      <h2 className="text-red-700 font-bold">Oops! Something went wrong</h2>
+      <pre className="mt-2 text-sm text-red-600">{error.message}</pre>
+      <button
+        className="mt-3 bg-red-500 text-white px-4 py-2 rounded"
+        onClick={resetErrorBoundary}
+      >
+        Try again
+      </button>
+    </div>
+  );
+}
+
+// Usage
+function App() {
+  return (
+    <div>
+      <h1>My App</h1>
+
+      <ReactErrorBoundary
+        FallbackComponent={ErrorFallback}
+        onError={(error, errorInfo) => {
+          console.log("Error logged:", error);
+        }}
+        onReset={() => {
+          // Reset app state if needed
+          window.location.reload();
+        }}
+      >
+        <ProblematicComponent />
+      </ReactErrorBoundary>
+
+      <ErrorBoundary>
+        <AnotherComponent />
+      </ErrorBoundary>
+    </div>
+  );
+}
+
+// Component that might throw an error
+function ProblematicComponent() {
+  const [shouldError, setShouldError] = React.useState(false);
+
+  if (shouldError) {
+    throw new Error("This is a test error!");
+  }
+
+  return (
+    <div>
+      <p>This component works fine.</p>
+      <button
+        onClick={() => setShouldError(true)}
+        className="bg-red-500 text-white p-2 rounded"
+      >
+        Trigger Error
+      </button>
+    </div>
+  );
+}
+```
+<BackToTop />
+
+## Testing React Components
+
+### Unit Testing with Jest and React Testing Library
+
+```javascript
+import React from "react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import "@testing-library/jest-dom";
+
+// Component to test
+function Counter({ initialCount = 0, onCountChange }) {
+  const [count, setCount] = React.useState(initialCount);
+
+  const handleIncrement = () => {
+    const newCount = count + 1;
+    setCount(newCount);
+    onCountChange?.(newCount);
+  };
+
+  const handleDecrement = () => {
+    const newCount = count - 1;
+    setCount(newCount);
+    onCountChange?.(newCount);
+  };
+
+  return (
+    <div>
+      <h2>Counter</h2>
+      <p data-testid="count-display">Count: {count}</p>
+      <button onClick={handleIncrement}>Increment</button>
+      <button onClick={handleDecrement}>Decrement</button>
+    </div>
+  );
+}
+
+// Test file: Counter.test.js
+describe("Counter Component", () => {
+  test("renders with initial count", () => {
+    render(<Counter initialCount={5} />);
+
+    expect(screen.getByText("Count: 5")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Increment" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Decrement" })
+    ).toBeInTheDocument();
+  });
+
+  test("increments count when increment button is clicked", async () => {
+    const user = userEvent.setup();
+    render(<Counter initialCount={0} />);
+
+    const incrementButton = screen.getByRole("button", { name: "Increment" });
+
+    await user.click(incrementButton);
+
+    expect(screen.getByText("Count: 1")).toBeInTheDocument();
+  });
+
+  test("decrements count when decrement button is clicked", async () => {
+    const user = userEvent.setup();
+    render(<Counter initialCount={2} />);
+
+    const decrementButton = screen.getByRole("button", { name: "Decrement" });
+
+    await user.click(decrementButton);
+
+    expect(screen.getByText("Count: 1")).toBeInTheDocument();
+  });
+
+  test("calls onCountChange when count changes", async () => {
+    const user = userEvent.setup();
+    const mockOnCountChange = jest.fn();
+
+    render(<Counter initialCount={0} onCountChange={mockOnCountChange} />);
+
+    const incrementButton = screen.getByRole("button", { name: "Increment" });
+
+    await user.click(incrementButton);
+
+    expect(mockOnCountChange).toHaveBeenCalledWith(1);
+  });
+});
+
+// Testing components with context
+function TestComponent() {
+  const { theme } = useTheme();
+  return <div data-testid="theme">{theme}</div>;
+}
+
+function renderWithTheme(ui, { theme = "light" } = {}) {
+  function Wrapper({ children }) {
+    return (
+      <ThemeContext.Provider value={{ theme, toggleTheme: jest.fn() }}>
+        {children}
+      </ThemeContext.Provider>
+    );
+  }
+
+  return render(ui, { wrapper: Wrapper });
+}
+
+test("displays correct theme", () => {
+  renderWithTheme(<TestComponent />, { theme: "dark" });
+
+  expect(screen.getByTestId("theme")).toHaveTextContent("dark");
+});
+
+// Testing async operations
+function AsyncUserProfile({ userId }) {
+  const [user, setUser] = React.useState(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    fetch(`/api/users/${userId}`)
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to fetch");
+        return response.json();
+      })
+      .then((userData) => {
+        setUser(userData);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [userId]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  return (
+    <div>
+      <h2>{user.name}</h2>
+      <p>{user.email}</p>
+    </div>
+  );
+}
+
+// Mock fetch for testing
+global.fetch = jest.fn();
+
+describe("AsyncUserProfile", () => {
+  beforeEach(() => {
+    fetch.mockClear();
+  });
+
+  test("displays loading initially", () => {
+    fetch.mockImplementationOnce(() => new Promise(() => {})); // Never resolves
+
+    render(<AsyncUserProfile userId="1" />);
+
+    expect(screen.getByText("Loading...")).toBeInTheDocument();
+  });
+
+  test("displays user data after successful fetch", async () => {
+    const mockUser = { name: "John Doe", email: "john@example.com" };
+
+    fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockUser,
+    });
+
+    render(<AsyncUserProfile userId="1" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("John Doe")).toBeInTheDocument();
+    });
+
+    expect(screen.getByText("john@example.com")).toBeInTheDocument();
+  });
+
+  test("displays error message on fetch failure", async () => {
+    fetch.mockRejectedValueOnce(new Error("Network error"));
+
+    render(<AsyncUserProfile userId="1" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Error: Network error")).toBeInTheDocument();
+    });
+  });
+});
+```
+<BackToTop />

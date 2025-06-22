@@ -84,6 +84,8 @@ When the component using `useDeferredValue` is rendered, the hook will return a 
 
 ## Examples
 
+### Basic Example
+
 ```javascript
 import { useDeferredValue, useState } from "react";
 function MyComponent() {
@@ -104,6 +106,33 @@ function MyComponent() {
 }
 ```
 
+<BackToTop />
+### Large List Example
+```javascript
+import { useDeferredValue, useState } from "react";
+function LargeList() {
+  const [items, setItems] = useState(Array.from({ length: 1000 }, (_, i) => `Item ${i + 1}`));
+  const [searchTerm, setSearchTerm] = useState("");
+  // Use useDeferredValue to defer the update of the search term
+  const deferredSearchTerm = useDeferredValue(searchTerm);
+  const filteredItems = items.filter(item => item.toLowerCase().includes(deferredSearchTerm.toLowerCase()));
+  return (
+    <div>
+      <input
+        type="text"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        placeholder="Search items..."
+      />
+      <ul>
+        {filteredItems.map(item => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </div>
+}
+```
+<BackToTop />
 ## Best Practices
 
 - Use `useDeferredValue` for values that require deferring to improve performance and user experience.
@@ -117,3 +146,5 @@ function MyComponent() {
 - Use `useDeferredValue` to optimize rendering performance by deferring updates that are not immediately necessary.
 - Use `useDeferredValue` to enhance user experience by deferring updates that may cause layout shifts or reflows.
 - Use `useDeferredValue` to reduce CPU usage by deferring updates that are not critical to the user experience.
+
+<BackToTop />

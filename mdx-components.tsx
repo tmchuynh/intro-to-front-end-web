@@ -108,7 +108,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       const textContent = extractTextContent(children);
       return (
         <>
-          <div className="relative bg-zinc-800 dark:bg-transparent my-5 px-4 border-zinc-700 dark:border-zinc-800 rounded-2xl overflow-y-auto">
+          <div className="bg-code-blocks relative my-5 px-4 border-zinc-700 dark:border-zinc-800 rounded-2xl overflow-y-auto">
             <CopyButton textToCopy={textContent} />
             <pre className="my-4 p-4">{children}</pre>
           </div>
@@ -139,17 +139,17 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <thead className="bg-gray-50 dark:bg-gray-700">{children}</thead>
     ),
     tbody: ({ children }) => (
-      <tbody className="divide-gray-200 dark:divide-gray-600 divide-y">
+      <tbody className="bg-table-body divide-gray-200 dark:divide-gray-600 divide-y">
         {children}
       </tbody>
     ),
     tr: ({ children }) => (
-      <tr className="hover:bg-gray-50 dark:hover:bg-gray-700 text-left transition-colors">
+      <tr className="hover:bg-table-hover text-left transition-colors">
         {children}
       </tr>
     ),
     th: ({ children }) => (
-      <th className="px-6 py-3 border-gray-200 dark:border-gray-600 border-b font-medium text-center text-gray-500 text-xs dark:text-gray-300 tracking-wider uppercase">
+      <th className="bg-muted px-6 py-3 border-b font-medium text-center tracking-wider uppercase">
         {children}
       </th>
     ),

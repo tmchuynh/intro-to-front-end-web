@@ -13,6 +13,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
+      storageKey="intro-to-web-theme"
     >
       {children}
     </NextThemesProvider>

@@ -18,8 +18,14 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
   const { navigation } = useNavigation();
+
+  // Ensure component is mounted before showing theme-dependent content
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Flatten navigation for search
   const flattenedNavigation = useMemo(() => {
@@ -147,7 +153,10 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
             className="hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-md text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 dark:text-gray-400 transition-colors"
             aria-label="Toggle theme"
           >
-            {theme === "dark" ? (
+            {!mounted ? (
+              // Placeholder icon while theme is loading
+              <div className="h-5 w-5" />
+            ) : theme === "dark" ? (
               <svg
                 className="h-5 w-5"
                 fill="none"

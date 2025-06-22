@@ -1,0 +1,280 @@
+import BackToTop from "@/components/BackToTop";
+
+# Layout and Pages
+
+## Table of Contents
+
+## Review
+
+### Layout
+
+The `layout.tsx` file is used to define the global layout for the application. It includes the `Header`, `Footer`, and `BackToTop` components, as well as the `Providers` component to wrap the application in necessary context providers.
+
+Layouts in Next.js allow you to define a common structure for your pages, such as headers, footers, and sidebars. This helps maintain a consistent look and feel across your application. You can create a layout by defining a React component that wraps your page content.
+
+```javascript
+import React from "react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import Providers from "@/components/Providers";
+import BackToTop from "@/components/BackToTop";
+export default function Layout({ children }) {
+  return (
+    <Providers>
+      <Header />
+      <main className="main-content">{children}</main>
+      <Footer />
+      <BackToTop />
+    </Providers>
+  );
+}
+```
+
+This layout component can be used in your pages to provide a consistent structure. You can also pass props to the layout component to customize its behavior or appearance.
+
+In this example, the `Layout` component includes a `Header`, `Footer`, and `BackToTop` component, which will be rendered alongside the page content. The `children` prop represents the content of the page that will be displayed within the layout.
+
+You can also create nested layouts by defining multiple layout components and using them in different parts of yourapplication. This allows for more complex structures, such as having a different layout for admin pages compared to public pages.
+
+### Using Layouts Within Routes
+
+To use layouts with pages in Next.js, you can wrap your page components with the layout component. This allows you to apply the layout structure to multiple pages without duplicating code.
+
+Remember, when doing this, the global layout in `src/app/layout.tsx` will be applied to all pages in the application. This means that any layout defined in a specific route (like `src/app/portfolio-website/getting-set-up/layout.tsx`) will be nested within the global layout.
+
+The file structure would look like this:
+
+```plaintext
+src/app/
+  portfolio-website/
+    getting-set-up/
+      layout.tsx
+      page.tsx
+    home-page/
+      layout.tsx
+      page.tsx
+    utility-functions/
+      layout.tsx
+      page.tsx
+    providers/
+      layout.tsx
+      page.tsx
+  layout.tsx
+  page.tsx
+```
+
+Here, each folder contains a `layout.tsx` file that defines the layout for that section of the application. The `page.tsx` files contain the content for each page.
+
+**CAUTION**
+
+<blockquote>
+When using layouts, ensure that you do not create circular dependencies between layouts and pages. This can lead to unexpected behavior and errors in your application.
+
+Also make sure you do not have conflicting styles or components that might interfere with the layout structure. Always test your layouts across different pages to ensure consistency.
+
+</blockquote>
+
+<BackToTop />
+
+### Pages
+
+Pages in Next.js are defined as React components that export a default function. Each page corresponds to a route in your application, and the file structure determines the routing.
+
+This means that the file `src/app/portfolio-website/getting-set-up/page.tsx` will be accessible at the route `/portfolio-website/getting-set-up`. If there is a folder in `src/app/` called `about/` but no `page.tsx` file, the route `/about` will not be accessible. Instead, you would need to create a `page.tsx` file in the `about/` folder to define the content for that route.
+
+## Creating the global `layout.tsx` file
+
+To create the global `layout.tsx` file, you need to define a React component that will serve as the layout for your entire application. This file should be placed in the `src/app/` directory.
+
+```javascript
+import React from "react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import Providers from "@/components/Providers";
+import BackToTop from "@/components/BackToTop";
+export default function Layout({ children }) {
+  return (
+    <Providers>
+      <Header />
+      <main className="main-content">{children}</main>
+      <Footer />
+      <BackToTop />
+    </Providers>
+  );
+}
+```
+
+Oh...wait...that means you need the `Header`, `Footer`, `Providers`, and `BackToTop` components to be created first. Let's do that now.
+
+**NOTE**
+
+> Every component, page, and layout in the project is entirely customizable. You can modify the styles, structure, and content to fit your specific needs. The provided code is a starting point to help you get set up.
+
+<BackToTop />
+
+### Creating the `Header` Component
+
+The `Header` component is typically used to display the navigation menu and branding for your application. This will be stored in `src/components/Header.tsx`.
+
+```javascript
+import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
+import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import ToggleButton from "@/components/ToggleButton";
+
+export default function Example() {
+  return (
+    <nav
+      as="nav"
+      className="bg-background border-b border-2 border-border shadow-sm"
+    >
+      <div className="mx-auto px-2 sm:px-4 lg:px-8">
+        <div className="flex h-16 justify-between">
+          <div className="flex px-2 lg:px-0">
+            <div className="hidden lg:ml-6 lg:flex lg:space-x-8">
+              <a
+                href="#"
+                className="inline-flex items-center border-b-2 border-accent px-1 pt-1 text-sm font-medium "
+              >
+                Home
+              </a>
+              <a
+                href="#"
+                className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-foreground/90 hover:border-secondary hover:text-muted"
+              >
+                Projects
+              </a>
+              <a
+                href="#"
+                className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-foreground/90 hover:border-secondary hover:text-muted"
+              >
+                Resume
+              </a>
+            </div>
+          </div>
+          <ToggleButton />
+        </div>
+      </div>
+    </nav>
+  );
+}
+```
+
+#### Creating the `ToggleButton` Component
+
+The `ToggleButton` component is used to toggle the theme of your application. This will be stored in `src/components/ToggleButton.tsx`. This component uses the `next-themes` package to manage the theme state.
+
+```javascript
+"use client";
+import { useTheme } from "next-themes";
+import { SunIcon, MoonIcon } from "@heroicons/react/24/outline";
+export default function ToggleButton() {
+  const { theme, setTheme } = useTheme();
+  return (
+    <button
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      className="p-2 rounded-md text-muted hover:text-secondary"
+    >
+      {theme === "dark" ? (
+        <SunIcon className="h-6 w-6" />
+      ) : (
+        <MoonIcon className="h-6 w-6" />
+      )}
+    </button>
+  );
+}
+```
+
+<BackToTop />
+
+### Creating the `Footer` Component
+
+The `Footer` component is typically used to display copyright information, links to social media, and other relevant information at the bottom of your application. This will be stored in `src/components/Footer.tsx`.
+
+```javascript
+export default function Footer() {
+  return (
+    <footer className="bg-background border-t border-2 border-border shadow-sm">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted">
+            &copy; {new Date().getFullYear()} Your Name. All rights reserved.
+          </p>
+          <div className="flex space-x-4">
+            <a href="#" className="text-muted hover:text-secondary">
+              Facebook
+            </a>
+            <a href="#" className="text-muted hover:text-secondary">
+              Twitter
+            </a>
+            <a href="#" className="text-muted hover:text-secondary">
+              LinkedIn
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+```
+
+### Creating the `Providers` Component
+
+The `Providers` component is used to wrap your application in necessary context providers, such as theme providers, state management providers, or any other context that your application needs. This will be stored in `src/providers/ThemeProvider.tsx`.
+
+```javascript
+import React from "react";
+import { ThemeProvider } from "next-themes";
+export default function Providers({ children }) {
+  return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      {children}
+    </ThemeProvider>
+  );
+}
+```
+
+<BackToTop />
+
+### Creating the `BackToTop` Component
+
+The `BackToTop` component is used to provide a button that allows users to quickly scroll back to the top of the page. This will be stored in `src/components/BackToTop.tsx`.
+
+```javascript
+"use client";
+import { useState, useEffect } from "react";
+import { ArrowUpIcon } from "@heroicons/react/24/outline";
+export default function BackToTop() {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsVisible(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  return (
+    isVisible && (
+      <button
+        onClick={scrollToTop}
+        className="fixed bottom-4 right-4 bg-accent text-accent-foreground p-2 rounded-full shadow-lg"
+      >
+        <ArrowUpIcon className="h-6 w-6" />
+      </button>
+    )
+  );
+}
+```
+
+## Next Steps
+
+Now that you have created the global `layout.tsx` file and the necessary components, you can start building out your pages. Each page can use the global layout by simply exporting a default function that returns the content of the page.
+
+You can create a new page by creating a new file in the `src/app/portfolio-website/` directory, such as `about/page.tsx`, and exporting a default function that returns the content for that page. Let's go do that! Navigate to the [Routing Folder, and Files](portfolio-website/getting-set-up/routing-folders-and-files) section to continue building out your portfolio website.
+
+<BackToTop />

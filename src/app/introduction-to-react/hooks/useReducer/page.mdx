@@ -1,0 +1,135 @@
+import BackToTop from "@/components/BackToTop";
+
+# useReducer
+
+## Table of Contents
+
+## Overview
+
+useReducer is a React hook that allows you to manage complex state logic in your components. It is particularly useful when dealing with state that involves multiple sub-values or when the next state depends on the previous one. useReducer provides a way to encapsulate state management logic in a reducer function, making it easier to understand and maintain.
+
+#### Benefits of `useReducer`:
+
+- **Centralized State Management**: It allows you to manage state in a single place, making it easier to reason about state changes.
+- **Predictable State Transitions**: The reducer function defines how the state transitions occur, making it easier to track changes and debug issues.
+- **Separation of Concerns**: It separates state management logic from the component logic, promoting cleaner and more maintainable code.
+- **Performance Optimization**: It can help optimize performance by preventing unnecessary re-renders when state changes are localized to specific parts of the state.
+
+#### When to Use `useReducer`:
+
+- When you have complex state logic that involves multiple sub-values or when the next state depends on the previous one.
+- When you want to encapsulate state management logic in a reducer function for better organization and maintainability.
+- When you need to manage state that is shared across multiple components or when you want to avoid prop drilling.
+- When you want to optimize performance by preventing unnecessary re-renders.
+
+### Syntax
+
+```javascript
+import React, { useReducer } from "react";
+const initialState = { count: 0 };
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "increment":
+      return { count: state.count + 1 };
+    case "decrement":
+      return { count: state.count - 1 };
+    default:
+      throw new Error(`Unknown action: ${action.type}`);
+  }
+};
+const MyComponent = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return (
+    <div>
+      <p>Count: {state.count}</p>
+      <button onClick={() => dispatch({ type: "increment" })}>Increment</button>
+      <button onClick={() => dispatch({ type: "decrement" })}>Decrement</button>
+    </div>
+  );
+};
+```
+
+### Parameters
+
+- `reducer`: A function that takes the current state and an action, and returns the next state. The reducer function defines how the state transitions occur based on the action type.
+- `initialState`: The initial state value for the reducer. This is the state that will be used when the component first renders.
+- `init` (optional): A function that takes the initial state and returns the initial state value. This can be used to compute the initial state based on some logic or to initialize the state from a more complex structure.
+- `state`: The current state value managed by the reducer. This is the state that will be used in the component.
+- `dispatch`: A function that takes an action and dispatches it to the reducer. This function is used to trigger state transitions by sending actions to the reducer.
+
+### Returns
+
+- An array containing the current state and the dispatch function. The current state is the value managed by the reducer, and the dispatch function is used to trigger state transitions by sending actions to the reducer.
+
+## Common Use Cases
+
+- **Counter**: Managing a simple counter state with increment and decrement actions.
+- **Form State**: Managing complex form state with multiple fields and validation logic.
+- **Toggle State**: Managing toggle states for UI components like modals or dropdowns.
+- **List Management**: Managing a list of items with actions to add, remove, or update items in the list.
+- **Complex State Logic**: Managing state that involves multiple sub-values or when the next state depends on the previous one, such as managing a shopping cart with multiple items and actions to add, remove, or update items in the cart.
+
+## How It Works
+
+1. **Reducer Function**: The reducer function defines how the state transitions occur based on the action type. It takes the current state and an action, and returns the next state.
+2. **Initial State**: The initial state is provided as the second argument to the `useReducer` hook. This is the state that will be used when the component first renders.
+3. **Dispatch Function**: The `dispatch` function is used to trigger state transitions by sending actions to the reducer. When an action is dispatched, the reducer function is called with the current state and the action, and it returns the next state.
+4. **State Updates**: When the state is updated, the component re-renders with the new state value. The `useReducer` hook ensures that the component only re-renders when the state changes, optimizing performance by preventing unnecessary re-renders.
+
+## What to Avoid
+
+- **Avoid Overusing**: While `useReducer` is powerful, it can add complexity to your codebase. Use it when necessary, but don't overuse it for simple state management tasks.
+- **Avoid Mutating State**: Always return a new state object from the reducer function. Mutating the state directly can lead to unexpected behavior and bugs.
+- **Avoid Side Effects in Reducer**: The reducer function should be pure and not contain side effects. Side effects should be handled in a separate function or using the `useEffect` hook.
+- **Avoid Deeply Nested State**: While `useReducer` can handle complex state, deeply nested state can make it difficult to manage and reason about. Consider flattening the state structure or using multiple reducers for different parts of the state.
+  <BackToTop />
+
+## Examples
+
+### Simple Counter Example
+
+```javascript
+import React, { useReducer } from "react";
+const initialState = { count: 0 };
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "increment":
+      return { count: state.count + 1 };
+    case "decrement":
+      return { count: state.count - 1 };
+    default:
+      throw new Error(`Unknown action: ${action.type}`);
+  }
+};
+const Counter = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return (
+    <div>
+      <p>Count: {state.count}</p>
+      <button onClick={() => dispatch({ type: "increment" })}>Increment</button>
+      <button onClick={() => dispatch({ type: "decrement" })}>Decrement</button>
+    </div>
+  );
+};
+export default Counter;
+```
+
+<BackToTop />
+
+## Best Practices
+
+- **Keep Reducer Functions Pure**: Ensure that your reducer functions are pure and do not contain side effects. This helps maintain predictable state transitions and makes debugging easier.
+- **Use Action Types**: Define action types as constants to avoid typos and make your code more maintainable. This helps ensure that the action types are consistent throughout your application.
+- **Organize Reducer Logic**: If your reducer logic becomes complex, consider organizing it into separate functions or files. This helps keep your codebase clean and maintainable.
+- **Use Descriptive Action Names**: Use descriptive names for your actions to make it clear what each action does. This improves code readability and makes it easier to understand the state transitions.
+- **Avoid Deeply Nested State**: While `useReducer` can handle complex state, deeply nested state can make it difficult to manage and reason about. Consider flattening the state structure or using multiple reducers for different parts of the state.
+- **Test Reducer Functions**: Write unit tests for your reducer functions to ensure that they behave as expected. This helps catch bugs early and ensures that your state transitions are predictable.
+- **Use `useMemo` for Derived State**: If you need to derive state from the reducer state, consider using `useMemo` to memoize the derived state. This can help optimize performance by preventing unnecessary recalculations when the state changes.
+- **Use `useCallback` for Dispatch Functions**: If you need to pass the dispatch function to child components, consider using `useCallback` to memoize the dispatch function. This can help prevent unnecessary re-renders of child components when the dispatch function changes.
+- **Use `useEffect` for Side Effects**: If you need to perform side effects based on state changes, use the `useEffect` hook. This allows you to handle side effects in a clean and organized way, separate from the reducer logic.
+- **Document Reducer Logic**: Document your reducer logic to explain how state transitions occur and what each action does. This helps other developers (and your future self) understand the state management logic and makes it easier to maintain the codebase.
+- **Use TypeScript for Type Safety**: If you're using TypeScript, define types for your state and actions to ensure type safety. This helps catch errors at compile time and improves code readability by providing clear type definitions for your state and actions.
+- **Avoid Overusing**: While `useReducer` is powerful, it can add complexity to your codebase. Use it when necessary, but don't overuse it for simple state management tasks. For simpler state management, consider using `useState` instead.
+- **Use Context for Global State**: If you need to share state across multiple components, consider using the Context API in combination with `useReducer`. This allows you to manage global state in a centralized way while still using the reducer pattern for state management.
+- **Profile Performance**: If you notice performance issues in your application, use React's profiling tools to identify bottlenecks. This can help you optimize your reducer logic and improve the performance of your application.
+  <BackToTop />

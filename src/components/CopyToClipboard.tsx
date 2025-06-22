@@ -55,14 +55,14 @@ function CopyButton({ textToCopy }: CopyButtonProps) {
   return (
     <Button
       onClick={handleCopy}
-      className="absolute right-0 top-0 flex gap-2 items-center hover:bg-primary py-2 hover:border-primary rounded-none rounded-bl-lg h-10"
+      className="absolute right-0 top-0 flex gap-2 items-center hover:bg-transparent py-2 border-0 rounded-none h-10"
       variant="outline"
       aria-label="Copy to clipboard"
     >
       {copied ? (
-        <BsClipboard2CheckFill className="h-4 w-4 text-background" />
+        <BsClipboard2CheckFill className="h-4 w-4 text-primary" />
       ) : (
-        <BsClipboard2Fill className="h-4 w-4 text-background" />
+        <BsClipboard2Fill className="h-4 w-4 text-foreground hover:text-primary" />
       )}
     </Button>
   );

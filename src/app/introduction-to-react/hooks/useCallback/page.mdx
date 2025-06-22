@@ -1,0 +1,133 @@
+import BackToTop from "@/components/BackToTop";
+
+# useCallback
+
+## Table of Contents
+
+## Overview
+
+`useCallback` is a React hook that returns a memoized version of the callback function that only changes if one of the dependencies has changed. This is useful for optimizing performance by preventing unnecessary re-renders of child components that rely on the callback.
+It is particularly useful when passing callbacks to optimized child components that rely on reference equality to prevent unnecessary renders.
+It is often used in conjunction with `useMemo` to optimize performance in functional components.
+
+#### Benefits of `useCallback`:
+
+- **Performance Optimization**: Prevents unnecessary re-renders of child components by ensuring that the callback function reference remains stable unless its dependencies change.
+- **Reference Equality**: Helps maintain reference equality for functions, which is important when passing callbacks to child components that use `React.memo` or `shouldComponentUpdate`.
+- **Dependency Management**: Allows you to specify dependencies for the callback function, ensuring that it only changes when necessary.
+
+#### When to Use `useCallback`:
+
+- When you have a callback function that is passed to a child component and you want to prevent unnecessary re-renders.
+- When you have a function that is expensive to create and you want to avoid recreating it on every render.
+- When you want to ensure that a function reference remains stable across renders, especially when using it as a dependency in other hooks like `useEffect` or `useMemo`.
+
+### Syntax
+
+```javascript
+import { useCallback } from "react";
+const memoizedCallback = useCallback(
+  () => {
+    // Your callback logic here
+  },
+  [dependency1, dependency2] // Dependencies that trigger a change in the callback
+);
+```
+
+### Parameters
+
+- `callback`: The function you want to memoize.
+- `dependencies`: An array of dependencies that, when changed, will cause the callback to be recreated.
+
+### Returns
+
+- A memoized version of the callback function that only changes if one of the dependencies has changed.
+
+## Common Use Cases
+
+- **Event Handlers**: When passing event handlers to child components, especially when those components are optimized with `React.memo`.
+- **API Calls**: When creating functions that make API calls and you want to ensure that the function reference remains stable across renders.
+- **Performance Optimization**: When you have expensive calculations or operations that you want to avoid re-running unless necessary.
+
+## How It Works
+
+`useCallback` works by returning a memoized version of the callback function. It compares the current dependencies with the previous ones, and if they are the same, it returns the same function reference. If any of the dependencies have changed, it creates a new function reference. This helps in preventing unnecessary re-renders of child components that rely on the callback function.
+
+### Initialization
+
+To use `useCallback`, you first need to import it from the React library and then call it within your functional component. You pass the callback function and an array of dependencies to it. The returned memoized function can then be used in your component or passed down to child components.
+
+## What to Avoid
+
+- **Overusing `useCallback`**: Not every function needs to be memoized. Overusing `useCallback` can lead to unnecessary complexity and may not provide significant performance benefits.
+- **Ignoring Dependencies**: Ensure that you include all necessary dependencies in the dependency array. Failing to do so can lead to stale closures and bugs in your application.
+- **Using `useCallback` for Simple Functions**: If a function is simple and does not cause performance issues, it may not be necessary to use `useCallback`. Use it judiciously for functions that are expensive to create or that are passed to child components that rely on reference equality.
+- **Using `useCallback` for Non-Callback Functions**: `useCallback` is specifically designed for memoizing callback functions. Using it for non-callback functions can lead to confusion and is not its intended use case.
+
+## Examples
+
+```javascript
+import React, { useState, useCallback } from "react";
+const Counter = () => {
+  const [count, setCount] = useState(0);
+  const increment = useCallback(() => {
+    setCount((prevCount) => prevCount + 1);
+  }, []); // No dependencies, so the function reference remains stable
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+};
+export default Counter;
+```
+
+```javascript
+import React, { useState, useCallback } from "react";
+const ExpensiveComponent = React.memo(({ onClick }) => {
+  console.log("ExpensiveComponent rendered");
+  return <button onClick={onClick}>Click Me</button>;
+});
+const ParentComponent = () => {
+  const [count, setCount] = useState(0);
+  const increment = useCallback(() => {
+    setCount((prevCount) => prevCount + 1);
+  }, []); // No dependencies, so the function reference remains stable
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <ExpensiveComponent onClick={increment} />
+    </div>
+  );
+};
+export default ParentComponent;
+```
+
+```javascript
+import React, { useState, useCallback } from "react";
+const FetchDataComponent = () => {
+  const [data, setData] = useState(null);
+  const fetchData = useCallback(async () => {
+    const response = await fetch("https://api.example.com/data");
+    const result = await response.json();
+    setData(result);
+  }, []); // No dependencies, so the function reference remains stable
+  return (
+    <div>
+      <button onClick={fetchData}>Fetch Data</button>
+      {data && <pre>{JSON.stringify(data, null, 2)}</pre>}
+    </div>
+  );
+};
+export default FetchDataComponent;
+```
+
+## Best Practices
+
+- **Use `useCallback` Sparingly**: Only use `useCallback` when necessary. Overusing it can lead to unnecessary complexity and may not provide significant performance benefits.
+- **Include All Dependencies**: Always include all necessary dependencies in the dependency array to avoid stale closures and bugs in your application.
+- **Combine with `useMemo`**: Use `useCallback` in conjunction with `useMemo` to optimize performance in functional components, especially when dealing with expensive calculations or operations.
+- **Test Performance**: Use performance profiling tools to determine if using `useCallback` provides a significant performance improvement in your application. If not, it may be better to avoid it for simplicity.
+- **Document Usage**: Clearly document the purpose of using `useCallback` in your code to help other developers understand its necessity and avoid confusion.
+- **Avoid Unnecessary Complexity**: Keep your code simple and avoid adding unnecessary complexity by using `useCallback` for every function. Focus on memoizing functions that are expensive to create or that are passed to child components that rely on reference equality.

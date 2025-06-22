@@ -10,8 +10,8 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
-    <header className="top-0 z-30 sticky bg-white dark:bg-gray-900 bg-opacity-95 dark:bg-opacity-95 backdrop-blur-sm border-gray-200 dark:border-gray-700 border-b w-full">
-      <div className="flex justify-between items-center px-4 lg:px-6 py-3">
+    <header className="sticky top-0 z-30 backdrop-blur-sm bg-white dark:bg-gray-900 bg-opacity-95 dark:bg-opacity-95 border-gray-200 dark:border-gray-700 border-b w-full">
+      <div className="flex items-center justify-between px-4 lg:px-6 py-3">
         {/* Left side - Mobile menu button */}
         <div className="flex items-center">
           <button
@@ -20,7 +20,7 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
             aria-label="Toggle sidebar"
           >
             <svg
-              className="w-5 h-5"
+              className="h-5 w-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -37,7 +37,7 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
           {/* Mobile logo - only visible when sidebar is closed */}
           <div className="lg:hidden ml-2">
             <div className="flex items-center space-x-2">
-              <div className="flex justify-center items-center bg-emerald-500 rounded-md w-6 h-6">
+              <div className="flex items-center justify-center bg-emerald-500 rounded-md h-6 w-6">
                 <span className="font-bold text-sm text-white">W</span>
               </div>
               <span className="font-bold text-gray-900 text-lg dark:text-white">
@@ -48,11 +48,11 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
         </div>
 
         {/* Center - Search bar */}
-        <div className="flex-1 mx-4 max-w-md">
+        <div className="flex-1 mx-auto max-w-2xl">
           <div className="relative">
-            <div className="left-0 absolute inset-y-0 flex items-center pl-3 pointer-events-none">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
               <svg
-                className="w-4 h-4 text-gray-400"
+                className="h-4 w-4 text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -70,13 +70,8 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
               placeholder="Find something..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="block bg-gray-50 dark:bg-gray-800 py-2 pr-12 pl-10 border border-gray-200 dark:border-gray-700 focus:border-transparent rounded-md focus:ring-2 focus:ring-emerald-500 w-full text-gray-900 text-sm dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none"
+              className="block bg-gray-50 dark:bg-gray-800 pl-10 pr-12 py-2 border border-gray-200 dark:border-gray-700 focus:border-transparent focus:ring-2 focus:ring-emerald-500 rounded-md min-w-[20em] w-full text-gray-900 text-sm dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none"
             />
-            <div className="right-0 absolute inset-y-0 flex items-center pr-3">
-              <kbd className="sm:inline-block hidden bg-gray-100 dark:bg-gray-700 px-2 py-1 border border-gray-200 dark:border-gray-600 rounded font-mono text-gray-400 text-xs">
-                ⌘K
-              </kbd>
-            </div>
           </div>
         </div>
 
@@ -109,7 +104,7 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
             aria-label="Toggle theme"
           >
             <svg
-              className="w-5 h-5"
+              className="h-5 w-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -126,7 +121,7 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
           {/* Mobile menu button for right side items */}
           <button className="sm:hidden hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-md text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 dark:text-gray-400">
             <svg
-              className="w-5 h-5"
+              className="h-5 w-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

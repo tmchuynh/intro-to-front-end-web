@@ -6,80 +6,250 @@ import BackToTop from "@/components/BackToTop";
 
 ## Overview
 
-Event handling in React is a way to respond to user interactions, such as clicks, form submissions, and keyboard events. React provides a synthetic event system that normalizes events across different browsers, making it easier to handle events consistently.
+Event handling in React is a declarative approach to responding to user interactions, such as clicks, form submissions, keyboard input, and touch gestures. React provides a sophisticated synthetic event system called SyntheticEvent that wraps native DOM events to ensure consistent behavior across different browsers and platforms.
 
-React uses its own event system called SyntheticEvents, which wraps native DOM events to provide consistent behavior across different browsers.
+React's SyntheticEvent system is built on top of the native DOM event system but provides several key improvements. It normalizes event properties and methods across different browsers, automatically handles event delegation at the document level for performance optimization, and provides a unified API that works consistently whether you're targeting desktop browsers, mobile devices, or different operating systems.
 
-In functional components, you can define event handlers as functions and pass them to the relevant JSX elements. React will automatically bind the event handlers to the component instance, allowing you to access component state and props within the handlers.
+In modern React applications using functional components and hooks, event handlers are defined as regular functions that receive the synthetic event object as their first parameter. These handlers can access and modify component state through hooks like `useState`, perform side effects, and interact with external APIs or services.
 
 #### Benefits of Using React's Event Handling
 
-- **Cross-Browser Compatibility**: React's synthetic events ensure that your event handlers work consistently across all browsers.
-- **Performance**: React's event system is optimized for performance, reducing the overhead of attaching event listeners directly to DOM elements.
-- **Declarative Syntax**: You can define event handlers directly in your JSX, making it easier to read and maintain your code.
-- **Event Pooling**: React pools events to reduce memory usage, which can improve performance in applications with many event listeners.
+- **Cross-Browser Compatibility**: React's synthetic events normalize differences between browsers (like Internet Explorer vs. modern browsers), ensuring your event handlers work identically across all platforms without requiring browser-specific code.
+- **Automatic Event Delegation**: React uses event delegation at the document root level, meaning it attaches a single event listener to the document and routes events to the appropriate components. This significantly improves performance, especially in applications with hundreds or thousands of interactive elements.
+- **Memory Efficiency**: Through automatic event delegation and object pooling, React minimizes memory usage and garbage collection pressure, resulting in smoother performance.
+- **Declarative Syntax**: Event handlers are defined directly in JSX using camelCase props (like `onClick`, `onChange`), making the relationship between UI elements and their behavior immediately clear.
+- **Built-in Event Pooling**: React reuses event objects to reduce memory allocation, though this is less relevant in React 17+ where event pooling was removed for better developer experience.
 
 #### When to Use React's Event Handling
 
-- When you need to respond to user interactions, such as clicks, form submissions, or keyboard events.
-- When you want to manage state changes based on user input.
-- When you need to handle events in a way that is consistent across different browsers.
+- **User Interface Interactions**: Responding to clicks, taps, form submissions, and keyboard shortcuts that drive your application's core functionality.
+- **Real-time User Feedback**: Providing immediate visual feedback through hover effects, focus states, and dynamic content updates.
+- **Form Management**: Handling input validation, auto-completion, dynamic form field generation, and submission workflows.
+- **Accessibility Features**: Implementing keyboard navigation, screen reader support, and assistive technology compatibility.
+- **Complex User Workflows**: Managing multi-step processes, drag-and-drop interactions, file uploads, and data visualization interactions.
+- **Performance-Critical Scenarios**: When you need optimized event handling that doesn't block the main thread or cause performance bottlenecks.
+  <BackToTop />
 
 ### Syntax
 
 ```javascript
+// Basic event handler
 const handleEvent = (event) => {
-  // Handle the event here
-  console.log(event.type); // e.g., "click", "submit", "keydown"
+  // Access event properties
+  console.log(event.type); // "click", "submit", "keydown", etc.
+  console.log(event.target); // The element that triggered the event
+  console.log(event.currentTarget); // The element the handler is attached to
+};
+
+// Event handler with additional parameters
+const handleEventWithData = (additionalData) => (event) => {
+  console.log("Event:", event.type);
+  console.log("Additional data:", additionalData);
+};
+
+// Async event handler
+const handleAsyncEvent = async (event) => {
+  event.preventDefault();
+  try {
+    const result = await someAsyncOperation();
+    // Handle success
+  } catch (error) {
+    // Handle error
+  }
 };
 ```
 
 ### Parameters
 
-- `event`: The event object that contains information about the event, such as the type of event, the target element, and any additional properties specific to the event type.
+- `event`: The SyntheticEvent object that wraps the native DOM event and provides:
+  - **Event Metadata**: `type`, `timeStamp`, `bubbles`, `cancelable`, `defaultPrevented`
+  - **Target Information**: `target` (triggering element), `currentTarget` (handler's element), `relatedTarget`
+  - **Mouse/Touch Data**: `clientX/Y`, `pageX/Y`, `screenX/Y`, `button`, `buttons`, `touches`
+  - **Keyboard Data**: `key`, `code`, `keyCode`, `altKey`, `ctrlKey`, `metaKey`, `shiftKey`
+  - **Control Methods**: `preventDefault()`, `stopPropagation()`, `stopImmediatePropagation()`
+  - **State Persistence**: `persist()` (legacy, not needed in React 17+)
 
 ## Common Use Cases
 
-- **Form Handling**: Managing form submissions, input changes, and validation.
-- **Button Clicks**: Responding to user clicks on buttons or other interactive elements.
-- **Keyboard Events**: Handling key presses for navigation or input validation.
-- **Mouse Events**: Responding to mouse movements, clicks, and hover states.
-- **Custom Events**: Creating and dispatching custom events for specific application logic.
+- **Interactive Forms**: Real-time validation, conditional field visibility, auto-save functionality, and multi-step form wizards.
+- **Data Visualization**: Chart interactions, zoom/pan controls, tooltip displays, and interactive dashboards.
+- **Media Controls**: Video/audio playback controls, volume adjustment, seeking, and playlist management.
+- **Navigation Systems**: Menu interactions, breadcrumb navigation, tab switching, and sidebar toggles.
+- **E-commerce Features**: Product filtering, shopping cart management, wishlist interactions, and checkout flows.
+- **Social Features**: Like/comment interactions, sharing functionality, real-time messaging, and notification handling.
+- **Gaming Elements**: Score tracking, timer controls, interactive puzzles, and gesture-based controls.
+- **File Management**: Upload progress tracking, drag-and-drop file organization, and batch operations.
   <BackToTop />
 
 ## How It Works
 
-React's event handling works by attaching event listeners to components and using synthetic events to handle user interactions. When an event occurs, React creates a synthetic event object that contains information about the event, such as the type of event, the target element, and any additional properties specific to the event type.
+React's event handling system operates through several sophisticated mechanisms that work together to provide a seamless developer experience:
 
-This synthetic event object is passed to the event handler function, allowing you to access and manipulate the event data. React's event system also provides a way to prevent default behavior and stop event propagation, which is useful for controlling how events are handled in your application.
+### Event Delegation and the Root Container
 
-### Initial Render
+React implements automatic event delegation by attaching a single event listener to the root container (typically the `div` with id "root") rather than individual DOM elements. When an event occurs anywhere in the application, it bubbles up to this root listener, which then determines the appropriate React component to handle the event. This approach dramatically reduces memory usage and improves performance, especially in large applications with thousands of interactive elements.
 
-When a component is rendered, React attaches event listeners to the relevant elements based on the event handlers defined in the JSX. For example, if you define an `onClick` handler for a button, React will attach a click event listener to that button.
+### SyntheticEvent Creation and Normalization
+
+When a native DOM event occurs, React creates a SyntheticEvent object that wraps the original event. This wrapper provides a consistent API across different browsers and platforms, normalizing differences in event properties and methods. For example, the `event.key` property works identically whether the user is on Chrome, Firefox, Safari, or Edge.
+
+### Event Handler Invocation
+
+React maintains an internal mapping between DOM elements and their corresponding React components and event handlers. When an event reaches the root listener, React traverses this mapping to find the appropriate handler function and invokes it with the SyntheticEvent object.
+
+### Initial Render and Event Registration
+
+During the initial render phase, React analyzes your JSX to identify elements with event handler props (like `onClick`, `onChange`, etc.). Instead of attaching individual listeners to each element, React registers these handlers in its internal event system and ensures the root-level listener can route events correctly.
+
+```javascript
+// React internally maps this:
+<button onClick={handleClick}>Click me</button>
+
+// To something conceptually similar to:
+// rootContainer.addEventListener('click', (nativeEvent) => {
+//   if (eventTargetIsButton && buttonHasClickHandler) {
+//     const syntheticEvent = createSyntheticEvent(nativeEvent);
+//     handleClick(syntheticEvent);
+//   }
+// });
+```
+
+<BackToTop />
 
 ## Event Object Properties
 
-The event object in React contains several properties that provide information about the event:
+React's SyntheticEvent object provides a rich set of properties that give you comprehensive information about user interactions:
 
-- `type`: The type of the event (e.g., "click", "submit", "keydown").
-- `target`: The element that triggered the event.
-- `currentTarget`: The element to which the event handler is attached.
-- `clientX` and `clientY`: The mouse position relative to the viewport (for mouse events).
-- `key`: The key pressed (for keyboard events).
-- `preventDefault()`: A method to prevent the default action associated with the event (e.g., preventing form submission).
-- `stopPropagation()`: A method to stop the event from propagating to parent elements.
+### Core Event Properties
+
+- `type`: The type of the event (e.g., "click", "submit", "keydown", "mouseover")
+- `target`: The DOM element that originally triggered the event (the most specific element)
+- `currentTarget`: The DOM element to which the event handler is attached (can be a parent of target)
+- `timeStamp`: High-precision timestamp when the event occurred (in milliseconds)
+- `bubbles`: Boolean indicating whether the event bubbles up through the DOM tree
+- `cancelable`: Boolean indicating whether the event can be cancelled with `preventDefault()`
+- `defaultPrevented`: Boolean indicating whether `preventDefault()` has been called
+- `eventPhase`: Number indicating the current phase of event flow (1=capture, 2=target, 3=bubble)
+- `isTrusted`: Boolean indicating whether the event was generated by user action (true) or script (false)
+
+### Mouse and Pointer Event Properties
+
+- `clientX` and `clientY`: Mouse position relative to the viewport (browser window)
+- `pageX` and `pageY`: Mouse position relative to the entire document (including scrolled areas)
+- `screenX` and `screenY`: Mouse position relative to the user's screen
+- `offsetX` and `offsetY`: Mouse position relative to the target element's padding edge
+- `movementX` and `movementY`: Change in mouse position since the last mousemove event
+- `button`: Which mouse button was pressed (0=left, 1=middle, 2=right)
+- `buttons`: Bitmask representing which buttons are currently pressed
+- `altKey`, `ctrlKey`, `metaKey`, `shiftKey`: Boolean values for modifier key states
+- `relatedTarget`: Secondary target for events like mouseenter/mouseleave
+
+### Keyboard Event Properties
+
+- `key`: The logical key value (e.g., "Enter", "Escape", "a", "A", "1", "!")
+- `code`: The physical key code (e.g., "KeyA", "Digit1", "Space", "Enter")
+- `keyCode`: Legacy numeric key code (deprecated, use `key` or `code` instead)
+- `charCode`: Legacy character code (deprecated)
+- `location`: Number indicating key location (0=standard, 1=left, 2=right, 3=numpad)
+- `repeat`: Boolean indicating whether the key is being held down
+- `altKey`, `ctrlKey`, `metaKey`, `shiftKey`: Modifier key states
+
+### Touch Event Properties (Mobile)
+
+- `touches`: List of all touch points currently on the screen
+- `targetTouches`: List of touch points on the target element
+- `changedTouches`: List of touch points that changed in this event
+
+### Control Methods
+
+- `preventDefault()`: Prevents the browser's default action for the event
+- `stopPropagation()`: Stops the event from bubbling up to parent elements
+- `stopImmediatePropagation()`: Stops event bubbling and prevents other handlers on the same element
+- `persist()`: (Legacy) Removes the event from the pool so it can be used asynchronously
+  <BackToTop />
 
 ### Event Propagation
 
-React's event system supports event propagation, which means that events can bubble up from child elements to parent elements. This allows you to handle events at a higher level in the component hierarchy, making it easier to manage complex interactions.
+React's event system fully supports the standard DOM event propagation model, which consists of three phases:
 
-You can use the `stopPropagation()` method on the event object to prevent the event from bubbling up to parent elements, or use the `preventDefault()` method to prevent the default action associated with the event (e.g., preventing a form submission).
+1. **Capture Phase**: The event travels down from the document root to the target element
+2. **Target Phase**: The event reaches the target element that triggered it
+3. **Bubble Phase**: The event bubbles back up from the target to the document root
+
+By default, React event handlers are attached to the bubble phase, meaning child element events will trigger parent element handlers. This allows you to implement patterns like event delegation and hierarchical event handling.
+
+```javascript
+function EventPropagationDemo() {
+  const handleParentClick = (event) => {
+    console.log("Parent clicked, target:", event.target.tagName);
+  };
+
+  const handleChildClick = (event) => {
+    console.log("Child clicked");
+    // event.stopPropagation(); // Uncomment to prevent parent handler
+  };
+
+  return (
+    <div onClick={handleParentClick} className="p-4 bg-blue-100">
+      Parent Div
+      <button onClick={handleChildClick} className="ml-4 p-2 bg-red-200">
+        Child Button
+      </button>
+    </div>
+  );
+}
+```
+
+You can control event propagation using:
+
+- `event.stopPropagation()`: Prevents the event from continuing its propagation journey
+- `event.stopImmediatePropagation()`: Stops propagation and prevents other handlers on the same element
+- Capture phase handlers: Add `Capture` to the event name (e.g., `onClickCapture`)
+  <BackToTop />
 
 ### Event Delegation
 
-Event delegation is a technique where you attach a single event listener to a parent element instead of multiple listeners on child elements. This can improve performance, especially in applications with many interactive elements.
+Event delegation is a powerful pattern where you attach a single event listener to a parent element to handle events from multiple child elements. React's architecture makes this particularly efficient since it already uses delegation at the root level.
 
-You can implement event delegation in React by attaching an event listener to a parent element and using the `event.target` property to determine which child element triggered the event. This allows you to handle events for multiple child elements with a single handler.
+```javascript
+function TodoList({ todos, onToggle, onDelete }) {
+  // Single handler manages all todo interactions
+  const handleTodoAction = (event) => {
+    const todoId = event.target.closest("[data-todo-id]")?.dataset.todoId;
+    const action = event.target.dataset.action;
+
+    if (!todoId || !action) return;
+
+    switch (action) {
+      case "toggle":
+        onToggle(todoId);
+        break;
+      case "delete":
+        onDelete(todoId);
+        break;
+    }
+  };
+
+  return (
+    <ul onClick={handleTodoAction} className="todo-list">
+      {todos.map((todo) => (
+        <li key={todo.id} data-todo-id={todo.id} className="todo-item">
+          <span className={todo.completed ? "completed" : ""}>{todo.text}</span>
+          <button data-action="toggle">Toggle</button>
+          <button data-action="delete">Delete</button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+```
+
+Benefits of event delegation:
+
+- **Performance**: Fewer event listeners in memory
+- **Dynamic Content**: Automatically handles newly added elements
+- **Cleaner Code**: Centralized event handling logic
+  <BackToTop />
 
 ### Event Binding
 
@@ -156,59 +326,180 @@ React provides several methods for handling events:
 | `onAnimationIteration` | CSS animation iteration events               |
 | `onTransitionEnd`      | CSS transition end events                    |
 
+<BackToTop />
+
 ## What to Avoid
 
-- Avoid using inline event handlers in JSX, as they can lead to performance issues and make the code harder to read.
-- Avoid using native DOM event listeners directly; always use React's synthetic events for consistency.
-- Avoid using `event.preventDefault()` unless necessary, as it can interfere with default browser behavior, such as form submission or link navigation.
-- Avoid using `event.stopPropagation()` unless you need to prevent an event from bubbling up to parent elements, as it can disrupt the natural flow of events in your application.
-- Avoid using `this` in event handlers in functional components, as they do not have a `this` context like class components. Instead, use arrow functions or the `useCallback` hook to define event handlers.
+- **Inline Event Handlers**: While not strictly forbidden, avoid complex inline functions as they create new function instances on every render, potentially causing performance issues and making debugging harder.
+
+  ```javascript
+  // Avoid - creates new function every render
+  <button onClick={() => console.log("Complex logic here...")}>Click</button>;
+
+  // Better - stable function reference
+  const handleClick = useCallback(() => {
+    console.log("Complex logic here...");
+  }, []);
+  ```
+
+- **Direct DOM Event Listeners**: Avoid using `addEventListener` directly on DOM elements. React's synthetic events provide better integration with the component lifecycle and debugging tools.
+
+- **Mixing Event Handler Paradigms**: Don't mix React event handlers with jQuery or other DOM manipulation libraries, as this can cause conflicts and unpredictable behavior.
+
+- **Incorrect Event Naming**: React uses camelCase for event props (`onClick`, not `onclick`). Using incorrect casing will not trigger your handlers.
+
+- **Forgetting Event Handler Dependencies**: When using `useCallback` or `useMemo` with event handlers, ensure all dependencies are included to avoid stale closures.
+
+- **Accessing Event Properties Asynchronously**: Don't access event properties inside `setTimeout`, Promise callbacks, or other asynchronous operations without calling `event.persist()` first (though this is less relevant in React 17+).
+
+- **Overusing `preventDefault()`**: Only prevent default behavior when necessary. Overuse can break expected browser functionality like form submission, link navigation, or accessibility features.
+
+- **Blocking the Main Thread**: Avoid performing heavy computations directly in event handlers. Use `setTimeout`, `requestIdleCallback`, or React's concurrent features for expensive operations.
+  <BackToTop />
 
 ## Examples
 
-### Basic Event Handling
+### Advanced Form Handling with Real-time Validation
 
 ```javascript
-import React, { useState } from "react";
+import React, { useState, useCallback, useRef } from "react";
 
-function InteractiveForm() {
+function SmartContactForm() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     message: "",
+    newsletter: false,
   });
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+  const debounceRef = useRef(null);
 
-  const handleSubmit = (event) => {
-    event.preventDefault(); // Prevent default form submission
-    console.log("Form submitted:", formData);
-    // Process form data here
-  };
-
-  const handleKeyPress = (event) => {
-    if (event.key === "Enter" && event.ctrlKey) {
-      handleSubmit(event);
+  const validateField = useCallback((name, value) => {
+    switch (name) {
+      case "email":
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+          ? ""
+          : "Please enter a valid email address";
+      case "phone":
+        return /^\+?[\d\s-()]{10,}$/.test(value.replace(/\s/g, ""))
+          ? ""
+          : "Please enter a valid phone number";
+      case "name":
+        return value.trim().length >= 2
+          ? ""
+          : "Name must be at least 2 characters";
+      case "message":
+        return value.trim().length >= 10
+          ? ""
+          : "Message must be at least 10 characters";
+      default:
+        return "";
     }
-  };
+  }, []);
+
+  const handleInputChange = useCallback(
+    (event) => {
+      const { name, value, type, checked } = event.target;
+      const newValue = type === "checkbox" ? checked : value;
+
+      setFormData((prev) => ({ ...prev, [name]: newValue }));
+
+      // Debounced validation for better UX
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        if (touched[name]) {
+          const error = validateField(name, newValue);
+          setErrors((prev) => ({ ...prev, [name]: error }));
+        }
+      }, 300);
+    },
+    [touched, validateField]
+  );
+
+  const handleBlur = useCallback(
+    (event) => {
+      const { name, value } = event.target;
+      setTouched((prev) => ({ ...prev, [name]: true }));
+
+      const error = validateField(name, value);
+      setErrors((prev) => ({ ...prev, [name]: error }));
+    },
+    [validateField]
+  );
+
+  const handleSubmit = useCallback(
+    (event) => {
+      event.preventDefault();
+
+      // Validate all fields
+      const newErrors = {};
+      Object.keys(formData).forEach((key) => {
+        if (key !== "newsletter") {
+          newErrors[key] = validateField(key, formData[key]);
+        }
+      });
+
+      setErrors(newErrors);
+      setTouched(
+        Object.keys(formData).reduce(
+          (acc, key) => ({ ...acc, [key]: true }),
+          {}
+        )
+      );
+
+      const hasErrors = Object.values(newErrors).some((error) => error);
+      if (!hasErrors) {
+        console.log("Form submitted successfully:", formData);
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          message: "",
+          newsletter: false,
+        });
+        setTouched({});
+      }
+    },
+    [formData, validateField]
+  );
+
+  const handleKeyboardShortcut = useCallback(
+    (event) => {
+      if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+        handleSubmit(event);
+      } else if (event.key === "Escape") {
+        event.target.blur();
+      }
+    },
+    [handleSubmit]
+  );
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-4">
       <div>
         <input
           type="text"
           name="name"
           value={formData.name}
           onChange={handleInputChange}
-          placeholder="Your name"
-          className="border p-2 w-full"
+          onBlur={handleBlur}
+          onKeyDown={handleKeyboardShortcut}
+          placeholder="Full Name *"
+          className={`w-full p-3 border rounded-lg ${
+            errors.name && touched.name ? "border-red-500" : "border-gray-300"
+          }`}
+          aria-invalid={errors.name && touched.name}
+          aria-describedby={errors.name ? "name-error" : undefined}
         />
+        {errors.name && touched.name && (
+          <p id="name-error" className="text-red-500 text-sm mt-1">
+            {errors.name}
+          </p>
+        )}
       </div>
 
       <div>
@@ -217,9 +508,34 @@ function InteractiveForm() {
           name="email"
           value={formData.email}
           onChange={handleInputChange}
-          placeholder="Your email"
-          className="border p-2 w-full"
+          onBlur={handleBlur}
+          onKeyDown={handleKeyboardShortcut}
+          placeholder="Email Address *"
+          className={`w-full p-3 border rounded-lg ${
+            errors.email && touched.email ? "border-red-500" : "border-gray-300"
+          }`}
+          aria-invalid={errors.email && touched.email}
         />
+        {errors.email && touched.email && (
+          <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+        )}
+      </div>
+
+      <div>
+        <input
+          type="tel"
+          name="phone"
+          value={formData.phone}
+          onChange={handleInputChange}
+          onBlur={handleBlur}
+          placeholder="Phone Number *"
+          className={`w-full p-3 border rounded-lg ${
+            errors.phone && touched.phone ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.phone && touched.phone && (
+          <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+        )}
       </div>
 
       <div>
@@ -227,14 +543,37 @@ function InteractiveForm() {
           name="message"
           value={formData.message}
           onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
-          placeholder="Your message (Ctrl+Enter to submit)"
-          className="border p-2 w-full h-24"
+          onBlur={handleBlur}
+          onKeyDown={handleKeyboardShortcut}
+          placeholder="Your message (Ctrl/Cmd+Enter to submit) *"
+          rows="4"
+          className={`w-full p-3 border rounded-lg resize-none ${
+            errors.message && touched.message
+              ? "border-red-500"
+              : "border-gray-300"
+          }`}
         />
+        {errors.message && touched.message && (
+          <p className="text-red-500 text-sm mt-1">{errors.message}</p>
+        )}
       </div>
 
-      <button type="submit" className="bg-blue-500 text-white p-2 rounded">
-        Submit
+      <label className="flex items-center space-x-2 cursor-pointer">
+        <input
+          type="checkbox"
+          name="newsletter"
+          checked={formData.newsletter}
+          onChange={handleInputChange}
+          className="rounded"
+        />
+        <span className="text-sm text-gray-700">Subscribe to newsletter</span>
+      </label>
+
+      <button
+        type="submit"
+        className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        Send Message
       </button>
     </form>
   );
@@ -243,35 +582,208 @@ function InteractiveForm() {
 
 <BackToTop />
 
-### Event Object Properties
+### Interactive File Upload with Drag & Drop
 
 ```javascript
-function EventDemo() {
-  const handleClick = (event) => {
-    console.log("Event type:", event.type);
-    console.log("Target element:", event.target);
-    console.log("Current target:", event.currentTarget);
-    console.log("Mouse position:", event.clientX, event.clientY);
-    console.log("Key pressed:", event.key);
-  };
+import React, { useState, useCallback, useRef } from "react";
 
-  const handleMouseEvent = (event) => {
-    console.log(`Mouse ${event.type} at (${event.clientX}, ${event.clientY})`);
-  };
+function FileUploadZone() {
+  const [files, setFiles] = useState([]);
+  const [dragActive, setDragActive] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({});
+  const fileInputRef = useRef(null);
+
+  const handleFiles = useCallback((fileList) => {
+    const validFiles = Array.from(fileList).filter((file) => {
+      const isValidType =
+        file.type.startsWith("image/") || file.type === "application/pdf";
+      const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB
+      return isValidType && isValidSize;
+    });
+
+    const newFiles = validFiles.map((file) => ({
+      id: Date.now() + Math.random(),
+      file,
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      preview: file.type.startsWith("image/")
+        ? URL.createObjectURL(file)
+        : null,
+    }));
+
+    setFiles((prev) => [...prev, ...newFiles]);
+  }, []);
+
+  const handleDrop = useCallback(
+    (event) => {
+      event.preventDefault();
+      setDragActive(false);
+
+      const { files: droppedFiles } = event.dataTransfer;
+      handleFiles(droppedFiles);
+    },
+    [handleFiles]
+  );
+
+  const handleDragOver = useCallback((event) => {
+    event.preventDefault();
+  }, []);
+
+  const handleDragEnter = useCallback((event) => {
+    event.preventDefault();
+    setDragActive(true);
+  }, []);
+
+  const handleDragLeave = useCallback((event) => {
+    event.preventDefault();
+    // Only set to false if leaving the drop zone entirely
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      setDragActive(false);
+    }
+  }, []);
+
+  const handleFileInput = useCallback(
+    (event) => {
+      handleFiles(event.target.files);
+      // Reset input to allow re-selecting the same file
+      event.target.value = "";
+    },
+    [handleFiles]
+  );
+
+  const removeFile = useCallback((fileId) => {
+    setFiles((prev) => {
+      const fileToRemove = prev.find((f) => f.id === fileId);
+      if (fileToRemove?.preview) {
+        URL.revokeObjectURL(fileToRemove.preview);
+      }
+      return prev.filter((f) => f.id !== fileId);
+    });
+    setUploadProgress((prev) => {
+      const newProgress = { ...prev };
+      delete newProgress[fileId];
+      return newProgress;
+    });
+  }, []);
+
+  const simulateUpload = useCallback(async (file) => {
+    const fileId = file.id;
+    setUploadProgress((prev) => ({ ...prev, [fileId]: 0 }));
+
+    // Simulate upload progress
+    for (let progress = 0; progress <= 100; progress += 10) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      setUploadProgress((prev) => ({ ...prev, [fileId]: progress }));
+    }
+  }, []);
+
+  const uploadAllFiles = useCallback(async () => {
+    const uploads = files.map((file) => simulateUpload(file));
+    await Promise.all(uploads);
+    console.log("All files uploaded successfully");
+  }, [files, simulateUpload]);
+
+  const openFileDialog = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
 
   return (
-    <div
-      onMouseEnter={handleMouseEvent}
-      onMouseLeave={handleMouseEvent}
-      className="p-4 border"
-    >
-      <button
-        onClick={handleClick}
-        onKeyDown={handleClick}
-        className="bg-green-500 text-white p-2 rounded"
+    <div className="max-w-2xl mx-auto p-6">
+      <div
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onClick={openFileDialog}
+        className={`
+          border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
+          ${
+            dragActive
+              ? "border-blue-500 bg-blue-50"
+              : "border-gray-300 hover:border-gray-400"
+          }
+        `}
       >
-        Click me or press a key
-      </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept="image/*,.pdf"
+          onChange={handleFileInput}
+          className="hidden"
+        />
+
+        <div className="space-y-2">
+          <div className="text-4xl">📁</div>
+          <p className="text-lg font-medium">
+            {dragActive ? "Drop files here" : "Click or drag files to upload"}
+          </p>
+          <p className="text-sm text-gray-500">
+            Supports images and PDFs up to 5MB each
+          </p>
+        </div>
+      </div>
+
+      {files.length > 0 && (
+        <div className="mt-6 space-y-3">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-medium">Files ({files.length})</h3>
+            <button
+              onClick={uploadAllFiles}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Upload All
+            </button>
+          </div>
+
+          {files.map((file) => (
+            <div
+              key={file.id}
+              className="flex items-center space-x-4 p-3 border rounded"
+            >
+              {file.preview && (
+                <img
+                  src={file.preview}
+                  alt={file.name}
+                  className="w-12 h-12 object-cover rounded"
+                />
+              )}
+
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate">{file.name}</p>
+                <p className="text-sm text-gray-500">
+                  {(file.size / 1024 / 1024).toFixed(2)} MB
+                </p>
+
+                {uploadProgress[file.id] !== undefined && (
+                  <div className="mt-2">
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-600 h-2 rounded-full transition-all"
+                        style={{ width: `${uploadProgress[file.id]}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {uploadProgress[file.id]}% uploaded
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeFile(file.id);
+                }}
+                className="text-red-500 hover:text-red-700 p-1"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -279,61 +791,574 @@ function EventDemo() {
 
 <BackToTop />
 
-### Custom Hooks for Event Handling
+### Advanced Custom Hooks for Event Handling
 
 ```javascript
-import { useState } from "react";
-export const useActionState = (initialState) => {
-  const [state, setState] = useState(initialState);
+import { useState, useEffect, useCallback, useRef } from "react";
 
-  const action = {
-    start: () => setState({ ...state, loading: true, error: null }),
-    success: (data) => setState({ ...state, loading: false, data }),
-    error: (error) => setState({ ...state, loading: false, error }),
+// Custom hook for keyboard shortcuts
+export const useKeyboardShortcuts = (shortcuts) => {
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const key = `${event.ctrlKey ? "ctrl+" : ""}${event.shiftKey ? "shift+" : ""}${event.altKey ? "alt+" : ""}${event.key.toLowerCase()}`;
+
+      if (shortcuts[key]) {
+        event.preventDefault();
+        shortcuts[key](event);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [shortcuts]);
+};
+
+// Custom hook for mouse tracking
+export const useMouseTracking = (ref) => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const handleMouseMove = (event) => {
+      const rect = element.getBoundingClientRect();
+      setMousePosition({
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      });
+    };
+
+    const handleMouseEnter = () => setIsHovering(true);
+    const handleMouseLeave = () => setIsHovering(false);
+
+    element.addEventListener("mousemove", handleMouseMove);
+    element.addEventListener("mouseenter", handleMouseEnter);
+    element.addEventListener("mouseleave", handleMouseLeave);
+
+    return () => {
+      element.removeEventListener("mousemove", handleMouseMove);
+      element.removeEventListener("mouseenter", handleMouseEnter);
+      element.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, [ref]);
+
+  return { mousePosition, isHovering };
+};
+
+// Custom hook for debounced input
+export const useDebouncedInput = (initialValue, delay = 300) => {
+  const [value, setValue] = useState(initialValue);
+  const [debouncedValue, setDebouncedValue] = useState(initialValue);
+  const timeoutRef = useRef(null);
+
+  const handleChange = useCallback(
+    (event) => {
+      const newValue = event.target.value;
+      setValue(newValue);
+
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      timeoutRef.current = setTimeout(() => {
+        setDebouncedValue(newValue);
+      }, delay);
+    },
+    [delay]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  return [value, debouncedValue, handleChange];
+};
+
+// Custom hook for complex form state management
+export const useFormState = (initialState, validationRules = {}) => {
+  const [values, setValues] = useState(initialState);
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validate = useCallback(
+    (name, value) => {
+      const rule = validationRules[name];
+      if (!rule) return "";
+
+      if (typeof rule === "function") {
+        return rule(value, values);
+      }
+
+      if (rule.required && !value.trim()) {
+        return rule.message || `${name} is required`;
+      }
+
+      if (rule.pattern && !rule.pattern.test(value)) {
+        return rule.message || `${name} format is invalid`;
+      }
+
+      if (rule.minLength && value.length < rule.minLength) {
+        return (
+          rule.message ||
+          `${name} must be at least ${rule.minLength} characters`
+        );
+      }
+
+      return "";
+    },
+    [validationRules, values]
+  );
+
+  const handleChange = useCallback(
+    (event) => {
+      const { name, value, type, checked } = event.target;
+      const newValue = type === "checkbox" ? checked : value;
+
+      setValues((prev) => ({ ...prev, [name]: newValue }));
+
+      if (touched[name]) {
+        const error = validate(name, newValue);
+        setErrors((prev) => ({ ...prev, [name]: error }));
+      }
+    },
+    [touched, validate]
+  );
+
+  const handleBlur = useCallback(
+    (event) => {
+      const { name, value } = event.target;
+      setTouched((prev) => ({ ...prev, [name]: true }));
+
+      const error = validate(name, value);
+      setErrors((prev) => ({ ...prev, [name]: error }));
+    },
+    [validate]
+  );
+
+  const handleSubmit = useCallback(
+    async (onSubmit) => {
+      setIsSubmitting(true);
+
+      // Validate all fields
+      const newErrors = {};
+      Object.keys(values).forEach((key) => {
+        newErrors[key] = validate(key, values[key]);
+      });
+
+      setErrors(newErrors);
+      setTouched(
+        Object.keys(values).reduce((acc, key) => ({ ...acc, [key]: true }), {})
+      );
+
+      const hasErrors = Object.values(newErrors).some((error) => error);
+
+      if (!hasErrors) {
+        try {
+          await onSubmit(values);
+          // Reset form on successful submission
+          setValues(initialState);
+          setTouched({});
+          setErrors({});
+        } catch (error) {
+          console.error("Form submission error:", error);
+        }
+      }
+
+      setIsSubmitting(false);
+    },
+    [values, validate, initialState]
+  );
+
+  const reset = useCallback(() => {
+    setValues(initialState);
+    setErrors({});
+    setTouched({});
+    setIsSubmitting(false);
+  }, [initialState]);
+
+  return {
+    values,
+    errors,
+    touched,
+    isSubmitting,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    reset,
+  };
+};
+
+// Example usage of custom hooks
+function AdvancedDemo() {
+  const containerRef = useRef(null);
+  const { mousePosition, isHovering } = useMouseTracking(containerRef);
+  const [searchTerm, debouncedSearchTerm, handleSearchChange] =
+    useDebouncedInput("");
+
+  const shortcuts = {
+    "ctrl+s": (event) => {
+      console.log("Save shortcut triggered");
+    },
+    "ctrl+k": (event) => {
+      console.log("Command palette shortcut");
+    },
+    esc: (event) => {
+      console.log("Escape pressed");
+    },
   };
 
-  return [state, action];
-};
+  useKeyboardShortcuts(shortcuts);
+
+  const formValidation = {
+    username: {
+      required: true,
+      minLength: 3,
+      message: "Username must be at least 3 characters",
+    },
+    email: {
+      required: true,
+      pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      message: "Please enter a valid email address",
+    },
+  };
+
+  const {
+    values,
+    errors,
+    touched,
+    isSubmitting,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+  } = useFormState({ username: "", email: "" }, formValidation);
+
+  const onFormSubmit = async (formData) => {
+    console.log("Submitting:", formData);
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto p-6 space-y-8">
+      <div
+        ref={containerRef}
+        className="h-64 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg flex items-center justify-center text-white"
+      >
+        <div className="text-center">
+          <p className="text-xl font-bold">Mouse Tracking Demo</p>
+          {isHovering && (
+            <p className="mt-2">
+              Position: ({mousePosition.x.toFixed(0)},{" "}
+              {mousePosition.y.toFixed(0)})
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          placeholder="Search (debounced)..."
+          className="w-full p-3 border rounded-lg"
+        />
+        <p className="mt-2 text-sm text-gray-600">
+          Debounced value: {debouncedSearchTerm}
+        </p>
+      </div>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit(onFormSubmit);
+        }}
+        className="space-y-4"
+      >
+        <div>
+          <input
+            type="text"
+            name="username"
+            value={values.username}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            placeholder="Username"
+            className={`w-full p-3 border rounded-lg ${
+              errors.username && touched.username
+                ? "border-red-500"
+                : "border-gray-300"
+            }`}
+          />
+          {errors.username && touched.username && (
+            <p className="text-red-500 text-sm mt-1">{errors.username}</p>
+          )}
+        </div>
+
+        <div>
+          <input
+            type="email"
+            name="email"
+            value={values.email}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            placeholder="Email"
+            className={`w-full p-3 border rounded-lg ${
+              errors.email && touched.email
+                ? "border-red-500"
+                : "border-gray-300"
+            }`}
+          />
+          {errors.email && touched.email && (
+            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className={`w-full p-3 rounded-lg text-white ${
+            isSubmitting ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+          }`}
+        >
+          {isSubmitting ? "Submitting..." : "Submit"}
+        </button>
+      </form>
+
+      <div className="text-sm text-gray-600">
+        <p>
+          <strong>Keyboard shortcuts:</strong>
+        </p>
+        <ul className="list-disc list-inside mt-1">
+          <li>Ctrl+S: Save</li>
+          <li>Ctrl+K: Command palette</li>
+          <li>Esc: Cancel</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
 ```
 
 <BackToTop />
 
 ## Best Practices
 
-- **Use Synthetic Events**: Always use React's synthetic events instead of native DOM events to ensure consistent behavior across browsers.
-- **Debounce Input Handlers**: For performance, debounce input handlers to avoid excessive re-renders.
-- **Use Controlled Components**: For form elements, use controlled components to manage state and handle user input effectively.
-- **Avoid Inline Functions**: Avoid defining functions inline in JSX to prevent unnecessary re-renders. Instead, define them outside the render method or use `useCallback` to memoize them.
-- **Prevent Default Behavior**: Use `event.preventDefault()` to prevent default form submission behavior when handling form submissions or other events that have default actions.
-- **Use Event Delegation**: For performance, consider using event delegation by attaching event listeners to a parent element instead of individual child elements when dealing with many similar elements.
-- **Handle Accessibility**: Ensure that your event handlers are accessible, especially for keyboard interactions. Use appropriate ARIA roles and attributes when necessary.
-- **Clean Up Event Listeners**: If you add event listeners directly to the DOM, ensure to clean them up in the `useEffect` cleanup function to avoid memory leaks.
-- **Use `useRef` for Direct DOM Access**: If you need to access the DOM directly, use the `useRef` hook to create a reference to the element instead of using `document.querySelector` or similar methods.
-- **Test Event Handlers**: Write unit tests for your event handlers to ensure they behave as expected under different conditions.
+### Performance Optimization
 
-### What to Use
+- **Use `useCallback` for Event Handlers**: Memoize event handlers to prevent unnecessary re-renders when passing them to child components.
 
-- Use React's synthetic events for handling user interactions, as they provide a consistent API across different browsers.
-- Use controlled components for form elements to manage their state and handle user input effectively.
-- Use event delegation to improve performance when dealing with many similar elements, such as lists or tables.
-- Use `event.preventDefault()` to prevent default browser behavior when necessary, such as preventing form submission or link navigation.
-- Use `event.stopPropagation()` to prevent an event from bubbling up to parent elements when you need to control the event flow in your application.
-- Use arrow functions or the `useCallback` hook to define event handlers in functional components, as they do not have a `this` context like class components.
-- Use the `useRef` hook to access DOM elements directly when needed, instead of using `document.querySelector` or similar methods.
-- Use custom hooks to encapsulate complex event handling logic, making it reusable across different components.
-- Use the `useEffect` hook to clean up event listeners when components unmount, preventing memory leaks.
-- Use the `useState` hook to manage state changes in response to events, allowing you to update the UI based on user interactions.
-- Use the `useReducer` hook for complex state management in response to multiple events, especially in forms or interactive components.
-- Use the `useMemo` and `useCallback` hooks to optimize performance by memoizing event handlers and preventing unnecessary re-renders.
-- Use the `useLayoutEffect` hook for event handling that requires DOM measurements or layout calculations, as it runs synchronously after all DOM mutations.
-- Use the `useEffect` hook to set up and clean up event listeners for global events, such as window resize or scroll events, ensuring that your application responds to changes in the environment.
-- Use the `useContext` hook to access global state or context values in event handlers, allowing you to share state and behavior across components without prop drilling.
-- Use the `useRef` hook to create mutable references for event handlers, allowing you to access the latest state or props without triggering re-renders.
-- Use the `useImperativeHandle` hook to customize the instance value of a component when using `forwardRef`, allowing you to expose specific methods or properties for event handling.
-- Use the `useDebugValue` hook to provide debug information for custom hooks that handle events, making it easier to understand their behavior during development.
-- Use the `useTransition` hook for handling events that involve state transitions, such as loading states or animations, allowing you to manage the timing and performance of these transitions effectively.
-- Use the `useDeferredValue` hook to defer updates to state in response to events, allowing you to prioritize rendering and improve performance in applications with complex interactions.
-- Use the `useId` hook to generate unique IDs for elements in event handlers, ensuring that your components can be identified correctly in the DOM, especially when dealing with forms or accessibility features.
-- Use the `useSyncExternalStore` hook to subscribe to external stores or data sources in event handlers, allowing you to react to changes in external data while maintaining a consistent state in your components.
-- Use the `useInsertionEffect` hook for injecting styles or class names in response to events, ensuring that your styles are applied correctly before the browser paints the UI.
-  <BackToTop />
+  ```javascript
+  const handleClick = useCallback(
+    (event) => {
+      // Handler logic
+    },
+    [dependency1, dependency2]
+  );
+  ```
+
+- **Debounce Expensive Operations**: For events that fire frequently (like `onChange` for search inputs), debounce expensive operations to improve performance.
+
+  ```javascript
+  const debouncedSearch = useMemo(
+    () => debounce((searchTerm) => performSearch(searchTerm), 300),
+    []
+  );
+  ```
+
+- **Use Event Delegation Strategically**: For lists with many items, consider event delegation to reduce the number of event listeners.
+
+### Accessibility and User Experience
+
+- **Support Keyboard Navigation**: Ensure all interactive elements can be accessed via keyboard. Implement proper focus management and keyboard shortcuts.
+
+  ```javascript
+  const handleKeyDown = (event) => {
+    switch (event.key) {
+      case "Enter":
+      case " ":
+        event.preventDefault();
+        handleAction();
+        break;
+      case "Escape":
+        handleCancel();
+        break;
+    }
+  };
+  ```
+
+- **Provide Visual Feedback**: Use appropriate ARIA attributes and visual cues to indicate the current state of interactive elements.
+
+  ```javascript
+  <button
+    onClick={handleSubmit}
+    aria-pressed={isPressed}
+    aria-busy={isLoading}
+    disabled={isLoading}
+  >
+    {isLoading ? "Processing..." : "Submit"}
+  </button>
+  ```
+
+- **Handle Touch Events for Mobile**: Consider touch-specific events for mobile-optimized interactions.
+  ```javascript
+  const handleTouchStart = (event) => {
+    // Prevent zoom on double-tap for custom interactions
+    if (event.touches.length > 1) {
+      event.preventDefault();
+    }
+  };
+  ```
+
+### Error Handling and Edge Cases
+
+- **Validate Event Targets**: Always check if event targets exist and have expected properties before using them.
+
+  ```javascript
+  const handleDelegatedClick = (event) => {
+    const button = event.target.closest("button");
+    if (!button || !button.dataset.action) return;
+
+    handleAction(button.dataset.action);
+  };
+  ```
+
+- **Handle Async Errors Gracefully**: Use try-catch blocks in async event handlers and provide user feedback for errors.
+
+  ```javascript
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+
+    try {
+      await submitData(formData);
+      setSuccessMessage("Data submitted successfully");
+    } catch (error) {
+      setErrorMessage("Failed to submit data. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  ```
+
+### Form Handling Excellence
+
+- **Use Controlled Components**: Always use controlled components for form elements to maintain a single source of truth.
+
+  ```javascript
+  <input
+    value={inputValue}
+    onChange={(e) => setInputValue(e.target.value)}
+    // Never use defaultValue with onChange
+  />
+  ```
+
+- **Implement Progressive Enhancement**: Ensure forms work without JavaScript and enhance with React for better user experience.
+
+- **Validate on Multiple Events**: Combine `onChange`, `onBlur`, and `onSubmit` validation for optimal user experience.
+
+  ```javascript
+  const handleBlur = (event) => {
+    validateField(event.target.name, event.target.value);
+  };
+
+  const handleChange = (event) => {
+    updateValue(event.target.name, event.target.value);
+    if (touched[event.target.name]) {
+      validateField(event.target.name, event.target.value);
+    }
+  };
+  ```
+
+### Memory Management
+
+- **Clean Up Event Listeners**: Remove manually added event listeners in useEffect cleanup functions.
+
+  ```javascript
+  useEffect(() => {
+    const handleResize = () => updateDimensions();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  ```
+
+- **Revoke Object URLs**: Clean up blob URLs created for file previews to prevent memory leaks.
+  ```javascript
+  useEffect(() => {
+    return () => {
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [previewUrls]);
+  ```
+
+### Security Considerations
+
+- **Sanitize User Input**: Always sanitize and validate user input before processing or displaying it.
+
+  ```javascript
+  const handleInput = (event) => {
+    const sanitizedValue = DOMPurify.sanitize(event.target.value);
+    setValue(sanitizedValue);
+  };
+  ```
+
+- **Prevent XSS in Dynamic Content**: Be cautious when setting innerHTML or using dangerouslySetInnerHTML.
+
+### Testing and Debugging
+
+- **Test Event Handlers Thoroughly**: Write unit tests that cover different event scenarios, including edge cases.
+
+  ```javascript
+  test("handles keyboard shortcuts correctly", () => {
+    const handleSave = jest.fn();
+    render(<Component onSave={handleSave} />);
+
+    fireEvent.keyDown(screen.getByRole("textbox"), {
+      key: "s",
+      ctrlKey: true,
+    });
+
+    expect(handleSave).toHaveBeenCalled();
+  });
+  ```
+
+- **Use React Developer Tools**: Utilize the React Developer Tools Profiler to identify performance bottlenecks in event handling.
+
+- **Add Meaningful Error Boundaries**: Wrap components with error boundaries to gracefully handle errors in event handlers.
+
+### Code Organization
+
+- **Separate Concerns**: Keep event handlers focused on their specific responsibility. Extract complex logic into separate functions or custom hooks.
+
+  ```javascript
+  // Good: Separated concerns
+  const { values, errors, handleChange, handleSubmit } = useForm();
+  const { loading, error, submitData } = useApiSubmission();
+
+  const onSubmit = async (formData) => {
+    await submitData(formData);
+  };
+  ```
+
+- **Use Custom Hooks for Reusability**: Extract common event handling patterns into custom hooks for reuse across components.
+
+- **Document Complex Event Interactions**: Add comments explaining complex event handling logic, especially for keyboard shortcuts or gesture handling.
+
+### Key Takeaways
+
+- **Embrace React's Synthetic Events**: They provide cross-browser compatibility and optimized performance through automatic event delegation.
+- **Use Modern Hooks**: Leverage `useCallback`, `useMemo`, and custom hooks to create efficient, reusable event handling logic.
+- **Prioritize Accessibility**: Implement keyboard navigation, screen reader support, and proper ARIA attributes for inclusive user experiences.
+- **Handle Errors Gracefully**: Always anticipate and handle potential errors in async event handlers with appropriate user feedback.
+- **Optimize for Performance**: Use debouncing for frequent events, memoization for handlers, and event delegation for large lists.
+- **Test Thoroughly**: Write comprehensive tests covering various event scenarios and edge cases to ensure reliability.
+- **Maintain Clean Code**: Separate concerns, use descriptive naming, and extract reusable patterns into custom hooks.
+
+<BackToTop />

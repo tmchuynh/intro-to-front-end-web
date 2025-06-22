@@ -6,71 +6,2067 @@ import BackToTop from "@/components/BackToTop";
 
 ## Overview
 
-Message queues are a fundamental component of distributed systems, enabling asynchronous communication between different parts of an application. They allow messages to be sent from one service to another without requiring the sender and receiver to be online at the same time. This decoupling of services enhances scalability, reliability, and flexibility in system design.
+Message queues are essential middleware components in distributed systems that facilitate asynchronous communication between services, applications, and system components. They act as intermediary buffers that store and forward messages between producers (senders) and consumers (receivers), enabling loose coupling and improved system resilience.
 
-Message queues are particularly useful in scenarios where:
+Modern message queues operate on the principle of **temporal decoupling**, where producers and consumers don't need to be available simultaneously. This fundamental characteristic enables systems to handle varying loads, recover from failures gracefully, and scale independently.
 
-- **Asynchronous Processing**: Tasks can be processed independently of the main application flow, allowing for better resource utilization and responsiveness.
-- **Load Balancing**: Incoming messages can be distributed across multiple consumers, enabling horizontal scaling and efficient resource management.
-- **Decoupling Services**: Services can communicate without being tightly coupled, allowing for easier maintenance and evolution of the system.
-- **Reliability**: Messages can be persisted in the queue until they are successfully processed, ensuring that no data is lost even if a service is temporarily unavailable.
+Message queues are particularly effective in scenarios requiring:
+
+- **High Throughput Processing**: Handle millions of messages per second with horizontal scaling
+- **System Resilience**: Maintain service availability during component failures or maintenance
+- **Peak Load Management**: Buffer traffic spikes and process them at sustainable rates
+- **Cross-Platform Integration**: Connect services written in different languages and frameworks
+- **Event-Driven Architectures**: Enable reactive systems that respond to state changes
 
 ### Key Features
 
-- **Asynchronous Communication**: Enables services to send and receive messages without waiting for immediate responses, improving overall system performance.
-- **Message Persistence**: Ensures that messages are stored reliably until they are processed, preventing data loss in case of failures.
-- **Load Balancing**: Distributes messages across multiple consumers, allowing for efficient resource utilization and improved throughput.
-- **Scalability**: Supports horizontal scaling by allowing multiple instances of consumers to process messages concurrently.
-- **Decoupling**: Services can evolve independently, as they communicate through messages rather than direct calls.
-- **Retry Mechanisms**:
-  Automatically retries message processing in case of failures, ensuring reliability and fault tolerance.
-- **Dead Letter Queues**: Provides a mechanism to handle messages that cannot be processed successfully, allowing for error handling and debugging.
-- **Message Prioritization**: Supports prioritizing messages, allowing critical messages to be processed first.
-- **Monitoring and Metrics**: Provides insights into message flow, processing times, and system health, enabling proactive management and optimization.
+#### Core Messaging Capabilities
+
+- **Asynchronous Communication**: Non-blocking message exchange that improves system responsiveness and resource utilization
+- **Message Durability**: Persistent storage ensures messages survive system restarts and failures
+- **Delivery Guarantees**: Configurable delivery semantics (at-most-once, at-least-once, exactly-once)
+- **Message Ordering**: FIFO delivery within partitions or message groups
+- **Message TTL (Time-To-Live)**: Automatic expiration of stale messages
+
+#### Advanced Features
+
+- **Dead Letter Queues (DLQ)**: Automatic routing of failed messages for error analysis and recovery
+- **Message Filtering**: Content-based routing and selective consumption
+- **Priority Queues**: Expedited processing for high-priority messages
+- **Message Batching**: Bulk operations for improved throughput
+- **Backpressure Handling**: Flow control to prevent consumer overload
+
+#### Operational Features
+
+- **Monitoring & Metrics**: Real-time visibility into queue depth, throughput, and error rates
+- **Auto-scaling**: Dynamic resource allocation based on queue metrics
+- **Security**: Encryption in transit and at rest, authentication, and authorization
+- **Multi-tenancy**: Isolation between different applications or teams
+  <BackToTop />
+
+## Message Queue Patterns
+
+### 1. Point-to-Point (Queue Pattern)
+
+- One producer sends messages to one consumer
+- Each message is consumed exactly once
+- Used for task distribution and load balancing
+
+```mermaid
+graph LR
+    P[Producer] --> Q[Queue] --> C[Consumer]
+```
+
+### 2. Publish-Subscribe (Topic Pattern)
+
+- One producer sends messages to multiple consumers
+- Each message can be consumed by multiple subscribers
+- Used for event notifications and broadcasting
+
+```mermaid
+graph TB
+    P[Publisher] --> T[Topic]
+    T --> C1[Consumer 1]
+    T --> C2[Consumer 2]
+    T --> C3[Consumer 3]
+```
+
+### 3. Request-Reply Pattern
+
+- Synchronous-like communication over asynchronous infrastructure
+- Correlation IDs link requests with responses
+- Used for RPC-style communication
+
+### 4. Message Router Pattern
+
+- Content-based routing to different queues
+- Dynamic routing based on message properties
+- Used for workflow orchestration
+
+### 5. Competing Consumers Pattern
+
+- Multiple consumers process messages from the same queue
+- Provides load balancing and fault tolerance
+- Used for horizontal scaling
 
 ### Use Cases
 
-- **Event-Driven Architectures**: Facilitates communication between microservices in event-driven systems, allowing services to react to events asynchronously.
-- **Task Queues**: Offloads long-running tasks from the main application flow, enabling background processing and improving user experience.
-- **Data Pipelines**: Enables the movement of data between different components of a data processing pipeline, allowing for real-time data processing and analytics.
-- **IoT Applications**: Handles communication between IoT devices and backend systems, enabling real-time data collection and processing.
-- **Workflow Orchestration**: Manages complex workflows by coordinating the execution of multiple tasks across different services.
+#### Enterprise Integration
+
+- **Microservices Communication**: Decouple service dependencies in distributed architectures
+- **Legacy System Integration**: Bridge modern applications with mainframe systems
+- **API Gateway Pattern**: Buffer and route API requests to backend services
+- **Data Synchronization**: Keep distributed databases in sync across regions
+
+#### Real-Time Processing
+
+- **Event Streaming**: Process continuous streams of user actions, sensor data, or system events
+- **IoT Data Processing**: Handle high-volume telemetry from connected devices
+- **Financial Trading**: Process market data and execute trades with low latency
+- **Gaming**: Handle player actions, leaderboards, and real-time multiplayer events
+
+#### Background Processing
+
+- **Email/SMS Notifications**: Queue and batch communication delivery
+- **Image/Video Processing**: Offload media transcoding and thumbnail generation
+- **Report Generation**: Process large datasets without blocking user interfaces
+- **Data ETL Pipelines**: Extract, transform, and load data between systems
+
+#### Workflow Orchestration
+
+- **Order Processing**: Coordinate payment, inventory, and shipping systems
+- **Content Management**: Manage approval workflows for publishing systems
+- **HR Processes**: Automate employee onboarding and document processing
+- **Supply Chain**: Coordinate between suppliers, warehouses, and logistics
 
 ### Benefits
 
-- **Decoupling**: Services can evolve independently, allowing for easier maintenance and deployment.
-- **Scalability**: Message queues enable horizontal scaling by allowing multiple consumers to process messages concurrently.
-- **Reliability**: Messages can be persisted in the queue until they are successfully processed, ensuring that no data is lost even if a service is temporarily unavailable.
-- **Asynchronous Processing**: Tasks can be processed independently of the main application flow, allowing for better resource utilization and responsiveness.
-- **Load Balancing**: Incoming messages can be distributed across multiple consumers, enabling efficient resource management and improved throughput.
-- **Fault Tolerance**: Message queues can automatically retry message processing in case of failures, ensuring reliability and fault tolerance.
-- **Monitoring and Metrics**: Provides insights into message flow, processing times, and system health, enabling proactive management and optimization.
-- **Dead Letter Queues**: Provides a mechanism to handle messages that cannot be processed successfully, allowing for error handling and debugging.
-- **Message Prioritization**: Supports prioritizing messages, allowing critical messages to be processed first.
-- **Security**: Many message queue solutions provide built-in security features, such as encryption, authentication, and access control, to protect sensitive data and ensure secure communication between services.
+#### Technical Benefits
+
+- **Horizontal Scalability**: Add consumers to handle increased load without architectural changes
+- **Fault Isolation**: Component failures don't cascade through the entire system
+- **Technology Diversity**: Services can use different programming languages and frameworks
+- **Performance Optimization**: Async processing improves response times and resource utilization
+- **Data Durability**: Message persistence prevents data loss during system failures
+
+#### Business Benefits
+
+- **Faster Time-to-Market**: Independent service development and deployment cycles
+- **Cost Efficiency**: Optimize resource usage through load leveling and auto-scaling
+- **Improved Reliability**: Better user experience through system resilience
+- **Compliance**: Built-in audit trails and message retention for regulatory requirements
+- **Global Scale**: Support for multi-region deployments and disaster recovery
 
 ### Challenges
 
-- **Complexity**: Introducing message queues adds complexity to the system architecture, requiring careful design and management.
-- **Message Ordering**: Ensuring the correct order of message processing can be challenging, especially in distributed systems where messages may arrive out of order.
-- **Latency**: While message queues can improve overall system performance, they can also introduce latency in message delivery, especially if messages are persisted to disk.
-- **Monitoring and Debugging**: Monitoring message queues and debugging issues can be complex, especially in large distributed systems with multiple consumers and producers.
-- **Data Consistency**: Ensuring data consistency across distributed systems can be challenging, especially when messages are processed asynchronously.
-- **Security Considerations**: Implementing robust security measures to protect sensitive messages is crucial, as message queues can be vulnerable to attacks if not properly secured.
-- **Message Duplication**: Handling duplicate messages can be challenging, especially in scenarios where message processing is idempotent.
-- **Resource Management**: Managing resources effectively, such as memory and disk space, is essential to ensure optimal performance and prevent bottlenecks in message processing.
+#### Technical Challenges
+
+- **Message Ordering Complexity**: Maintaining order across partitions requires careful design
+- **Exactly-Once Delivery**: Achieving this semantic often requires application-level deduplication
+- **Latency Considerations**: Network hops and persistence can add 1-50ms per message
+- **Memory Management**: Queue buildup can consume significant memory and disk space
+- **Network Partitions**: Handling split-brain scenarios in distributed deployments
+
+#### Operational Challenges
+
+- **Monitoring Complexity**: Tracking message flow across multiple queues and services
+- **Capacity Planning**: Predicting queue sizes and consumer requirements
+- **Security Management**: Encrypting messages and managing access across multiple services
+- **Version Compatibility**: Managing schema evolution without breaking consumers
+- **Debugging Distributed Flows**: Tracing issues across asynchronous message paths
+
+#### Design Challenges
+
+- **Poison Messages**: Handling malformed messages that cause repeated failures
+- **Resource Contention**: Managing competing consumers and producer backpressure
+- **State Management**: Coordinating stateful operations across async boundaries
+- **Error Handling**: Designing comprehensive retry and failure recovery strategies
+- **Testing Complexity**: Simulating async scenarios and timing-dependent behaviors
+  <BackToTop />
 
 ## Popular Message Queue Solutions
 
-| Provider                                                                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [**RabbitMQ**](https://www.rabbitmq.com/)                                        | An open-source message broker that implements the Advanced Message Queuing Protocol (AMQP). It supports multiple messaging patterns, including publish/subscribe, request/reply, and point-to-point messaging. RabbitMQ is known for its flexibility, reliability, and ease of use. It provides features like message persistence, routing, and clustering capabilities.                                                                                                                                                                                                                                                                                                      |
-| [**Apache Kafka**](https://kafka.apache.org/)                                    | A distributed streaming platform that is designed for high-throughput, fault-tolerant, and scalable message processing. It is widely used for building real-time data pipelines and streaming applications. Kafka provides strong durability guarantees, allowing messages to be stored for long periods and processed by multiple consumers. It supports partitioning, replication, and stream processing capabilities.                                                                                                                                                                                                                                                      |
-| [**Amazon SQS**](https://aws.amazon.com/sqs/)                                    | A fully managed message queuing service provided by Amazon Web Services (AWS). It allows developers to decouple and scale microservices, distributed systems, and serverless applications. SQS supports both standard and FIFO (First-In-First-Out) queues, providing flexibility in message ordering and delivery. It integrates seamlessly with other AWS services and provides features like dead-letter queues, message visibility timeout, and message batching.                                                                                                                                                                                                         |
-| [**Azure Service Bus**](https://azure.microsoft.com/en-us/services/service-bus/) | A fully managed message broker service provided by Microsoft Azure. It supports various messaging patterns, including queues, topics, and subscriptions. Azure Service Bus provides features like message sessions, dead-letter queues, and message forwarding. It is designed for building scalable and reliable applications in the cloud. It integrates with other Azure services and provides advanced features like message deduplication, auto-forwarding, and scheduled delivery.                                                                                                                                                                                      |
-| [**Google Cloud Pub/Sub**](https://cloud.google.com/pubsub)                      | A fully managed messaging service provided by Google Cloud Platform. It allows developers to build event-driven architectures and real-time data processing applications. Pub/Sub supports both push and pull message delivery models, enabling flexibility in how messages are consumed. It provides features like message ordering, dead-letter topics, and message filtering. Pub/Sub integrates with other Google Cloud services and provides strong durability guarantees for message storage and delivery.                                                                                                                                                              |
-| [**Apache ActiveMQ**](http://activemq.apache.org/)                               | An open-source message broker that supports multiple messaging protocols, including AMQP, MQTT, and STOMP. ActiveMQ provides features like message persistence, transactions, and clustering capabilities. It is widely used in enterprise applications for building reliable and scalable messaging systems. ActiveMQ supports various messaging patterns, including point-to-point, publish/subscribe, and request/reply. It also provides a web-based management console for monitoring and managing message queues.                                                                                                                                                       |
-| [**Redis Streams**](https://redis.io/topics/streams)                             | A data structure in Redis that provides a log-like data structure for managing streams of messages. Redis Streams allows for efficient message processing and supports features like message acknowledgment, consumer groups, and message expiration. It is suitable for building real-time applications and event-driven architectures. Redis Streams provides high performance and low latency for message processing, making it a popular choice for applications that require real-time data processing and analytics. It integrates seamlessly with other Redis data structures and provides features like message filtering, range queries, and message prioritization. |
-| [**NATS**](https://nats.io/)                                                     | A lightweight, high-performance messaging system designed for cloud-native applications. NATS provides a simple and efficient way to connect services and enable real-time communication. It supports publish/subscribe, request/reply, and point-to-point messaging patterns. NATS is known for its low latency, high throughput, and ease of use. It provides features like message persistence, clustering, and service discovery. NATS is suitable for building microservices architectures and real-time data processing applications.                                                                                                                                   |
+| Solution                                                                   | Type               | Throughput                | Latency            | Ordering        | Best For                       | Learning Curve |
+| -------------------------------------------------------------------------- | ------------------ | ------------------------- | ------------------ | --------------- | ------------------------------ | -------------- |
+| [**Apache Kafka**](https://kafka.apache.org/)                              | Distributed Log    | Very High (1M+ msg/s)     | Medium (2-10ms)    | Partition-level | Event Streaming, Big Data      | High           |
+| [**RabbitMQ**](https://www.rabbitmq.com/)                                  | Traditional Broker | High (100K msg/s)         | Low (1-5ms)        | Queue-level     | Enterprise, Complex Routing    | Medium         |
+| [**Amazon SQS**](https://aws.amazon.com/sqs/)                              | Managed Service    | High (300+ TPS per queue) | Medium (1-10ms)    | FIFO queues     | AWS Ecosystem, Serverless      | Low            |
+| [**Apache Pulsar**](https://pulsar.apache.org/)                            | Unified Platform   | Very High (1M+ msg/s)     | Low (0.5-5ms)      | Multi-level     | Multi-tenancy, Geo-replication | High           |
+| [**Redis Streams**](https://redis.io/topics/streams)                       | In-Memory          | Very High (1M+ msg/s)     | Very Low (&lt;1ms) | Stream-level    | Real-time, Caching Integration | Medium         |
+| [**NATS**](https://nats.io/)                                               | Cloud-Native       | High (10M+ msg/s)         | Very Low (&lt;1ms) | Subject-based   | Microservices, IoT             | Low            |
+| [**Azure Service Bus**](https://azure.microsoft.com/services/service-bus/) | Managed Service    | Medium (1K-10K msg/s)     | Medium (5-50ms)    | Session-based   | Enterprise, .NET Integration   | Medium         |
+
+### Detailed Analysis
+
+#### Apache Kafka
+
+- **Architecture**: Distributed commit log with topics and partitions
+- **Strengths**: Exceptional throughput, data persistence, stream processing
+- **Use Cases**: Event sourcing, log aggregation, real-time analytics
+- **Limitations**: Higher operational complexity, eventual consistency
+
+#### RabbitMQ
+
+- **Architecture**: Traditional message broker with exchanges and queues
+- **Strengths**: Rich routing features, mature ecosystem, multiple protocols
+- **Use Cases**: Enterprise integration, complex workflows, RPC patterns
+- **Limitations**: Single-node bottlenecks, memory consumption with large queues
+
+#### Amazon SQS
+
+- **Architecture**: Fully managed, distributed queues
+- **Strengths**: No operational overhead, auto-scaling, AWS integration
+- **Use Cases**: Serverless applications, AWS-native architectures
+- **Limitations**: Vendor lock-in, limited advanced features
+
+#### Apache Pulsar
+
+- **Architecture**: Layered architecture (brokers + bookies)
+- **Strengths**: Multi-tenancy, geo-replication, unified batch/streaming
+- **Use Cases**: Large enterprises, multi-tenant SaaS, global applications
+- **Limitations**: Newer ecosystem, complex deployment
+
+#### Redis Streams
+
+- **Architecture**: In-memory data structure with persistence options
+- **Strengths**: Ultra-low latency, existing Redis integration, simplicity
+- **Use Cases**: Real-time features, session stores, leaderboards
+- **Limitations**: Memory constraints, limited durability guarantees
+
+#### NATS
+
+- **Architecture**: Simple pub-sub with clustering support
+- **Strengths**: Minimal footprint, high performance, ease of use
+- **Use Cases**: Microservices communication, IoT edge computing
+- **Limitations**: Limited message persistence, basic features
+
+<BackToTop />
+
+## Implementation Examples
+
+### Apache Kafka Implementation
+
+#### 1. Kafka Setup and Configuration
+
+```bash
+# Download and start Kafka
+wget https://downloads.apache.org/kafka/2.8.2/kafka_2.13-2.8.2.tgz
+tar -xzf kafka_2.13-2.8.2.tgz
+cd kafka_2.13-2.8.2
+
+# Start Zookeeper
+bin/zookeeper-server-start.sh config/zookeeper.properties
+
+# Start Kafka Server
+bin/kafka-server-start.sh config/server.properties
+
+# Create a topic
+bin/kafka-topics.sh --create --topic user-events \
+  --bootstrap-server localhost:9092 \
+  --partitions 3 \
+  --replication-factor 1
+```
+
+#### 2. Kafka Producer (Node.js)
+
+```javascript
+// kafka-producer.js
+const { Kafka } = require("kafkajs");
+
+const kafka = Kafka({
+  clientId: "user-service-producer",
+  brokers: ["localhost:9092"],
+  retry: {
+    initialRetryTime: 100,
+    retries: 8,
+  },
+});
+
+const producer = kafka.producer({
+  maxInFlightRequests: 1,
+  idempotent: true,
+  transactionTimeout: 30000,
+});
+
+class UserEventProducer {
+  constructor() {
+    this.isConnected = false;
+  }
+
+  async connect() {
+    try {
+      await producer.connect();
+      this.isConnected = true;
+      console.log("Kafka producer connected");
+    } catch (error) {
+      console.error("Failed to connect producer:", error);
+      throw error;
+    }
+  }
+
+  async publishUserEvent(userId, eventType, data) {
+    if (!this.isConnected) {
+      await this.connect();
+    }
+
+    const message = {
+      partition: this.getPartition(userId),
+      key: userId.toString(),
+      value: JSON.stringify({
+        userId,
+        eventType,
+        data,
+        timestamp: Date.now(),
+        version: "1.0",
+      }),
+      headers: {
+        "content-type": "application/json",
+        source: "user-service",
+      },
+    };
+
+    try {
+      const result = await producer.send({
+        topic: "user-events",
+        messages: [message],
+      });
+
+      console.log("Message published:", result);
+      return result;
+    } catch (error) {
+      console.error("Failed to publish message:", error);
+      throw error;
+    }
+  }
+
+  getPartition(userId) {
+    // Ensure same user events go to same partition for ordering
+    return userId % 3;
+  }
+
+  async disconnect() {
+    await producer.disconnect();
+    this.isConnected = false;
+  }
+}
+
+// Usage example
+async function main() {
+  const eventProducer = new UserEventProducer();
+
+  try {
+    await eventProducer.publishUserEvent(12345, "user_registered", {
+      email: "user@example.com",
+      plan: "premium",
+    });
+
+    await eventProducer.publishUserEvent(12345, "subscription_updated", {
+      oldPlan: "basic",
+      newPlan: "premium",
+    });
+  } catch (error) {
+    console.error("Error:", error);
+  } finally {
+    await eventProducer.disconnect();
+  }
+}
+
+module.exports = UserEventProducer;
+```
+
+<BackToTop />
+
+#### 3. Kafka Consumer (Node.js)
+
+```javascript
+// kafka-consumer.js
+const { Kafka } = require("kafkajs");
+
+const kafka = Kafka({
+  clientId: "analytics-service-consumer",
+  brokers: ["localhost:9092"],
+});
+
+const consumer = kafka.consumer({
+  groupId: "analytics-group",
+  sessionTimeout: 30000,
+  heartbeatInterval: 3000,
+  maxWaitTimeInMs: 5000,
+  retry: {
+    initialRetryTime: 100,
+    retries: 8,
+  },
+});
+
+class UserEventConsumer {
+  constructor() {
+    this.isRunning = false;
+  }
+
+  async start() {
+    try {
+      await consumer.connect();
+      await consumer.subscribe({
+        topic: "user-events",
+        fromBeginning: false,
+      });
+
+      this.isRunning = true;
+
+      await consumer.run({
+        partitionsConsumedConcurrently: 3,
+        eachMessage: async ({ topic, partition, message }) => {
+          try {
+            await this.processMessage(topic, partition, message);
+          } catch (error) {
+            console.error("Error processing message:", error);
+            // Handle poison messages - send to DLQ or skip
+            await this.handlePoisonMessage(message, error);
+          }
+        },
+      });
+
+      console.log("Kafka consumer started");
+    } catch (error) {
+      console.error("Failed to start consumer:", error);
+      throw error;
+    }
+  }
+
+  async processMessage(topic, partition, message) {
+    const { key, value, headers, timestamp } = message;
+
+    console.log(`Processing message from ${topic}[${partition}]`);
+
+    const userId = key?.toString();
+    const eventData = JSON.parse(value.toString());
+
+    // Idempotency check
+    if (await this.isDuplicateMessage(eventData)) {
+      console.log("Duplicate message detected, skipping");
+      return;
+    }
+
+    // Process based on event type
+    switch (eventData.eventType) {
+      case "user_registered":
+        await this.handleUserRegistration(eventData);
+        break;
+      case "subscription_updated":
+        await this.handleSubscriptionUpdate(eventData);
+        break;
+      default:
+        console.log(`Unknown event type: ${eventData.eventType}`);
+    }
+
+    // Update analytics
+    await this.updateAnalytics(eventData);
+  }
+
+  async handleUserRegistration(eventData) {
+    console.log("Processing user registration:", eventData);
+    // Send welcome email, update metrics, etc.
+  }
+
+  async handleSubscriptionUpdate(eventData) {
+    console.log("Processing subscription update:", eventData);
+    // Update billing, send notifications, etc.
+  }
+
+  async updateAnalytics(eventData) {
+    // Update real-time dashboards, metrics, etc.
+    console.log("Updating analytics for event:", eventData.eventType);
+  }
+
+  async isDuplicateMessage(eventData) {
+    // Check Redis or database for message ID
+    // Return true if already processed
+    return false;
+  }
+
+  async handlePoisonMessage(message, error) {
+    console.error("Poison message detected:", {
+      offset: message.offset,
+      error: error.message,
+    });
+
+    // Send to dead letter topic
+    await this.sendToDeadLetterQueue(message, error);
+  }
+
+  async sendToDeadLetterQueue(message, error) {
+    // Implementation for DLQ
+    console.log("Sending message to DLQ");
+  }
+
+  async stop() {
+    if (this.isRunning) {
+      await consumer.disconnect();
+      this.isRunning = false;
+      console.log("Kafka consumer stopped");
+    }
+  }
+}
+
+module.exports = UserEventConsumer;
+```
+
+<BackToTop />
+
+### RabbitMQ Implementation
+
+#### 1. RabbitMQ Setup
+
+```bash
+# Install RabbitMQ using Docker
+docker run -d --hostname rabbit \
+  --name rabbitmq \
+  -p 5672:5672 \
+  -p 15672:15672 \
+  -e RABBITMQ_DEFAULT_USER=admin \
+  -e RABBITMQ_DEFAULT_PASS=password \
+  rabbitmq:3-management
+
+# Enable management plugin
+docker exec rabbitmq rabbitmq-plugins enable rabbitmq_management
+```
+
+#### 2. RabbitMQ Producer (Python)
+
+```python
+# rabbitmq_producer.py
+import pika
+import json
+import logging
+from typing import Dict, Any
+from datetime import datetime
+
+class OrderProcessor:
+    def __init__(self, connection_url='amqp://admin:password@localhost:5672/'):
+        self.connection_url = connection_url
+        self.connection = None
+        self.channel = None
+
+    def connect(self):
+        """Establish connection to RabbitMQ"""
+        try:
+            parameters = pika.URLParameters(self.connection_url)
+            self.connection = pika.BlockingConnection(parameters)
+            self.channel = self.connection.channel()
+
+            # Declare exchanges
+            self.channel.exchange_declare(
+                exchange='orders',
+                exchange_type='topic',
+                durable=True
+            )
+
+            # Declare queues with dead letter exchange
+            self.channel.queue_declare(
+                queue='order.payment',
+                durable=True,
+                arguments={
+                    'x-dead-letter-exchange': 'orders.dlx',
+                    'x-dead-letter-routing-key': 'failed.payment',
+                    'x-message-ttl': 300000  # 5 minutes TTL
+                }
+            )
+
+            self.channel.queue_declare(
+                queue='order.inventory',
+                durable=True,
+                arguments={
+                    'x-dead-letter-exchange': 'orders.dlx',
+                    'x-dead-letter-routing-key': 'failed.inventory'
+                }
+            )
+
+            self.channel.queue_declare(
+                queue='order.shipping',
+                durable=True,
+                arguments={
+                    'x-dead-letter-exchange': 'orders.dlx',
+                    'x-dead-letter-routing-key': 'failed.shipping'
+                }
+            )
+
+            # Bind queues to exchange
+            self.channel.queue_bind(
+                exchange='orders',
+                queue='order.payment',
+                routing_key='order.payment'
+            )
+
+            self.channel.queue_bind(
+                exchange='orders',
+                queue='order.inventory',
+                routing_key='order.inventory'
+            )
+
+            self.channel.queue_bind(
+                exchange='orders',
+                queue='order.shipping',
+                routing_key='order.shipping'
+            )
+
+            logging.info("Connected to RabbitMQ")
+
+        except Exception as e:
+            logging.error(f"Failed to connect to RabbitMQ: {e}")
+            raise
+
+    def publish_order_event(self, order_data: Dict[str, Any], routing_key: str):
+        """Publish order event with reliability features"""
+        if not self.channel:
+            self.connect()
+
+        message = {
+            'order_id': order_data['order_id'],
+            'customer_id': order_data['customer_id'],
+            'items': order_data['items'],
+            'total_amount': order_data['total_amount'],
+            'timestamp': datetime.utcnow().isoformat(),
+            'correlation_id': order_data.get('correlation_id'),
+            'retry_count': 0
+        }
+
+        try:
+            # Publish with confirmation
+            self.channel.confirm_delivery()
+
+            published = self.channel.basic_publish(
+                exchange='orders',
+                routing_key=routing_key,
+                body=json.dumps(message),
+                properties=pika.BasicProperties(
+                    delivery_mode=2,  # Make message persistent
+                    correlation_id=message['correlation_id'],
+                    message_id=f"{order_data['order_id']}_{routing_key}",
+                    timestamp=int(datetime.utcnow().timestamp()),
+                    headers={
+                        'retry_count': 0,
+                        'source_service': 'order_service'
+                    }
+                )
+            )
+
+            if published:
+                logging.info(f"Published order event: {routing_key}")
+            else:
+                raise Exception("Failed to publish message")
+
+        except Exception as e:
+            logging.error(f"Failed to publish message: {e}")
+            raise
+
+    def process_new_order(self, order_data: Dict[str, Any]):
+        """Process new order by publishing to multiple queues"""
+        correlation_id = f"order_{order_data['order_id']}_{int(datetime.utcnow().timestamp())}"
+        order_data['correlation_id'] = correlation_id
+
+        try:
+            # Publish to payment queue
+            self.publish_order_event(order_data, 'order.payment')
+
+            # Publish to inventory queue
+            self.publish_order_event(order_data, 'order.inventory')
+
+            # Publish to shipping queue (only if payment succeeds)
+            # This would typically be done by the payment service
+
+            logging.info(f"Order {order_data['order_id']} processing initiated")
+
+        except Exception as e:
+            logging.error(f"Failed to process order {order_data['order_id']}: {e}")
+            raise
+
+    def close(self):
+        """Close connection"""
+        if self.connection and not self.connection.is_closed:
+            self.connection.close()
+
+# Usage example
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+
+    processor = OrderProcessor()
+
+    order = {
+        'order_id': 'ORD-12345',
+        'customer_id': 'CUST-789',
+        'items': [
+            {'product_id': 'PROD-1', 'quantity': 2, 'price': 29.99},
+            {'product_id': 'PROD-2', 'quantity': 1, 'price': 49.99}
+        ],
+        'total_amount': 109.97
+    }
+
+    try:
+        processor.process_new_order(order)
+    finally:
+        processor.close()
+```
+
+<BackToTop />
+
+#### 3. RabbitMQ Consumer (Python)
+
+```python
+# rabbitmq_consumer.py
+import pika
+import json
+import logging
+import time
+from typing import Callable
+
+class PaymentProcessor:
+    def __init__(self, connection_url='amqp://admin:password@localhost:5672/'):
+        self.connection_url = connection_url
+        self.connection = None
+        self.channel = None
+
+    def connect(self):
+        """Establish connection to RabbitMQ"""
+        try:
+            parameters = pika.URLParameters(self.connection_url)
+            self.connection = pika.BlockingConnection(parameters)
+            self.channel = self.connection.channel()
+
+            # Set QoS to process one message at a time
+            self.channel.basic_qos(prefetch_count=1)
+
+            logging.info("Payment processor connected to RabbitMQ")
+
+        except Exception as e:
+            logging.error(f"Failed to connect to RabbitMQ: {e}")
+            raise
+
+    def process_payment(self, order_data: dict) -> bool:
+        """Simulate payment processing"""
+        try:
+            # Simulate payment API call
+            customer_id = order_data['customer_id']
+            amount = order_data['total_amount']
+
+            logging.info(f"Processing payment for order {order_data['order_id']}")
+
+            # Simulate processing time
+            time.sleep(2)
+
+            # Simulate 90% success rate
+            import random
+            if random.random() > 0.1:
+                logging.info(f"Payment successful for order {order_data['order_id']}")
+                return True
+            else:
+                logging.error(f"Payment failed for order {order_data['order_id']}")
+                return False
+
+        except Exception as e:
+            logging.error(f"Payment processing error: {e}")
+            return False
+
+    def handle_payment_message(self, channel, method, properties, body):
+        """Handle incoming payment messages"""
+        try:
+            # Parse message
+            order_data = json.loads(body.decode('utf-8'))
+            correlation_id = properties.correlation_id
+
+            logging.info(f"Received payment request for order {order_data['order_id']}")
+
+            # Check for duplicate processing
+            if self.is_duplicate_message(properties.message_id):
+                logging.warning(f"Duplicate message detected: {properties.message_id}")
+                channel.basic_ack(delivery_tag=method.delivery_tag)
+                return
+
+            # Process payment
+            payment_success = self.process_payment(order_data)
+
+            if payment_success:
+                # Publish success event to shipping queue
+                self.publish_payment_success(order_data, correlation_id)
+
+                # Acknowledge message
+                channel.basic_ack(delivery_tag=method.delivery_tag)
+
+            else:
+                # Check retry count
+                retry_count = properties.headers.get('retry_count', 0) if properties.headers else 0
+
+                if retry_count < 3:
+                    # Retry with exponential backoff
+                    self.retry_message(channel, method, properties, body, retry_count)
+                else:
+                    # Send to dead letter queue
+                    logging.error(f"Max retries exceeded for order {order_data['order_id']}")
+                    channel.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+
+        except Exception as e:
+            logging.error(f"Error processing payment message: {e}")
+            # Reject message and send to DLQ
+            channel.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+
+    def retry_message(self, channel, method, properties, body, retry_count):
+        """Implement retry with exponential backoff"""
+        delay = (2 ** retry_count) * 1000  # Exponential backoff in ms
+
+        # Update retry count
+        new_headers = properties.headers.copy() if properties.headers else {}
+        new_headers['retry_count'] = retry_count + 1
+
+        # Publish to retry queue with delay
+        channel.basic_publish(
+            exchange='orders.retry',
+            routing_key='order.payment.retry',
+            body=body,
+            properties=pika.BasicProperties(
+                delivery_mode=2,
+                correlation_id=properties.correlation_id,
+                message_id=properties.message_id,
+                headers=new_headers,
+                expiration=str(delay)  # TTL for retry delay
+            )
+        )
+
+        # Acknowledge original message
+        channel.basic_ack(delivery_tag=method.delivery_tag)
+
+        logging.info(f"Message scheduled for retry in {delay}ms")
+
+    def publish_payment_success(self, order_data: dict, correlation_id: str):
+        """Publish payment success event"""
+        success_message = {
+            'order_id': order_data['order_id'],
+            'customer_id': order_data['customer_id'],
+            'payment_status': 'completed',
+            'amount_charged': order_data['total_amount'],
+            'timestamp': time.time()
+        }
+
+        self.channel.basic_publish(
+            exchange='orders',
+            routing_key='order.shipping',
+            body=json.dumps(success_message),
+            properties=pika.BasicProperties(
+                delivery_mode=2,
+                correlation_id=correlation_id,
+                headers={'source_service': 'payment_service'}
+            )
+        )
+
+        logging.info(f"Payment success event published for order {order_data['order_id']}")
+
+    def is_duplicate_message(self, message_id: str) -> bool:
+        """Check if message has already been processed"""
+        # In production, check Redis or database
+        # For demo, assume no duplicates
+        return False
+
+    def start_consuming(self):
+        """Start consuming messages from payment queue"""
+        if not self.channel:
+            self.connect()
+
+        # Set up consumer
+        self.channel.basic_consume(
+            queue='order.payment',
+            on_message_callback=self.handle_payment_message,
+            auto_ack=False  # Manual acknowledgment for reliability
+        )
+
+        logging.info("Payment processor started. Waiting for messages...")
+
+        try:
+            self.channel.start_consuming()
+        except KeyboardInterrupt:
+            logging.info("Stopping payment processor...")
+            self.channel.stop_consuming()
+            self.connection.close()
+
+# Usage example
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+
+    processor = PaymentProcessor()
+    processor.start_consuming()
+```
+
+<BackToTop />
+
+### Amazon SQS Implementation
+
+#### 1. SQS Queue Setup (AWS CLI)
+
+```bash
+# Create standard SQS queue
+aws sqs create-queue \
+  --queue-name user-notifications \
+  --attributes '{
+    "DelaySeconds": "0",
+    "MaxReceiveCount": "3",
+    "MessageRetentionPeriod": "1209600",
+    "VisibilityTimeoutSeconds": "60"
+  }'
+
+# Create FIFO queue for ordered processing
+aws sqs create-queue \
+  --queue-name order-processing.fifo \
+  --attributes '{
+    "FifoQueue": "true",
+    "ContentBasedDeduplication": "true",
+    "DelaySeconds": "0",
+    "MessageRetentionPeriod": "1209600"
+  }'
+
+# Create dead letter queue
+aws sqs create-queue \
+  --queue-name user-notifications-dlq \
+  --attributes '{
+    "MessageRetentionPeriod": "1209600"
+  }'
+
+# Set up dead letter queue policy
+aws sqs set-queue-attributes \
+  --queue-url https://sqs.us-east-1.amazonaws.com/123456789/user-notifications \
+  --attributes '{
+    "RedrivePolicy": "{\"deadLetterTargetArn\":\"arn:aws:sqs:us-east-1:123456789:user-notifications-dlq\",\"maxReceiveCount\":3}"
+  }'
+```
+
+#### 2. SQS Producer (Python with Boto3)
+
+```python
+# sqs_producer.py
+import boto3
+import json
+import hashlib
+from datetime import datetime
+from typing import Dict, Any, Optional
+
+class NotificationPublisher:
+    def __init__(self, region_name='us-east-1'):
+        self.sqs = boto3.client('sqs', region_name=region_name)
+        self.queue_urls = {
+            'notifications': 'https://sqs.us-east-1.amazonaws.com/123456789/user-notifications',
+            'orders': 'https://sqs.us-east-1.amazonaws.com/123456789/order-processing.fifo'
+        }
+
+    def send_notification(self, user_id: str, notification_type: str,
+                         content: Dict[str, Any], priority: str = 'normal') -> str:
+        """Send notification to standard SQS queue"""
+
+        message = {
+            'user_id': user_id,
+            'notification_type': notification_type,
+            'content': content,
+            'priority': priority,
+            'timestamp': datetime.utcnow().isoformat(),
+            'message_id': self.generate_message_id(user_id, notification_type)
+        }
+
+        # Set message attributes for filtering
+        message_attributes = {
+            'notification_type': {
+                'StringValue': notification_type,
+                'DataType': 'String'
+            },
+            'priority': {
+                'StringValue': priority,
+                'DataType': 'String'
+            },
+            'user_id': {
+                'StringValue': user_id,
+                'DataType': 'String'
+            }
+        }
+
+        try:
+            response = self.sqs.send_message(
+                QueueUrl=self.queue_urls['notifications'],
+                MessageBody=json.dumps(message),
+                MessageAttributes=message_attributes,
+                DelaySeconds=0 if priority == 'high' else 30  # Delay normal priority
+            )
+
+            print(f"Notification sent: {response['MessageId']}")
+            return response['MessageId']
+
+        except Exception as e:
+            print(f"Failed to send notification: {e}")
+            raise
+
+    def send_order_event(self, order_id: str, event_type: str,
+                        order_data: Dict[str, Any]) -> str:
+        """Send order event to FIFO queue for ordered processing"""
+
+        message = {
+            'order_id': order_id,
+            'event_type': event_type,
+            'order_data': order_data,
+            'timestamp': datetime.utcnow().isoformat()
+        }
+
+        # Use customer_id as message group for ordering per customer
+        message_group_id = f"customer_{order_data.get('customer_id', 'default')}"
+
+        # Generate deduplication ID based on content
+        deduplication_id = self.generate_deduplication_id(order_id, event_type)
+
+        try:
+            response = self.sqs.send_message(
+                QueueUrl=self.queue_urls['orders'],
+                MessageBody=json.dumps(message),
+                MessageGroupId=message_group_id,
+                MessageDeduplicationId=deduplication_id,
+                MessageAttributes={
+                    'event_type': {
+                        'StringValue': event_type,
+                        'DataType': 'String'
+                    },
+                    'order_id': {
+                        'StringValue': order_id,
+                        'DataType': 'String'
+                    }
+                }
+            )
+
+            print(f"Order event sent: {response['MessageId']}")
+            return response['MessageId']
+
+        except Exception as e:
+            print(f"Failed to send order event: {e}")
+            raise
+
+    def send_batch_notifications(self, notifications: list) -> dict:
+        """Send multiple notifications in a single batch"""
+
+        entries = []
+        for i, notification in enumerate(notifications):
+            entry = {
+                'Id': str(i),
+                'MessageBody': json.dumps({
+                    'user_id': notification['user_id'],
+                    'notification_type': notification['type'],
+                    'content': notification['content'],
+                    'timestamp': datetime.utcnow().isoformat()
+                }),
+                'MessageAttributes': {
+                    'notification_type': {
+                        'StringValue': notification['type'],
+                        'DataType': 'String'
+                    }
+                }
+            }
+            entries.append(entry)
+
+        try:
+            response = self.sqs.send_message_batch(
+                QueueUrl=self.queue_urls['notifications'],
+                Entries=entries
+            )
+
+            print(f"Batch sent: {len(response['Successful'])} successful, "
+                  f"{len(response.get('Failed', []))} failed")
+
+            return response
+
+        except Exception as e:
+            print(f"Failed to send batch notifications: {e}")
+            raise
+
+    def generate_message_id(self, user_id: str, notification_type: str) -> str:
+        """Generate unique message ID"""
+        content = f"{user_id}_{notification_type}_{datetime.utcnow().isoformat()}"
+        return hashlib.md5(content.encode()).hexdigest()
+
+    def generate_deduplication_id(self, order_id: str, event_type: str) -> str:
+        """Generate deduplication ID for FIFO queue"""
+        content = f"{order_id}_{event_type}"
+        return hashlib.md5(content.encode()).hexdigest()
+
+# Usage example
+if __name__ == "__main__":
+    publisher = NotificationPublisher()
+
+    # Send single notification
+    publisher.send_notification(
+        user_id="12345",
+        notification_type="welcome_email",
+        content={
+            "subject": "Welcome to our platform!",
+            "template": "welcome_template",
+            "personalization": {"name": "John Doe"}
+        },
+        priority="high"
+    )
+
+    # Send order event
+    publisher.send_order_event(
+        order_id="ORD-12345",
+        event_type="order_created",
+        order_data={
+            "customer_id": "CUST-789",
+            "total": 99.99,
+            "items": ["item1", "item2"]
+        }
+    )
+
+    # Send batch notifications
+    batch_notifications = [
+        {
+            "user_id": "12345",
+            "type": "promotion",
+            "content": {"discount": "20%"}
+        },
+        {
+            "user_id": "12346",
+            "type": "reminder",
+            "content": {"cart_items": 3}
+        }
+    ]
+
+    publisher.send_batch_notifications(batch_notifications)
+```
+
+<BackToTop />
+
+#### 3. SQS Consumer (Python)
+
+```python
+# sqs_consumer.py
+import boto3
+import json
+import time
+import logging
+from concurrent.futures import ThreadPoolExecutor
+from typing import Dict, Any
+
+class NotificationProcessor:
+    def __init__(self, region_name='us-east-1', max_workers=4):
+        self.sqs = boto3.client('sqs', region_name=region_name)
+        self.queue_url = 'https://sqs.us-east-1.amazonaws.com/123456789/user-notifications'
+        self.max_workers = max_workers
+        self.running = False
+
+    def process_notification(self, message_body: str, receipt_handle: str) -> bool:
+        """Process individual notification message"""
+        try:
+            notification = json.loads(message_body)
+
+            user_id = notification['user_id']
+            notification_type = notification['notification_type']
+            content = notification['content']
+
+            logging.info(f"Processing {notification_type} for user {user_id}")
+
+            # Route to appropriate handler
+            if notification_type == 'welcome_email':
+                success = self.send_welcome_email(user_id, content)
+            elif notification_type == 'promotion':
+                success = self.send_promotion_email(user_id, content)
+            elif notification_type == 'reminder':
+                success = self.send_reminder_notification(user_id, content)
+            else:
+                logging.warning(f"Unknown notification type: {notification_type}")
+                success = False
+
+            if success:
+                # Delete message from queue
+                self.sqs.delete_message(
+                    QueueUrl=self.queue_url,
+                    ReceiptHandle=receipt_handle
+                )
+                logging.info(f"Message processed and deleted: {user_id}")
+                return True
+            else:
+                logging.error(f"Failed to process message for user {user_id}")
+                return False
+
+        except Exception as e:
+            logging.error(f"Error processing message: {e}")
+            return False
+
+    def send_welcome_email(self, user_id: str, content: Dict[str, Any]) -> bool:
+        """Send welcome email"""
+        try:
+            # Simulate email sending
+            logging.info(f"Sending welcome email to user {user_id}")
+            time.sleep(1)  # Simulate processing time
+
+            # In production, integrate with email service (SES, SendGrid, etc.)
+            subject = content.get('subject', 'Welcome!')
+            template = content.get('template', 'default')
+
+            logging.info(f"Welcome email sent successfully to user {user_id}")
+            return True
+
+        except Exception as e:
+            logging.error(f"Failed to send welcome email: {e}")
+            return False
+
+    def send_promotion_email(self, user_id: str, content: Dict[str, Any]) -> bool:
+        """Send promotional email"""
+        try:
+            logging.info(f"Sending promotion email to user {user_id}")
+            discount = content.get('discount', '0%')
+
+            # Simulate email sending
+            time.sleep(0.5)
+
+            logging.info(f"Promotion email sent: {discount} discount to user {user_id}")
+            return True
+
+        except Exception as e:
+            logging.error(f"Failed to send promotion email: {e}")
+            return False
+
+    def send_reminder_notification(self, user_id: str, content: Dict[str, Any]) -> bool:
+        """Send reminder notification"""
+        try:
+            logging.info(f"Sending reminder to user {user_id}")
+            cart_items = content.get('cart_items', 0)
+
+            # Simulate push notification or email
+            time.sleep(0.3)
+
+            logging.info(f"Reminder sent: {cart_items} items in cart for user {user_id}")
+            return True
+
+        except Exception as e:
+            logging.error(f"Failed to send reminder: {e}")
+            return False
+
+    def poll_messages(self):
+        """Poll for messages with long polling"""
+        try:
+            response = self.sqs.receive_message(
+                QueueUrl=self.queue_url,
+                MaxNumberOfMessages=10,  # Batch receive
+                WaitTimeSeconds=20,      # Long polling
+                MessageAttributeNames=['All'],
+                AttributeNames=['All']
+            )
+
+            messages = response.get('Messages', [])
+
+            if messages:
+                logging.info(f"Received {len(messages)} messages")
+
+                # Process messages concurrently
+                with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+                    futures = []
+
+                    for message in messages:
+                        future = executor.submit(
+                            self.process_notification,
+                            message['Body'],
+                            message['ReceiptHandle']
+                        )
+                        futures.append(future)
+
+                    # Wait for all processing to complete
+                    for future in futures:
+                        try:
+                            success = future.result(timeout=30)
+                            if not success:
+                                logging.warning("Message processing failed")
+                        except Exception as e:
+                            logging.error(f"Future execution failed: {e}")
+
+            return len(messages);
+
+        except Exception as e:
+            logging.error(f"Error polling messages: {e}")
+            return 0
+
+    def start_processing(self):
+        """Start the message processing loop"""
+        self.running = True;
+        logging.info("Starting notification processor...");
+
+        while self.running:
+            try:
+                message_count = self.poll_messages();
+
+                if message_count == 0:
+                    logging.info("No messages received, continuing to poll...");
+
+                # Small delay between polling cycles
+                time.sleep(1);
+
+            except KeyboardInterrupt:
+                logging.info("Received interrupt signal, stopping...");
+                self.running = False;
+            except Exception as e:
+                logging.error(f"Unexpected error in processing loop: {e}");
+                time.sleep(5);  # Wait before retrying
+
+    def stop_processing(self):
+        """Stop the message processing loop"""
+        self.running = False;
+        logging.info("Notification processor stopped");
+
+# Usage example
+if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s'
+    );
+
+    processor = NotificationProcessor(max_workers=4);
+
+    try:
+        processor.start_processing();
+    except KeyboardInterrupt:
+        processor.stop_processing();
+```
+
+<BackToTop />
+
+### Redis Streams Implementation
+
+#### 1. Redis Streams Setup
+
+```bash
+# Start Redis with streams support
+docker run -d --name redis-streams \
+  -p 6379:6379 \
+  redis:7-alpine
+
+# Connect to Redis CLI
+redis-cli
+
+# Create a consumer group
+XGROUP CREATE user-activity activity-processors $ MKSTREAM
+
+# Add some sample data
+XADD user-activity * user_id 12345 action login timestamp 1640995200
+XADD user-activity * user_id 12346 action purchase amount 99.99 timestamp 1640995260
+```
+
+#### 2. Redis Streams Producer (Node.js)
+
+```javascript
+// redis-streams-producer.js
+const Redis = require("ioredis");
+
+class ActivityTracker {
+  constructor(redisConfig = { host: "localhost", port: 6379 }) {
+    this.redis = new Redis(redisConfig);
+    this.streamKey = "user-activity";
+  }
+
+  async trackUserActivity(userId, action, metadata = {}) {
+    const activityData = {
+      user_id: userId,
+      action: action,
+      timestamp: Date.now(),
+      session_id: metadata.sessionId || "unknown",
+      ip_address: metadata.ipAddress || "unknown",
+      user_agent: metadata.userAgent || "unknown",
+      ...metadata,
+    };
+
+    try {
+      // Add to stream with automatic ID generation
+      const messageId = await this.redis.xadd(
+        this.streamKey,
+        "*", // Auto-generate ID
+        ...this.flattenObject(activityData)
+      );
+
+      console.log(`Activity tracked: ${messageId}`, activityData);
+      return messageId;
+    } catch (error) {
+      console.error("Failed to track activity:", error);
+      throw error;
+    }
+  }
+
+  async trackUserJourney(userId, events) {
+    // Use pipeline for batch operations
+    const pipeline = this.redis.pipeline();
+
+    events.forEach((event) => {
+      const eventData = {
+        user_id: userId,
+        event_type: event.type,
+        event_data: JSON.stringify(event.data),
+        timestamp: event.timestamp || Date.now(),
+      };
+
+      pipeline.xadd(this.streamKey, "*", ...this.flattenObject(eventData));
+    });
+
+    try {
+      const results = await pipeline.exec();
+      console.log(`Tracked ${results.length} events for user ${userId}`);
+      return results.map(([err, messageId]) => messageId);
+    } catch (error) {
+      console.error("Failed to track user journey:", error);
+      throw error;
+    }
+  }
+
+  flattenObject(obj) {
+    const flattened = [];
+    for (const [key, value] of Object.entries(obj)) {
+      flattened.push(key);
+      flattened.push(
+        typeof value === "object" ? JSON.stringify(value) : String(value)
+      );
+    }
+    return flattened;
+  }
+
+  async getStreamInfo() {
+    try {
+      const info = await this.redis.xinfo("STREAM", this.streamKey);
+      return {
+        length: info[1],
+        firstEntry: info[5],
+        lastEntry: info[7],
+        groups: info[9],
+      };
+    } catch (error) {
+      console.error("Failed to get stream info:", error);
+      return null;
+    }
+  }
+
+  async disconnect() {
+    await this.redis.disconnect();
+  }
+}
+
+// Usage example
+async function trackUserActivities() {
+  const tracker = new ActivityTracker();
+
+  try {
+    // Track individual activities
+    await tracker.trackUserActivity("user123", "login", {
+      sessionId: "sess_abc123",
+      ipAddress: "192.168.1.100",
+    });
+
+    await tracker.trackUserActivity("user123", "page_view", {
+      page: "/products",
+      duration: 15000,
+    });
+
+    await tracker.trackUserActivity("user123", "add_to_cart", {
+      productId: "prod_456",
+      price: 29.99,
+      quantity: 2,
+    });
+
+    // Track user journey
+    const userJourney = [
+      {
+        type: "search",
+        data: { query: "laptop", results: 25 },
+        timestamp: Date.now() - 300000,
+      },
+      {
+        type: "product_view",
+        data: { productId: "laptop_789", category: "electronics" },
+        timestamp: Date.now() - 240000,
+      },
+      {
+        type: "add_to_cart",
+        data: { productId: "laptop_789", price: 899.99 },
+        timestamp: Date.now() - 180000,
+      },
+    ];
+
+    await tracker.trackUserJourney("user456", userJourney);
+
+    // Get stream statistics
+    const streamInfo = await tracker.getStreamInfo();
+    console.log("Stream info:", streamInfo);
+  } catch (error) {
+    console.error("Error in user activity tracking:", error);
+  } finally {
+    await tracker.disconnect();
+  }
+}
+
+module.exports = ActivityTracker;
+
+// Run if called directly
+if (require.main === module) {
+  trackUserActivities();
+}
+```
+
+<BackToTop />
+
+#### 3. Redis Streams Consumer (Node.js)
+
+```javascript
+// redis-streams-consumer.js
+const Redis = require("ioredis");
+
+class ActivityProcessor {
+  constructor(
+    redisConfig = { host: "localhost", port: 6379 },
+    consumerGroup = "activity-processors"
+  ) {
+    this.redis = new Redis(redisConfig);
+    this.streamKey = "user-activity";
+    this.consumerGroup = consumerGroup;
+    this.consumerName = `consumer-${process.pid}-${Date.now()}`;
+    this.isProcessing = false;
+  }
+
+  async initialize() {
+    try {
+      // Try to create consumer group
+      await this.redis.xgroup(
+        "CREATE",
+        this.streamKey,
+        this.consumerGroup,
+        "$",
+        "MKSTREAM"
+      );
+      console.log(`Consumer group '${this.consumerGroup}' created`);
+    } catch (error) {
+      if (error.message.includes("BUSYGROUP")) {
+        console.log(`Consumer group '${this.consumerGroup}' already exists`);
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  async startProcessing() {
+    await this.initialize();
+    this.isProcessing = true;
+
+    console.log(`Starting consumer: ${this.consumerName}`);
+
+    while (this.isProcessing) {
+      try {
+        // Read new messages and pending messages
+        const results = await Promise.all([
+          this.readNewMessages(),
+          this.processPendingMessages(),
+        ]);
+
+        const [newMessages, pendingMessages] = results;
+        const totalProcessed = newMessages + pendingMessages;
+
+        if (totalProcessed === 0) {
+          // No messages, wait a bit
+          await this.sleep(1000);
+        }
+      } catch (error) {
+        console.error("Error in processing loop:", error);
+        await this.sleep(5000); // Wait before retrying
+      }
+    }
+  }
+
+  async readNewMessages() {
+    try {
+      const results = await this.redis.xreadgroup(
+        "GROUP",
+        this.consumerGroup,
+        this.consumerName,
+        "COUNT",
+        10, // Read up to 10 messages
+        "BLOCK",
+        5000, // Block for 5 seconds
+        "STREAMS",
+        this.streamKey,
+        ">"
+      );
+
+      if (!results || results.length === 0) {
+        return 0;
+      }
+
+      const [streamName, messages] = results[0];
+
+      for (const [messageId, fields] of messages) {
+        await this.processMessage(messageId, this.parseMessage(fields));
+      }
+
+      return messages.length;
+    } catch (error) {
+      console.error("Error reading new messages:", error);
+      return 0;
+    }
+  }
+
+  async processPendingMessages() {
+    try {
+      // Get pending messages for this consumer
+      const pendingInfo = await this.redis.xpending(
+        this.streamKey,
+        this.consumerGroup,
+        "-",
+        "+",
+        10,
+        this.consumerName
+      );
+
+      if (!pendingInfo || pendingInfo.length === 0) {
+        return 0;
+      }
+
+      // Claim and process pending messages older than 30 seconds
+      const oldThreshold = Date.now() - 30000;
+      let processedCount = 0;
+
+      for (const pendingMessage of pendingInfo) {
+        const [messageId, consumerName, idleTime] = pendingMessage;
+
+        if (idleTime > 30000) {
+          // Message is older than 30 seconds
+          const claimedMessages = await this.redis.xclaim(
+            this.streamKey,
+            this.consumerGroup,
+            this.consumerName,
+            30000, // Min idle time
+            messageId
+          );
+
+          for (const [claimedId, fields] of claimedMessages) {
+            await this.processMessage(claimedId, this.parseMessage(fields));
+            processedCount++;
+          }
+        }
+      }
+
+      return processedCount;
+    } catch (error) {
+      console.error("Error processing pending messages:", error);
+      return 0;
+    }
+  }
+
+  async processMessage(messageId, messageData) {
+    try {
+      console.log(`Processing message ${messageId}:`, messageData);
+
+      // Route message based on action type
+      switch (messageData.action || messageData.event_type) {
+        case "login":
+          await this.handleLoginEvent(messageData);
+          break;
+        case "purchase":
+          await this.handlePurchaseEvent(messageData);
+          break;
+        case "page_view":
+          await this.handlePageViewEvent(messageData);
+          break;
+        case "add_to_cart":
+          await this.handleAddToCartEvent(messageData);
+          break;
+        default:
+          console.log(`Unknown action: ${messageData.action}`);
+      }
+
+      // Acknowledge successful processing
+      await this.redis.xack(this.streamKey, this.consumerGroup, messageId);
+      console.log(`Message ${messageId} acknowledged`);
+    } catch (error) {
+      console.error(`Error processing message ${messageId}:`, error);
+
+      // In production, implement retry logic or send to DLQ
+      await this.handleProcessingError(messageId, messageData, error);
+    }
+  }
+
+  async handleLoginEvent(data) {
+    // Update user session, trigger welcome notifications, etc.
+    console.log(`User ${data.user_id} logged in from ${data.ip_address}`);
+
+    // Simulate processing
+    await this.sleep(100);
+
+    // Update analytics
+    await this.updateUserAnalytics(data.user_id, "login", data);
+  }
+
+  async handlePurchaseEvent(data) {
+    // Process purchase, update inventory, send receipts, etc.
+    console.log(`User ${data.user_id} made purchase: $${data.amount}`);
+
+    // Simulate processing
+    await this.sleep(200);
+
+    // Update analytics
+    await this.updateUserAnalytics(data.user_id, "purchase", data);
+  }
+
+  async handlePageViewEvent(data) {
+    // Track page analytics, update recommendations, etc.
+    console.log(`User ${data.user_id} viewed page: ${data.page}`);
+
+    // Update analytics
+    await this.updateUserAnalytics(data.user_id, "page_view", data);
+  }
+
+  async handleAddToCartEvent(data) {
+    // Update cart, trigger abandon cart flows, etc.
+    console.log(`User ${data.user_id} added product ${data.productId} to cart`);
+
+    // Update analytics
+    await this.updateUserAnalytics(data.user_id, "add_to_cart", data);
+  }
+
+  async updateUserAnalytics(userId, eventType, data) {
+    // In production, update analytics database, send to data warehouse, etc.
+    console.log(`Analytics updated for user ${userId}: ${eventType}`);
+  }
+
+  async handleProcessingError(messageId, messageData, error) {
+    // Log error for monitoring
+    console.error(`Failed to process message ${messageId}:`, error);
+
+    // In production:
+    // 1. Check retry count
+    // 2. Implement exponential backoff
+    // 3. Send to dead letter queue after max retries
+    // 4. Alert monitoring systems
+  }
+
+  parseMessage(fields) {
+    const message = {};
+    for (let i = 0; i < fields.length; i += 2) {
+      const key = fields[i];
+      const value = fields[i + 1];
+
+      // Try to parse JSON values
+      try {
+        message[key] = JSON.parse(value);
+      } catch {
+        message[key] = value;
+      }
+    }
+    return message;
+  }
+
+  async sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async stop() {
+    console.log(`Stopping consumer: ${this.consumerName}`);
+    this.isProcessing = false;
+    await this.redis.disconnect();
+  }
+
+  async getConsumerInfo() {
+    try {
+      const info = await this.redis.xinfo(
+        "CONSUMERS",
+        this.streamKey,
+        this.consumerGroup
+      );
+      return info;
+    } catch (error) {
+      console.error("Failed to get consumer info:", error);
+      return null;
+    }
+  }
+}
+
+// Usage example
+async function startActivityProcessor() {
+  const processor = new ActivityProcessor();
+
+  // Handle graceful shutdown
+  process.on("SIGINT", async () => {
+    console.log("Received SIGINT, shutting down gracefully...");
+    await processor.stop();
+    process.exit(0);
+  });
+
+  process.on("SIGTERM", async () => {
+    console.log("Received SIGTERM, shutting down gracefully...");
+    await processor.stop();
+    process.exit(0);
+  });
+
+  try {
+    await processor.startProcessing();
+  } catch (error) {
+    console.error("Failed to start processor:", error);
+    process.exit(1);
+  }
+}
+
+module.exports = ActivityProcessor;
+
+// Run if called directly
+if (require.main === module) {
+  startActivityProcessor();
+}
+```
+
+<BackToTop />
+
+## Performance Considerations
+
+### Throughput Benchmarks
+
+| Solution          | Messages/Second | Latency (P99) | Memory Usage  | CPU Usage |
+| ----------------- | --------------- | ------------- | ------------- | --------- |
+| **Kafka**         | 1,000,000+      | 5-15ms        | High          | Medium    |
+| **RabbitMQ**      | 100,000+        | 1-5ms         | High          | Medium    |
+| **Redis Streams** | 1,000,000+      | &lt;1ms       | Very High     | Low       |
+| **NATS**          | 10,000,000+     | &lt;1ms       | Low           | Very Low  |
+| **SQS**           | 300 TPS/queue   | 1-10ms        | N/A (Managed) | N/A       |
+
+### Optimization Strategies
+
+#### 1. Batching
+
+```javascript
+// Batch processing example
+class BatchProcessor {
+  constructor(batchSize = 100, flushInterval = 5000) {
+    this.batchSize = batchSize;
+    this.flushInterval = flushInterval;
+    this.batch = [];
+    this.timer = null;
+  }
+
+  addMessage(message) {
+    this.batch.push(message);
+
+    if (this.batch.length >= this.batchSize) {
+      this.flush();
+    } else if (!this.timer) {
+      this.timer = setTimeout(() => this.flush(), this.flushInterval);
+    }
+  }
+
+  async flush() {
+    if (this.batch.length === 0) return;
+
+    const currentBatch = this.batch.splice(0);
+
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+
+    await this.processBatch(currentBatch);
+  }
+
+  async processBatch(messages) {
+    console.log(`Processing batch of ${messages.length} messages`);
+    // Process all messages in batch
+  }
+}
+```
+
+#### 2. Connection Pooling
+
+```python
+# Connection pooling for RabbitMQ
+import pika
+from pika.pool import PooledConnection
+
+class ConnectionPool:
+    def __init__(self, max_connections=10):
+        self.pool = pika.pool.PooledConnection(
+            pika.ConnectionParameters('localhost'),
+            max_connections=max_connections
+        )
+
+    def get_channel(self):
+        return self.pool.channel()
+
+    def close(self):
+        self.pool.close()
+```
+
+#### 3. Partitioning Strategy
+
+```python
+# Kafka partitioning strategy
+class MessagePartitioner:
+    def __init__(self, num_partitions):
+        self.num_partitions = num_partitions
+
+    def get_partition(self, key, message_data):
+        if key:
+            # Hash-based partitioning for even distribution
+            return hash(key) % self.num_partitions
+
+        # Custom partitioning based on message content
+        if message_data.get('priority') == 'high':
+            return 0  # Dedicated partition for high priority
+
+        # Round-robin for other messages
+        return hash(message_data.get('timestamp', 0)) % self.num_partitions
+```
+
+<BackToTop />
+
+## Best Practices
+
+### 1. Message Design
+
+```json
+{
+  "messageId": "msg_123456789",
+  "version": "1.0",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "source": "user-service",
+  "eventType": "user.registered",
+  "correlationId": "corr_abc123",
+  "data": {
+    "userId": "user_456",
+    "email": "user@example.com",
+    "plan": "premium"
+  },
+  "metadata": {
+    "retryCount": 0,
+    "maxRetries": 3,
+    "ttl": 3600000
+  }
+}
+```
+
+### 2. Error Handling Pattern
+
+```javascript
+// Comprehensive error handling
+class MessageProcessor {
+  async processMessage(message) {
+    const maxRetries = 3;
+    const retryCount = message.metadata?.retryCount || 0;
+
+    try {
+      await this.handleMessage(message);
+      await this.ackMessage(message);
+    } catch (error) {
+      if (this.isRetryableError(error) && retryCount < maxRetries) {
+        await this.scheduleRetry(message, retryCount + 1);
+      } else {
+        await this.sendToDeadLetterQueue(message, error);
+      }
+    }
+  }
+
+  isRetryableError(error) {
+    // Network errors, temporary service unavailability
+    return (
+      error.code === "NETWORK_ERROR" || error.code === "SERVICE_UNAVAILABLE"
+    );
+  }
+
+  async scheduleRetry(message, retryCount) {
+    const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff
+
+    message.metadata.retryCount = retryCount;
+    message.metadata.nextRetry = Date.now() + delay;
+
+    await this.publishToRetryQueue(message, delay);
+  }
+}
+```
+
+### 3. Monitoring and Alerting
+
+```yaml
+# Prometheus metrics for monitoring
+queue_depth:
+  metric: histogram
+  labels: [queue_name, environment]
+  description: "Number of messages in queue"
+
+message_processing_duration:
+  metric: histogram
+  labels: [queue_name, message_type, status]
+  description: "Time taken to process messages"
+
+message_processing_errors:
+  metric: counter
+  labels: [queue_name, error_type]
+  description: "Number of message processing errors"
+
+consumer_lag:
+  metric: gauge
+  labels: [consumer_group, topic, partition]
+  description: "Consumer lag behind latest message"
+```
+
+### 4. Security Configuration
+
+```yaml
+# Secure RabbitMQ configuration
+ssl_options:
+  verify: verify_peer
+  cacertfile: /path/to/cacert.pem
+  certfile: /path/to/cert.pem
+  keyfile: /path/to/key.pem
+
+auth_mechanisms:
+  - EXTERNAL
+  - PLAIN
+
+auth_backends:
+  - rabbit_auth_backend_ldap
+  - rabbit_auth_backend_internal
+
+default_permissions:
+  configure: "^$"
+  write: "^amq\.gen.*$"
+  read: "^amq\.gen.*$"
+```
+
+<BackToTop />
+
+## Comparison Matrix
+
+| Feature              | Kafka          | RabbitMQ        | SQS           | Redis Streams    | NATS           | Pulsar         |
+| -------------------- | -------------- | --------------- | ------------- | ---------------- | -------------- | -------------- |
+| **Throughput**       | Very High      | High            | Medium        | Very High        | Very High      | Very High      |
+| **Latency**          | Medium         | Low             | Medium        | Very Low         | Very Low       | Low            |
+| **Durability**       | Excellent      | Good            | Excellent     | Good             | Optional       | Excellent      |
+| **Ordering**         | Partition      | Queue           | FIFO Queue    | Stream           | Subject        | Partition      |
+| **Clustering**       | Native         | Plugin          | N/A           | Sentinel/Cluster | Native         | Native         |
+| **Multi-tenancy**    | Basic          | Vhosts          | Account-based | DB-based         | Account-based  | Native         |
+| **Ops Complexity**   | High           | Medium          | None          | Low              | Low            | High           |
+| **Ecosystem**        | Rich           | Rich            | AWS-focused   | Redis-based      | Growing        | Growing        |
+| **Protocol Support** | Kafka          | AMQP/STOMP/MQTT | HTTP/SQS      | Redis            | NATS           | Pulsar         |
+| **Schema Evolution** | Registry       | Manual          | Manual        | Manual           | Manual         | Built-in       |
+| **Cost**             | Infrastructure | Infrastructure  | Pay-per-use   | Infrastructure   | Infrastructure | Infrastructure |
+
+### Decision Matrix
+
+Choose **Kafka** when:
+
+- High throughput event streaming required
+- Building data pipelines or analytics platforms
+- Need strong durability and replay capabilities
+- Team has expertise in distributed systems
+
+Choose **RabbitMQ** when:
+
+- Complex routing requirements
+- Enterprise integration patterns needed
+- Moderate throughput with low latency
+- Rich protocol support required
+
+Choose **SQS** when:
+
+- Using AWS ecosystem
+- Want managed service with no ops overhead
+- Moderate throughput requirements
+- Cost optimization for variable workloads
+
+Choose **Redis Streams** when:
+
+- Ultra-low latency required
+- Already using Redis infrastructure
+- Real-time features and caching integration
+- Moderate persistence requirements
+
+Choose **NATS** when:
+
+- Building cloud-native microservices
+- Need simple, lightweight messaging
+- High performance with minimal resources
+- IoT or edge computing scenarios
+
+Choose **Pulsar** when:
+
+- Need multi-tenancy at scale
+- Geo-replication requirements
+- Unified batch and stream processing
+- Enterprise features with cloud-native architecture
+
+This comprehensive implementation guide provides production-ready examples and practical guidance for implementing message queues in real-world applications.
 
 <BackToTop />

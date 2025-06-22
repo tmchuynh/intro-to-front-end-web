@@ -69,7 +69,7 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95 border-gray-200 dark:border-gray-700 border-b w-full -900">
+    <header className="sticky top-0 z-30 backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95 border-b border-border h-16 w-full -900">
       <div className="flex items-center justify-between px-4 lg:px-6 py-3">
         {/* Left side - Mobile menu button */}
         <div className="flex items-center">

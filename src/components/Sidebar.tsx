@@ -72,7 +72,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 lg:hidden overlay"
+          className="fixed inset-0 z-40 lg:hidden bg-background bg-opacity-50 transition-opacity"
           onClick={onClose}
         />
       )}
@@ -81,7 +81,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <aside
         id="sidebar"
         className={`
-        sidebar-section fixed top-0 left-0 z-50 w-64 h-full border-r
+        bg-sidebar-bg border-sidebar-border text-sidebar-text fixed top-0 left-0 z-50 w-64 h-full border-r
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0 lg:static lg:z-auto
@@ -90,11 +90,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div
-            className="flex items-center justify-between p-4 border-b"
+            className="flex items-center justify-between p-4 border-b h-16"
             style={{ borderColor: "var(--sidebar-border)" }}
           >
             <Link href="/" className="flex items-center space-x-2">
-              <div className="flex items-center justify-center h-8 w-8 brand-logo">
+              <div className="flex items-center justify-center bg-primary rounded-lg h-8 w-8">
                 <span className="font-bold text-lg text-white">W</span>
               </div>
               <span
@@ -106,8 +106,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </Link>
             <button
               onClick={onClose}
-              className="lg:hidden p-1 rounded-md"
-              style={{ color: "var(--sidebar-text-secondary)" }}
+              className="lg:hidden p-1 rounded-md sidebar-text-secondary"
             >
               <svg
                 className="h-5 w-5"
@@ -130,23 +129,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div className="space-y-6">
               {loading ? (
                 <div className="animate-pulse">
-                  <div
-                    className="mb-3 rounded h-4"
-                    style={{ backgroundColor: "var(--sidebar-hover-bg)" }}
-                  ></div>
-                  <div className="space-y-2">
-                    <div
-                      className="rounded h-3"
-                      style={{ backgroundColor: "var(--sidebar-hover-bg)" }}
-                    ></div>
-                    <div
-                      className="rounded h-3"
-                      style={{ backgroundColor: "var(--sidebar-hover-bg)" }}
-                    ></div>
-                    <div
-                      className="rounded h-3"
-                      style={{ backgroundColor: "var(--sidebar-hover-bg)" }}
-                    ></div>
+                  <div className="bg-sidebar-hover-bg mb-3 rounded h-4"></div>
+                  <div className="space-y-2 bg-sidebar-hover-bg">
+                    <div className="bg-sidebar-hover-bg rounded h-3"></div>
+                    <div className="bg-sidebar-hover-bg rounded h-3"></div>
+                    <div className="bg-sidebar-hover-bg rounded h-3"></div>
                   </div>
                 </div>
               ) : (

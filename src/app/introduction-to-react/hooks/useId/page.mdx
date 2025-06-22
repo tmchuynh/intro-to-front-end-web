@@ -59,20 +59,60 @@ Here, the `useId` hook generates a unique ID that is used for both the label and
 
 ## Examples
 
-### Basic Usage
+### Basic Form Field Association
 
 ```javascript
 import { useId } from "react";
-function FormComponent() {
-  const id = useId();
+
+function UserRegistrationForm() {
+  const nameId = useId();
+  const emailId = useId();
+  const passwordId = useId();
+  const confirmPasswordId = useId();
+
   return (
-    <form>
-      <label htmlFor={id}>Name:</label>
-      <input id={id} type="text" />
-      <label htmlFor={`${id}-email`}>Email:</label>
-      <input id={`${id}-email`} type="email" />
-      <label htmlFor={`${id}-password`}>Password:</label>
-      <input id={`${id}-password`} type="password" />
+    <form className="registration-form">
+      <div className="form-group">
+        <label htmlFor={nameId}>Full Name</label>
+        <input
+          id={nameId}
+          type="text"
+          placeholder="Enter your full name"
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor={emailId}>Email Address</label>
+        <input
+          id={emailId}
+          type="email"
+          placeholder="your.email@example.com"
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor={passwordId}>Password</label>
+        <input
+          id={passwordId}
+          type="password"
+          placeholder="Choose a strong password"
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor={confirmPasswordId}>Confirm Password</label>
+        <input
+          id={confirmPasswordId}
+          type="password"
+          placeholder="Confirm your password"
+          required
+        />
+      </div>
+
+      <button type="submit">Create Account</button>
     </form>
   );
 }
@@ -80,17 +120,563 @@ function FormComponent() {
 
 <BackToTop />
 
-### ARIA Attributes
+### Complex ARIA Relationships
 
 ```javascript
 import { useId } from "react";
-function AccessibleComponent() {
-  const id = useId();
+import { useState } from "react";
+
+function AccessibleModal() {
+  const modalId = useId();
+  const titleId = useId();
+  const descriptionId = useId();
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <div>
-      <h2 id={id}>Section Title</h2>
-      <p aria-labelledby={id}>This section is labeled by the heading above.</p>
+    <>
+      <button
+        onClick={() => setIsOpen(true)}
+        aria-haspopup="dialog"
+        aria-controls={modalId}
+      >
+        Open Settings
+      </button>
+
+      {isOpen && (
+        <div
+          id={modalId}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+          aria-describedby={descriptionId}
+          className="modal-overlay"
+        >
+          <div className="modal-content">
+            <header>
+              <h2 id={titleId}>Notification Settings</h2>
+              <button
+                onClick={() => setIsOpen(false)}
+                aria-label="Close settings dialog"
+              >
+                ×
+              </button>
+            </header>
+
+            <div id={descriptionId}>
+              Configure how and when you receive notifications from our
+              application.
+            </div>
+
+            <form>
+              <fieldset>
+                <legend>Email Notifications</legend>
+                <label>
+                  <input type="checkbox" /> Daily digest
+                </label>
+                <label>
+                  <input type="checkbox" /> Breaking news
+                </label>
+              </fieldset>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+```
+
+<BackToTop />
+
+### Dynamic Form Builder
+
+```javascript
+import { useId } from "react";
+import { useState } from "react";
+
+function DynamicFormBuilder() {
+  const formId = useId();
+  const [fields, setFields] = useState([
+    { type: "text", label: "First Name", required: true },
+    { type: "email", label: "Email", required: true },
+  ]);
+
+  const addField = (type) => {
+    setFields((prev) => [
+      ...prev,
+      {
+        type,
+        label: `New ${type} field`,
+        required: false,
+      },
+    ]);
+  };
+
+  const removeField = (index) => {
+    setFields((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div className="form-builder">
+      <h3>Dynamic Form Builder</h3>
+
+      <div className="field-controls">
+        <button onClick={() => addField("text")}>Add Text Field</button>
+        <button onClick={() => addField("email")}>Add Email Field</button>
+        <button onClick={() => addField("textarea")}>Add Textarea</button>
+        <button onClick={() => addField("select")}>Add Select</button>
+      </div>
+
+      <form id={formId} className="preview-form">
+        {fields.map((field, index) => (
+          <DynamicField
+            key={index}
+            field={field}
+            index={index}
+            onRemove={() => removeField(index)}
+          />
+        ))}
+
+        {fields.length > 0 && <button type="submit">Submit Form</button>}
+      </form>
     </div>
+  );
+}
+
+function DynamicField({ field, index, onRemove }) {
+  const fieldId = useId();
+  const helpTextId = useId();
+
+  const renderInput = () => {
+    const commonProps = {
+      id: fieldId,
+      name: `field_${index}`,
+      required: field.required,
+      "aria-describedby": helpTextId,
+    };
+
+    switch (field.type) {
+      case "textarea":
+        return <textarea {...commonProps} rows="3" />;
+      case "select":
+        return (
+          <select {...commonProps}>
+            <option value="">Choose an option</option>
+            <option value="option1">Option 1</option>
+            <option value="option2">Option 2</option>
+          </select>
+        );
+      default:
+        return <input type={field.type} {...commonProps} />;
+    }
+  };
+
+  return (
+    <div className="form-field">
+      <div className="field-header">
+        <label htmlFor={fieldId}>
+          {field.label}
+          {field.required && <span className="required">*</span>}
+        </label>
+        <button
+          type="button"
+          onClick={onRemove}
+          className="remove-field"
+          aria-label={`Remove ${field.label} field`}
+        >
+          Remove
+        </button>
+      </div>
+
+      {renderInput()}
+
+      <div id={helpTextId} className="help-text">
+        {field.type === "email" && "Please enter a valid email address"}
+        {field.type === "textarea" &&
+          "You can enter multiple lines of text here"}
+        {field.type === "select" &&
+          "Please select one of the available options"}
+      </div>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+### Accordion with Accessibility
+
+```javascript
+import { useId } from "react";
+import { useState } from "react";
+
+function AccessibleAccordion() {
+  const accordionId = useId();
+  const [openPanels, setOpenPanels] = useState(new Set());
+
+  const togglePanel = (index) => {
+    setOpenPanels((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
+  };
+
+  const sections = [
+    {
+      title: "Getting Started",
+      content:
+        "Learn the basics of our platform and how to set up your first project.",
+    },
+    {
+      title: "Advanced Features",
+      content:
+        "Discover powerful features that can help you build more sophisticated applications.",
+    },
+    {
+      title: "Troubleshooting",
+      content:
+        "Common issues and their solutions to help you resolve problems quickly.",
+    },
+    {
+      title: "API Reference",
+      content:
+        "Comprehensive documentation of all available API endpoints and methods.",
+    },
+  ];
+
+  return (
+    <div
+      className="accordion"
+      id={accordionId}
+      role="region"
+      aria-label="Help documentation sections"
+    >
+      <h2>Help Documentation</h2>
+
+      {sections.map((section, index) => (
+        <AccordionPanel
+          key={index}
+          section={section}
+          index={index}
+          isOpen={openPanels.has(index)}
+          onToggle={() => togglePanel(index)}
+          accordionId={accordionId}
+        />
+      ))}
+    </div>
+  );
+}
+
+function AccordionPanel({ section, index, isOpen, onToggle, accordionId }) {
+  const buttonId = useId();
+  const panelId = useId();
+
+  return (
+    <div className="accordion-item">
+      <h3>
+        <button
+          id={buttonId}
+          className="accordion-button"
+          aria-expanded={isOpen}
+          aria-controls={panelId}
+          onClick={onToggle}
+        >
+          <span>{section.title}</span>
+          <span className={`icon ${isOpen ? "open" : ""}`}>
+            {isOpen ? "−" : "+"}
+          </span>
+        </button>
+      </h3>
+
+      <div
+        id={panelId}
+        className={`accordion-panel ${isOpen ? "open" : "closed"}`}
+        role="region"
+        aria-labelledby={buttonId}
+        hidden={!isOpen}
+      >
+        <div className="panel-content">{section.content}</div>
+      </div>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+### Multi-Step Wizard with Navigation
+
+```javascript
+import { useId } from "react";
+import { useState } from "react";
+
+function SetupWizard() {
+  const wizardId = useId();
+  const [currentStep, setCurrentStep] = useState(0);
+  const [formData, setFormData] = useState({});
+
+  const steps = [
+    { title: "Personal Information", component: PersonalInfoStep },
+    { title: "Account Settings", component: AccountSettingsStep },
+    { title: "Preferences", component: PreferencesStep },
+    { title: "Review & Confirm", component: ReviewStep },
+  ];
+
+  const nextStep = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep((prev) => prev + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep((prev) => prev - 1);
+    }
+  };
+
+  const updateFormData = (stepData) => {
+    setFormData((prev) => ({ ...prev, ...stepData }));
+  };
+
+  const CurrentStepComponent = steps[currentStep].component;
+
+  return (
+    <div
+      className="setup-wizard"
+      id={wizardId}
+      role="region"
+      aria-label="Account setup wizard"
+    >
+      <WizardNavigation
+        steps={steps}
+        currentStep={currentStep}
+        wizardId={wizardId}
+      />
+
+      <div className="wizard-content">
+        <CurrentStepComponent
+          data={formData}
+          onUpdate={updateFormData}
+          onNext={nextStep}
+          onPrev={prevStep}
+          isFirst={currentStep === 0}
+          isLast={currentStep === steps.length - 1}
+        />
+      </div>
+    </div>
+  );
+}
+
+function WizardNavigation({ steps, currentStep, wizardId }) {
+  const navId = useId();
+
+  return (
+    <nav id={navId} className="wizard-nav" aria-label="Setup wizard progress">
+      <ol className="step-list">
+        {steps.map((step, index) => {
+          const stepId = useId();
+          const isActive = index === currentStep;
+          const isCompleted = index < currentStep;
+
+          return (
+            <li
+              key={index}
+              className={`step ${isActive ? "active" : ""} ${isCompleted ? "completed" : ""}`}
+            >
+              <div
+                id={stepId}
+                className="step-indicator"
+                aria-current={isActive ? "step" : undefined}
+              >
+                {isCompleted ? "✓" : index + 1}
+              </div>
+              <span className="step-title" aria-describedby={stepId}>
+                {step.title}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+}
+
+function PersonalInfoStep({ data, onUpdate, onNext, isFirst }) {
+  const nameId = useId();
+  const phoneId = useId();
+  const sectionId = useId();
+
+  return (
+    <section
+      id={sectionId}
+      aria-labelledby={`${sectionId}-title`}
+      className="wizard-step"
+    >
+      <h2 id={`${sectionId}-title`}>Personal Information</h2>
+
+      <div className="form-group">
+        <label htmlFor={nameId}>Full Name</label>
+        <input
+          id={nameId}
+          type="text"
+          value={data.name || ""}
+          onChange={(e) => onUpdate({ name: e.target.value })}
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor={phoneId}>Phone Number</label>
+        <input
+          id={phoneId}
+          type="tel"
+          value={data.phone || ""}
+          onChange={(e) => onUpdate({ phone: e.target.value })}
+        />
+      </div>
+
+      <div className="wizard-actions">
+        <button onClick={onNext} disabled={!data.name}>
+          Next Step
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function AccountSettingsStep({ data, onUpdate, onNext, onPrev }) {
+  const usernameId = useId();
+  const passwordId = useId();
+  const sectionId = useId();
+
+  return (
+    <section
+      id={sectionId}
+      aria-labelledby={`${sectionId}-title`}
+      className="wizard-step"
+    >
+      <h2 id={`${sectionId}-title`}>Account Settings</h2>
+
+      <div className="form-group">
+        <label htmlFor={usernameId}>Username</label>
+        <input
+          id={usernameId}
+          type="text"
+          value={data.username || ""}
+          onChange={(e) => onUpdate({ username: e.target.value })}
+          required
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor={passwordId}>Password</label>
+        <input
+          id={passwordId}
+          type="password"
+          value={data.password || ""}
+          onChange={(e) => onUpdate({ password: e.target.value })}
+          required
+        />
+      </div>
+
+      <div className="wizard-actions">
+        <button onClick={onPrev}>Previous</button>
+        <button onClick={onNext} disabled={!data.username || !data.password}>
+          Next Step
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function PreferencesStep({ data, onUpdate, onNext, onPrev }) {
+  const sectionId = useId();
+  const newsletterId = useId();
+  const notificationsId = useId();
+
+  return (
+    <section
+      id={sectionId}
+      aria-labelledby={`${sectionId}-title`}
+      className="wizard-step"
+    >
+      <h2 id={`${sectionId}-title`}>Preferences</h2>
+
+      <fieldset>
+        <legend>Communication Preferences</legend>
+
+        <div className="checkbox-group">
+          <label>
+            <input
+              id={newsletterId}
+              type="checkbox"
+              checked={data.newsletter || false}
+              onChange={(e) => onUpdate({ newsletter: e.target.checked })}
+            />
+            Subscribe to newsletter
+          </label>
+        </div>
+
+        <div className="checkbox-group">
+          <label>
+            <input
+              id={notificationsId}
+              type="checkbox"
+              checked={data.notifications || false}
+              onChange={(e) => onUpdate({ notifications: e.target.checked })}
+            />
+            Enable push notifications
+          </label>
+        </div>
+      </fieldset>
+
+      <div className="wizard-actions">
+        <button onClick={onPrev}>Previous</button>
+        <button onClick={onNext}>Review & Confirm</button>
+      </div>
+    </section>
+  );
+}
+
+function ReviewStep({ data, onPrev, isLast }) {
+  const sectionId = useId();
+
+  return (
+    <section
+      id={sectionId}
+      aria-labelledby={`${sectionId}-title`}
+      className="wizard-step"
+    >
+      <h2 id={`${sectionId}-title`}>Review & Confirm</h2>
+
+      <div className="review-summary">
+        <h3>Account Summary</h3>
+        <dl>
+          <dt>Name:</dt>
+          <dd>{data.name}</dd>
+          <dt>Phone:</dt>
+          <dd>{data.phone || "Not provided"}</dd>
+          <dt>Username:</dt>
+          <dd>{data.username}</dd>
+          <dt>Newsletter:</dt>
+          <dd>{data.newsletter ? "Yes" : "No"}</dd>
+          <dt>Notifications:</dt>
+          <dd>{data.notifications ? "Enabled" : "Disabled"}</dd>
+        </dl>
+      </div>
+
+      <div className="wizard-actions">
+        <button onClick={onPrev}>Previous</button>
+        <button type="submit" className="primary">
+          Create Account
+        </button>
+      </div>
+    </section>
   );
 }
 ```

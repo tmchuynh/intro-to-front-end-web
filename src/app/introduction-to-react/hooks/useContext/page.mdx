@@ -1,0 +1,249 @@
+import BackToTop from "@/components/BackToTop";
+
+# useContext
+
+## Table of Contents
+
+## Overview
+
+`useContext` is a React hook that allows you to access the context value provided by a Context Provider. It simplifies the process of consuming context in functional components, making it easier to share data across your component tree without having to pass props down manually.
+
+#### Benefits of `useContext`:
+
+- **Simplifies Context Consumption**: It eliminates the need for the `Context.Consumer` component, making your code cleaner and more readable.
+- **Direct Access to Context Value**: You can access the context value directly within your component, which can improve performance by avoiding unnecessary re-renders.
+- **Easier to Use with Functional Components**: It integrates seamlessly with functional components, allowing you to use context without needing to convert your component to a class.
+
+#### When to Use `useContext`:
+
+- When you need to share data or state across multiple components without prop drilling.
+- When you want to access context values in functional components without using the `Context.Consumer` component.
+- When you want to simplify your component structure by avoiding unnecessary wrapper components.
+
+### Syntax
+
+```javascript
+import { useContext } from "react";
+import MyContext from "./MyContext";
+const MyComponent = () => {
+  const contextValue = useContext(MyContext);
+
+  return (
+    <div>
+      <p>Context Value: {contextValue}</p>
+    </div>
+  );
+};
+```
+
+### Parameters
+
+- `MyContext`: The context object created using `React.createContext()`.
+
+### Returns
+
+- The current context value, which can be any data type (object, string, number, etc.) provided by the nearest `MyContext.Provider` in the component tree.
+
+## Common Use Cases
+
+- **Theming**: Accessing theme values (colors, fonts, etc.) across your application.
+- **User Authentication**: Sharing user authentication status and information across components.
+- **Global State Management**: Managing global state that needs to be accessed by multiple components without prop drilling.
+- **Localization**: Accessing localization data (translations, formats, etc.) to render content in different languages.
+
+## How It Works
+
+`useContext` works by subscribing to the nearest `MyContext.Provider` in the component tree. When the context value changes, any component that uses `useContext` will re-render with the new context value. This allows you to keep your components in sync with the context data without having to manually pass props down through every level of your component hierarchy.
+
+### Initialization
+
+To use `useContext`, you first need to create a context using `React.createContext()` and then wrap your component tree with a `MyContext.Provider` that provides the context value.
+
+```javascript
+import React, { createContext, useContext } from "react";
+const MyContext = createContext();
+const MyProvider = ({ children }) => {
+  const contextValue = {
+    /* your context data */
+  };
+
+  return (
+    <MyContext.Provider value={contextValue}>{children}</MyContext.Provider>
+  );
+};
+const MyComponent = () => {
+  const contextValue = useContext(MyContext);
+
+  return (
+    <div>
+      <p>Context Value: {contextValue}</p>
+    </div>
+  );
+};
+```
+
+### What Happens Under the Hood
+
+When you call `useContext(MyContext)`, React looks for the nearest `MyContext.Provider` in the component tree and retrieves its value. If no provider is found, it returns the default value specified when creating the context. This allows you to access context values without needing to pass them down through props, making your components more modular and easier to maintain.
+
+## What to Avoid
+
+- **Avoid Overusing Context**: While `useContext` is powerful, overusing it can lead to performance issues and make your code harder to understand. Use it judiciously for data that truly needs to be shared across multiple components.
+- **Avoid Mixing Context with Local State**: If a piece of state is only relevant to a single component, it's better to use local state with `useState` or `useReducer` rather than context. Context is best suited for global or shared state.
+- **Avoid Context for Frequent Updates**: If the context value changes frequently, it can cause unnecessary re-renders of all components that consume the context. In such cases, consider using local state or a more specialized state management solution.
+
+## Examples
+
+```javascript
+import React, { createContext, useContext } from "react";
+const ThemeContext = createContext("light");
+const ThemedComponent = () => {
+  const theme = useContext(ThemeContext);
+  return (
+    <div
+      style={{
+        background: theme === "light" ? "#fff" : "#333",
+        color: theme === "light" ? "#000" : "#fff",
+      }}
+    >
+      <p>Current Theme: {theme}</p>
+    </div>
+  );
+};
+const App = () => {
+  return (
+    <ThemeContext.Provider value="dark">
+      <ThemedComponent />
+    </ThemeContext.Provider>
+  );
+};
+export default App;
+```
+
+```javascript
+import React, { createContext, useContext } from "react";
+const UserContext = createContext({ name: "Guest" });
+const UserProfile = () => {
+  const user = useContext(UserContext);
+  return (
+    <div>
+      <h1>User Profile</h1>
+      <p>Name: {user.name}</p>
+    </div>
+  );
+};
+const App = () => {
+  return (
+    <UserContext.Provider value={{ name: "John Doe" }}>
+      <UserProfile />
+    </UserContext.Provider>
+  );
+};
+export default App;
+```
+
+```javascript
+import React, { createContext, useContext } from "react";
+const LanguageContext = createContext("en");
+const Greeting = () => {
+  const language = useContext(LanguageContext);
+  const greetings = {
+    en: "Hello",
+    es: "Hola",
+    fr: "Bonjour",
+  };
+  return <h1>{greetings[language]}</h1>;
+};
+const App = () => {
+  return (
+    <LanguageContext.Provider value="es">
+      <Greeting />
+    </LanguageContext.Provider>
+  );
+};
+export default App;
+```
+
+```javascript
+import React, { createContext, useContext } from "react";
+const AuthContext = createContext({ isAuthenticated: false });
+const AuthStatus = () => {
+  const auth = useContext(AuthContext);
+  return (
+    <div>
+      <h1>Authentication Status</h1>
+      <p>{auth.isAuthenticated ? "Logged In" : "Logged Out"}</p>
+    </div>
+  );
+};
+const App = () => {
+  return (
+    <AuthContext.Provider value={{ isAuthenticated: true }}>
+      <AuthStatus />
+    </AuthContext.Provider>
+  );
+};
+export default App;
+```
+
+```javascript
+import React, { createContext, useContext } from "react";
+const CartContext = createContext([]);
+const Cart = () => {
+  const cartItems = useContext(CartContext);
+  return (
+    <div>
+      <h1>Shopping Cart</h1>
+      <ul>
+        {cartItems.map((item, index) => (
+          <li key={index}>
+            {item.name} - ${item.price}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+const App = () => {
+  const cartItems = [
+    { name: "Apple", price: 1.2 },
+    { name: "Banana", price: 0.8 },
+    { name: "Cherry", price: 2.5 },
+  ];
+  return (
+    <CartContext.Provider value={cartItems}>
+      <Cart />
+    </CartContext.Provider>
+  );
+};
+export default App;
+```
+
+```javascript
+import React, { createContext, useContext } from "react";
+const CurrencyContext = createContext("USD");
+const CurrencyConverter = () => {
+  const currency = useContext(CurrencyContext);
+  const exchangeRate = {
+    USD: 1,
+    EUR: 0.85,
+    GBP: 0.75,
+  };
+  return (
+    <div>
+      <h1>Currency Converter</h1>
+      <p>
+        1 USD = {exchangeRate[currency]} {currency}
+      </p>
+    </div>
+  );
+};
+const App = () => {
+  return (
+    <CurrencyContext.Provider value="EUR">
+      <CurrencyConverter />
+    </CurrencyContext.Provider>
+  );
+};
+export default App;
+```

@@ -1,0 +1,114 @@
+import BackToTop from "@/components/BackToTop";
+
+# useMemo
+
+## Table of Contents
+
+## Overview
+
+useMemo is a React hook that allows you to optimize performance by memoizing the result of a computation. It is particularly useful when you have expensive calculations that do not need to be recalculated on every render, but only when specific dependencies change.
+It helps to avoid unnecessary re-computations and can improve the performance of your application, especially in cases where the computation is resource-intensive.
+
+#### Benefits of using `useMemo`:
+
+- **Performance Optimization**: It prevents expensive calculations from being executed on every render, which can lead to significant performance improvements.
+- **Avoiding Unnecessary Re-renders**: By memoizing the result, it helps to avoid unnecessary re-renders of components that depend on the computed value.
+- **Improved User Experience**: By reducing the computational overhead, it can lead to a smoother user experience, especially in applications with complex UI interactions or large datasets.
+
+#### When to Use `useMemo`:
+
+- When you have expensive calculations that do not need to be recalculated on every render.
+- When you want to avoid unnecessary re-renders of components that depend on the computed value.
+- When you want to optimize performance in scenarios where the computation is resource-intensive.
+
+## Common Use Cases
+
+- **Expensive Calculations**: When you have calculations that are computationally expensive and do not need to be recalculated on every render, such as filtering or sorting large datasets.
+- **Derived State**: When you need to derive state from props or other state variables, and you want to avoid recalculating it on every render.
+- **Memoizing Component Props**: When you want to memoize the props passed to a child component to prevent unnecessary re-renders of that component.
+- **Optimizing Rendering Performance**: When you want to optimize the rendering performance of a component by memoizing the result of a computation that is used in the render method.
+
+### Syntax
+
+```javascript
+import React, { useMemo } from "react";
+const MyComponent = ({ data }) => {
+  const computedValue = useMemo(() => {
+    // Expensive calculation
+    return data.reduce((acc, item) => acc + item.value, 0);
+  }, [data]); // Dependencies array
+
+  return <div>{computedValue}</div>;
+};
+```
+
+### Parameters
+
+- `create`: A function that returns the computed value. This function will be executed only when the dependencies change.
+- `dependencies`: An array of dependencies that determine when the memoized value should be recalculated. If any of the dependencies change, the `create` function will be executed again to recalculate the memoized value. If the dependencies do not change, the previously memoized value will be returned.
+
+## How It Works
+
+### Initial Render
+
+When the component is first rendered, the `useMemo` hook is called with the `create` function and the `dependencies` array. The `create` function is executed, and the result is memoized. This memoized value is then returned by the `useMemo` hook.
+
+### Updates
+
+On subsequent renders, the `useMemo` hook checks the `dependencies` array. If any of the dependencies have changed since the last render, the `create` function is executed again to recalculate the memoized value. If the dependencies have not changed, the previously memoized value is returned, avoiding the need to re-execute the `create` function.
+
+### What Happens on Re-renders
+
+When the component re-renders, the `useMemo` hook checks the dependencies array. If any of the dependencies have changed, the `create` function is executed again to recalculate the memoized value. If the dependencies have not changed, the previously memoized value is returned, preventing unnecessary re-computation and improving performance.
+
+## What to Avoid
+
+- **Avoid Overusing `useMemo`**: While `useMemo` can improve performance, it should not be used excessively. Overusing it can lead to unnecessary complexity and make the code harder to read and maintain.
+- **Avoid Using `useMemo` for Simple Calculations**: If the calculation is simple and does not involve expensive computations, using `useMemo` may not provide significant performance benefits. In such cases, it is better to rely on React's built-in optimizations.
+- **Avoid Using `useMemo` for Side Effects**: `useMemo` is intended for memoizing values, not for managing side effects. If you need to perform side effects, such as fetching data or updating the DOM, use the `useEffect` hook instead.
+  <BackToTop />
+
+## Examples
+
+### Memoizing an Expensive Calculation
+
+```javascript
+import React, { useMemo } from "react";
+const ExpensiveCalculationComponent = ({ data }) => {
+  const computedValue = useMemo(() => {
+    // Simulating an expensive calculation
+    return data.reduce((acc, item) => acc + item.value, 0);
+  }, [data]); // Only recalculate when 'data' changes
+  return <div>Computed Value: {computedValue}</div>;
+};
+export default ExpensiveCalculationComponent;
+```
+
+<BackToTop />
+
+### Memoizing Component Props
+
+```javascript
+import React, { useMemo } from "react";
+const ChildComponent = React.memo(({ value }) => {
+  console.log("ChildComponent rendered");
+  return <div>Value: {value}</div>;
+});
+const ParentComponent = ({ data }) => {
+  const memoizedValue = useMemo(() => {
+    return data.reduce((acc, item) => acc + item.value, 0);
+  }, [data]); // Only recalculate when 'data' changes
+  return <ChildComponent value={memoizedValue} />;
+};
+export default ParentComponent;
+```
+
+<BackToTop />
+
+## Best Practices
+
+- **Use `useMemo` Sparingly**: Only use `useMemo` for expensive calculations or when you need to avoid unnecessary re-renders. Overusing it can lead to code complexity.
+- **Keep Dependencies Accurate**: Ensure that the dependencies array is accurate. If you forget to include a dependency, the memoized value may not update when it should, leading to stale data.
+- **Avoid Side Effects**: Do not use `useMemo` for side effects. It is meant for memoizing values, not for managing side effects. Use `useEffect` for side effects instead.
+- **Profile Performance**: Use React's performance profiling tools to identify bottlenecks in your application. Only use `useMemo` when it provides a measurable performance improvement.
+  <BackToTop />

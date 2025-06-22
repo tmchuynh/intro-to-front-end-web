@@ -1,0 +1,179 @@
+import BackToTop from "@/components/BackToTop";
+
+# Client APIs
+
+## Table of Contents
+
+## Overview
+
+Client APIs in React are used to interact with the browser's capabilities, such as making HTTP requests, accessing local storage, and handling events. These APIs allow you to build dynamic and interactive applications that respond to user actions and external data.
+
+### Core Concepts
+
+- **HTTP Requests**: Making requests to external APIs or servers to fetch or send data.
+- **Local Storage**: Storing data in the browser's local storage for persistence across sessions.
+- **Event Handling**: Responding to user interactions, such as clicks, form submissions, and keyboard events.
+- **Browser APIs**: Utilizing browser-specific features, such as geolocation, notifications, and media playback.
+- **State Management**: Managing the state of components and applications using hooks or state management libraries.
+- **Asynchronous Operations**: Handling asynchronous tasks, such as fetching data or performing background operations, using promises or async/await syntax.
+- **Error Handling**: Implementing error handling mechanisms to gracefully manage failures in API calls or user interactions.
+- **Performance Optimization**: Techniques to improve the performance of client-side applications, such as lazy loading, code splitting, and caching.
+
+### Advantages and Disadvantages
+
+- **Advantages**:
+  - Enables dynamic and interactive user experiences.
+  - Allows for real-time data updates and user feedback.
+  - Provides access to browser features that enhance functionality.
+  - Facilitates state management and asynchronous operations.
+- **Disadvantages**:
+  - Can lead to increased complexity in managing state and side effects.
+  - Requires careful handling of asynchronous operations to avoid
+
+### When to Use Client APIs
+
+Client APIs are essential when building applications that require interaction with the browser or external services. Here are some common use cases:
+
+- **Fetching Data**: When you need to retrieve data from an external API or server to display in your application.
+- **User Interactions**: When you want to respond to user actions, such as clicks, form submissions, or keyboard events, to update the UI or perform actions.
+- **Local Storage**: When you need to store user preferences, session data, or other information that should persist across sessions.
+- **Browser Features**: When you want to leverage browser capabilities, such as geolocation, notifications, or media playback, to enhance the user experience.
+- **State Management**: When you need to manage the state of your application, such as form inputs, navigation, or UI components, to ensure a smooth user experience.
+- **Asynchronous Operations**: When you need to perform tasks that take time, such as fetching data or processing user input, without blocking the UI.
+- **Error Handling**: When you want to gracefully handle errors in API calls or user interactions to provide feedback to the user.
+- **Performance Optimization**: When you want to improve the performance of your application by implementing techniques like lazy loading, code splitting, or caching to reduce load times and improve responsiveness.
+  <BackToTop />
+
+## `createRoot`
+
+The `createRoot` function is part of the React 18 API and is used to create a root for rendering React components. It allows you to render components in a more efficient way, enabling features like concurrent rendering and automatic batching of updates.
+
+### Syntax
+
+```javascript
+import { createRoot } from "react-dom/client";
+const root = createRoot(domNode, options);
+```
+
+### Parameters
+
+- `domNode`: The DOM node where the React application will be mounted.
+- `options`: An optional object that can include configuration options for the root, such as enabling concurrent mode.
+  - `onCaughtError`: A callback function that is called when an error is caught during rendering.
+  - `onUncaughtError`: A callback function that is called when an uncaught error occurs during rendering.
+  - `onRecoverableError`: A callback function that is called when a recoverable error occurs during rendering.
+  - `indentifierPrefix`: A string that is used to prefix the identifiers of the root, which can be useful for debugging purposes.
+
+### Returns
+
+#### `root.render`
+
+##### Parameters
+
+- `reactNode`: The React element to render.
+
+##### Returns
+
+- `undefined`: This method does not return a value.
+
+##### Caveats
+
+- The `render` method can only be called once per root. If you need to update the rendered content, you should call `render` again with the new React element.
+- If you try to call `render` on a root that has already been rendered, it will throw an error.
+
+#### `root.unmount`
+
+##### Parameters
+
+- `reactNode`: The React element to unmount.
+
+##### Returns
+
+- `undefined`: This method does not return a value.
+
+##### Caveats
+
+- The `unmount` method will remove the React component from the DOM and clean up any associated resources.
+- After calling `unmount`, the root cannot be used to render new content unless you create a new root using `createRoot`.
+
+### Caveats
+
+- The `createRoot` function is specifically designed for React 18 and later versions. It should not be used with earlier versions of React.
+- Concurrent rendering is an advanced feature that may require additional configuration and understanding of React's rendering behavior. It is recommended to familiarize yourself with the concepts of concurrent rendering and automatic batching before using `createRoot`.
+- Ensure that the DOM node where the root is created is not already occupied by another React application or component. If the DOM node is already in use, it may lead to unexpected behavior or errors.
+- The `createRoot` function is intended for client-side rendering. If you are using server-side rendering (SSR), you should use the `hydrateRoot` function instead to hydrate the server-rendered React application.
+- Be cautious when using third-party libraries or custom components that manipulate the DOM directly, as they may interfere with the rendering process.
+- If you encounter issues during rendering, you can use the `onCaughtError`, `onUncaughtError`, and `onRecoverableError` options to handle errors gracefully and provide feedback to the user. This can help improve the user experience and prevent the application from crashing due to unhandled errors.
+- Always test your application thoroughly after implementing `createRoot` to ensure that it works as expected across different browsers and devices. This includes checking for any discrepancies in the rendered output, ensuring that all event listeners and interactions work correctly, and verifying that the application remains responsive to user actions.
+- Consider using tools like React DevTools to debug rendering issues and inspect the component tree. This can help you identify any discrepancies or issues that may arise during the rendering process.
+- Keep in mind that `createRoot` is a powerful tool that can significantly improve the performance and responsiveness of your React applications.
+  <BackToTop />
+
+## `hydrateRoot`
+
+The `hydrateRoot` function is used to hydrate a server-rendered React application. It allows you to attach event listeners and make the application interactive without re-rendering the entire component tree.
+
+### Syntax
+
+```javascript
+import { hydrateRoot } from "react-dom/client";
+const root = hydrateRoot(domNode, reactNode, options);
+```
+
+### Parameters
+
+- `domNode`: The DOM node where the server-rendered React application is mounted.
+- `reactNode`: The React element that represents the initial state of the application.
+- `options`: An optional object that can include configuration options for the root, such as enabling concurrent mode.
+  - `onCaughtError`: A callback function that is called when an error is caught during hydration.
+  - `onUncaughtError`: A callback function that is called when an uncaught error occurs during hydration.
+  - `onRecoverableError`: A callback function that is called when a recoverable error occurs during hydration.
+  - `indentifierPrefix`: A string that is used to prefix the identifiers of the root, which can be useful for debugging purposes.
+
+### Returns
+
+#### `root.render`
+
+##### Parameters
+
+- `reactNode`: The React element to render.
+
+##### Returns
+
+- `undefined`: This method does not return a value.
+
+##### Caveats
+
+- The `render` method can only be called once per root. If you need to update the rendered content, you should call `render` again with the new React element.
+- If you try to call `render` on a root that has already been rendered, it will throw an error.
+
+#### `root.unmount`
+
+##### Parameters
+
+- `reactNode`: The React element to unmount.
+
+##### Returns
+
+- `undefined`: This method does not return a value.
+
+##### Caveats
+
+- The `unmount` method will remove the React component from the DOM and clean up any associated resources.
+- After calling `unmount`, the root cannot be used to render new content unless you create a new root using `hydrateRoot`.
+
+### Caveats
+
+- The `hydrateRoot` function is specifically designed for server-rendered applications. It should not be used for client-rendered applications.
+- Hydration can be more complex than regular rendering, as it requires the initial HTML to match the React component tree. If there are discrepancies, it can lead to unexpected behavior or errors.
+- Ensure that the server-rendered HTML matches the React component structure to avoid hydration issues. This includes matching the structure, attributes, and content of the elements.
+- Hydration can be more resource-intensive than regular rendering, as it involves attaching event listeners and reconciling the server-rendered HTML with the React component tree. This can lead to performance issues if not managed properly.
+- If you need to update the state of the application after hydration, you should use the `render` method to re-render the component tree with the updated state. This will ensure that the application remains interactive and responsive to user actions.
+- Be cautious when using third-party libraries or custom components that manipulate the DOM directly, as they may interfere with the hydration process. It's best to use React's built-in methods for manipulating the DOM to ensure compatibility with hydration.
+- If you encounter issues during hydration, you can use the `onCaughtError`, `onUncaughtError`, and `onRecoverableError` options to handle errors gracefully and provide feedback to the user. This can help improve the user experience and prevent the application from crashing due to unhandled errors.
+- Always test your application thoroughly after implementing hydration to ensure that it works as expected across different browsers and devices. This includes checking for any discrepancies between the server-rendered HTML and the React component tree, as well as ensuring that all event listeners and interactions work correctly.
+- Consider using tools like React DevTools to debug hydration issues and inspect the component tree. This can help you identify any discrepancies or issues that may arise during the hydration process.
+- Keep in mind that hydration is a complex process, and it may require additional configuration or adjustments based on your specific application requirements. Be prepared to experiment and iterate on your implementation to achieve the desired results.
+- If you are using server-side rendering (SSR) with frameworks like Next.js or Remix, they often provide built-in support for hydration and may handle some of the complexities for you. However, it's still important to understand the underlying concepts and how to troubleshoot issues that may arise during the hydration process.
+- Always refer to the official React documentation for the most up-to-date information and best practices regarding hydration and client APIs. The React team continuously improves the library, and staying informed about the latest features and changes can help you build better applications.
+  <BackToTop />

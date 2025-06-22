@@ -75,27 +75,27 @@ Package managers like npm and Yarn are essential tools for modern web developmen
 Both npm and Yarn share many similar commands, making it easy for developers to switch between them. Here are some common commands:
 
 | Action                     | npm Command                | Yarn Command                |
-| -------------------------- | -------------------------- | --------------------------- | ----------- |
+| -------------------------- | -------------------------- | --------------------------- |
 | Install a package          | `npm install <package>`    | `yarn add <package>`        |
 | Install a package globally | `npm install -g <package>` | `yarn global add <package>` |
 | Remove a package           | `npm uninstall <package>`  | `yarn remove <package>`     |
 | Update a package           | `npm update <package>`     | `yarn upgrade <package>`    |
-| List installed packages    |                            | `npm list`                  | `yarn list` |
-| Initialize a project       |                            | `npm init`                  | `yarn init` |
-| Install all dependencies   |
-| `npm install`              | `yarn install`             |
+| List installed packages    | `npm list`                 | `yarn list`                 |
+| Initialize a project       | `npm init`                 | `yarn init`                 |
+| Install all dependencies   | `npm install`              | `yarn install`              |
 | Run a script               | `npm run <script>`         | `yarn <script>`             |
 
 ### Differences in Features
 
 While npm and Yarn share many similarities, they also have distinct features that set them apart:
-| Feature | npm | Yarn |
-|-----------------------------|------------------------------|------------------------------|
-| Package Locking | `package-lock.json` | `yarn.lock` |
-| Offline Mode | Limited support | Full offline mode |
-| Parallel Installation | No | Yes |
-| Security Checks | Basic | Enhanced security checks |
-| Workspaces | Limited support | Full support |
+
+| Feature               | npm                 | Yarn                     |
+| --------------------- | ------------------- | ------------------------ |
+| Package Locking       | `package-lock.json` | `yarn.lock`              |
+| Offline Mode          | Limited support     | Full offline mode        |
+| Parallel Installation | ❌                  | ✅                       |
+| Security Checks       | Basic               | Enhanced security checks |
+| Workspaces            | Limited support     | Full support             |
 
 ### Package Locking
 
@@ -124,5 +124,451 @@ When it comes to speed, Yarn excels with its ability to install packages in para
 ### Security Considerations
 
 Yarn includes built-in security checks that are more rigorous than standard practices. While npm does offer some security features, it permits packages to execute code during installation, which can expose your project to potential risks. In contrast, Yarn enforces stricter measures to ensure that only safe packages are installed, enhancing the overall security of your development environment.
+
+<BackToTop />
+
+## npm
+
+npm is the world's largest software registry and is included with Node.js. It's free, open-source, and uses **JSON (JavaScript Object Notation)** for package management. npm's main job is to handle dependencies and packages automatically, making **Node.js** development smoother and more efficient by allowing you to install only the modules you need. Its benefits include:
+
+- **Ease of Use**: Simple for developers to manage and use.
+- **Faster Development**: Reduces the time needed to set up and manage dependencies.
+- **Local Installation**: Saves space by installing packages only where needed.
+  npm is included with Node.js, making it readily accessible. However, different projects may require different versions of Node, and using an incompatible version can lead to errors and project failures. Ensure you are using the correct version for each project to maintain functionality.
+
+### Installing npm
+
+To install npm, you need to have Node.js installed on your system. npm comes bundled with Node.js, so when you install Node.js, npm is automatically installed as well. You can download the latest version of Node.js from the [official website](https://nodejs.org/).
+
+### Initializing a Project with npm
+
+To start a new Node.js project, you can use the following command to create a `package.json` file, which will hold information about your project and its dependencies:
+
+```bash
+npm init
+```
+
+This command will prompt you to enter details about your project, such as its name, version, description, entry point, and more. After answering the prompts, a `package.json` file will be created in your project directory.
+
+### Installing Packages with npm
+
+To install a package using npm, you can use the following command:
+
+```bash
+npm install <package-name>
+```
+
+This command will download the specified package and its dependencies, placing them in the `node_modules` directory within your project. If you want to install a package globally (making it available system-wide), you can use the `-g` flag:
+
+```bash
+npm install -g <package-name>
+```
+
+### Managing Dependencies
+
+npm allows you to manage your project's dependencies easily. You can specify which packages your project depends on in the `package.json` file. When you run `npm install`, npm will read this file and install all the listed dependencies automatically.
+
+You can also specify different types of dependencies, such as:
+
+- **Dependencies**: Packages required for your project to run in production.
+- **DevDependencies**: Packages needed only for development and testing purposes.
+
+### Uninstalling Packages
+
+To remove a package from your project, you can use the following command:
+
+```bash
+npm uninstall <package-name>
+```
+
+This command will remove the specified package from the `node_modules` directory and update the `package.json` file accordingly. If you want to uninstall a package globally, you can use the `-g` flag:
+
+```bash
+npm uninstall -g <package-name>
+```
+
+### Updating Packages
+
+To update a package to the latest version, you can use the following command:
+
+```bash
+npm update <package-name>
+```
+
+This command will check for the latest version of the specified package and update it if a newer version is available. If you want to update all packages in your project, you can simply run:
+
+```bash
+npm update
+```
+
+This will update all dependencies listed in your `package.json` file to their latest compatible versions.
+
+### Running Scripts
+
+npm allows you to define scripts in your `package.json` file that can be executed using the `npm run` command. For example, you can define a script to start your application or run tests. Here's an example of how to define a script in your `package.json` file:
+
+```json
+{
+  "scripts": {
+    "start": "node app.js",
+    "test": "jest"
+  }
+}
+```
+
+You can then run these scripts using the following commands:
+
+```bash
+npm run start
+npm run test
+```
+
+### Publishing Packages
+
+If you want to share your package with the world, you can publish it to the npm registry. To do this, you need to create an account on the [npm website](https://www.npmjs.com/) and then run the following command in your project directory:
+
+```bash
+npm publish
+```
+
+This command will package your project and upload it to the npm registry, making it available for others to install and use. Before publishing, make sure your `package.json` file is properly configured with the necessary information, such as name, version, description, and author.
+
+<BackToTop />
+
+### Common npm Commands
+
+| Command                            | Description                                                                                              |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `npm init`                         | Initializes a new Node.js project and creates a `package.json` file.                                     |
+| `npm install <package>`            | Installs a package and adds it to the `node_modules` directory.                                          |
+| `npm install <package> --save`     |                                                                                                          | Installs a package and adds it to the `dependencies` section of `package.json`. |
+| `npm install <package> --save-dev` | Installs a package and adds it to the `devDependencies` section of `package.json`.                       |
+| `npm uninstall <package>`          | Uninstalls a package and removes it from the `node_modules` directory.                                   |
+| `npm update <package>`             | Updates a package to the latest version.                                                                 |
+| `npm list`                         | Lists all installed packages and their versions.                                                         |
+| `npm run <script>`                 | Runs a script defined in the `package.json` file.                                                        |
+| `npm publish`                      | Publishes a package to the npm registry.                                                                 |
+| `npm login`                        | Logs in to your npm account.                                                                             |
+| `npm logout`                       | Logs out of your npm account.                                                                            |
+| `npm config set <key> <value>`     | Sets a configuration value for npm.                                                                      |
+| `npm config get <key>`             | Gets the value of a configuration key.                                                                   |
+| `npm cache clean --force`          | Clears the npm cache.                                                                                    |
+| `npm audit`                        | Checks for vulnerabilities in installed packages.                                                        |
+| `npm audit fix`                    | Automatically fixes vulnerabilities in installed packages.                                               |
+| `npm ci`                           | Installs dependencies from the `package-lock.json` file, ensuring a clean and reproducible installation. |
+| `npm outdated`                     | Checks for outdated packages in the project.                                                             |
+| `npm dedupe`                       | Removes duplicate packages from the `node_modules` directory.                                            |
+| `npm version <newversion>`         | Updates the version of the package in `package.json` and creates a new Git tag.                          |
+| `npm help`                         | Displays help information for npm commands.                                                              |
+
+<BackToTop />
+
+### Common npm Errors and Solutions
+
+| Error Message                   | Description                                                                             | Solution                                                                                                                                                                                                                                                                    |
+| ------------------------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm ERR! code EACCES`          | Permission denied error when trying to install packages globally.                       | Use `sudo` to run the command with elevated privileges or change the ownership of the npm directory.                                                                                                                                                                        |
+| `npm ERR! code ENOENT`          | No such file or directory error when trying to install a package.                       | Ensure you are in the correct directory and that the package name is correct. If the package is private, ensure you are logged in to npm.                                                                                                                                   |
+| `npm ERR! code EEXIST`          | File already exists error when trying to create a file or directory.                    | Check if the file or directory already exists and remove it if necessary. If you are trying to install a package, ensure that the package name is unique.                                                                                                                   |
+| `npm ERR! code ETIMEDOUT`       | Network timeout error when trying to connect to the npm registry.                       | Check your internet connection and try again. If the issue persists, you can try changing the npm registry URL using `npm config set registry <new-url>`.                                                                                                                   |
+| `npm ERR! code E404`            | Package not found error when trying to install a package.                               | Ensure that the package name is correct and that it exists in the npm registry. If the package is private, ensure you are logged in to npm.                                                                                                                                 |
+| `npm ERR! code EINVALIDTAGNAME` | Invalid tag name error when trying to install a package with an invalid tag name.       | Ensure that the tag name is valid and follows the npm naming conventions. If you are trying to install a specific version of a package, use the correct version format (e.g., `npm install <package>@<version>`).                                                           |
+| `npm ERR! code ERESOLVE`        | Dependency resolution error when npm cannot resolve package dependencies.               | Check your `package.json` file for conflicting versions of packages. You can try running `npm install --legacy-peer-deps` to bypass peer dependency conflicts or manually resolve the conflicts by updating the package versions.                                           |
+| `npm ERR! code ECONNREFUSED`    | Connection refused error when trying to connect to the npm registry.                    | Check your internet connection and ensure that the npm registry is accessible. You can also try changing the npm registry URL using `npm config set registry <new-url>`. If you are behind a proxy, ensure that your proxy settings are correctly configured in npm.        |
+| `npm ERR! code ENOMEM`          | Out of memory error when npm runs out of memory during installation.                    | Try increasing the memory limit for Node.js by running `node --max-old-space-size=4096 $(which npm) install` to allocate more memory. If the issue persists, consider optimizing your project or reducing the number of dependencies.                                       |
+| `npm ERR! code EBUSY`           | Resource busy error when trying to access a file or directory that is currently in use. | Ensure that no other processes are using the file or directory. You can try closing any applications that may be accessing the resource or restarting your computer to release the lock.                                                                                    |
+| `npm ERR! code EPIPE`           | Broken pipe error when npm tries to write to a stream that has been closed.             | This error can occur if the npm process is interrupted or if there is an issue with the network connection. Try running the command again or check your network connection. If the issue persists, you may need to investigate further or seek help from the npm community. |
+| `npm ERR! code ENOTFOUND`       | Host not found error when npm cannot resolve the hostname for the npm registry.         | Check your internet connection and ensure that the npm registry URL is correct. You can also try changing the npm registry URL using `npm config set registry <new-url>`. If you are behind a proxy, ensure that your proxy settings are correctly configured in npm.       |
+
+<BackToTop />
+
+## Yarn
+
+Yarn is a modern package manager for Node.js, developed by Facebook, Exponent, Google, and Tilde, and is distributed under the BSD license.
+
+Developers often switch to Yarn for its stability. Unlike npm, which may lead to inconsistencies in package versions when deploying across different machines, Yarn addresses this issue effectively.
+
+The key benefits of Yarn include:
+
+- **Active Community**: Yarn has a vibrant and supportive user community.
+- **Local Cache Installation**: Yarn can install packages from the local cache, speeding up the process.
+- **Parallel Installation**: Yarn installs packages in parallel, which is faster than npm's sequential installation.
+- **Version Binding**: It strongly binds package versions, ensuring consistency.
+
+### Installing Yarn
+
+To install Yarn, you need to have Node.js installed on your system. You can install Yarn globally using npm with the following command:
+
+```bash
+npm install -g yarn
+```
+
+Alternatively, you can install Yarn using the official installer for your operating system. You can find the installation instructions on the [Yarn website](https://yarnpkg.com/getting-started/install).
+
+### Initializing a Project with Yarn
+
+To start a new Node.js project with Yarn, you can use the following command to create a `package.json` file, which will hold information about your project and its dependencies:
+
+```bash
+yarn init
+```
+
+This command will prompt you to enter details about your project, such as its name, version, description, entry point, and more. After answering the prompts, a `package.json` file will be created in your project directory.
+
+### Installing Packages with Yarn
+
+To install a package using Yarn, you can use the following command:
+
+```bash
+yarn add <package-name>
+```
+
+This command will download the specified package and its dependencies, placing them in the `node_modules` directory within your project. If you want to install a package globally (making it available system-wide), you can use the following command:
+
+```bash
+yarn global add <package-name>
+```
+
+### Managing Dependencies
+
+Yarn allows you to manage your project's dependencies easily. You can specify which packages your project depends on in the `package.json` file. When you run `yarn install`, Yarn will read this file and install all the listed dependencies automatically.
+You can also specify different types of dependencies, such as:
+
+- **Dependencies**: Packages required for your project to run in production.
+- **DevDependencies**: Packages needed only for development and testing purposes.
+
+### Uninstalling Packages
+
+To remove a package from your project, you can use the following command:
+
+```bash
+yarn remove <package-name>
+```
+
+This command will remove the specified package from the `node_modules` directory and update the `package.json` file accordingly. If you want to uninstall a package globally, you can use the following command:
+
+```bash
+yarn global remove <package-name>
+```
+
+### Updating Packages
+
+To update a package to the latest version, you can use the following command:
+
+```bash
+yarn upgrade <package-name>
+```
+
+This command will check for the latest version of the specified package and update it if a newer version is available. If you want to update all packages in your project, you can simply run:
+
+```bash
+yarn upgrade
+```
+
+This will update all dependencies listed in your `package.json` file to their latest compatible versions.
+
+### Running Scripts
+
+Yarn allows you to define scripts in your `package.json` file that can be executed using the `yarn run` command. For example, you can define a script to start your application or run tests. Here's an example of how to define a script in your `package.json` file:
+
+```json
+{
+  "scripts": {
+    "start": "node app.js",
+    "test": "jest"
+  }
+}
+```
+
+You can then run these scripts using the following commands:
+
+```bash
+yarn start
+yarn test
+```
+
+### Publishing Packages
+
+If you want to share your package with the world, you can publish it to the Yarn registry. To do this, you need to create an account on the [Yarn website](https://yarnpkg.com/) and then run the following command in your project directory:
+
+```bash
+yarn publish
+```
+
+This command will package your project and upload it to the Yarn registry, making it available for others to install and use. Before publishing, make sure your `package.json` file is properly configured with the necessary information, such as name, version, description, and author.
+<BackToTop />
+
+### Common Yarn Commands
+
+| Command                         | Description                                                                        |
+| ------------------------------- | ---------------------------------------------------------------------------------- |
+| `yarn init`                     | Initializes a new Node.js project and creates a `package.json` file.               |
+| `yarn add <package>`            | Installs a package and adds it to the `node_modules` directory.                    |
+| `yarn add <package> --dev`      | Installs a package and adds it to the `devDependencies` section of `package.json`. |
+| `yarn remove <package>`         | Uninstalls a package and removes it from the `node_modules` directory.             |
+| `yarn upgrade <package>`        | Updates a package to the latest version.                                           |
+| `yarn list`                     | Lists all installed packages and their versions.                                   |
+| `yarn run <script>`             | Runs a script defined in the `package.json` file.                                  |
+| `yarn publish`                  | Publishes a package to the Yarn registry.                                          |
+| `yarn global add <package>`     | Installs a package globally, making it available system-wide.                      |
+| `yarn global remove <package>`  | Uninstalls a globally installed package.                                           |
+| `yarn config set <key> <value>` | Sets a configuration value for Yarn.                                               |
+| `yarn config get <key>`         | Gets the value of a configuration key.                                             |
+| `yarn cache clean`              | Clears the Yarn cache.                                                             |
+| `yarn audit`                    | Checks for vulnerabilities in installed packages.                                  |
+| `yarn audit fix`                | Automatically fixes vulnerabilities in installed packages.                         |
+| `yarn install`                  | Installs all dependencies listed in the `package.json` file.                       |
+| `yarn outdated`                 | Checks for outdated packages in the project.                                       |
+| `yarn dedupe`                   | Removes duplicate packages from the `node_modules` directory.                      |
+| `yarn version <newversion>`     | Updates the version of the package in `package.json` and creates a new Git tag.    |
+| `yarn help`                     | Displays help information for Yarn commands.                                       |
+<BackToTop />
+
+### Common Yarn Errors and Solutions
+
+| Error Message          | Description                                                                                       | Solution                                                                                                                                                                                                                                                                      |
+| ---------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `yarn EACCES`          | Permission denied error when trying to install packages globally.                                 | Use `sudo` to run the command with elevated privileges or change the ownership of the Yarn directory.                                                                                                                                                                         |
+| `yarn ENOENT`          | No such file or directory error when trying to install a package.                                 | Ensure you are in the correct directory and that the package name is correct. If the package is private, ensure you are logged in to Yarn.                                                                                                                                    |
+| `yarn EEXIST`          | File already exists error when trying to create a file or directory.                              | Check if the file or directory already exists and remove it if necessary. If you are trying to install a package, ensure that the package name is unique.                                                                                                                     |
+| `yarn ETIMEDOUT`       | Network timeout error when trying to connect to the Yarn registry.                                | Check your internet connection and try again. If the issue persists, you can try changing the Yarn registry URL using `yarn config set registry <new-url>`.                                                                                                                   |
+| `yarn E404`            | Package not found error when trying to install a package.                                         | Ensure that the package name is correct and that it exists in the Yarn registry. If the package is private, ensure you are logged in to Yarn.                                                                                                                                 |
+| `yarn EINVALIDTAGNAME` | Invalid tag name error when trying to install a package with an invalid tag name.                 | Ensure that the tag name is valid and follows the Yarn naming conventions. If you are trying to install a specific version of a package, use the correct version format (e.g., `yarn add <package>@<version>`).                                                               |
+| `yarn ERESOLVE`        | Dependency resolution error when Yarn cannot resolve package dependencies.                        | Check your `package.json` file for conflicting versions of packages. You can try running `yarn install --legacy-peer-deps` to bypass peer dependency conflicts or manually resolve the conflicts by updating the package versions.                                            |
+| `yarn ECONNREFUSED`    | Connection refused error when trying to connect to the Yarn registry.                             | Check your internet connection and ensure that the Yarn registry URL is correct. You can also try changing the Yarn registry URL using `yarn config set registry <new-url>`. If you are behind a proxy, ensure that your proxy settings are correctly configured in Yarn.     |
+| `yarn ENOMEM`          | Out of memory error when Yarn runs out of memory during installation.                             | Try increasing the memory limit for Node.js by running `node --max-old-space-size=4096 $(which yarn) install` to allocate more memory. If the issue persists, consider optimizing your project or reducing the number of dependencies.                                        |
+| `yarn EBUSY`           | Resource busy error when trying to access a file or directory that is currently in use.           | Ensure that no other processes are using the file or directory. You can try closing any applications that may be accessing the resource or restarting your computer to release the lock.                                                                                      |
+| `yarn EPIPE`           | Broken pipe error when Yarn tries to write to a stream that has been closed.                      | This error can occur if the Yarn process is interrupted or if there is an issue with the network connection. Try running the command again or check your network connection. If the issue persists, you may need to investigate further or seek help from the Yarn community. |
+| `yarn ENOTFOUND`       | Host not found error when Yarn cannot resolve the hostname for the Yarn registry.                 | Check your internet connection and ensure that the Yarn registry URL is correct. You can also try changing the Yarn registry URL using `yarn config set registry <new-url>`. If you are behind a proxy, ensure that your proxy settings are correctly configured in Yarn.     |
+| `yarn EAI_AGAIN`       | Temporary failure in name resolution when Yarn cannot resolve the hostname for the Yarn registry. | Check your internet connection and try again. If the issue persists, you can try changing the Yarn registry URL using `yarn config set registry <new-url>`. If you are behind a proxy, ensure that your proxy settings are correctly configured in Yarn.                      |
+<BackToTop />
+
+## nvm
+
+nvm (Node Version Manager) is a tool that allows you to manage multiple versions of Node.js on your system. It enables you to switch between different Node.js versions easily, making it ideal for developers who work on multiple projects with varying Node.js requirements.
+
+### Key Features of nvm
+
+- **Version Management**: nvm allows you to install, uninstall, and switch between different versions of Node.js effortlessly.
+- **Project Isolation**: You can set a specific Node.js version for each project, ensuring that your projects run with the correct version of Node.js.
+- **Easy Installation**: nvm provides a simple command-line interface for installing and managing Node.js versions.
+
+### Benefits of Using nvm
+
+- **Flexibility**: nvm allows you to test your code against different Node.js versions, ensuring compatibility across various environments.
+- **Simplicity**: It simplifies the process of managing Node.js versions, eliminating the need to manually install and configure different versions.
+- **Community Support**: nvm has a large and active community, providing support and resources for users.
+
+### Is nvm Right for You?
+
+If you are a Node.js developer who works on multiple projects or needs to test your code against different Node.js versions, nvm is an essential tool for your development workflow. It provides a convenient way to manage Node.js versions, ensuring that you can easily switch between them as needed.
+
+### nvm vs. Other Node.js Version Managers
+
+While there are other Node.js version managers available, such as n and asdf, nvm is one of the most popular and widely used tools in the Node.js community. It offers a straightforward and user-friendly interface, making it easy for developers to manage Node.js versions without any hassle. Other version managers may have additional features or different approaches, but nvm remains a reliable choice for most Node.js developers.
+
+### nvm vs. Node.js Version Manager (n)
+
+nvm and n are both popular tools for managing Node.js versions, but they have some differences in their approach and features. Here are some key differences:
+
+- **Installation**: nvm is installed via a shell script, while n is installed via npm. This means that nvm requires a bit more setup initially, but it provides a more comprehensive solution for managing Node.js versions.
+- **Version Management**: nvm allows you to install and switch between multiple versions of Node.js easily, while n focuses on installing the latest version of Node.js and switching to it. nvm provides more flexibility in managing different Node.js versions, making it suitable for developers who work on multiple projects with varying Node.js requirements.
+- **Project Isolation**: nvm allows you to set a specific Node.js version for each project, ensuring that your projects run with the correct version of Node.js. This is particularly useful for developers who need to maintain compatibility across different projects. n does not provide this level of project isolation, making it less suitable for developers who work on multiple projects with different Node.js requirements.
+- **Community Support**: nvm has a larger and more active community compared to n, providing better support and resources for users. This means that if you encounter any issues or need help with nvm, you are more likely to find solutions and assistance from the community.
+<BackToTop />
+
+### Installing nvm
+
+To install nvm, you can use the following command in your terminal:
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+```
+
+This command will download and run the nvm installation script. After installation, you may need to restart your terminal or run the following command to load nvm:
+
+```bash
+source ~/.nvm/nvm.sh
+```
+
+### Using nvm
+
+Once nvm is installed, you can use the following commands to manage Node.js versions:
+
+- **Install a specific version**:
+
+```bash
+nvm install <version>
+```
+
+Replace `<version>` with the desired Node.js version (e.g., `nvm install 14.17.0`).
+
+- **List installed versions**:
+
+```bash
+nvm ls
+```
+
+This command will display all the Node.js versions installed on your system.
+
+- **Use a specific version**:
+
+```bash
+nvm use <version>
+```
+
+Replace `<version>` with the desired Node.js version to switch to that version.
+
+- **Set a default version**:
+
+```bash
+nvm alias default <version>
+```
+
+Replace `<version>` with the desired Node.js version to set it as the default version used when opening a new terminal session.
+
+- **Uninstall a version**:
+
+```bash
+nvm uninstall <version>
+```
+
+Replace `<version>` with the Node.js version you want to uninstall.
+
+- **Check the current version**:
+
+```bash
+nvm current
+```
+
+This command will display the currently active Node.js version.
+
+- **Update nvm**:
+
+```bash
+nvm install --lts
+```
+
+This command will install the latest Long Term Support (LTS) version of Node.js.
+
+- **Check for available Node.js versions**:
+
+```bash
+nvm ls-remote
+```
+
+This command will list all available Node.js versions that can be installed using nvm.
+
+```bash
+nvm ls-remote --lts
+```
+
+This command will list all available Long Term Support (LTS) versions of Node.js that can be installed using nvm.
+
+```bash
+nvm ls-remote --lts --json
+```
+
+This command will list all available Long Term Support (LTS) versions of Node.js in JSON format, which can be useful for scripting or automation purposes.
 
 <BackToTop />

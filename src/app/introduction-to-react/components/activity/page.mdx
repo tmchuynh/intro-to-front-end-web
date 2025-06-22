@@ -1,0 +1,1344 @@
+import BackToTop from "@/components/BackToTop";
+
+# Activity
+
+## Table of Contents
+
+## Overview
+
+Activity components in React are UI patterns designed to display user actions, system events, notifications, and real-time updates in an organized and user-friendly manner. These components are essential for creating engaging user experiences that keep users informed about what's happening in your application, whether it's their own actions or activities from other users.
+
+Activity components encompass a wide range of patterns including activity feeds, notification centers, timeline components, live updates, user action logs, and real-time collaboration indicators. They help bridge the gap between backend events and frontend user experience by presenting complex data streams in digestible, interactive formats.
+
+### Key Concepts
+
+- **Activity Feeds**: Chronological displays of user actions and system events
+- **Real-time Updates**: Live data that updates without user interaction
+- **Notification Systems**: Targeted messages for user attention
+- **Timeline Components**: Historical progression of events or milestones
+- **Action Tracking**: Logging and displaying user interactions
+- **Collaboration Indicators**: Showing multiple user activities in shared spaces
+
+### Why Activity Components Matter
+
+- **User Engagement**: Keep users informed and engaged with relevant updates
+- **Transparency**: Provide visibility into system processes and user actions
+- **Collaboration**: Enable awareness of other users' activities in shared environments
+- **Feedback**: Give immediate confirmation of user actions
+- **Context**: Help users understand the current state and recent changes
+  <BackToTop />
+
+## Types of Activity Components
+
+### Activity Feed
+
+A chronological list of events, actions, or updates:
+
+```javascript
+import React, { useState, useEffect } from "react";
+
+function ActivityFeed({ userId, limit = 10 }) {
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchActivities = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(
+          `/api/activities?userId=${userId}&limit=${limit}`
+        );
+        const data = await response.json();
+        setActivities(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchActivities();
+  }, [userId, limit]);
+
+  const getActivityIcon = (type) => {
+    const icons = {
+      user_joined: "👋",
+      post_created: "📝",
+      comment_added: "💬",
+      file_uploaded: "📁",
+      task_completed: "✅",
+      meeting_scheduled: "📅",
+    };
+    return icons[type] || "📌";
+  };
+
+  const formatTimeAgo = (timestamp) => {
+    const now = new Date();
+    const activityTime = new Date(timestamp);
+    const diffInHours = Math.floor((now - activityTime) / (1000 * 60 * 60));
+
+    if (diffInHours < 1) return "Just now";
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    if (diffInHours < 168) return `${Math.floor(diffInHours / 24)}d ago`;
+    return activityTime.toLocaleDateString();
+  };
+
+  if (loading) {
+    return (
+      <div className="activity-feed loading">
+        {Array.from({ length: 3 }, (_, i) => (
+          <div key={i} className="activity-skeleton">
+            <div className="skeleton-avatar"></div>
+            <div className="skeleton-content">
+              <div className="skeleton-line"></div>
+              <div className="skeleton-line short"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="activity-feed error">
+        <div className="error-message">
+          <span className="error-icon">⚠️</span>
+          <p>Failed to load activities: {error}</p>
+          <button onClick={() => window.location.reload()}>Try Again</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="activity-feed">
+      <h3 className="feed-title">Recent Activity</h3>
+      <div className="activity-list">
+        {activities.map((activity) => (
+          <div key={activity.id} className="activity-item">
+            <div className="activity-avatar">
+              {activity.user?.avatar ? (
+                <img src={activity.user.avatar} alt={activity.user.name} />
+              ) : (
+                <div className="avatar-placeholder">
+                  {activity.user?.name?.[0] || "?"}
+                </div>
+              )}
+            </div>
+
+            <div className="activity-content">
+              <div className="activity-header">
+                <span className="activity-icon">
+                  {getActivityIcon(activity.type)}
+                </span>
+                <span className="activity-description">
+                  <strong>{activity.user?.name || "Someone"}</strong>{" "}
+                  {activity.description}
+                </span>
+                <span className="activity-time">
+                  {formatTimeAgo(activity.timestamp)}
+                </span>
+              </div>
+
+              {activity.metadata && (
+                <div className="activity-metadata">
+                  {activity.metadata.title && (
+                    <span className="metadata-title">
+                      "{activity.metadata.title}"
+                    </span>
+                  )}
+                  {activity.metadata.location && (
+                    <span className="metadata-location">
+                      in {activity.metadata.location}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {activities.length === 0 && (
+        <div className="empty-state">
+          <span className="empty-icon">📭</span>
+          <p>No recent activity</p>
+          <small>When something happens, it'll show up here</small>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default ActivityFeed;
+```
+
+<BackToTop />
+
+### Real-time Notification Center
+
+A component for managing and displaying notifications:
+
+```javascript
+import React, { useState, useEffect, useCallback } from "react";
+
+function NotificationCenter() {
+  const [notifications, setNotifications] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Simulate real-time notifications
+  useEffect(() => {
+    const eventSource = new EventSource("/api/notifications/stream");
+
+    eventSource.onmessage = (event) => {
+      const notification = JSON.parse(event.data);
+      addNotification(notification);
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("Notification stream error:", error);
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
+
+  const addNotification = useCallback((notification) => {
+    setNotifications((prev) =>
+      [
+        {
+          ...notification,
+          id: notification.id || Date.now(),
+          timestamp: notification.timestamp || new Date().toISOString(),
+          read: false,
+        },
+        ...prev,
+      ].slice(0, 50)
+    ); // Keep only last 50 notifications
+
+    if (!notification.read) {
+      setUnreadCount((prev) => prev + 1);
+    }
+  }, []);
+
+  const markAsRead = useCallback((notificationId) => {
+    setNotifications((prev) =>
+      prev.map((notification) =>
+        notification.id === notificationId
+          ? { ...notification, read: true }
+          : notification
+      )
+    );
+    setUnreadCount((prev) => Math.max(0, prev - 1));
+  }, []);
+
+  const markAllAsRead = useCallback(() => {
+    setNotifications((prev) =>
+      prev.map((notification) => ({ ...notification, read: true }))
+    );
+    setUnreadCount(0);
+  }, []);
+
+  const removeNotification = useCallback((notificationId) => {
+    setNotifications((prev) => {
+      const notification = prev.find((n) => n.id === notificationId);
+      if (notification && !notification.read) {
+        setUnreadCount((count) => Math.max(0, count - 1));
+      }
+      return prev.filter((n) => n.id !== notificationId);
+    });
+  }, []);
+
+  const getNotificationIcon = (type) => {
+    const icons = {
+      info: "ℹ️",
+      success: "✅",
+      warning: "⚠️",
+      error: "❌",
+      message: "💬",
+      reminder: "⏰",
+      update: "🔄",
+    };
+    return icons[type] || "ℹ️";
+  };
+
+  const getNotificationColor = (type) => {
+    const colors = {
+      info: "#3498db",
+      success: "#2ecc71",
+      warning: "#f39c12",
+      error: "#e74c3c",
+      message: "#9b59b6",
+      reminder: "#1abc9c",
+      update: "#34495e",
+    };
+    return colors[type] || "#3498db";
+  };
+
+  return (
+    <div className="notification-center">
+      <button
+        className="notification-trigger"
+        onClick={() => setIsOpen(!isOpen)}
+        aria-label={`Notifications ${unreadCount > 0 ? `(${unreadCount} unread)` : ""}`}
+      >
+        <span className="notification-icon">🔔</span>
+        {unreadCount > 0 && (
+          <span className="notification-badge">
+            {unreadCount > 99 ? "99+" : unreadCount}
+          </span>
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="notification-dropdown">
+          <div className="notification-header">
+            <h3>Notifications</h3>
+            <div className="notification-actions">
+              {unreadCount > 0 && (
+                <button onClick={markAllAsRead} className="mark-all-read">
+                  Mark all as read
+                </button>
+              )}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="close-notifications"
+                aria-label="Close notifications"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+
+          <div className="notification-list">
+            {notifications.length === 0 ? (
+              <div className="empty-notifications">
+                <span className="empty-icon">📭</span>
+                <p>No notifications yet</p>
+                <small>We'll notify you when something important happens</small>
+              </div>
+            ) : (
+              notifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={`notification-item ${notification.read ? "read" : "unread"}`}
+                  style={{
+                    "--notification-color": getNotificationColor(
+                      notification.type
+                    ),
+                  }}
+                >
+                  <div className="notification-content">
+                    <div className="notification-icon">
+                      {getNotificationIcon(notification.type)}
+                    </div>
+
+                    <div className="notification-body">
+                      <div className="notification-title">
+                        {notification.title}
+                      </div>
+                      <div className="notification-message">
+                        {notification.message}
+                      </div>
+                      <div className="notification-time">
+                        {new Date(notification.timestamp).toLocaleString()}
+                      </div>
+                    </div>
+
+                    <div className="notification-actions">
+                      {!notification.read && (
+                        <button
+                          onClick={() => markAsRead(notification.id)}
+                          className="mark-read-btn"
+                          title="Mark as read"
+                        >
+                          ✓
+                        </button>
+                      )}
+                      <button
+                        onClick={() => removeNotification(notification.id)}
+                        className="remove-btn"
+                        title="Remove notification"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </div>
+
+                  {notification.actionUrl && (
+                    <div className="notification-cta">
+                      <a
+                        href={notification.actionUrl}
+                        className="notification-link"
+                        onClick={() => markAsRead(notification.id)}
+                      >
+                        {notification.actionText || "View"}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default NotificationCenter;
+```
+
+<BackToTop />
+
+### Timeline Component
+
+A visual representation of events over time:
+
+```javascript
+import React, { useState } from "react";
+
+function Timeline({ events, orientation = "vertical" }) {
+  const [expandedEvents, setExpandedEvents] = useState(new Set());
+
+  const toggleEventExpansion = (eventId) => {
+    setExpandedEvents((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(eventId)) {
+        newSet.delete(eventId);
+      } else {
+        newSet.add(eventId);
+      }
+      return newSet;
+    });
+  };
+
+  const getEventTypeStyle = (type) => {
+    const styles = {
+      milestone: { color: "#e74c3c", icon: "🎯" },
+      release: { color: "#2ecc71", icon: "🚀" },
+      update: { color: "#3498db", icon: "🔄" },
+      bug_fix: { color: "#f39c12", icon: "🐛" },
+      feature: { color: "#9b59b6", icon: "✨" },
+      meeting: { color: "#1abc9c", icon: "👥" },
+      deadline: { color: "#e67e22", icon: "⏰" },
+    };
+    return styles[type] || { color: "#34495e", icon: "📌" };
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return "Today";
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays} days ago`;
+
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: date.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
+    });
+  };
+
+  const sortedEvents = [...events].sort(
+    (a, b) => new Date(b.date) - new Date(a.date)
+  );
+
+  return (
+    <div className={`timeline timeline-${orientation}`}>
+      <div className="timeline-header">
+        <h3>Project Timeline</h3>
+        <div className="timeline-stats">
+          <span className="total-events">{events.length} events</span>
+        </div>
+      </div>
+
+      <div className="timeline-container">
+        {sortedEvents.map((event, index) => {
+          const eventStyle = getEventTypeStyle(event.type);
+          const isExpanded = expandedEvents.has(event.id);
+          const isUpcoming = new Date(event.date) > new Date();
+
+          return (
+            <div
+              key={event.id}
+              className={`timeline-event ${isUpcoming ? "upcoming" : "past"}`}
+            >
+              <div className="timeline-marker">
+                <div
+                  className="timeline-dot"
+                  style={{ backgroundColor: eventStyle.color }}
+                >
+                  <span className="timeline-icon">{eventStyle.icon}</span>
+                </div>
+                {index < sortedEvents.length - 1 && (
+                  <div className="timeline-line"></div>
+                )}
+              </div>
+
+              <div className="timeline-content">
+                <div className="timeline-date">
+                  {formatDate(event.date)}
+                  {isUpcoming && (
+                    <span className="upcoming-badge">Upcoming</span>
+                  )}
+                </div>
+
+                <div className="timeline-card">
+                  <div className="timeline-header">
+                    <h4 className="timeline-title">{event.title}</h4>
+                    <span
+                      className="timeline-type"
+                      style={{ color: eventStyle.color }}
+                    >
+                      {event.type.replace("_", " ")}
+                    </span>
+                  </div>
+
+                  <p className="timeline-summary">{event.summary}</p>
+
+                  {event.details && (
+                    <div className="timeline-details">
+                      <button
+                        onClick={() => toggleEventExpansion(event.id)}
+                        className="timeline-expand-btn"
+                      >
+                        {isExpanded ? "Show less" : "Show more"}
+                        <span
+                          className={`expand-icon ${isExpanded ? "expanded" : ""}`}
+                        >
+                          ▼
+                        </span>
+                      </button>
+
+                      {isExpanded && (
+                        <div className="timeline-expanded-content">
+                          {typeof event.details === "string" ? (
+                            <p>{event.details}</p>
+                          ) : (
+                            <div>
+                              {event.details.description && (
+                                <p>{event.details.description}</p>
+                              )}
+                              {event.details.participants && (
+                                <div className="event-participants">
+                                  <strong>Participants:</strong>
+                                  <ul>
+                                    {event.details.participants.map(
+                                      (participant, i) => (
+                                        <li key={i}>{participant}</li>
+                                      )
+                                    )}
+                                  </ul>
+                                </div>
+                              )}
+                              {event.details.links && (
+                                <div className="event-links">
+                                  <strong>Related Links:</strong>
+                                  <ul>
+                                    {event.details.links.map((link, i) => (
+                                      <li key={i}>
+                                        <a
+                                          href={link.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                        >
+                                          {link.title}
+                                        </a>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {event.tags && event.tags.length > 0 && (
+                    <div className="timeline-tags">
+                      {event.tags.map((tag, i) => (
+                        <span key={i} className="timeline-tag">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+export default Timeline;
+```
+
+<BackToTop />
+
+### Live Activity Indicator
+
+Shows real-time user presence and activities:
+
+```javascript
+import React, { useState, useEffect, useCallback } from "react";
+
+function LiveActivityIndicator({ roomId, currentUserId }) {
+  const [activeUsers, setActiveUsers] = useState([]);
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [connectionStatus, setConnectionStatus] = useState("connecting");
+
+  useEffect(() => {
+    const ws = new WebSocket(`ws://localhost:8080/rooms/${roomId}`);
+
+    ws.onopen = () => {
+      setConnectionStatus("connected");
+      ws.send(
+        JSON.stringify({
+          type: "join",
+          userId: currentUserId,
+          timestamp: new Date().toISOString(),
+        })
+      );
+    };
+
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      handleWebSocketMessage(message);
+    };
+
+    ws.onclose = () => {
+      setConnectionStatus("disconnected");
+    };
+
+    ws.onerror = () => {
+      setConnectionStatus("error");
+    };
+
+    return () => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(
+          JSON.stringify({
+            type: "leave",
+            userId: currentUserId,
+            timestamp: new Date().toISOString(),
+          })
+        );
+      }
+      ws.close();
+    };
+  }, [roomId, currentUserId]);
+
+  const handleWebSocketMessage = useCallback((message) => {
+    switch (message.type) {
+      case "user_joined":
+        setActiveUsers((prev) => {
+          const existing = prev.find((user) => user.id === message.user.id);
+          if (existing) return prev;
+          return [...prev, { ...message.user, joinedAt: message.timestamp }];
+        });
+        addActivity({
+          id: Date.now(),
+          type: "user_joined",
+          user: message.user,
+          message: `${message.user.name} joined`,
+          timestamp: message.timestamp,
+        });
+        break;
+
+      case "user_left":
+        setActiveUsers((prev) =>
+          prev.filter((user) => user.id !== message.userId)
+        );
+        addActivity({
+          id: Date.now(),
+          type: "user_left",
+          userId: message.userId,
+          message: `User left`,
+          timestamp: message.timestamp,
+        });
+        break;
+
+      case "user_activity":
+        addActivity({
+          id: Date.now(),
+          type: message.activityType,
+          user: message.user,
+          message: message.message,
+          timestamp: message.timestamp,
+          metadata: message.metadata,
+        });
+        break;
+
+      case "typing_start":
+        setActiveUsers((prev) =>
+          prev.map((user) =>
+            user.id === message.userId ? { ...user, isTyping: true } : user
+          )
+        );
+        break;
+
+      case "typing_stop":
+        setActiveUsers((prev) =>
+          prev.map((user) =>
+            user.id === message.userId ? { ...user, isTyping: false } : user
+          )
+        );
+        break;
+
+      default:
+        console.log("Unknown message type:", message.type);
+    }
+  }, []);
+
+  const addActivity = useCallback((activity) => {
+    setRecentActivities((prev) => [
+      activity,
+      ...prev.slice(0, 9), // Keep only last 10 activities
+    ]);
+
+    // Remove activity after 30 seconds
+    setTimeout(() => {
+      setRecentActivities((prev) => prev.filter((a) => a.id !== activity.id));
+    }, 30000);
+  }, []);
+
+  const getConnectionStatusColor = () => {
+    const colors = {
+      connecting: "#f39c12",
+      connected: "#2ecc71",
+      disconnected: "#e74c3c",
+      error: "#e74c3c",
+    };
+    return colors[connectionStatus] || "#34495e";
+  };
+
+  const getActivityIcon = (type) => {
+    const icons = {
+      user_joined: "👋",
+      user_left: "👋",
+      message_sent: "💬",
+      file_uploaded: "📁",
+      document_edited: "✏️",
+      cursor_moved: "👆",
+      selection_made: "🔍",
+    };
+    return icons[type] || "📌";
+  };
+
+  return (
+    <div className="live-activity-indicator">
+      <div className="activity-header">
+        <div className="connection-status">
+          <div
+            className="status-dot"
+            style={{ backgroundColor: getConnectionStatusColor() }}
+          ></div>
+          <span className="status-text">
+            {connectionStatus === "connected" ? "Live" : connectionStatus}
+          </span>
+        </div>
+
+        <div className="active-users-count">
+          {activeUsers.length} {activeUsers.length === 1 ? "user" : "users"}{" "}
+          online
+        </div>
+      </div>
+
+      <div className="active-users">
+        <h4>Active Users</h4>
+        <div className="users-list">
+          {activeUsers.map((user) => (
+            <div key={user.id} className="active-user">
+              <div className="user-avatar">
+                {user.avatar ? (
+                  <img src={user.avatar} alt={user.name} />
+                ) : (
+                  <div className="avatar-placeholder">{user.name[0]}</div>
+                )}
+                <div className="user-status-dot"></div>
+              </div>
+
+              <div className="user-info">
+                <span className="user-name">
+                  {user.name}
+                  {user.id === currentUserId && " (You)"}
+                </span>
+                {user.isTyping && (
+                  <span className="typing-indicator">
+                    <span className="typing-dots">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </span>
+                    typing...
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="recent-activities">
+        <h4>Recent Activity</h4>
+        <div className="activities-list">
+          {recentActivities.length === 0 ? (
+            <div className="no-activities">
+              <span className="empty-icon">💤</span>
+              <p>Quiet for now...</p>
+            </div>
+          ) : (
+            recentActivities.map((activity) => (
+              <div key={activity.id} className="activity-item">
+                <span className="activity-icon">
+                  {getActivityIcon(activity.type)}
+                </span>
+                <span className="activity-message">{activity.message}</span>
+                <span className="activity-time">
+                  {new Date(activity.timestamp).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default LiveActivityIndicator;
+```
+
+<BackToTop />
+
+## Advanced Activity Patterns
+
+### Activity Aggregation
+
+Combining multiple related activities into summaries:
+
+```javascript
+import React, { useMemo } from "react";
+
+function AggregatedActivityFeed({ activities, timeWindow = "hour" }) {
+  const aggregatedActivities = useMemo(() => {
+    const getTimeKey = (timestamp) => {
+      const date = new Date(timestamp);
+      switch (timeWindow) {
+        case "hour":
+          return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}`;
+        case "day":
+          return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+        case "week":
+          const weekStart = new Date(
+            date.setDate(date.getDate() - date.getDay())
+          );
+          return `${weekStart.getFullYear()}-${weekStart.getMonth()}-${weekStart.getDate()}`;
+        default:
+          return timestamp;
+      }
+    };
+
+    const groupedActivities = activities.reduce((groups, activity) => {
+      const timeKey = getTimeKey(activity.timestamp);
+      const activityKey = `${timeKey}-${activity.type}-${activity.userId}`;
+
+      if (!groups[activityKey]) {
+        groups[activityKey] = {
+          ...activity,
+          count: 1,
+          firstTimestamp: activity.timestamp,
+          lastTimestamp: activity.timestamp,
+        };
+      } else {
+        groups[activityKey].count += 1;
+        groups[activityKey].lastTimestamp = activity.timestamp;
+      }
+
+      return groups;
+    }, {});
+
+    return Object.values(groupedActivities).sort(
+      (a, b) => new Date(b.lastTimestamp) - new Date(a.lastTimestamp)
+    );
+  }, [activities, timeWindow]);
+
+  const formatAggregatedMessage = (activity) => {
+    const { user, type, count } = activity;
+    const userName = user?.name || "Someone";
+
+    if (count === 1) {
+      return `${userName} ${getActivityDescription(type)}`;
+    }
+
+    const actions = {
+      comment_added: `added ${count} comments`,
+      file_uploaded: `uploaded ${count} files`,
+      task_completed: `completed ${count} tasks`,
+      post_liked: `liked ${count} posts`,
+    };
+
+    return `${userName} ${actions[type] || `performed ${count} actions`}`;
+  };
+
+  const getActivityDescription = (type) => {
+    const descriptions = {
+      comment_added: "added a comment",
+      file_uploaded: "uploaded a file",
+      task_completed: "completed a task",
+      post_liked: "liked a post",
+    };
+    return descriptions[type] || "performed an action";
+  };
+
+  return (
+    <div className="aggregated-activity-feed">
+      <div className="feed-controls">
+        <label>
+          Group by:
+          <select
+            value={timeWindow}
+            onChange={(e) => setTimeWindow(e.target.value)}
+          >
+            <option value="hour">Hour</option>
+            <option value="day">Day</option>
+            <option value="week">Week</option>
+          </select>
+        </label>
+      </div>
+
+      <div className="aggregated-activities">
+        {aggregatedActivities.map((activity) => (
+          <div
+            key={`${activity.id}-${activity.count}`}
+            className="aggregated-activity"
+          >
+            <div className="activity-summary">
+              <span className="activity-message">
+                {formatAggregatedMessage(activity)}
+              </span>
+              {activity.count > 1 && (
+                <span className="activity-count-badge">{activity.count}</span>
+              )}
+            </div>
+            <div className="activity-timespan">
+              {activity.count > 1 ? (
+                <span>
+                  {new Date(activity.firstTimestamp).toLocaleString()} -
+                  {new Date(activity.lastTimestamp).toLocaleString()}
+                </span>
+              ) : (
+                <span>{new Date(activity.timestamp).toLocaleString()}</span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+### Activity Filtering and Search
+
+Advanced filtering capabilities for activity feeds:
+
+```javascript
+import React, { useState, useMemo } from "react";
+
+function FilterableActivityFeed({ activities }) {
+  const [filters, setFilters] = useState({
+    search: "",
+    types: [],
+    users: [],
+    dateRange: { start: "", end: "" },
+  });
+
+  const [sortBy, setSortBy] = useState("timestamp");
+  const [sortOrder, setSortOrder] = useState("desc");
+
+  const availableTypes = useMemo(() => {
+    const types = [...new Set(activities.map((a) => a.type))];
+    return types.sort();
+  }, [activities]);
+
+  const availableUsers = useMemo(() => {
+    const users = [
+      ...new Set(activities.map((a) => a.user?.name).filter(Boolean)),
+    ];
+    return users.sort();
+  }, [activities]);
+
+  const filteredAndSortedActivities = useMemo(() => {
+    let filtered = activities;
+
+    // Text search
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filtered = filtered.filter(
+        (activity) =>
+          activity.description?.toLowerCase().includes(searchLower) ||
+          activity.user?.name?.toLowerCase().includes(searchLower) ||
+          activity.metadata?.title?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Type filter
+    if (filters.types.length > 0) {
+      filtered = filtered.filter((activity) =>
+        filters.types.includes(activity.type)
+      );
+    }
+
+    // User filter
+    if (filters.users.length > 0) {
+      filtered = filtered.filter((activity) =>
+        filters.users.includes(activity.user?.name)
+      );
+    }
+
+    // Date range filter
+    if (filters.dateRange.start) {
+      const startDate = new Date(filters.dateRange.start);
+      filtered = filtered.filter(
+        (activity) => new Date(activity.timestamp) >= startDate
+      );
+    }
+
+    if (filters.dateRange.end) {
+      const endDate = new Date(filters.dateRange.end);
+      endDate.setHours(23, 59, 59, 999); // End of day
+      filtered = filtered.filter(
+        (activity) => new Date(activity.timestamp) <= endDate
+      );
+    }
+
+    // Sorting
+    filtered.sort((a, b) => {
+      let aValue, bValue;
+
+      switch (sortBy) {
+        case "timestamp":
+          aValue = new Date(a.timestamp);
+          bValue = new Date(b.timestamp);
+          break;
+        case "user":
+          aValue = a.user?.name || "";
+          bValue = b.user?.name || "";
+          break;
+        case "type":
+          aValue = a.type;
+          bValue = b.type;
+          break;
+        default:
+          return 0;
+      }
+
+      if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
+
+    return filtered;
+  }, [activities, filters, sortBy, sortOrder]);
+
+  const updateFilter = (key, value) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const toggleTypeFilter = (type) => {
+    setFilters((prev) => ({
+      ...prev,
+      types: prev.types.includes(type)
+        ? prev.types.filter((t) => t !== type)
+        : [...prev.types, type],
+    }));
+  };
+
+  const toggleUserFilter = (user) => {
+    setFilters((prev) => ({
+      ...prev,
+      users: prev.users.includes(user)
+        ? prev.users.filter((u) => u !== user)
+        : [...prev.users, user],
+    }));
+  };
+
+  const clearAllFilters = () => {
+    setFilters({
+      search: "",
+      types: [],
+      users: [],
+      dateRange: { start: "", end: "" },
+    });
+  };
+
+  return (
+    <div className="filterable-activity-feed">
+      <div className="activity-filters">
+        <div className="filter-section">
+          <label>Search:</label>
+          <input
+            type="text"
+            value={filters.search}
+            onChange={(e) => updateFilter("search", e.target.value)}
+            placeholder="Search activities..."
+            className="search-input"
+          />
+        </div>
+
+        <div className="filter-section">
+          <label>Activity Types:</label>
+          <div className="filter-chips">
+            {availableTypes.map((type) => (
+              <button
+                key={type}
+                onClick={() => toggleTypeFilter(type)}
+                className={`filter-chip ${filters.types.includes(type) ? "active" : ""}`}
+              >
+                {type.replace("_", " ")}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="filter-section">
+          <label>Users:</label>
+          <div className="filter-chips">
+            {availableUsers.map((user) => (
+              <button
+                key={user}
+                onClick={() => toggleUserFilter(user)}
+                className={`filter-chip ${filters.users.includes(user) ? "active" : ""}`}
+              >
+                {user}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="filter-section">
+          <label>Date Range:</label>
+          <div className="date-range">
+            <input
+              type="date"
+              value={filters.dateRange.start}
+              onChange={(e) =>
+                updateFilter("dateRange", {
+                  ...filters.dateRange,
+                  start: e.target.value,
+                })
+              }
+            />
+            <span>to</span>
+            <input
+              type="date"
+              value={filters.dateRange.end}
+              onChange={(e) =>
+                updateFilter("dateRange", {
+                  ...filters.dateRange,
+                  end: e.target.value,
+                })
+              }
+            />
+          </div>
+        </div>
+
+        <div className="filter-section">
+          <label>Sort by:</label>
+          <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+            <option value="timestamp">Date</option>
+            <option value="user">User</option>
+            <option value="type">Type</option>
+          </select>
+          <button
+            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+            className="sort-order-btn"
+          >
+            {sortOrder === "asc" ? "↑" : "↓"}
+          </button>
+        </div>
+
+        <button onClick={clearAllFilters} className="clear-filters-btn">
+          Clear All Filters
+        </button>
+      </div>
+
+      <div className="activity-results">
+        <div className="results-summary">
+          Showing {filteredAndSortedActivities.length} of {activities.length}{" "}
+          activities
+        </div>
+
+        <div className="activity-list">
+          {filteredAndSortedActivities.map((activity) => (
+            <div key={activity.id} className="activity-item">
+              {/* Render activity item */}
+              <div className="activity-content">
+                <strong>{activity.user?.name}</strong> {activity.description}
+              </div>
+              <div className="activity-timestamp">
+                {new Date(activity.timestamp).toLocaleString()}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {filteredAndSortedActivities.length === 0 && (
+          <div className="no-results">
+            <span className="no-results-icon">🔍</span>
+            <p>No activities match your current filters</p>
+            <button onClick={clearAllFilters}>Clear filters</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+## Best Practices
+
+### Performance Optimization
+
+```javascript
+// Virtualized activity feed for large datasets
+import React, { useMemo } from "react";
+import { FixedSizeList as List } from "react-window";
+
+function VirtualizedActivityFeed({ activities, height = 400 }) {
+  const memoizedActivities = useMemo(() => activities, [activities]);
+
+  const ActivityItem = ({ index, style }) => {
+    const activity = memoizedActivities[index];
+
+    return (
+      <div style={style} className="virtualized-activity-item">
+        <div className="activity-content">
+          <strong>{activity.user?.name}</strong> {activity.description}
+        </div>
+        <div className="activity-time">
+          {new Date(activity.timestamp).toLocaleString()}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <List
+      height={height}
+      itemCount={memoizedActivities.length}
+      itemSize={80}
+      className="virtualized-activity-list"
+    >
+      {ActivityItem}
+    </List>
+  );
+}
+```
+
+<BackToTop />
+
+### Accessibility Features
+
+```javascript
+function AccessibleActivityFeed({ activities }) {
+  const [announcements, setAnnouncements] = useState([]);
+
+  useEffect(() => {
+    // Announce new activities to screen readers
+    const latestActivity = activities[0];
+    if (latestActivity && !announcements.includes(latestActivity.id)) {
+      const announcement = `New activity: ${latestActivity.user?.name} ${latestActivity.description}`;
+      setAnnouncements((prev) => [latestActivity.id, ...prev.slice(0, 4)]);
+
+      // Use live region for announcements
+      const liveRegion = document.getElementById("activity-announcements");
+      if (liveRegion) {
+        liveRegion.textContent = announcement;
+      }
+    }
+  }, [activities, announcements]);
+
+  return (
+    <div className="accessible-activity-feed">
+      <div
+        id="activity-announcements"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      />
+
+      <div
+        role="log"
+        aria-label="Activity feed"
+        aria-describedby="activity-description"
+      >
+        <p id="activity-description" className="sr-only">
+          A live updating list of recent user activities
+        </p>
+
+        {activities.map((activity, index) => (
+          <div
+            key={activity.id}
+            role="article"
+            aria-labelledby={`activity-${activity.id}-title`}
+            className="activity-item"
+          >
+            <h4 id={`activity-${activity.id}-title`} className="sr-only">
+              Activity by {activity.user?.name}
+            </h4>
+            <div className="activity-content">
+              <strong>{activity.user?.name}</strong> {activity.description}
+            </div>
+            <time dateTime={activity.timestamp}>
+              {new Date(activity.timestamp).toLocaleString()}
+            </time>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+## Conclusion
+
+Activity components are crucial for creating engaging, transparent, and collaborative user experiences in modern React applications. They help bridge the gap between backend events and frontend user interfaces, providing users with the context and awareness they need to stay informed and engaged.
+
+### Key Takeaways
+
+- **Choose the right pattern** for your specific use case (feeds, notifications, timelines, etc.)
+- **Optimize for performance** with virtualization, pagination, and efficient state management
+- **Consider real-time updates** for enhanced user engagement
+- **Implement proper accessibility** features for inclusive design
+- **Provide filtering and search** capabilities for large datasets
+- **Aggregate related activities** to reduce noise and improve readability
+- **Handle edge cases** like empty states, errors, and loading states gracefully
+
+Activity components should feel natural and unobtrusive while providing valuable information that enhances the user experience. By following these patterns and best practices, you can create activity systems that users will find helpful and engaging rather than overwhelming or distracting.
+
+<BackToTop />

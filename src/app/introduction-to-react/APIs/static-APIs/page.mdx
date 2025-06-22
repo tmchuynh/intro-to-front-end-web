@@ -1,0 +1,94 @@
+import BackToTop from "@/components/BackToTop";
+
+# Static APIs
+
+## Table of Contents
+
+## Overview
+
+Static APIs in React are used to handle static data and resources that do not change over time. These APIs allow you to serve static files, such as images, stylesheets, and scripts, directly from the server without the need for dynamic processing. They are essential for optimizing performance and improving the user experience by reducing load times and server requests.
+
+### Core Concepts
+
+- **Static Files**: These are files that do not change and can be served directly to the client. Examples include images, CSS files, and JavaScript files.
+- **Caching**: Static files can be cached by the browser, which reduces the need for repeated requests to the server. This improves performance and reduces server load.
+- **Content Delivery Network (CDN)**: A CDN can be used to distribute static files across multiple servers around the world, allowing users to access them from the nearest server, further improving load times.
+
+### Benefits
+
+- **Performance**: Serving static files is faster than generating dynamic content, leading to quicker page loads.
+- **Scalability**: Static files can be easily cached and served from multiple locations, making it easier to handle high traffic.
+- **Simplicity**: Static APIs are straightforward to implement and require less server-side processing, making them easier to maintain.
+
+### Use Cases
+
+- **Serving Images**: Static APIs can be used to serve images for a website or application, such as logos, icons, and product photos.
+- **Stylesheets**: CSS files can be served as static files, allowing for consistent styling across the application without the need for dynamic generation.
+- **JavaScript Libraries**: Common libraries and frameworks can be served as static files, reducing the need for bundling and improving load times.
+  <BackToTop />
+
+## `prerender()`
+
+The `prerender()` function is a static API in React that allows you to pre-render pages at build time. This means that the HTML for the page is generated ahead of time, rather than on each request, which can significantly improve performance and SEO.
+
+### Usage
+
+To use `prerender()`, you typically define it in your page component file. The function should return an object containing the props that will be passed to the page component. This allows you to fetch data or perform any necessary calculations before the page is rendered.
+
+```javascript
+export async function prerender() {
+  // Fetch data or perform calculations
+  const data = await fetchData();
+  return {
+    props: {
+      data,
+    },
+  };
+}
+```
+
+### Benefits
+
+- **Performance**: Pre-rendering pages reduces the time it takes to load the page, as the HTML is generated ahead of time and served directly to the client.
+- **SEO**: Pre-rendered pages are more easily indexed by search engines, improving the visibility of your application in search results.
+- **User Experience**: Users receive a fully rendered page more quickly, leading to a better overall experience.
+
+### Considerations
+
+- **Build Time**: Pre-rendering can increase the build time of your application, especially if you have many pages or complex data fetching.
+- **Data Freshness**: Since the data is fetched at build time, it may not always be up-to-date. You may need to implement strategies to refresh the data periodically or on specific user actions.
+- **Dynamic Content**: If your page relies heavily on dynamic content that changes frequently, pre-rendering may not be the best approach.
+  <BackToTop />
+
+## `prerenderToNodeStream()`
+
+The `prerenderToNodeStream()` function is another static API in React that allows you to pre-render pages to a Node.js stream. This is particularly useful for applications that require server-side rendering (SSR) and want to take advantage of streaming to improve performance and reduce memory usage.
+
+### Usage
+
+To use `prerenderToNodeStream()`, you define it in your page component file. The function should return a Node.js stream that emits the HTML for the page as it is being generated. This allows the server to start sending the HTML to the client before the entire page is rendered.
+
+```javascript
+import { prerenderToNodeStream } from "react";
+export async function prerenderToNodeStream() {
+  const stream = prerenderToNodeStream(async (write) => {
+    // Fetch data or perform calculations
+    const data = await fetchData();
+    write(`<div>${data}</div>`);
+  });
+
+  return stream;
+}
+```
+
+### Benefits
+
+- **Performance**: Streaming allows the server to send parts of the page to the client as they are generated, reducing the time it takes for the user to see the content.
+- **Memory Efficiency**: By streaming the HTML, you can reduce memory usage on the server, as you don't need to hold the entire page in memory before sending it to the client.
+- **Progressive Rendering**: Users can start interacting with the page as soon as the first parts of the HTML are sent, leading to a more responsive experience.
+
+### Considerations
+
+- **Complexity**: Implementing streaming can be more complex than traditional pre-rendering, especially if you need to manage multiple streams or handle errors during streaming.
+- **Browser Compatibility**: Not all browsers support streaming, so you may need to implement fallbacks for users on older browsers.
+  <BackToTop />

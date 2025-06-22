@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Sidebar from "./Sidebar";
+import { ThemeProvider } from "./ThemeProvider";
 import TopNavbar from "./TopNavbar";
 
 interface LayoutWrapperProps {
@@ -20,20 +21,22 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   };
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
+    <ThemeProvider>
+      <div className="flex h-screen">
+        {/* Sidebar */}
+        <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
 
-      {/* Main content area */}
-      <div className="flex flex-1 flex-col min-w-0">
-        {/* Top navbar */}
-        <TopNavbar onToggleSidebar={toggleSidebar} />
+        {/* Main content area */}
+        <div className="flex flex-1 flex-col min-w-0">
+          {/* Top navbar */}
+          <TopNavbar onToggleSidebar={toggleSidebar} />
 
-        {/* Main content */}
-        <main className="flex-1 overflow-auto">
-          <div className="mx-auto px-4 lg:px-8 py-8">{children}</div>
-        </main>
+          {/* Main content */}
+          <main className="flex-1 overflow-auto">
+            <div className="mx-auto px-4 lg:px-8 py-8">{children}</div>
+          </main>
+        </div>
       </div>
-    </div>
+    </ThemeProvider>
   );
 }

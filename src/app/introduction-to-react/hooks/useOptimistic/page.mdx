@@ -1,0 +1,183 @@
+import BackToTop from "@/components/BackToTop";
+
+# useOptimistic
+
+## Table of Contents
+
+## Overview
+
+useOptimistic is a React hook that allows you to manage optimistic updates in your application. Optimistic updates are a technique where you update the UI immediately in anticipation of a successful server response, providing a more responsive user experience.
+This hook is particularly useful for scenarios where you want to update the UI before receiving confirmation from the server, such as when adding or removing items from a list.
+
+#### Benefits of using `useOptimistic`:
+
+- **Improved User Experience**: By updating the UI immediately, users see changes without waiting for server responses, making the application feel faster and more responsive.
+- **Reduced Latency**: It minimizes the perceived latency of operations by allowing users to interact with the UI while waiting for server confirmation.
+- **Optimistic UI Updates**: It allows you to implement optimistic UI updates, where the UI reflects the expected outcome of an operation before the server response is received.
+
+#### When to Use `useOptimistic`:
+
+- When you want to provide a more responsive user experience by updating the UI immediately in anticipation of a successful server response.
+- When you want to implement optimistic UI updates for operations that can be performed without waiting for server confirmation, such as adding or removing items from a list.
+- When you want to manage the state of optimistic updates in your application, including handling loading and error states.
+
+### Syntax
+
+```javascript
+import React, { useState } from "react";
+const useOptimistic = (initialValue) => {
+  const [value, setValue] = useState(initialValue);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const optimisticUpdate = (newValue) => {
+    setLoading(true);
+    setValue(newValue);
+    // Simulate server request
+    setTimeout(() => {
+      setLoading(false);
+      // Simulate success or failure
+      if (Math.random() > 0.5) {
+        setValue(newValue);
+        setError(null);
+      } else {
+        setError("Failed to update");
+        setValue(initialValue); // Revert to initial value on error
+      }
+    }, 1000);
+  };
+  return { value, loading, error, optimisticUpdate };
+};
+```
+
+### Parameters
+
+- `initialValue`: The initial value for the optimistic state. This is the value that will be used as the starting point for the optimistic updates.
+- `optimisticUpdate`: A function that takes a new value and updates the state optimistically. It sets the loading state to `true`, updates the value immediately, and simulates a server request.
+- `value`: The current value of the optimistic state. This is the value that will be displayed in the UI.
+- `loading`: A boolean indicating whether the optimistic update is currently in progress. This can be used to show a loading indicator in the UI.
+- `error`: An error message if the optimistic update fails. This can be used to display an error message in the UI.
+
+### Returns
+
+- An object containing the following properties:
+  - `value`: The current value of the optimistic state.
+  - `loading`: A boolean indicating whether the optimistic update is currently in progress.
+  - `error`: An error message if the optimistic update fails.
+  - `optimisticUpdate`: A function that takes a new value and updates the state optimistically.
+
+<BackToTop />
+
+### How It Works
+
+#### Initial Render
+
+When the component is first rendered, the `useOptimistic` hook initializes the state with the `initialValue`. It also sets up the loading and error states to manage the optimistic updates.
+
+#### Updates
+
+When the `optimisticUpdate` function is called with a new value, it sets the loading state to `true`, updates the value immediately, and simulates a server request using a timeout. After the timeout, it randomly simulates a success or failure response.
+
+- If the update is successful, it updates the value and clears any error state.
+- If the update fails, it sets the error state and reverts the value to the initial value, allowing the UI to reflect the failure.
+
+#### What Happens on Re-renders
+
+On subsequent renders, the `useOptimistic` hook maintains the current value, loading state, and error state. If the `optimisticUpdate` function is called again, it will follow the same process of updating the value, setting the loading state, and simulating a server request. The UI will reflect the current value, loading state, and any error messages as needed.
+
+<BackToTop />
+
+## Common Use Cases
+
+- **Form Submissions**: When submitting a form, you can use `useOptimistic` to immediately update the UI with the new form data while waiting for the server response.
+- **List Management**: When adding or removing items from a list, you can use `useOptimistic` to update the list immediately, providing a responsive user experience while waiting for the server confirmation.
+- **Real-time Updates**: When implementing real-time updates, such as chat messages or notifications, you can use `useOptimistic` to update the UI immediately with new messages or notifications, providing a seamless user experience.
+
+## What to Expect
+
+When using the `useOptimistic` hook, you can expect the following behavior:
+
+- The initial value will be set as the starting point for the optimistic updates.
+- When the `optimisticUpdate` function is called, the UI will update immediately with the new value, providing a responsive user experience.
+- The loading state will be set to `true` while the optimistic update is being processed, allowing you to show a loading indicator if desired.
+- If the optimistic update is successful, the value will be updated, and any error state will be cleared.
+- If the optimistic update fails, the error state will be set, and the value will revert to the initial value, allowing the UI to reflect the failure.
+
+## What to Avoid
+
+- Avoid using the hook for operations that require immediate server confirmation, as it is designed for optimistic updates where the UI can be updated immediately without waiting for a server response.
+- Avoid using the hook for operations that may lead to inconsistent state if the optimistic update fails, as it is designed to handle optimistic updates where the UI can be updated immediately in anticipation of a successful server response.
+- Avoid using the hook for operations that require complex error handling, as it is designed to handle simple optimistic updates where the UI can be updated immediately in anticipation of a successful server response.
+- Avoid using the hook for operations that require immediate server confirmation, as it is designed for optimistic updates where the UI can be updated immediately without waiting for a server response.
+  <BackToTop />
+
+## Examples
+
+### Basic Usage
+
+```javascript
+import React from "react";
+import useOptimistic from "./useOptimistic";
+const MyComponent = () => {
+  const { value, loading, error, optimisticUpdate } = useOptimistic([]);
+
+  const handleAddItem = () => {
+    optimisticUpdate([...value, "New Item"]);
+  };
+
+  return (
+    <div>
+      <h1>Optimistic Updates Example</h1>
+      <button onClick={handleAddItem} disabled={loading}>
+        {loading ? "Adding..." : "Add Item"}
+      </button>
+      {error && <p>Error: {error}</p>}
+      <ul>
+        {value.map((item, index) => (
+          <li key={index}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+export default MyComponent;
+```
+
+<BackToTop />
+
+### Advanced Usage with Error Handling
+
+```javascript
+import React from "react";
+import useOptimistic from "./useOptimistic";
+const MyComponent = () => {
+  const { value, loading, error, optimisticUpdate } = useOptimistic([]);
+  const handleAddItem = () => {
+    optimisticUpdate([...value, "New Item"]);
+  };
+  return (
+    <div>
+      <h1>Optimistic Updates Example</h1>
+      <button onClick={handleAddItem} disabled={loading}>
+        {loading ? "Adding..." : "Add Item"}
+      </button>
+      {error && <p>Error: {error}</p>}
+      <ul>
+        {value.map((item, index) => (
+          <li key={index}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+export default MyComponent;
+```
+
+<BackToTop />
+
+## Best Practices
+
+- Use `useOptimistic` for operations that can be performed without waiting for server confirmation, such as adding or removing items from a list.
+- Handle loading and error states appropriately to provide feedback to the user during optimistic updates.
+- Ensure that the optimistic updates do not lead to inconsistent state if the server response fails, by reverting to the initial value or handling errors gracefully.
+- Test the optimistic updates thoroughly to ensure that they work as expected and provide a smooth user experience.
+  <BackToTop />

@@ -6,54 +6,991 @@ import BackToTop from "@/components/BackToTop";
 
 ## Overview
 
-Document APIs are a type of API that allows applications to interact with document-based data stores. They provide a way to create, read, update, and delete documents in a structured format, often using JSON or XML. Document APIs are commonly used in content management systems, databases, and applications that require flexible data storage.
+Document APIs are specialized interfaces that enable applications to interact with document-oriented databases and data stores. Unlike traditional relational databases that organize data in tables with fixed schemas, document APIs work with semi-structured data stored as documents, typically in JSON, BSON, or XML formats. These APIs provide a flexible and intuitive way to store, retrieve, and manipulate complex data structures that can vary in schema and contain nested objects, arrays, and various data types.
+
+Document APIs are particularly well-suited for modern web applications, content management systems, and applications requiring rapid development and schema evolution. They bridge the gap between the object-oriented nature of application code and data persistence, allowing developers to work with data in a more natural, document-centric manner.
 
 ### Key Features
 
-- **Document-Oriented**: Focus on managing documents rather than individual data fields.
-- **Flexible Schema**: Allow for dynamic and flexible data structures, accommodating various document formats.
+- **Document-Oriented Storage**: Focus on managing documents as the primary unit of data, where each document can contain complex, nested structures with varying schemas.
+- **Schema Flexibility**: Allow for dynamic and evolving data structures without requiring predefined schemas, making it easy to adapt to changing requirements.
+- **JSON/BSON Native Support**: Most document APIs natively support JSON (JavaScript Object Notation) or BSON (Binary JSON) formats, making them natural for web development.
 - **CRUD Operations**:
-  - **Create**: Add new documents to the system.
-  - **Read**: Retrieve documents based on specific criteria or identifiers.
-  - **Update**: Modify existing documents with new data.
-  - **Delete**: Remove documents from the system.
-- **Indexing**: Support for indexing documents to improve search and retrieval performance.
-- **Search Capabilities**: Enable full-text search and filtering of documents based on various attributes.
-- **Versioning**: Track changes to documents over time, allowing for rollback and history management.
-- **Access Control**: Implement security measures to control who can access or modify documents.
-- **Query Capabilities**: Enable complex queries to retrieve documents based on specific criteria.
+  - **Create**: Add new documents with unique identifiers
+  - **Read**: Retrieve documents using various query methods
+  - **Update**: Modify documents partially or completely
+  - **Delete**: Remove documents from collections
+- **Indexing and Performance**: Support for multiple index types including compound, text, geospatial, and partial indexes to optimize query performance.
+- **Advanced Query Capabilities**:
+  - Field-level queries with operators ($eq, $gt, $lt, $in, etc.)
+  - Regular expression matching
+  - Array operations and element matching
+  - Aggregation pipelines for complex data processing
+- **Full-Text Search**: Built-in text search capabilities with language-specific stemming and ranking.
+- **Geospatial Queries**: Support for location-based queries and geographic data types.
+- **Atomic Operations**: Document-level atomicity ensuring data consistency during updates.
+- **Versioning and Change Tracking**: Track document modifications over time with timestamp and version control.
+- **Access Control and Security**: Role-based access control, field-level security, and encryption at rest and in transit.
+- **Horizontal Scaling**: Support for sharding and replication across multiple servers.
+
+## Document Structure and Data Models
+
+Document APIs typically work with JSON-like documents that can contain:
+
+```json
+{
+  "_id": "507f1f77bcf86cd799439011",
+  "title": "Introduction to Document APIs",
+  "author": {
+    "name": "Jane Smith",
+    "email": "jane@example.com",
+    "bio": "Senior Software Engineer"
+  },
+  "tags": ["database", "api", "nosql", "mongodb"],
+  "metadata": {
+    "created_at": "2024-01-15T10:30:00Z",
+    "updated_at": "2024-01-20T14:45:00Z",
+    "version": 2,
+    "status": "published"
+  },
+  "content": {
+    "sections": [
+      {
+        "heading": "Overview",
+        "body": "Document APIs provide flexible data storage...",
+        "word_count": 245
+      },
+      {
+        "heading": "Examples",
+        "body": "Here are some practical examples...",
+        "word_count": 180
+      }
+    ],
+    "estimated_read_time": 8
+  },
+  "comments": [
+    {
+      "user": "bob123",
+      "text": "Great article!",
+      "timestamp": "2024-01-16T09:15:00Z",
+      "likes": 5
+    }
+  ]
+}
+```
+
+This example demonstrates:
+
+- **Embedded Documents**: `author`, `metadata`, `content` objects
+- **Arrays**: `tags`, `sections`, `comments`
+- **Mixed Data Types**: strings, numbers, dates, booleans
+- **Nested Structures**: Objects within arrays within objects
+  <BackToTop />
+
+## CRUD Operations with Examples
+
+### Create Operations
+
+**MongoDB Example:**
+
+```javascript
+// Insert a single document
+const result = await db.collection("articles").insertOne({
+  title: "Getting Started with Document APIs",
+  author: {
+    name: "John Doe",
+    email: "john@example.com",
+  },
+  tags: ["tutorial", "database"],
+  published: true,
+  created_at: new Date(),
+});
+
+// Insert multiple documents
+const results = await db.collection("articles").insertMany([
+  {
+    title: "Advanced Querying",
+    author: { name: "Alice Johnson", email: "alice@example.com" },
+    tags: ["advanced", "queries"],
+  },
+  {
+    title: "Performance Optimization",
+    author: { name: "Bob Wilson", email: "bob@example.com" },
+    tags: ["performance", "optimization"],
+  },
+]);
+```
+
+**Firestore Example:**
+
+```javascript
+import { doc, setDoc, addDoc, collection } from "firebase/firestore";
+
+// Add document with custom ID
+await setDoc(doc(db, "articles", "article-001"), {
+  title: "Document API Guide",
+  author: "Jane Smith",
+  published: true,
+  timestamp: serverTimestamp(),
+});
+
+// Add document with auto-generated ID
+const docRef = await addDoc(collection(db, "articles"), {
+  title: "Auto-generated ID Article",
+  content: "This document will have an auto-generated ID",
+});
+```
+
+### Read Operations
+
+**MongoDB Query Examples:**
+
+```javascript
+// Find all published articles
+const publishedArticles = await db
+  .collection("articles")
+  .find({ published: true })
+  .toArray();
+
+// Find articles by specific author
+const authorArticles = await db
+  .collection("articles")
+  .find({ "author.name": "John Doe" })
+  .toArray();
+
+// Find articles with specific tags
+const taggedArticles = await db
+  .collection("articles")
+  .find({ tags: { $in: ["tutorial", "database"] } })
+  .toArray();
+
+// Find articles created after a specific date
+const recentArticles = await db
+  .collection("articles")
+  .find({
+    created_at: {
+      $gte: new Date("2024-01-01"),
+    },
+  })
+  .sort({ created_at: -1 })
+  .limit(10)
+  .toArray();
+
+// Complex query with multiple conditions
+const complexQuery = await db
+  .collection("articles")
+  .find({
+    $and: [
+      { published: true },
+      { "author.email": { $regex: /@example\.com$/ } },
+      { tags: { $size: { $gte: 2 } } },
+    ],
+  })
+  .toArray();
+```
+
+**Firestore Query Examples:**
+
+```javascript
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs,
+} from "firebase/firestore";
+
+// Basic query
+const q = query(
+  collection(db, "articles"),
+  where("published", "==", true),
+  orderBy("created_at", "desc"),
+  limit(10)
+);
+const querySnapshot = await getDocs(q);
+
+// Compound query
+const complexQ = query(
+  collection(db, "articles"),
+  where("published", "==", true),
+  where("tags", "array-contains-any", ["tutorial", "guide"]),
+  orderBy("created_at", "desc")
+);
+const complexSnapshot = await getDocs(complexQ);
+```
+
+### Update Operations
+
+**MongoDB Update Examples:**
+
+```javascript
+// Update a single document
+await db.collection("articles").updateOne(
+  { _id: ObjectId("507f1f77bcf86cd799439011") },
+  {
+    $set: {
+      title: "Updated Title",
+      "metadata.updated_at": new Date(),
+    },
+    $push: {
+      tags: "updated",
+    },
+  }
+);
+
+// Update multiple documents
+await db.collection("articles").updateMany(
+  { published: false },
+  {
+    $set: {
+      status: "draft",
+      "metadata.updated_at": new Date(),
+    },
+  }
+);
+
+// Upsert operation (update or insert)
+await db.collection("articles").updateOne(
+  { slug: "unique-article-slug" },
+  {
+    $set: {
+      title: "New Article",
+      content: "Article content",
+      created_at: new Date(),
+    },
+  },
+  { upsert: true }
+);
+```
+
+**Firestore Update Examples:**
+
+```javascript
+import { doc, updateDoc, arrayUnion, increment } from "firebase/firestore";
+
+// Update specific fields
+await updateDoc(doc(db, "articles", "article-001"), {
+  title: "Updated Title",
+  "metadata.updated_at": serverTimestamp(),
+  tags: arrayUnion("new-tag"),
+});
+
+// Increment a numeric field
+await updateDoc(doc(db, "articles", "article-001"), {
+  views: increment(1),
+});
+```
+
+### Delete Operations
+
+**MongoDB Delete Examples:**
+
+```javascript
+// Delete a single document
+await db.collection("articles").deleteOne({
+  _id: ObjectId("507f1f77bcf86cd799439011"),
+});
+
+// Delete multiple documents
+await db.collection("articles").deleteMany({
+  published: false,
+  created_at: { $lt: new Date("2024-01-01") },
+});
+```
+
+**Firestore Delete Examples:**
+
+```javascript
+import { doc, deleteDoc } from "firebase/firestore";
+
+// Delete a document
+await deleteDoc(doc(db, "articles", "article-001"));
+```
+
+<BackToTop />
+
+## Query Examples
+
+### Aggregation Pipeline (MongoDB)
+
+```javascript
+// Complex aggregation example
+const aggregationResult = await db
+  .collection("articles")
+  .aggregate([
+    // Match published articles
+    { $match: { published: true } },
+
+    // Add computed fields
+    {
+      $addFields: {
+        tag_count: { $size: "$tags" },
+        author_domain: {
+          $arrayElemAt: [{ $split: ["$author.email", "@"] }, 1],
+        },
+      },
+    },
+
+    // Group by author domain
+    {
+      $group: {
+        _id: "$author_domain",
+        article_count: { $sum: 1 },
+        avg_tags: { $avg: "$tag_count" },
+        authors: { $addToSet: "$author.name" },
+        latest_article: { $max: "$created_at" },
+      },
+    },
+
+    // Sort by article count
+    { $sort: { article_count: -1 } },
+
+    // Limit results
+    { $limit: 5 },
+  ])
+  .toArray();
+```
+
+### Text Search Examples
+
+**MongoDB Text Search:**
+
+```javascript
+// Create text index first
+await db.collection("articles").createIndex({
+  title: "text",
+  content: "text",
+  "author.name": "text",
+});
+
+// Perform text search
+const searchResults = await db
+  .collection("articles")
+  .find({
+    $text: {
+      $search: "database tutorial mongodb",
+      $language: "english",
+    },
+  })
+  .sort({ score: { $meta: "textScore" } })
+  .toArray();
+```
+
+### Geospatial Queries
+
+**MongoDB Geospatial Example:**
+
+```javascript
+// Find articles near a location
+const nearbyArticles = await db
+  .collection("articles")
+  .find({
+    location: {
+      $near: {
+        $geometry: {
+          type: "Point",
+          coordinates: [-122.4194, 37.7749], // San Francisco
+        },
+        $maxDistance: 1000, // 1km radius
+      },
+    },
+  })
+  .toArray();
+```
 
 ### Use Cases
 
-- **Content Management Systems**: Managing articles, blog posts, and other content types.
-- **Database Management**: Storing and retrieving structured data in a document format.
-- **Data Integration**: Integrating data from various sources into a unified document format.
-- **Search Applications**: Building search engines that index and retrieve documents based on user queries.
+- **Content Management Systems (CMS)**:
+  - Managing articles, blog posts, pages, and multimedia content
+  - Supporting dynamic content structures and custom fields
+  - Version control and content workflow management
+- **E-commerce Platforms**:
+  - Product catalogs with varying attributes and specifications
+  - User profiles, shopping carts, and order history
+  - Inventory management and pricing data
+- **Social Media and Collaboration**:
+  - User profiles, posts, comments, and social connections
+  - Real-time messaging and notification systems
+  - Activity feeds and timeline data
+- **IoT and Sensor Data**:
+  - Time-series data from sensors and devices
+  - Device configuration and metadata storage
+  - Event logging and analytics
+- **Financial Services**:
+  - Transaction records and account information
+  - Risk assessment and compliance data
+  - Customer profiles and preferences
+- **Healthcare and Medical Records**:
+  - Patient records with varying medical histories
+  - Clinical trial data and research information
+  - Medical device data and diagnostics
+- **Real-time Analytics**:
+  - User behavior tracking and analytics
+  - Application performance monitoring
+  - Business intelligence and reporting
+    <BackToTop />
 
 ### Benefits
 
-- **Flexibility**: Document APIs allow for flexible data structures, making it easy to adapt to changing requirements.
-- **Scalability**: They can handle large volumes of documents and support horizontal scaling.
-- **Ease of Use**: Document APIs often provide simple and intuitive interfaces for developers to interact with documents.
-- **Rich Query Capabilities**: Support for complex queries and search operations enhances data retrieval capabilities.
-- **Version Control**: Document APIs can maintain versions of documents, allowing for easy tracking of changes and history management.
+- **Schema Flexibility**: Document APIs eliminate the need for rigid schemas, allowing applications to evolve data structures without database migrations or downtime.
+- **Developer Productivity**: JSON-native storage aligns with modern programming languages, reducing object-relational mapping complexity.
+- **Horizontal Scalability**: Built-in support for sharding and distribution across multiple servers handles growing data volumes and user loads.
+- **Rich Query Capabilities**: Support for complex nested queries, array operations, and aggregation pipelines enables sophisticated data analysis.
+- **Rapid Prototyping**: Quick iteration on data models supports agile development and fast time-to-market.
+- **Natural Data Modeling**: Documents can represent real-world entities more naturally than normalized relational tables.
+- **Performance Optimization**: Strategic denormalization and embedded documents can reduce join operations and improve read performance.
+- **Multi-model Support**: Many document databases support additional data models like key-value, graph, and time-series within the same system.
 
 ### Challenges
 
-- **Data Consistency**: Ensuring data consistency across distributed systems can be challenging.
-- **Performance**: Depending on the implementation, document APIs may face performance issues with large datasets or complex queries.
-- **Security**: Implementing robust security measures to protect sensitive documents is crucial.
-- **Complexity**: Managing document schemas and relationships can add complexity to the application architecture.
+- **Data Consistency**:
+  - Eventual consistency models may not suit all use cases
+  - Managing distributed transactions across multiple documents
+  - Ensuring referential integrity without foreign key constraints
+- **Query Limitations**:
+  - Limited support for complex joins compared to SQL databases
+  - Potential for inconsistent query performance with large datasets
+  - Learning curve for developers familiar with SQL
+- **Storage Overhead**:
+  - JSON document structure can lead to data duplication
+  - Field names repeated in every document increase storage requirements
+  - Uncompressed JSON can be verbose compared to binary formats
+- **Schema Governance**:
+  - Lack of enforced schemas can lead to data quality issues
+  - Difficulty maintaining data standards across development teams
+  - Challenges in data validation and type safety
+- **Operational Complexity**:
+  - Monitoring and debugging distributed document databases
+  - Backup and disaster recovery strategies for large collections
+  - Index management and query optimization
+    <BackToTop />
 
 ## Popular Document API Providers
 
-| Provider                                                                     | Description                                                                                                                                                                                                                                                                                                                 |
-| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [**MongoDB Atlas**](https://www.mongodb.com/cloud/atlas)                     | A fully managed cloud database service that provides a document-oriented API for managing MongoDB databases. It offers features like automatic scaling, backups, and security.                                                                                                                                              |
-| [**Firebase Firestore**](https://firebase.google.com/products/firestore)     | A NoSQL document database that provides a flexible, scalable database for mobile, web, and server development. It offers real-time synchronization, offline support, and powerful querying capabilities.                                                                                                                    |
-| [**Amazon DocumentDB**](https://aws.amazon.com/documentdb/)                  | A fully managed document database service that is compatible with MongoDB. It provides scalability, high availability, and security features for managing document-based data.                                                                                                                                              |
-| [**Azure Cosmos DB**](https://azure.microsoft.com/en-us/services/cosmos-db/) | A globally distributed, multi-model database service that supports document APIs. It offers low latency, high availability, and automatic scaling for document-based applications.                                                                                                                                          |
-| [**Couchbase**](https://www.couchbase.com/)                                  | A NoSQL document database that provides a flexible data model, high performance, and scalability. It supports key-value and document data models, making it suitable for various applications.                                                                                                                              |
-| [**ElasticSearch**](https://www.elastic.co/elasticsearch/)                   | A distributed search and analytics engine that provides a document-oriented API. It is commonly used for full-text search, log analysis, and real-time data exploration. It supports complex queries and aggregations on document data.                                                                                     |
-| [**Apache CouchDB**](https://couchdb.apache.org/)                            | An open-source document database that uses JSON to store data and JavaScript for indexing. It provides a RESTful HTTP API for managing documents and supports replication and offline capabilities. CouchDB is known for its ease of use and flexibility in handling document-based data.                                   |
-| [**RethinkDB**](https://rethinkdb.com/)                                      | An open-source, distributed document database that provides a real-time API for managing documents. It supports live queries, allowing applications to receive updates in real-time as documents change. RethinkDB is designed for building real-time applications and provides a flexible data model for document storage. |
+| Provider                                                                     | Description                                                                                                                                                                                                                       | Key Features                                                                                          |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| [**MongoDB Atlas**](https://www.mongodb.com/cloud/atlas)                     | A fully managed cloud database service that provides a document-oriented API for managing MongoDB databases. Offers automatic scaling, backups, security, and global clusters with multi-region deployment capabilities.          | Multi-cloud support, ACID transactions, full-text search, aggregation framework, change streams       |
+| [**Firebase Firestore**](https://firebase.google.com/products/firestore)     | Google's NoSQL document database with real-time synchronization capabilities. Designed for mobile and web applications with offline support, automatic scaling, and seamless integration with other Firebase services.            | Real-time listeners, offline persistence, security rules, automatic indexing, subcollections          |
+| [**Amazon DocumentDB**](https://aws.amazon.com/documentdb/)                  | A fully managed document database service compatible with MongoDB APIs. Provides high availability, automatic backups, and seamless integration with AWS services while maintaining MongoDB compatibility.                        | MongoDB compatibility, automatic failover, point-in-time recovery, VPC isolation                      |
+| [**Azure Cosmos DB**](https://azure.microsoft.com/en-us/services/cosmos-db/) | Microsoft's globally distributed, multi-model database service supporting document, key-value, graph, and column-family data models. Offers multiple consistency levels and guaranteed low latency worldwide.                     | Global distribution, multiple APIs (SQL, MongoDB, Cassandra), tunable consistency, automatic indexing |
+| [**Couchbase**](https://www.couchbase.com/)                                  | A distributed NoSQL database that combines document and key-value data models. Provides memory-first architecture, built-in caching, and full-text search capabilities with SQL-like query language (N1QL).                       | Memory-first architecture, N1QL query language, mobile sync, analytics service                        |
+| [**Elasticsearch**](https://www.elastic.co/elasticsearch/)                   | A distributed search and analytics engine optimized for full-text search, log analysis, and real-time data exploration. Built on Apache Lucene with powerful aggregation and filtering capabilities.                              | Full-text search, real-time indexing, aggregations, machine learning features, RESTful API            |
+| [**Apache CouchDB**](https://couchdb.apache.org/)                            | An open-source document database using JSON for documents and JavaScript for indexing. Features a RESTful HTTP API, multi-master replication, and excellent offline capabilities with conflict resolution.                        | RESTful API, multi-master replication, offline-first, conflict resolution, MapReduce views            |
+| [**RethinkDB**](https://rethinkdb.com/)                                      | An open-source distributed document database designed for real-time applications. Features live queries that automatically push updates to applications, making it ideal for collaborative applications and real-time dashboards. | Live queries, real-time updates, automatic table joins, distributed architecture                      |
+
+<BackToTop />
+
+## Code Examples by Provider
+
+### MongoDB Node.js Examples
+
+**Connection and Basic Setup:**
+
+```javascript
+const { MongoClient, ObjectId } = require("mongodb");
+
+// Connection
+const client = new MongoClient("mongodb://localhost:27017");
+await client.connect();
+const db = client.db("blog_app");
+const articles = db.collection("articles");
+
+// Create with validation schema
+await db.createCollection("articles", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["title", "author", "published"],
+      properties: {
+        title: { bsonType: "string", minLength: 1 },
+        author: {
+          bsonType: "object",
+          required: ["name", "email"],
+          properties: {
+            name: { bsonType: "string" },
+            email: { bsonType: "string", pattern: "^.+@.+$" },
+          },
+        },
+        published: { bsonType: "bool" },
+        tags: { bsonType: "array", items: { bsonType: "string" } },
+      },
+    },
+  },
+});
+```
+
+**Advanced Queries:**
+
+```javascript
+// Full-text search with scoring
+const searchResults = await articles
+  .aggregate([
+    {
+      $match: {
+        $text: { $search: "mongodb tutorial" },
+      },
+    },
+    {
+      $addFields: {
+        score: { $meta: "textScore" },
+      },
+    },
+    {
+      $sort: { score: -1 },
+    },
+  ])
+  .toArray();
+
+// Faceted search
+const facetedSearch = await articles
+  .aggregate([
+    {
+      $facet: {
+        byAuthor: [
+          { $group: { _id: "$author.name", count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+        ],
+        byTag: [
+          { $unwind: "$tags" },
+          { $group: { _id: "$tags", count: { $sum: 1 } } },
+          { $sort: { count: -1 } },
+        ],
+        byYear: [
+          {
+            $group: {
+              _id: { $year: "$created_at" },
+              count: { $sum: 1 },
+            },
+          },
+        ],
+      },
+    },
+  ])
+  .toArray();
+```
+
+<BackToTop />
+
+### Firestore Examples
+
+**React Integration:**
+
+```javascript
+import { initializeApp } from "firebase/app";
+import {
+  getFirestore,
+  collection,
+  doc,
+  onSnapshot,
+  query,
+  where,
+  orderBy,
+} from "firebase/firestore";
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Real-time listener
+function useArticles() {
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const q = query(
+      collection(db, "articles"),
+      where("published", "==", true),
+      orderBy("created_at", "desc")
+    );
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const articlesData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setArticles(articlesData);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  return { articles, loading };
+}
+
+// Batch operations
+import { writeBatch } from "firebase/firestore";
+
+async function batchUpdate() {
+  const batch = writeBatch(db);
+
+  const articles = ["article1", "article2", "article3"];
+  articles.forEach((articleId) => {
+    const articleRef = doc(db, "articles", articleId);
+    batch.update(articleRef, {
+      updated_at: serverTimestamp(),
+      status: "archived",
+    });
+  });
+
+  await batch.commit();
+}
+```
+
+<BackToTop />
+
+### Amazon DocumentDB Example
+
+```javascript
+// DocumentDB with MongoDB compatibility
+const { MongoClient } = require("mongodb");
+
+const client = new MongoClient(
+  "mongodb://username:password@docdb-cluster.cluster-xyz.us-east-1.docdb.amazonaws.com:27017/sample-database?ssl=true&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false",
+  {
+    tlsCAFile: "./rds-combined-ca-bundle.pem",
+    useUnifiedTopology: true,
+  }
+);
+
+async function connectToDocumentDB() {
+  try {
+    await client.connect();
+    const db = client.db("blog");
+
+    // Use change streams for real-time updates
+    const changeStream = db.collection("articles").watch();
+    changeStream.on("change", (change) => {
+      console.log("Document changed:", change);
+    });
+  } catch (error) {
+    console.error("Connection failed:", error);
+  }
+}
+```
+
+<BackToTop />
+
+### Elasticsearch Document API Example
+
+```javascript
+const { Client } = require("@elastic/elasticsearch");
+
+const client = new Client({
+  node: "http://localhost:9200",
+});
+
+// Index a document
+await client.index({
+  index: "articles",
+  id: "1",
+  body: {
+    title: "Elasticsearch Guide",
+    content: "Comprehensive guide to Elasticsearch...",
+    author: "Jane Doe",
+    published_date: "2024-01-15",
+    tags: ["elasticsearch", "search", "tutorial"],
+  },
+});
+
+// Complex search with aggregations
+const searchResponse = await client.search({
+  index: "articles",
+  body: {
+    query: {
+      bool: {
+        must: [{ match: { content: "elasticsearch" } }],
+        filter: [
+          { term: { published: true } },
+          { range: { published_date: { gte: "2024-01-01" } } },
+        ],
+      },
+    },
+    aggs: {
+      popular_tags: {
+        terms: {
+          field: "tags.keyword",
+          size: 10,
+        },
+      },
+      monthly_articles: {
+        date_histogram: {
+          field: "published_date",
+          calendar_interval: "month",
+        },
+      },
+    },
+    highlight: {
+      fields: {
+        content: {},
+      },
+    },
+  },
+});
+```
+
+<BackToTop />
+
+### CouchDB REST API Examples
+
+```javascript
+// Using native HTTP requests
+const couchUrl = "http://localhost:5984/blog";
+
+// Create document
+const createResponse = await fetch(`${couchUrl}`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    title: "CouchDB Tutorial",
+    author: "Bob Smith",
+    content: "Learning CouchDB...",
+    created_at: new Date().toISOString(),
+  }),
+});
+
+// Create a view for querying
+const designDoc = {
+  _id: "_design/articles",
+  views: {
+    by_author: {
+      map: function (doc) {
+        if (doc.author) {
+          emit(doc.author, doc);
+        }
+      }.toString(),
+    },
+    by_date: {
+      map: function (doc) {
+        if (doc.created_at) {
+          emit(doc.created_at, doc);
+        }
+      }.toString(),
+    },
+  },
+};
+
+await fetch(`${couchUrl}/_design/articles`, {
+  method: "PUT",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(designDoc),
+});
+
+// Query the view
+const viewResponse = await fetch(
+  `${couchUrl}/_design/articles/_view/by_author?key="Bob Smith"`
+);
+const viewResults = await viewResponse.json();
+```
+
+<BackToTop />
+
+## Best Practices
+
+### Data Modeling
+
+1. **Embed vs. Reference**:
+
+```javascript
+// Good: Embed when data is read together
+{
+  _id: "article-123",
+  title: "Document API Guide",
+  author: {
+    name: "Jane Smith",
+    bio: "Senior Developer"  // Embedded - rarely changes
+  },
+  comments: [  // Embedded - read with article
+    { user: "john", text: "Great post!" }
+  ]
+}
+
+// Good: Reference when data is large or frequently updated
+{
+  _id: "article-123",
+  title: "Document API Guide",
+  author_id: "user-456",  // Reference - user data changes
+  category_ids: ["cat-1", "cat-2"]  // Reference - shared across articles
+}
+```
+
+2. **Schema Design Patterns**:
+
+```javascript
+// Polymorphic pattern - different document types in same collection
+{
+  _id: "content-123",
+  type: "article",
+  title: "My Article",
+  content: "Article content..."
+}
+
+{
+  _id: "content-124",
+  type: "video",
+  title: "My Video",
+  duration: 300,
+  thumbnail_url: "https://example.com/thumb.jpg"
+}
+
+// Bucket pattern - time-series data
+{
+  _id: "metrics-2024-01-15-hour-14",
+  timestamp: "2024-01-15T14:00:00Z",
+  measurements: [
+    { time: "2024-01-15T14:01:00Z", cpu: 45.2, memory: 68.1 },
+    { time: "2024-01-15T14:02:00Z", cpu: 47.8, memory: 69.3 }
+    // ... more measurements for this hour
+  ]
+}
+```
+
+<BackToTop />
+
+### Performance Optimization
+
+1. **Indexing Strategy**:
+
+```javascript
+// MongoDB index examples
+await db.collection("articles").createIndex({ "author.email": 1 });
+await db.collection("articles").createIndex({ tags: 1 });
+await db.collection("articles").createIndex({
+  created_at: -1,
+  published: 1,
+}); // Compound index
+
+// Text search index
+await db.collection("articles").createIndex(
+  {
+    title: "text",
+    content: "text",
+  },
+  {
+    weights: { title: 10, content: 1 }, // Title is more important
+  }
+);
+```
+
+2. **Query Optimization**:
+
+```javascript
+// Use projection to limit returned fields
+const articles = await db
+  .collection("articles")
+  .find({ published: true })
+  .project({ title: 1, author: 1, created_at: 1 })
+  .toArray();
+
+// Use hint to force index usage
+const results = await db
+  .collection("articles")
+  .find({ tags: "mongodb" })
+  .hint({ tags: 1 })
+  .toArray();
+```
+
+<BackToTop />
+
+### Security Best Practices
+
+1. **Firestore Security Rules**:
+
+```javascript
+// Firestore security rules
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can only read/write their own documents
+    match /users/{userId} {
+      allow read, write: if request.auth != null
+        && request.auth.uid == userId;
+    }
+
+    // Articles can be read by anyone, written by authenticated users
+    match /articles/{articleId} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.uid == resource.data.author_id;
+    }
+  }
+}
+```
+
+2. **MongoDB Security**:
+
+```javascript
+// Enable authentication and create user
+use admin
+db.createUser({
+  user: "appUser",
+  pwd: "securePassword",
+  roles: [
+    { role: "readWrite", db: "blog" },
+    { role: "read", db: "analytics" }
+  ]
+});
+
+// Use connection with authentication
+const client = new MongoClient(
+  'mongodb://appUser:securePassword@localhost:27017/blog'
+);
+```
+
+<BackToTop />
+
+### Error Handling and Monitoring
+
+```javascript
+// Comprehensive error handling
+async function createArticle(articleData) {
+  try {
+    // Validate input
+    if (!articleData.title || !articleData.content) {
+      throw new Error("Title and content are required");
+    }
+
+    const result = await db.collection("articles").insertOne({
+      ...articleData,
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
+
+    // Log successful operation
+    console.log(`Article created with ID: ${result.insertedId}`);
+    return result;
+  } catch (error) {
+    if (error.code === 11000) {
+      // Duplicate key error
+      throw new Error("Article with this slug already exists");
+    } else if (error.name === "ValidationError") {
+      throw new Error(`Validation failed: ${error.message}`);
+    } else {
+      // Log unexpected errors
+      console.error("Failed to create article:", error);
+      throw new Error("Internal server error");
+    }
+  }
+}
+
+// Performance monitoring
+const performanceWrapper = (fn) => {
+  return async (...args) => {
+    const start = Date.now();
+    try {
+      const result = await fn(...args);
+      const duration = Date.now() - start;
+      console.log(`Operation completed in ${duration}ms`);
+      return result;
+    } catch (error) {
+      const duration = Date.now() - start;
+      console.error(`Operation failed after ${duration}ms:`, error);
+      throw error;
+    }
+  };
+};
+
+const monitoredCreateArticle = performanceWrapper(createArticle);
+```
+
+<BackToTop />

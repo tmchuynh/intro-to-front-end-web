@@ -45,16 +45,16 @@ export function Tag({
   variant = "medium",
   color = valueColorMap[children] ?? "emerald",
 }: {
-  children: keyof typeof valueColorMap & (string | {});
+  children: keyof typeof valueColorMap & string;
   variant?: keyof typeof variantStyles;
   color?: keyof typeof colorStyles;
 }) {
   return (
     <span
       className={clsx(
-        "font-mono text-[0.625rem]/6 font-semibold",
+        "font-mono font-semibold text-[0.625rem]/6",
         variantStyles[variant],
-        colorStyles[color][variant],
+        colorStyles[color][variant]
       )}
     >
       {children}

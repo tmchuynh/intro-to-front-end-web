@@ -39,6 +39,7 @@ It is part of the React 18+ features and is designed to work seamlessly with ser
 - **Asynchronous Operations**: When performing asynchronous operations as part of a form submission, such as API calls or data processing, use `useFormStatus` to manage the loading state and errors effectively.
 - **Dynamic Forms**: In dynamic forms where the fields may change based on user input, use `useFormStatus` to manage the loading state and errors for the form submission process.
 - **Error Recovery**: When implementing error recovery mechanisms for form submissions, use `useFormStatus` to handle the loading state and errors, allowing users to retry submissions or take corrective actions.
+  <BackToTop />
 
 ## How It Works
 
@@ -94,93 +95,666 @@ When using `useFormStatus`, you can expect the following behavior:
 - Avoid calling the `submit` function multiple times in quick succession, as this may lead to unexpected behavior
 - Avoid using `useFormStatus` in components that do not handle form submissions, as it may clutter the code and make it harder to read.
 - Avoid relying solely on `useFormStatus` for form validation; it is primarily designed for managing submission status, not validation logic.
+  <BackToTop />
 
 ## Examples
 
-### Basic Example
+### Basic Contact Form Example
 
 ```javascript
 import { useFormStatus } from "react";
-function MyForm() {
-  const { status, error, submit } = useFormStatus();
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      await submit(); // Submit the form
-    } catch (err) {
-      console.error("Form submission failed:", err);
-    }
+import { useState } from "react";
+
+function ContactForm() {
+  const { pending, data } = useFormStatus();
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="text" name="name" required />
-      <button type="submit" disabled={status === "loading"}>
-        Submit
+    <form action="/api/contact" method="POST">
+      <div className="form-group">
+        <label htmlFor="name">Name:</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          value={formData.name}
+          onChange={handleInputChange}
+          required
+          disabled={pending}
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          value={formData.email}
+          onChange={handleInputChange}
+          required
+          disabled={pending}
+        />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="message">Message:</label>
+        <textarea
+          id="message"
+          name="message"
+          value={formData.message}
+          onChange={handleInputChange}
+          rows="4"
+          required
+          disabled={pending}
+        />
+      </div>
+
+      <button type="submit" disabled={pending}>
+        {pending ? (
+          <>
+            <span className="spinner"></span>
+            Sending Message...
+          </>
+        ) : (
+          "Send Message"
+        )}
       </button>
-      {status === "loading" && <p>Submitting...</p>}
-      {error && <p>Error: {error.message}</p>}
     </form>
   );
 }
 ```
 
 <BackToTop />
-### Intermediate Example
+
+### Newsletter Subscription Example
 
 ```javascript
 import { useFormStatus } from "react";
-function MyForm() {
-  const { status, error, submit } = useFormStatus();
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      await submit(); // Submit the form
-    } catch (err) {
-      console.error("Form submission failed:", err);
-    }
+import { useState } from "react";
+
+function NewsletterSubscription() {
+  const { pending, data } = useFormStatus();
+  const [email, setEmail] = useState("");
+  const [preferences, setPreferences] = useState([]);
+
+  const handlePreferenceChange = (preference) => {
+    setPreferences((prev) =>
+      prev.includes(preference)
+        ? prev.filter((p) => p !== preference)
+        : [...prev, preference]
+    );
   };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="text" name="name" required />
-      <button type="submit" disabled={status === "loading"}>
-        Submit
-      </button>
-      {status === "loading" && <p>Submitting...</p>}
-      {error && <p>Error: {error.message}</p>}
-      {status === "success" && <p>Form submitted successfully!</p>}
+    <form action="/api/newsletter/subscribe" method="POST">
+      <div className="subscription-form">
+        <h3>Subscribe to Our Newsletter</h3>
+
+        <div className="email-input">
+          <input
+            type="email"
+            name="email"
+            placeholder="Enter your email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            disabled={pending}
+          />
+        </div>
+
+        <div className="preferences">
+          <p>What topics interest you?</p>
+          {[
+            "Tech News",
+            "Product Updates",
+            "Industry Insights",
+            "Tutorials",
+          ].map((topic) => (
+            <label key={topic} className="checkbox-label">
+              <input
+                type="checkbox"
+                name="preferences"
+                value={topic}
+                checked={preferences.includes(topic)}
+                onChange={() => handlePreferenceChange(topic)}
+                disabled={pending}
+              />
+              {topic}
+            </label>
+          ))}
+        </div>
+
+        <button type="submit" disabled={pending || !email}>
+          {pending ? (
+            <div className="loading-state">
+              <div className="pulse-dot"></div>
+              <div className="pulse-dot"></div>
+              <div className="pulse-dot"></div>
+              <span>Subscribing...</span>
+            </div>
+          ) : (
+            "Subscribe Now"
+          )}
+        </button>
+
+        {pending && (
+          <p className="status-message">
+            We're adding you to our newsletter. This won't take long!
+          </p>
+        )}
+      </div>
     </form>
   );
 }
 ```
 
 <BackToTop />
-### Advanced Example
+
+### File Upload Progress Example
 
 ```javascript
 import { useFormStatus } from "react";
-function MyForm() {
-  const { status, error, submit } = useFormStatus();
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      await submit(); // Submit the form
-    } catch (err) {
-      console.error("Form submission failed:", err);
+import { useState, useRef } from "react";
+
+function FileUploadForm() {
+  const { pending, data } = useFormStatus();
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const fileInputRef = useRef(null);
+
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files);
+    setSelectedFiles(files);
+  };
+
+  const removeFile = (indexToRemove) => {
+    setSelectedFiles((prev) =>
+      prev.filter((_, index) => index !== indexToRemove)
+    );
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
+  return (
+    <form action="/api/upload" method="POST" encType="multipart/form-data">
+      <div className="upload-container">
+        <h3>Upload Your Files</h3>
+
+        <div className="file-input-area">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileSelect}
+            multiple
+            accept=".pdf,.doc,.docx,.jpg,.png,.gif"
+            disabled={pending}
+            style={{ display: "none" }}
+          />
+
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={pending}
+            className="file-select-btn"
+          >
+            {pending ? "Uploading..." : "Choose Files"}
+          </button>
+        </div>
+
+        {selectedFiles.length > 0 && (
+          <div className="selected-files">
+            <h4>Selected Files:</h4>
+            {selectedFiles.map((file, index) => (
+              <div key={index} className="file-item">
+                <span className="file-name">{file.name}</span>
+                <span className="file-size">({formatFileSize(file.size)})</span>
+                {!pending && (
+                  <button
+                    type="button"
+                    onClick={() => removeFile(index)}
+                    className="remove-file-btn"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {pending && (
+          <div className="upload-progress">
+            <div className="progress-bar">
+              <div
+                className="progress-fill"
+                style={{ width: `${uploadProgress}%` }}
+              ></div>
+            </div>
+            <p>
+              Uploading {selectedFiles.length} file(s)... {uploadProgress}%
+            </p>
+          </div>
+        )}
+
+        <div className="form-actions">
+          <button
+            type="submit"
+            disabled={pending || selectedFiles.length === 0}
+            className="upload-btn"
+          >
+            {pending ? (
+              <>
+                <span className="spinner"></span>
+                Uploading Files...
+              </>
+            ) : (
+              `Upload ${selectedFiles.length} File(s)`
+            )}
+          </button>
+        </div>
+      </div>
+    </form>
+  );
+}
+```
+
+<BackToTop />
+
+### Multi-Step Survey Form Example
+
+```javascript
+import { useFormStatus } from "react";
+import { useState } from "react";
+
+function SurveyForm() {
+  const { pending, data } = useFormStatus();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [surveyData, setSurveyData] = useState({
+    demographics: {},
+    preferences: {},
+    feedback: {},
+  });
+
+  const totalSteps = 3;
+
+  const handleStepData = (stepData, step) => {
+    setSurveyData((prev) => ({
+      ...prev,
+      [step]: { ...prev[step], ...stepData },
+    }));
+  };
+
+  const nextStep = () => {
+    if (currentStep < totalSteps) {
+      setCurrentStep((prev) => prev + 1);
     }
   };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep((prev) => prev - 1);
+    }
+  };
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <div className="step-content">
+            <h4>Step 1: Demographics</h4>
+            <div className="form-group">
+              <label>Age Range:</label>
+              <select
+                name="ageRange"
+                onChange={(e) =>
+                  handleStepData({ ageRange: e.target.value }, "demographics")
+                }
+                disabled={pending}
+              >
+                <option value="">Select age range</option>
+                <option value="18-25">18-25</option>
+                <option value="26-35">26-35</option>
+                <option value="36-45">36-45</option>
+                <option value="46+">46+</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label>Occupation:</label>
+              <input
+                type="text"
+                name="occupation"
+                placeholder="Your occupation"
+                onChange={(e) =>
+                  handleStepData({ occupation: e.target.value }, "demographics")
+                }
+                disabled={pending}
+              />
+            </div>
+          </div>
+        );
+
+      case 2:
+        return (
+          <div className="step-content">
+            <h4>Step 2: Preferences</h4>
+            <div className="form-group">
+              <label>Preferred Communication:</label>
+              {["Email", "SMS", "Phone", "Mail"].map((method) => (
+                <label key={method} className="radio-label">
+                  <input
+                    type="radio"
+                    name="communication"
+                    value={method}
+                    onChange={(e) =>
+                      handleStepData(
+                        { communication: e.target.value },
+                        "preferences"
+                      )
+                    }
+                    disabled={pending}
+                  />
+                  {method}
+                </label>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="step-content">
+            <h4>Step 3: Feedback</h4>
+            <div className="form-group">
+              <label>Overall Satisfaction:</label>
+              <div className="rating-stars">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    className={`star ${surveyData.feedback.rating >= star ? "active" : ""}`}
+                    onClick={() => handleStepData({ rating: star }, "feedback")}
+                    disabled={pending}
+                  >
+                    ★
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Additional Comments:</label>
+              <textarea
+                name="comments"
+                placeholder="Share your thoughts..."
+                rows="4"
+                onChange={(e) =>
+                  handleStepData({ comments: e.target.value }, "feedback")
+                }
+                disabled={pending}
+              />
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="text" name="name" required />
-      <button type="submit" disabled={status === "loading"}>
-        Submit
-      </button>
-      {status === "loading" && <p>Submitting...</p>}
-      {error && <p>Error: {error.message}</p>}
-      {status === "success" && <p>Form submitted successfully!</p>}
-      <button type="reset" onClick={() => console.log("Form reset")}>
-        Reset Form
-      </button>
+    <form action="/api/survey" method="POST">
+      <div className="survey-form">
+        <div className="progress-indicator">
+          <div className="progress-bar">
+            <div
+              className="progress"
+              style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+            ></div>
+          </div>
+          <span>
+            {currentStep} of {totalSteps}
+          </span>
+        </div>
+
+        {renderStep()}
+
+        <div className="form-navigation">
+          {currentStep > 1 && (
+            <button
+              type="button"
+              onClick={prevStep}
+              disabled={pending}
+              className="btn-secondary"
+            >
+              Previous
+            </button>
+          )}
+
+          {currentStep < totalSteps ? (
+            <button
+              type="button"
+              onClick={nextStep}
+              disabled={pending}
+              className="btn-primary"
+            >
+              Next Step
+            </button>
+          ) : (
+            <button type="submit" disabled={pending} className="btn-submit">
+              {pending ? (
+                <>
+                  <span className="spinner"></span>
+                  Submitting Survey...
+                </>
+              ) : (
+                "Complete Survey"
+              )}
+            </button>
+          )}
+        </div>
+
+        {pending && (
+          <div className="submission-status">
+            <p>Processing your survey responses...</p>
+            <div className="loading-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Hidden inputs to include all survey data */}
+      <input
+        type="hidden"
+        name="surveyData"
+        value={JSON.stringify(surveyData)}
+      />
     </form>
+  );
+}
+```
+
+<BackToTop />
+
+### Real-time Search with Form Status Example
+
+```javascript
+import { useFormStatus } from "react";
+import { useState, useEffect, useRef } from "react";
+
+function SearchForm() {
+  const { pending, data } = useFormStatus();
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef(null);
+
+  // Debounced search function
+  useEffect(() => {
+    if (query.length > 2) {
+      setIsSearching(true);
+
+      // Clear previous timeout
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+
+      // Set new timeout for debounced search
+      searchTimeoutRef.current = setTimeout(async () => {
+        try {
+          const response = await fetch(
+            `/api/search?q=${encodeURIComponent(query)}`
+          );
+          const data = await response.json();
+          setResults(data.results || []);
+        } catch (error) {
+          console.error("Search failed:", error);
+          setResults([]);
+        } finally {
+          setIsSearching(false);
+        }
+      }, 300);
+    } else {
+      setResults([]);
+      setIsSearching(false);
+    }
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [query]);
+
+  const handleAdvancedSearch = async (e) => {
+    e.preventDefault();
+    // This will trigger the form action and useFormStatus
+  };
+
+  return (
+    <div className="search-container">
+      <form
+        action="/api/advanced-search"
+        method="POST"
+        onSubmit={handleAdvancedSearch}
+      >
+        <div className="search-input-container">
+          <input
+            type="text"
+            name="query"
+            placeholder="Search for products, articles, or people..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            disabled={pending}
+            className="search-input"
+          />
+
+          <div className="search-status">
+            {isSearching && (
+              <div className="searching-indicator">
+                <span className="pulse"></span>
+                Searching...
+              </div>
+            )}
+
+            {pending && (
+              <div className="advanced-search-indicator">
+                <span className="spinner"></span>
+                Running advanced search...
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="search-filters">
+          <label className="filter-option">
+            <input
+              type="checkbox"
+              name="includeArchived"
+              disabled={pending || isSearching}
+            />
+            Include archived items
+          </label>
+
+          <select name="category" disabled={pending || isSearching}>
+            <option value="">All Categories</option>
+            <option value="products">Products</option>
+            <option value="articles">Articles</option>
+            <option value="people">People</option>
+          </select>
+
+          <select name="sortBy" disabled={pending || isSearching}>
+            <option value="relevance">Relevance</option>
+            <option value="date">Date</option>
+            <option value="popularity">Popularity</option>
+          </select>
+        </div>
+
+        <button
+          type="submit"
+          disabled={pending || isSearching || query.length < 3}
+          className="advanced-search-btn"
+        >
+          {pending ? (
+            <>
+              <span className="spinner"></span>
+              Processing Advanced Search...
+            </>
+          ) : (
+            "Advanced Search"
+          )}
+        </button>
+      </form>
+
+      {/* Real-time search results */}
+      {results.length > 0 && !pending && (
+        <div className="search-results">
+          <h4>Quick Results:</h4>
+          {results.slice(0, 5).map((result, index) => (
+            <div key={index} className="result-item">
+              <h5>{result.title}</h5>
+              <p>{result.description}</p>
+              <span className="result-category">{result.category}</span>
+            </div>
+          ))}
+          {results.length > 5 && (
+            <p className="more-results">
+              +{results.length - 5} more results available with advanced search
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Search state messages */}
+      {query.length > 0 && query.length <= 2 && (
+        <p className="search-hint">Type at least 3 characters to search</p>
+      )}
+
+      {query.length > 2 && results.length === 0 && !isSearching && !pending && (
+        <p className="no-results">No results found for "{query}"</p>
+      )}
+    </div>
   );
 }
 ```

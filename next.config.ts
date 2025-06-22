@@ -21,7 +21,7 @@ const withMDX = createMDX({
       [
         remarkToc,
         {
-          maxDepth: 2, // Limit TOC depth to 2 levels
+          maxDepth: 3, // Limit TOC depth to 3 levels
         },
       ],
     ],

@@ -1,9 +1,9 @@
 import type { MDXComponents } from "mdx/types";
 import { JSX } from "react";
 import Button from "./src/components/Button";
+import CopyButton from "./src/components/CopyToClipboard";
 import Guides from "./src/components/Guides";
 import Resources from "./src/components/Resources";
-import CopyButton from "./src/components/CopyToClipboard";
 
 // Utility function to extract text content from React children
 function extractTextContent(children: React.ReactNode): string {
@@ -67,17 +67,13 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <CustomHeading
         level={4}
         id={props.id}
-        className="my-3 font-medium text-xl underline underline-offset-2"
+        className="my-3 font-medium italic text-xl"
       >
-        {children}:
+        {children}
       </CustomHeading>
     ),
     h5: ({ children, ...props }) => (
-      <CustomHeading
-        level={5}
-        id={props.id}
-        className="font-bold text-sm uppercase"
-      >
+      <CustomHeading level={5} id={props.id} className="font-bold uppercase">
         {children}:
       </CustomHeading>
     ),

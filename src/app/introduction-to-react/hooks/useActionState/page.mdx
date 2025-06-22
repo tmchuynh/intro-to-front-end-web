@@ -9,17 +9,25 @@ import BackToTop from "@/components/BackToTop";
 The `useActionState` hook is a custom React hook that allows you to manage the state of actions in your application. It provides a way to handle asynchronous operations, such as API calls or other side effects, while keeping track of the loading and error states.
 It is particularly useful for managing the state of actions that can be triggered by user interactions, such as form submissions or button clicks.
 
+This hook simplifies the process of managing action states by providing a consistent interface for starting actions, handling success and error states, and resetting the state when necessary. It helps you keep your components clean and focused on rendering UI, while delegating the state management logic to the hook.
+
 #### Benefits of using `useActionState`:
 
 - **Simplified State Management**: It abstracts the complexity of managing loading and error states, allowing you to focus on the core logic of your application.
 - **Improved User Experience**: By providing feedback on the status of actions, it enhances the user experience by indicating when an action is in progress or has failed.
 - **Reusability**: The hook can be reused across different components, promoting consistency in how actions are handled throughout your application.
+- **Separation of Concerns**: It separates the logic of managing action states from the UI components, making your code cleaner and easier to maintain.
+- **Flexibility**: It allows you to define custom initial states and provides methods to update the state based on the lifecycle of the action.
 
 #### When to use `useActionState`:
 
 - When you need to manage the state of asynchronous actions in your application.
 - When you want to provide feedback to users about the status of actions, such as loading indicators or error messages.
 - When you want to simplify the management of action states in your components.
+- When you want to encapsulate the logic of handling actions in a reusable way.
+- When you want to keep your components clean and focused on rendering UI, while delegating state management to the hook.
+- When you want to handle complex action states that involve loading, error, and data management in a consistent manner.
+- When you want to improve the maintainability of your code by separating action state management from UI logic.
 
 ### Syntax
 
@@ -43,6 +51,9 @@ const [state, action] = useActionState(initialState);
 - **Form Submissions**: Managing the state of form submissions, including loading indicators and error messages.
 - **API Calls**: Handling the state of API calls, such as fetching data or submitting data to a server.
 - **User Interactions**: Managing the state of user interactions, such as button clicks or other events that trigger actions in your application.
+- **Loading Indicators**: Providing visual feedback to users when actions are in progress, such as showing a spinner or disabling buttons.
+- **Error Handling**: Capturing and displaying error messages when actions fail, allowing users to understand what went wrong.
+- **Data Management**: Keeping track of data returned from actions, such as API responses, and updating the UI accordingly.
 
 ## How It Works
 
@@ -59,6 +70,21 @@ The `action` object returned by the hook contains methods to update the state:
 - `start`: Call this method to set the `loading` state to `true` and reset any previous `error` state.
 - `success`: Call this method to set the `loading` state to `false`, clear any `error` state, and update the `data` with the result of the action.
 - `error`: Call this method to set the `loading` state to `false` and update the `error` state with the provided error message.
+- `reset`: Call this method to reset the state to the initial state, clearing any `loading`, `error`, or `data` values.
+- `setData`: Call this method to update the `data` state with a new value without changing the `loading` or `error` states.
+- `setError`: Call this method to update the `error` state with a new error message without changing the `loading` or `data` states.
+- `setLoading`: Call this method to update the `loading` state to a specific boolean value.
+- `setState`: Call this method to update the entire state object with a new state, allowing for more complex state updates.
+- `getState`: Call this method to retrieve the current state of the action.
+- `getLoading`: Call this method to retrieve the current loading state.
+- `getError`: Call this method to retrieve the current error state.
+- `getData`: Call this method to retrieve the current data state.
+- `getAction`: Call this method to retrieve the action methods, allowing you to access them outside of the hook's context.
+- `getInitialState`: Call this method to retrieve the initial state of the action, which can be useful for resetting the state or comparing against the current state.
+- `getInitialLoading`: Call this method to retrieve the initial loading state, which can be useful for determining if the action was initially in a loading state.
+- `getInitialError`: Call this method to retrieve the initial error state, which can be useful for determining if the action was initially in an error state.
+- `getInitialData`: Call this method to retrieve the initial data state, which can be useful for determining if the action was initially in a data state.
+- `getInitialAction`: Call this method to retrieve the initial action methods, which can be useful for resetting the action state or comparing against the current action methods.
 
 ## What to Avoid
 
@@ -170,4 +196,6 @@ const FormComponent = () => {
 - **Handle Errors Gracefully**: Always handle errors in your action methods to provide feedback to users when something goes wrong.
 - **Keep State Management Simple**: Use the `useActionState` hook to manage the state of actions in a simple and consistent way, avoiding unnecessary complexity in your components.
 - **Reuse the Hook**: If you find yourself managing similar action states in multiple components, consider creating a custom hook that encapsulates the logic of `useActionState` to promote reusability and maintainability.
+- **Test Your Actions**: Write tests for your action methods to ensure they behave as expected, especially when handling loading and error states.
+- **Use the Hook in Functional Components**: Ensure that you are using the `useActionState` hook within functional components, as it relies on React's hooks system.
   <BackToTop />

@@ -6,34 +6,39 @@ import BackToTop from "@/components/BackToTop";
 
 ## Overview
 
-Custom hooks in React allow you to extract component logic into reusable functions. They can use other hooks and encapsulate complex logic, making your components cleaner and more maintainable.
+Custom hooks are JavaScript functions that start with the word "use" and allow you to extract and reuse component logic across multiple React components. They leverage React's built-in hooks system to create stateful logic that can be shared between components without the complexity of higher-order components or render props patterns. Custom hooks follow the same rules as React hooks and can call other hooks internally, making them powerful tools for creating reusable, testable, and maintainable code.
 
 ## Benefits of Custom Hooks
 
-- **Reusability**: Share logic across components without duplicating code.
-- **Separation of Concerns**: Keep your components focused on rendering while encapsulating logic in hooks.
-- **Testing**: Easier to test logic in isolation.
-- **Readability**: Simplify component code by moving complex logic into hooks.
+- **Reusability**: Extract common logic patterns and share them across multiple components, reducing code duplication and ensuring consistency.
+- **Separation of Concerns**: Keep your components focused purely on rendering and user interface logic while moving business logic, state management, and side effects into dedicated hooks.
+- **Testing**: Test complex logic in isolation from the component tree, making unit tests more focused and reliable.
+- **Readability**: Simplify component code by abstracting complex operations behind descriptive hook names that clearly communicate their purpose.
+- **Encapsulation**: Hide implementation details and expose only the necessary interface, making components easier to understand and maintain.
+- **Composition**: Combine multiple hooks together to create more complex behaviors while keeping each individual hook simple and focused.
+  <BackToTop />
 
 ### Why Use Custom Hooks?
 
-Custom hooks allow you to encapsulate and reuse stateful logic across multiple components. They help keep your components clean and focused on rendering, while the logic can be shared and maintained in one place.
+Custom hooks provide a powerful mechanism to encapsulate and reuse stateful logic across multiple components without the overhead of component hierarchies. They solve the problem of logic duplication while maintaining React's functional paradigm. Unlike class-based mixins or higher-order components, custom hooks offer a clean, intuitive way to share behavior while preserving the simplicity of function components. They enable you to create domain-specific abstractions that make your codebase more expressive and maintainable.
 
-| Use Case                 | Example                                                                                    |
-| ------------------------ | ------------------------------------------------------------------------------------------ |
-| Form Handling            | `useForm` for managing form state and validation                                           |
-| API Calls                | `useFetch` for fetching data from an API                                                   |
-| Animation                | `useAnimation` for managing animations and transitions                                     |
-| Event Handling           | `useEventListener` for adding event listeners                                              |
-| State Management         | `useCounter` for managing a simple counter state                                           |
-| Performance Optimization | `useDebounce` for debouncing input changes                                                 |
-| Context Management       | `useTheme` for managing theme context                                                      |
-| Error Handling           | `useErrorBoundary` for catching errors in components                                       |
-| Subscription Management  | `useSubscription` for managing subscriptions to external data sources                      |
-| WebSocket Management     | `useWebSocket` for managing WebSocket connections                                          |
-| Local Storage            | `useLocalStorage` for managing state in local storage                                      |
-| Session Storage          | `useSessionStorage` for managing state in session storage                                  |
-| Custom Logic             | `useCustomLogic` for encapsulating any custom logic that doesn't fit into other categories |
+| Use Case                   | Hook Name              | Description                                                                      |
+| -------------------------- | ---------------------- | -------------------------------------------------------------------------------- |
+| Shopping Cart Management   | `useShoppingCart`      | Manages cart items, quantities, total price, and persistence across sessions     |
+| Infinite Scroll Pagination | `useInfiniteScroll`    | Handles loading more data when user scrolls near the bottom of the page          |
+| Real-time Chat Messages    | `useChatRoom`          | Manages WebSocket connections, message history, and user presence indicators     |
+| Image Upload with Preview  | `useImageUpload`       | Handles file selection, preview generation, upload progress, and error handling  |
+| Multi-step Form Wizard     | `useFormWizard`        | Manages step navigation, validation per step, and form data persistence          |
+| Geolocation Tracking       | `useGeolocation`       | Tracks user location with permission handling and real-time position updates     |
+| Dark/Light Theme Toggle    | `useThemeToggle`       | Manages theme state with system preference detection and local storage           |
+| API Data with Caching      | `useCachedAPI`         | Fetches data with intelligent caching, stale-while-revalidate strategy           |
+| Keyboard Shortcuts         | `useKeyboardShortcuts` | Registers and manages global keyboard shortcuts with conflict resolution         |
+| User Authentication State  | `useAuth`              | Manages login/logout state, token refresh, and protected route access            |
+| Toast Notifications        | `useToast`             | Creates, manages, and auto-dismisses notification messages with queuing          |
+| Browser Tab Visibility     | `usePageVisibility`    | Tracks when the browser tab becomes active/inactive for performance optimization |
+| Responsive Media Queries   | `useMediaQuery`        | Monitors screen size changes and provides responsive breakpoint information      |
+| Clipboard Operations       | `useClipboard`         | Handles copy/paste operations with fallbacks and permission management           |
+| Undo/Redo History          | `useUndoRedo`          | Manages state history with undo/redo capabilities for complex data editing       |
 
 <BackToTop />
 ## How to Create a Custom Hook
@@ -41,111 +46,763 @@ Custom hooks allow you to encapsulate and reuse stateful logic across multiple c
 ### Step 1: Define the Hook
 
 ```javascript
-import { useState } from "react";
-function useStorage(key, initialValue) {
+import { useState, useCallback, useEffect } from "react";
+
+function useLocalStorage(key, initialValue) {
+  // State to store our value
   const [storedValue, setStoredValue] = useState(() => {
     try {
+      // Check if we're in a browser environment
+      if (typeof window === "undefined") {
+        return initialValue;
+      }
+
+      // Get from local storage by key
       const item = window.localStorage.getItem(key);
+      // Parse stored json or if none return initialValue
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.error(error);
+      // If error also return initialValue
+      console.error(`Error reading localStorage key "${key}":`, error);
       return initialValue;
     }
   });
 
-  const setValue = (value) => {
-    try {
-      const valueToStore =
-        value instanceof Function ? value(storedValue) : value;
-      setStoredValue(valueToStore);
-      window.localStorage.setItem(key, JSON.stringify(valueToStore));
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // Return a wrapped version of useState's setter function that persists the new value to localStorage
+  const setValue = useCallback(
+    (value) => {
+      try {
+        // Allow value to be a function so we have the same API as useState
+        const valueToStore =
+          value instanceof Function ? value(storedValue) : value;
+
+        // Save state
+        setStoredValue(valueToStore);
+
+        // Save to local storage only in browser environment
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(key, JSON.stringify(valueToStore));
+        }
+      } catch (error) {
+        console.error(`Error setting localStorage key "${key}":`, error);
+      }
+    },
+    [key, storedValue]
+  );
+
+  // Listen for changes to this key in other tabs/windows
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleStorageChange = (e) => {
+      if (e.key === key && e.newValue !== null) {
+        try {
+          setStoredValue(JSON.parse(e.newValue));
+        } catch (error) {
+          console.error(
+            `Error parsing localStorage value for key "${key}":`,
+            error
+          );
+        }
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, [key]);
 
   return [storedValue, setValue];
 }
-export default useStorage;
+
+export default useLocalStorage;
 ```
 
 ### Step 2: Use the Hook in a Component
 
 ```javascript
 import React from "react";
-import useStorage from "./useStorage";
-function StorageComponent() {
-  const [name, setName] = useStorage("name", "John Doe");
+import useLocalStorage from "./useLocalStorage";
+
+function UserPreferencesComponent() {
+  const [preferences, setPreferences] = useLocalStorage("userPreferences", {
+    theme: "light",
+    fontSize: "medium",
+    notifications: true,
+  });
+
+  const updateTheme = (theme) => {
+    setPreferences((prev) => ({ ...prev, theme }));
+  };
+
+  const updateFontSize = (fontSize) => {
+    setPreferences((prev) => ({ ...prev, fontSize }));
+  };
+
+  const toggleNotifications = () => {
+    setPreferences((prev) => ({ ...prev, notifications: !prev.notifications }));
+  };
+
   return (
-    <div>
-      <h1>Stored Name: {name}</h1>
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Enter your name"
-      />
+    <div className={`app ${preferences.theme} ${preferences.fontSize}`}>
+      <h1>User Preferences</h1>
+
+      <div className="preference-group">
+        <label>Theme:</label>
+        <select
+          value={preferences.theme}
+          onChange={(e) => updateTheme(e.target.value)}
+        >
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+          <option value="auto">Auto</option>
+        </select>
+      </div>
+
+      <div className="preference-group">
+        <label>Font Size:</label>
+        <select
+          value={preferences.fontSize}
+          onChange={(e) => updateFontSize(e.target.value)}
+        >
+          <option value="small">Small</option>
+          <option value="medium">Medium</option>
+          <option value="large">Large</option>
+        </select>
+      </div>
+
+      <div className="preference-group">
+        <label>
+          <input
+            type="checkbox"
+            checked={preferences.notifications}
+            onChange={toggleNotifications}
+          />
+          Enable Notifications
+        </label>
+      </div>
+
+      <div className="current-settings">
+        <h3>Current Settings:</h3>
+        <pre>{JSON.stringify(preferences, null, 2)}</pre>
+      </div>
     </div>
   );
 }
-export default StorageComponent;
+
+export default UserPreferencesComponent;
 ```
+
+<BackToTop />
 
 ## Best Practices for Custom Hooks
 
-- **Use Descriptive Names**: Name your hooks starting with `use` to indicate they are hooks (e.g., `useCounter`, `useFetch`).
-- **Keep Hooks Focused**: Each hook should have a single responsibility. Avoid combining unrelated logic in one hook.
-- **Use Other Hooks**: Custom hooks can use built-in hooks like `useState`, `useEffect`, and others to manage state and side effects.
-- **Return Values**: Return an object or array with the values and functions you want to expose from the hook.
-- **Documentation**: Document your custom hooks to explain their purpose, usage, and parameters.
-- **Testing**: Write tests for your custom hooks to ensure they behave as expected in different scenarios.
-- **Avoid Side Effects**: Custom hooks should not cause side effects directly. Use `useEffect` for side effects within the hook.
-- **Use Dependencies**: If your hook uses `useEffect`, ensure you provide a dependency array to control when the effect runs.
-- **Error Handling**: Implement error handling within your custom hooks to manage potential issues gracefully.
+- **Use Descriptive Names**: Always prefix custom hooks with "use" and choose names that clearly describe their purpose (e.g., `useShoppingCart`, `useApiData`, `useFormValidation`). This follows React's naming convention and makes the hook's intent immediately clear.
 
-## Example: Custom Hook for Fetching Data
+- **Keep Hooks Focused**: Each hook should have a single, well-defined responsibility. Avoid creating "god hooks" that handle multiple unrelated concerns. Instead, compose multiple focused hooks together when needed.
+
+- **Use Built-in Hooks Appropriately**: Leverage React's built-in hooks (`useState`, `useEffect`, `useCallback`, `useMemo`, etc.) within your custom hooks to manage state, side effects, and performance optimizations properly.
+
+- **Return Consistent Interfaces**: Design your hook's return value carefully. Use arrays for simple state-setter pairs `[value, setValue]` following the `useState` pattern, or objects for more complex APIs `{ data, loading, error, refetch }`.
+
+- **Handle Edge Cases**: Always consider and handle edge cases like SSR (server-side rendering), cleanup on unmount, and error scenarios. Include proper error boundaries and fallback values.
+
+- **Optimize Performance**: Use `useCallback` and `useMemo` appropriately to prevent unnecessary re-renders. Be mindful of dependencies in `useEffect` to avoid infinite loops or missing updates.
+
+- **Provide Clear Documentation**: Document your hooks with JSDoc comments explaining parameters, return values, and usage examples. Include information about any side effects or requirements.
+
+- **Write Comprehensive Tests**: Test your custom hooks using tools like React Testing Library's `renderHook`. Test various scenarios including error cases, edge conditions, and cleanup behavior.
+
+- **Consider Server-Side Rendering**: Ensure your hooks work correctly in SSR environments by checking for `window` availability and providing appropriate fallbacks.
+
+- **Use TypeScript**: If using TypeScript, provide proper type definitions for your hook parameters and return values to improve developer experience and catch errors early.
+
+- **Handle Cleanup Properly**: Always clean up side effects like event listeners, timers, or subscriptions in `useEffect` cleanup functions to prevent memory leaks.
+
+- **Make Hooks Composable**: Design hooks that can be easily combined with other hooks to create more complex behaviors while maintaining simplicity at each level.
+
+<BackToTop />
+
+## Examples
+
+### Advanced Data Fetching Hook
 
 ```javascript
-import { useState, useEffect } from "react";
-function useFetch(url) {
+import { useState, useEffect, useCallback, useRef } from "react";
+
+function useAdvancedFetch(url, options = {}) {
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  useEffect(() => {
-    const fetchData = async () => {
+  const [lastFetched, setLastFetched] = useState(null);
+
+  // Keep track of the current request to handle race conditions
+  const abortControllerRef = useRef(null);
+
+  const {
+    cacheTime = 300000, // 5 minutes default cache
+    retryCount = 3,
+    retryDelay = 1000,
+    onSuccess,
+    onError,
+    enabled = true,
+    refetchOnWindowFocus = false,
+  } = options;
+
+  const fetchData = useCallback(
+    async (isRetry = false, attempt = 1) => {
+      if (!url || !enabled) return;
+
+      // Check cache
+      if (!isRetry && lastFetched && Date.now() - lastFetched < cacheTime) {
+        return; // Use cached data
+      }
+
+      // Cancel previous request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      // Create new abort controller
+      abortControllerRef.current = new AbortController();
+
       try {
         setLoading(true);
-        const response = await fetch(url);
-        if (!response.ok) throw new Error("Network response was not ok");
+        setError(null);
+
+        const response = await fetch(url, {
+          signal: abortControllerRef.current.signal,
+          ...options.fetchOptions,
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const result = await response.json();
         setData(result);
+        setLastFetched(Date.now());
+
+        if (onSuccess) {
+          onSuccess(result);
+        }
       } catch (err) {
+        if (err.name === "AbortError") {
+          return; // Request was aborted, don't update state
+        }
+
+        if (attempt < retryCount) {
+          // Retry with exponential backoff
+          setTimeout(
+            () => {
+              fetchData(true, attempt + 1);
+            },
+            retryDelay * Math.pow(2, attempt - 1)
+          );
+          return;
+        }
+
         setError(err.message);
+        if (onError) {
+          onError(err);
+        }
       } finally {
         setLoading(false);
       }
-    };
+    },
+    [
+      url,
+      enabled,
+      cacheTime,
+      retryCount,
+      retryDelay,
+      onSuccess,
+      onError,
+      lastFetched,
+      options.fetchOptions,
+    ]
+  );
+
+  // Manual refetch function
+  const refetch = useCallback(() => {
+    setLastFetched(null); // Clear cache
     fetchData();
-  }, [url]);
-  return { data, loading, error };
+  }, [fetchData]);
+
+  // Initial fetch
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Refetch on window focus
+  useEffect(() => {
+    if (!refetchOnWindowFocus) return;
+
+    const handleWindowFocus = () => {
+      if (document.visibilityState === "visible") {
+        refetch();
+      }
+    };
+
+    window.addEventListener("visibilitychange", handleWindowFocus);
+    return () =>
+      window.removeEventListener("visibilitychange", handleWindowFocus);
+  }, [refetch, refetchOnWindowFocus]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
+  return {
+    data,
+    loading,
+    error,
+    refetch,
+    isStale: lastFetched && Date.now() - lastFetched > cacheTime,
+  };
 }
 ```
 
+#### Usage Example:
+
 ```javascript
 import React from "react";
-import useFetch from "./useFetch";
-function DataFetchingComponent({ url }) {
-  const { data, loading, error } = useFetch(url);
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+import useAdvancedFetch from "./useAdvancedFetch";
+
+function ProductList() {
+  const {
+    data: products,
+    loading,
+    error,
+    refetch,
+    isStale,
+  } = useAdvancedFetch("https://api.example.com/products", {
+    cacheTime: 600000, // 10 minutes
+    retryCount: 2,
+    refetchOnWindowFocus: true,
+    onSuccess: (data) => console.log("Products loaded:", data.length),
+    onError: (err) => console.error("Failed to load products:", err),
+  });
+
+  if (loading && !products) {
+    return <div className="loading">Loading products...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="error">
+        <p>Error loading products: {error}</p>
+        <button onClick={refetch}>Retry</button>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <h2>Data:</h2>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
+    <div className="product-list">
+      <div className="header">
+        <h2>Products</h2>
+        <button onClick={refetch} disabled={loading}>
+          {loading ? "Refreshing..." : "Refresh"}
+        </button>
+        {isStale && (
+          <span className="stale-indicator">Data may be outdated</span>
+        )}
+      </div>
+
+      <div className="products">
+        {products?.map((product) => (
+          <div key={product.id} className="product-card">
+            <h3>{product.name}</h3>
+            <p>{product.description}</p>
+            <span className="price">${product.price}</span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
-export default DataFetchingComponent;
+
+export default ProductList;
 ```
+
+<BackToTop />
+
+### Shopping Cart Hook
+
+```javascript
+import { useState, useCallback, useEffect } from "react";
+import useLocalStorage from "./useLocalStorage";
+
+function useShoppingCart() {
+  const [items, setItems] = useLocalStorage("shopping-cart", []);
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Calculate totals
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
+  // Add item to cart
+  const addItem = useCallback(
+    (product, quantity = 1) => {
+      setItems((currentItems) => {
+        const existingItem = currentItems.find(
+          (item) => item.id === product.id
+        );
+
+        if (existingItem) {
+          return currentItems.map((item) =>
+            item.id === product.id
+              ? { ...item, quantity: item.quantity + quantity }
+              : item
+          );
+        }
+
+        return [...currentItems, { ...product, quantity }];
+      });
+    },
+    [setItems]
+  );
+
+  // Remove item from cart
+  const removeItem = useCallback(
+    (productId) => {
+      setItems((currentItems) =>
+        currentItems.filter((item) => item.id !== productId)
+      );
+    },
+    [setItems]
+  );
+
+  // Update item quantity
+  const updateQuantity = useCallback(
+    (productId, quantity) => {
+      if (quantity <= 0) {
+        removeItem(productId);
+        return;
+      }
+
+      setItems((currentItems) =>
+        currentItems.map((item) =>
+          item.id === productId ? { ...item, quantity } : item
+        )
+      );
+    },
+    [setItems, removeItem]
+  );
+
+  // Clear entire cart
+  const clearCart = useCallback(() => {
+    setItems([]);
+  }, [setItems]);
+
+  // Check if item is in cart
+  const isInCart = useCallback(
+    (productId) => {
+      return items.some((item) => item.id === productId);
+    },
+    [items]
+  );
+
+  // Get item quantity
+  const getItemQuantity = useCallback(
+    (productId) => {
+      const item = items.find((item) => item.id === productId);
+      return item ? item.quantity : 0;
+    },
+    [items]
+  );
+
+  return {
+    items,
+    totalItems,
+    totalPrice,
+    isOpen,
+    setIsOpen,
+    addItem,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    isInCart,
+    getItemQuantity,
+  };
+}
+
+export default useShoppingCart;
+```
+
+<BackToTop />
+
+### `useDebounce` Hook
+
+```javascript
+import { useState, useEffect } from "react";
+
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// Usage in a search component
+function SearchComponent() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  useEffect(() => {
+    if (debouncedSearchTerm) {
+      // Perform search API call
+      console.log("Searching for:", debouncedSearchTerm);
+    }
+  }, [debouncedSearchTerm]);
+
+  return (
+    <input
+      type="text"
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      placeholder="Search..."
+    />
+  );
+}
+```
+
+<BackToTop />
+
+### `useToggle` Hook
+
+```javascript
+import { useState, useCallback } from "react";
+
+function useToggle(initialValue = false) {
+  const [value, setValue] = useState(initialValue);
+
+  const toggle = useCallback(() => setValue((v) => !v), []);
+  const setTrue = useCallback(() => setValue(true), []);
+  const setFalse = useCallback(() => setValue(false), []);
+
+  return [value, { toggle, setTrue, setFalse, setValue }];
+}
+
+// Usage example
+function ModalComponent() {
+  const [isOpen, { toggle, setTrue, setFalse }] = useToggle(false);
+
+  return (
+    <div>
+      <button onClick={setTrue}>Open Modal</button>
+      {isOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Modal Content</h2>
+            <button onClick={setFalse}>Close</button>
+            <button onClick={toggle}>Toggle</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+### `useIntersectionObserver` Hook
+
+```javascript
+import { useState, useEffect, useRef } from "react";
+
+function useIntersectionObserver(options = {}) {
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  const [entry, setEntry] = useState(null);
+  const elementRef = useRef(null);
+
+  useEffect(() => {
+    const element = elementRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsIntersecting(entry.isIntersecting);
+      setEntry(entry);
+    }, options);
+
+    observer.observe(element);
+
+    return () => {
+      observer.unobserve(element);
+    };
+  }, [options]);
+
+  return [elementRef, isIntersecting, entry];
+}
+
+// Usage for lazy loading
+function LazyImage({ src, alt, ...props }) {
+  const [ref, isIntersecting] = useIntersectionObserver({
+    threshold: 0.1,
+    rootMargin: "50px",
+  });
+  const [hasLoaded, setHasLoaded] = useState(false);
+
+  useEffect(() => {
+    if (isIntersecting && !hasLoaded) {
+      setHasLoaded(true);
+    }
+  }, [isIntersecting, hasLoaded]);
+
+  return (
+    <div ref={ref} {...props}>
+      {hasLoaded ? (
+        <img src={src} alt={alt} loading="lazy" />
+      ) : (
+        <div className="image-placeholder">Loading...</div>
+      )}
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+## Testing Custom Hooks
+
+When testing custom hooks, use React Testing Library's `renderHook` utility:
+
+```javascript
+import { renderHook, act } from "@testing-library/react";
+import useLocalStorage from "./useLocalStorage";
+
+describe("useLocalStorage", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  test("should initialize with initial value", () => {
+    const { result } = renderHook(() => useLocalStorage("test-key", "initial"));
+    expect(result.current[0]).toBe("initial");
+  });
+
+  test("should update localStorage when value changes", () => {
+    const { result } = renderHook(() => useLocalStorage("test-key", "initial"));
+
+    act(() => {
+      result.current[1]("new value");
+    });
+
+    expect(result.current[0]).toBe("new value");
+    expect(localStorage.getItem("test-key")).toBe('"new value"');
+  });
+
+  test("should handle JSON parsing errors gracefully", () => {
+    localStorage.setItem("test-key", "invalid json");
+
+    const { result } = renderHook(() =>
+      useLocalStorage("test-key", "fallback")
+    );
+    expect(result.current[0]).toBe("fallback");
+  });
+});
+```
+
+<BackToTop />
+
+## Common Pitfalls and How to Avoid Them
+
+### 1. Infinite Re-renders
+
+```javascript
+// ❌ Wrong - missing dependency
+function useBadExample() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    setCount(count + 1); // This will cause infinite re-renders
+  }, []); // Missing 'count' in dependencies
+}
+
+// ✅ Correct - use functional update
+function useGoodExample() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    setCount((prev) => prev + 1); // Use functional update
+  }, []); // No dependencies needed
+}
+```
+
+### 2. Memory Leaks
+
+```javascript
+// ❌ Wrong - no cleanup
+function useBadTimer() {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log("Timer tick");
+    }, 1000);
+    // Missing cleanup!
+  }, []);
+}
+
+// ✅ Correct - proper cleanup
+function useGoodTimer() {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log("Timer tick");
+    }, 1000);
+
+    return () => clearInterval(interval); // Cleanup
+  }, []);
+}
+```
+
+### 3. Stale Closures
+
+```javascript
+// ❌ Wrong - stale closure
+function useBadCounter() {
+  const [count, setCount] = useState(0);
+
+  const increment = () => {
+    setCount(count + 1); // Uses stale count value
+  };
+
+  return { count, increment };
+}
+
+// ✅ Correct - use useCallback with proper dependencies
+function useGoodCounter() {
+  const [count, setCount] = useState(0);
+
+  const increment = useCallback(() => {
+    setCount((prev) => prev + 1); // Always uses current value
+  }, []); // No dependencies needed with functional update
+
+  return { count, increment };
+}
+```
+
+## Conclusion
+
+Custom hooks represent one of React's most powerful patterns for creating reusable, maintainable, and testable code. They enable you to extract complex stateful logic from components while preserving React's functional paradigm and hook composition model. By following the patterns and best practices outlined in this guide, you can create custom hooks that not only solve immediate problems but also contribute to a more organized and scalable codebase.
+
+Remember that effective custom hooks are focused, well-tested, and designed with reusability in mind. They should abstract away complexity while providing a clean, intuitive API for consumers. As you develop more custom hooks, you'll find that they become the building blocks for more sophisticated application architectures, enabling you to compose complex behaviors from simple, focused pieces.
+
+The examples provided here demonstrate various levels of complexity, from simple state management to advanced data fetching with caching and error handling. Use these as starting points for your own custom hooks, adapting them to fit your specific use cases and requirements.
 
 <BackToTop />

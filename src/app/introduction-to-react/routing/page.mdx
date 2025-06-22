@@ -1,0 +1,196 @@
+import BackToTop from "@/components/BackToTop";
+
+# Routing
+
+## Table of Contents
+
+## Overview
+
+Routing in React is a way to manage navigation and rendering of different components based on the URL.
+It allows you to create single-page applications (SPAs) where the user can navigate between different views without reloading the entire page.
+
+React Router is a popular library for implementing routing in React applications.
+It provides a set of components and hooks that make it easy to define routes, navigate between them, and manage the browser history.
+
+## Basic Routing
+
+```javascript
+import React from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Home from "./Home";
+import About from "./About";
+import NotFound from "./NotFound";
+function App() {
+  return (
+    <Router>
+      <Switch>
+        <Route exact path="/" component={Home} />
+        <Route path="/about" component={About} />
+        <Route component={NotFound} />
+      </Switch>
+    </Router>
+  );
+}
+export default App;
+```
+
+In this example, we use the `BrowserRouter` component to wrap our application, which enables routing functionality.
+
+The `Route` component defines a mapping between a URL path and a React component.
+
+The `path` prop specifies the URL path, and the `component` prop specifies the component to render when that path is matched.
+
+The `Switch` component renders the first `Route` that matches the current URL.
+
+The `exact` prop ensures that the `Home` component is only rendered when the path is exactly `/`.
+
+The `NotFound` component is rendered for any unmatched routes.
+
+#### Advantages and Disadvantages of Basic Routing
+
+| Aspect      | Advantages                                          | Disadvantages                                            |
+| ----------- | --------------------------------------------------- | -------------------------------------------------------- |
+| Simplicity  | Easy to set up and understand                       | Limited to simple routing needs                          |
+| Performance | Fast initial load time                              | May require additional libraries for complex routing     |
+| Flexibility | Can handle basic navigation                         | Not suitable for complex applications with nested routes |
+| SEO         | Can be optimized for SEO with server-side rendering | Requires additional setup for SEO optimization           |
+
+<BackToTop />
+## Dynamic Routing
+
+Dynamic routing allows you to create routes that can change based on the application's state or user input. This is useful for applications that need to display different content based on parameters in the URL.
+
+```javascript
+import React from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import UserProfile from "./UserProfile";
+function App() {
+  return (
+    <Router>
+      <Switch>
+        <Route path="/user/:id" component={UserProfile} />
+      </Switch>
+    </Router>
+  );
+}
+export default App;
+```
+
+In this example, the `:id` part of the path is a dynamic segment that can match any user ID. The `UserProfile` component can access the `id` parameter from the URL using the `useParams` hook.
+
+The `UserProfile` component might look like this:
+
+```javascript
+import React from "react";
+import { useParams } from "react-router-dom";
+function UserProfile() {
+  const { id } = useParams();
+  return <h1>User Profile for User ID: {id}</h1>;
+}
+export default UserProfile;
+```
+
+In this `UserProfile` component, we use the `useParams` hook to extract the `id` parameter from the URL, allowing us to display the user profile based on the ID provided in the URL.
+
+#### Advantages and Disadvantages of Dynamic Routing
+
+| Aspect          | Advantages                                                    | Disadvantages                                           |
+| --------------- | ------------------------------------------------------------- | ------------------------------------------------------- |
+| Flexibility     | Can handle complex routing needs                              | More complex to set up and maintain                     |
+| User Experience | Provides a better user experience by showing relevant content | May require additional logic to handle different states |
+| Performance     | Can improve performance by loading only necessary data        | May lead to larger bundle sizes if not optimized        |
+
+<BackToTop />
+
+## Nested Routing
+
+Nested routing allows you to define routes within other routes, enabling a hierarchical structure for your application. This is useful for applications with complex layouts or multiple views that share a common parent.
+
+```javascript
+import React from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import Dashboard from "./Dashboard";
+import Settings from "./Settings";
+function App() {
+  return (
+    <Router>
+      <Switch>
+        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/settings" component={Settings} />
+      </Switch>
+    </Router>
+  );
+}
+export default App;
+```
+
+In this example, we have two top-level routes: `/dashboard` and `/settings`. Each route renders a different component.
+
+The `Dashboard` component might have its own nested routes for different sections, such as `/dashboard/overview` and `/dashboard/reports`.
+
+```javascript
+import React from "react";
+import { Route, Switch } from "react-router-dom";
+import Overview from "./Overview";
+import Reports from "./Reports";
+function Dashboard() {
+  return (
+    <div>
+      <h1>Dashboard</h1>
+      <Switch>
+        <Route path="/dashboard/overview" component={Overview} />
+        <Route path="/dashboard/reports" component={Reports} />
+      </Switch>
+    </div>
+  );
+}
+export default Dashboard;
+```
+
+In this `Dashboard` component, we define nested routes for the `Overview` and `Reports` components. When the user navigates to `/dashboard/overview`, the `Overview` component will be rendered, and similarly for `/dashboard/reports`.
+
+#### Advantages and Disadvantages of Nested Routing
+
+| Aspect          | Advantages                                                    | Disadvantages                                        |
+| --------------- | ------------------------------------------------------------- | ---------------------------------------------------- |
+| Organization    | Helps organize complex applications with multiple views       | Can lead to more complex routing logic and structure |
+| Reusability     | Allows for reusable components across different routes        | May require additional setup for nested components   |
+| User Experience | Provides a better user experience by showing relevant content | May require careful management of state and props    |
+| Performance     | Can improve performance by loading only necessary data        | May lead to larger bundle sizes if not optimized     |
+
+<BackToTop />
+## Programmatic Navigation
+
+Programmatic navigation allows you to navigate to different routes in your application using JavaScript code, rather than relying solely on user interactions like clicking links. This is useful for scenarios where you want to redirect users based on certain conditions or after performing actions like form submissions.
+
+```javascript
+import React from "react";
+import { useHistory } from "react-router-dom";
+function Login() {
+  const history = useHistory();
+  const handleLogin = () => {
+    // Perform login logic here
+    // After successful login, navigate to the dashboard
+    history.push("/dashboard");
+  };
+  return (
+    <div>
+      <h1>Login</h1>
+      <button onClick={handleLogin}>Login</button>
+    </div>
+  );
+}
+export default Login;
+```
+
+In this `Login` component, we use the `useHistory` hook to get access to the history object. When the user clicks the "Login" button, we call `history.push("/dashboard")` to navigate to the `/dashboard` route programmatically.
+
+#### Advantages and Disadvantages of Programmatic Navigation
+
+| Aspect          | Advantages                                                       | Disadvantages                                                |
+| --------------- | ---------------------------------------------------------------- | ------------------------------------------------------------ |
+| Flexibility     | Allows for dynamic navigation based on application state         | Can lead to complex navigation logic if not managed properly |
+| User Experience | Provides a better user experience by controlling navigation flow | May require additional logic to handle different states      |
+| Performance     | Can improve performance by avoiding unnecessary re-renders       | May lead to larger bundle sizes if not optimized             |
+
+<BackToTop />

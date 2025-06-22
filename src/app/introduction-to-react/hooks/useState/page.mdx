@@ -1,0 +1,142 @@
+import BackToTop from "@/components/BackToTop";
+
+# useState
+
+## Table of Contents
+
+## Overview
+
+`useState` is a React Hook that allows you to add state to functional components. It provides a way to declare state variables and update them, enabling your components to respond to user interactions and other events.
+
+`useState` is a fundamental part of React's state management system, allowing you to create and manage local state within functional components. `useState` is a built-in React Hook that allows you to add state to functional components. It provides a way to declare state variables and update them, enabling your components to respond to user interactions and other events.
+
+#### Benefits of Using `useState`
+
+- **Simplicity**: `useState` allows you to manage state in functional components without needing to convert them to class components.
+- **Local State**: It provides a way to manage local state within a component, making it easier to encapsulate logic and data.
+- **Reactivity**: When the state changes, React automatically re-renders the component, ensuring that the UI stays in sync with the state.
+
+#### When to Use `useState`
+
+`useState` is used when you need to manage local state within a functional component. It is suitable for:
+
+- Managing form inputs and user interactions
+- Keeping track of component-specific data
+- Handling UI state, such as toggling visibility or managing loading states
+- Managing simple counters or toggles
+- Implementing dynamic behavior in your components, such as showing/hiding elements or updating lists
+
+## Basic Usage
+
+```javascript
+import React, { useState } from "react";
+function ShoppingCart() {
+  const [items, setItems] = useState([]); // Declare state variable 'items' with initial value as an empty array
+
+  const addItem = (item) => {
+    setItems([...items, item]); // Update state by adding a new item
+  };
+
+  return (
+    <div>
+      <h1>Shopping Cart</h1>
+      <button onClick={() => addItem("Apple")}>Add Apple</button>
+      <ul>
+        {items.map((item, index) => (
+          <li key={index}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+export default ShoppingCart;
+```
+
+## How It Works
+
+### Initial State
+
+The `useState` hook takes an initial state value as an argument. This value can be of any type, including primitive values, objects, or arrays. The initial state is set only during the first render.
+
+```javascript
+const [count, setCount] = useState(0); // Initial state is a number
+const [user, setUser] = useState({ name: "", age: 0 }); // Initial state is an object
+const [items, setItems] = useState([]); // Initial state is an empty array
+```
+
+### Updating State
+
+To update the state, you call the setter function returned by `useState`. This function takes the new state value as an argument. React will re-render the component with the updated state.
+
+```javascript
+setCount(count + 1); // Increment count by 1
+setUser({ name: "Alice", age: 30 }); // Update user object
+setItems([...items, newItem]); // Add a new item to the array
+```
+
+### Functional Updates
+
+If the new state depends on the previous state, you can pass a function to the setter function. This function receives the previous state as an argument and returns the new state.
+
+```javascript
+setCount((prevCount) => prevCount + 1); // Increment count using functional update
+setItems((prevItems) => [...prevItems, newItem]); // Add a new item using functional update
+```
+
+<BackToTop />
+
+## Common Patterns
+
+- **Multiple State Variables**: You can use multiple `useState` calls to manage different pieces of state within the same component.
+- **Object State**: When managing complex state, you can use an object to group related state variables together.
+- **Array State**: You can use arrays to manage lists of items, allowing you to add, remove, or update items easily.
+
+#### Example of Multiple State Variables
+
+```javascript
+const [formData, setFormData] = useState({
+  name: "",
+  email: "",
+  message: "",
+});
+const handleInputChange = (event) => {
+  const { name, value } = event.target;
+  setFormData((prevData) => ({
+    ...prevData,
+    [name]: value,
+  }));
+};
+```
+
+#### Example of Object State
+
+```javascript
+const [items, setItems] = useState([]);
+const addItem = (item) => {
+  setItems((prevItems) => [...prevItems, item]);
+};
+const removeItem = (index) => {
+  setItems((prevItems) => prevItems.filter((_, i) => i !== index));
+};
+```
+
+#### Example of Array State
+
+```javascript
+const [todos, setTodos] = useState([]);
+const addTodo = (todo) => {
+  setTodos((prevTodos) => [...prevTodos, todo]);
+};
+const removeTodo = (index) => {
+  setTodos((prevTodos) => prevTodos.filter((_, i) => i !== index));
+};
+```
+
+## Best Practices
+
+- **Use Descriptive Names**: Name your state variables and setter functions clearly to indicate their purpose.
+- **Avoid Overusing State**: Only use state when necessary. If a value can be derived from props or other state, consider using a computed value instead.
+- **Batch Updates**: React batches state updates for performance. If you need to update multiple state variables in response to a single event, you can call the setter functions multiple times, and React will handle the batching for you.
+- **Use Functional Updates**: When the new state depends on the previous state, use functional updates to ensure you get the correct value.
+
+<BackToTop />

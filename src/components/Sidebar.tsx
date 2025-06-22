@@ -2,7 +2,7 @@ import { useNavigation } from "@/hooks/useNavigation";
 import type { NavigationItem } from "@/utils/navigation";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import NavigationSection from "./NavigationSection";
 
 interface SidebarProps {
@@ -15,37 +15,40 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
   const [openSection, setOpenSection] = useState<string | null>(null);
 
-  // Function to find which section contains the current path
-  const findSectionForPath = (path: string) => {
-    for (const section of navigation) {
-      if (checkItemContainsPath(section.items, path)) {
-        return section.title;
-      }
-    }
-    return null;
-  };
-
   // Recursive function to check if any item or its children contain the path
-  const checkItemContainsPath = (
-    items: NavigationItem[],
-    path: string
-  ): boolean => {
-    for (const item of items) {
-      // Check direct match
-      if (item.href === path) {
-        return true;
+  const checkItemContainsPath = useCallback(
+    (items: NavigationItem[], path: string): boolean => {
+      for (const item of items) {
+        // Check direct match
+        if (item.href === path) {
+          return true;
+        }
+        // Check if path starts with this item's path (for sub-routes)
+        if (path.startsWith(item.href + "/") && item.href !== "#") {
+          return true;
+        }
+        // Recursively check children
+        if (item.children && checkItemContainsPath(item.children, path)) {
+          return true;
+        }
       }
-      // Check if path starts with this item's path (for sub-routes)
-      if (path.startsWith(item.href + "/") && item.href !== "#") {
-        return true;
+      return false;
+    },
+    []
+  );
+
+  // Function to find which section contains the current path
+  const findSectionForPath = useCallback(
+    (path: string) => {
+      for (const section of navigation) {
+        if (checkItemContainsPath(section.items, path)) {
+          return section.title;
+        }
       }
-      // Recursively check children
-      if (item.children && checkItemContainsPath(item.children, path)) {
-        return true;
-      }
-    }
-    return false;
-  };
+      return null;
+    },
+    [navigation, checkItemContainsPath]
+  );
 
   // Set the section containing the current page as open by default
   useEffect(() => {
@@ -58,7 +61,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         setOpenSection(navigation[0].title);
       }
     }
-  }, [navigation, pathname, openSection]);
+  }, [navigation, openSection, findSectionForPath, pathname]);
 
   const handleSectionToggle = (sectionTitle: string) => {
     setOpenSection(openSection === sectionTitle ? null : sectionTitle);

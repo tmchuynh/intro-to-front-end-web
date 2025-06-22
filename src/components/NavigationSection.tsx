@@ -32,7 +32,7 @@ export default function NavigationSection({
     <div>
       <button
         onClick={onToggle}
-        className={`flex justify-between items-center mb-3 w-full  font-semibold text-left text-xs uppercase tracking-wider transition-colors ${
+        className={`flex justify-between items-center mb-3 w-full font-semibold text-left text-xs uppercase tracking-wider transition-colors ${
           isOpen
             ? "text-sidebar-active-text"
             : "text-sidebar-text hover:text-sidebar-text-secondary "
@@ -57,7 +57,7 @@ export default function NavigationSection({
         </svg>
       </button>
       <div
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+        className={`overflow-hidden transition-all duration-300 ease-in-out scrollbar-hide ${
           isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
         }`}
       >
@@ -108,12 +108,12 @@ function NavigationItem({
 
   if (hasChildren) {
     return (
-      <li>
+      <li className="">
         <button
           onClick={onToggle}
-          className={`flex justify-between items-center px-3 py-2 w-full font-medium text-left text-sm transition-colors rounded-md ${
-            isExpanded ? "bg-primary/50" : "hover:bg-sidebar-border"
-          }`}
+          className={`flex justify-between items-center px-3 py-2 ml-1 max-w-full w-13/14  font-medium text-left text-sm transition-colors rounded-md ${
+            isExpanded ? "bg-primary/50 " : "hover:bg-sidebar-border "
+          } `}
         >
           {item.title}
           <svg
@@ -133,14 +133,14 @@ function NavigationItem({
           </svg>
         </button>
         <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${
-            isExpanded ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+          className={`overflow-hidden transition-all duration-300 ease-in-out max-w-full w-11/12 scrollbar-hide ${
+            isExpanded ? "max-h-screen opacity-100 ml-5" : "max-h-0 opacity-0 "
           }`}
         >
           <ul
-            className={`space-y-1 mt-1 ml-3 border-gray-200 dark:border-gray-700 ${
+            className={`space-y-1 mt-1  border-gray-200 dark:border-gray-700 ${
               isExpanded ? "pb-2" : ""
-            } ${depth === 0 ? "border-l" : ""}`}
+            } ${depth === 0 ? "border-l" : ""} ${depth > 0 ? "max-w-full w-[98%]" : ""}`}
           >
             {item.children!.map((child, childIndex) => {
               const childHasChildren =
@@ -167,7 +167,7 @@ function NavigationItem({
     <li>
       <Link
         href={item.href}
-        className="block ml-1 px-3 py-2 hover:bg-sidebar-border rounded-md text-sm transition-colors"
+        className="block ml-1 px-3 py-2 hover:bg-sidebar-border rounded-md max-w-full w-13/14 text-sm transition-colors"
       >
         {item.title}
       </Link>

@@ -81,7 +81,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <aside
         id="sidebar"
         className={`
-        bg-sidebar-bg border-sidebar-border text-sidebar-text fixed top-0 left-0 z-50 w-64 h-full border-r
+        bg-sidebar-bg border-sidebar-border text-sidebar-text fixed top-0 left-0 z-50 w-72 h-full border-r
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0 lg:static lg:z-auto

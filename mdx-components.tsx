@@ -99,7 +99,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     li: ({ children }) => <li className="mb-0 ml-9">{children}</li>,
     strong: ({ children }) => (
-      <strong className="font-extrabold">{children}</strong>
+      <strong className="font-extrabold text-tertiary">{children}</strong>
     ),
     code: ({ children }) => (
       <code className="my-5 py-1 font-mono text-sm">{children}</code>

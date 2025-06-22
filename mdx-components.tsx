@@ -92,12 +92,12 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       return <span className="block mb-4 leading-relaxed">{children}</span>;
     },
     ul: ({ children }) => (
-      <ul className="space-y-2 my-4 list-disc list-outside">{children}</ul>
+      <ul className="space-y-1 my-1 list-disc list-outside">{children}</ul>
     ),
     ol: ({ children }) => (
-      <ol className="space-y-2 my-4 list-decimal list-outside">{children}</ol>
+      <ol className="space-y-1 my-1 list-decimal list-outside">{children}</ol>
     ),
-    li: ({ children }) => <li className="ml-9">{children}</li>,
+    li: ({ children }) => <li className="mb-0 ml-9">{children}</li>,
     strong: ({ children }) => (
       <strong className="font-extrabold">{children}</strong>
     ),

@@ -1,0 +1,662 @@
+import BackToTop from "@/components/BackToTop";
+
+# Profiler
+
+## Table of Contents
+
+## Overview
+
+The React `<Profiler>` is a powerful performance measurement tool that allows you to programmatically collect performance metrics about your React application's rendering behavior. Unlike the React DevTools `<Profiler>` (which is a browser extension), the `<Profiler>` component is built into React and can be used directly in your code to measure rendering performance in both development and production environments.
+
+The `<Profiler>` component wraps around parts of your component tree and measures how long it takes to render those components, providing detailed insights into rendering performance, including:
+
+- **Render Duration**: How long it takes to render the profiled component tree
+- **Render Phase**: Whether the component is in the "mount" or "update" phase
+- **Actual vs Base Duration**: Comparison between actual render time and baseline performance
+- **Interaction Tracking**: Correlating renders with user interactions
+
+#### Key Concepts
+
+- **Profiler Tree**: The component subtree being measured by the Profiler
+- **Commit Phase**: The phase when React applies changes to the DOM
+- **Interaction**: User events that trigger renders (clicks, input changes, etc.)
+- **Performance Metrics**: Quantitative data about rendering performance
+
+#### When to Use `<Profiler>`
+
+- **Performance Optimization**: Identify slow-rendering components and bottlenecks
+- **Production Monitoring**: Track real-world performance metrics in production
+- **A/B Testing**: Compare performance between different implementations
+- **Regression Detection**: Monitor for performance regressions over time
+- **User Experience Analytics**: Understand how performance impacts user experience
+  <BackToTop />
+
+## Props
+
+The `<Profiler>` component accepts two required props:
+
+### Required Props
+
+- **id** (string): A unique identifier for the `<Profiler>` instance. This helps you identify which `<Profiler>` generated the performance data when you have multiple `<Profiler>`s in your application.
+
+- **onRender** (function): A callback function that gets called every time the profiled tree commits an update. This function receives detailed performance information about the render.
+
+### onRender Callback Parameters
+
+The `onRender` callback receives the following parameters:
+
+```typescript
+function onRender(
+  id: string, // The "id" prop of the `<Profiler>` tree that has just committed
+  phase: "mount" | "update", // Whether the tree just mounted or re-rendered due to a change
+  actualDuration: number, // Time spent rendering the committed update
+  baseDuration: number, // Estimated time to render the entire subtree without memoization
+  startTime: number, // When React began rendering this update
+  commitTime: number, // When React committed this update
+  interactions: Set<Interaction> // Set of interactions that were being traced when the update was scheduled
+) {
+  // Handle performance data
+}
+```
+
+<BackToTop />
+
+## Basic Usage
+
+### Simple Performance Measurement
+
+```javascript
+import React, { Profiler } from "react";
+
+function onRenderCallback(id, phase, actualDuration, baseDuration) {
+  console.log("Profiler Results:", {
+    id,
+    phase,
+    actualDuration,
+    baseDuration,
+    performanceGain: baseDuration - actualDuration,
+  });
+}
+
+function App() {
+  return (
+    <div>
+      <h1>My Application</h1>
+      <Profiler id="UserList" onRender={onRenderCallback}>
+        <UserList />
+      </Profiler>
+      <Profiler id="Navigation" onRender={onRenderCallback}>
+        <Navigation />
+      </Profiler>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+### Advanced Usage with Performance Tracking
+
+```javascript
+import React, { Profiler, useState, useCallback } from "react";
+
+// Performance tracking service
+class PerformanceTracker {
+  static measurements = [];
+
+  static track(measurement) {
+    this.measurements.push({
+      ...measurement,
+      timestamp: Date.now(),
+      url: window.location.pathname,
+    });
+
+    // Send to analytics service in production
+    if (process.env.NODE_ENV === "production") {
+      this.sendToAnalytics(measurement);
+    }
+  }
+
+  static sendToAnalytics(measurement) {
+    // Send to your analytics service
+    fetch("/api/performance", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(measurement),
+    });
+  }
+
+  static getSlowComponents(threshold = 16) {
+    return this.measurements.filter((m) => m.actualDuration > threshold);
+  }
+}
+
+function usePerformanceProfiler() {
+  const onRender = useCallback(
+    (
+      id,
+      phase,
+      actualDuration,
+      baseDuration,
+      startTime,
+      commitTime,
+      interactions
+    ) => {
+      const measurement = {
+        id,
+        phase,
+        actualDuration,
+        baseDuration,
+        startTime,
+        commitTime,
+        interactionCount: interactions.size,
+        isSlowRender: actualDuration > 16, // 60fps threshold
+        memoryUsage: performance.memory
+          ? performance.memory.usedJSHeapSize
+          : null,
+      };
+
+      PerformanceTracker.track(measurement);
+
+      // Log slow renders in development
+      if (process.env.NODE_ENV === "development" && actualDuration > 16) {
+        console.warn(`Slow render detected in ${id}:`, measurement);
+      }
+    },
+    []
+  );
+
+  return onRender;
+}
+
+function Dashboard() {
+  const onRender = usePerformanceProfiler();
+  const [filter, setFilter] = useState("");
+
+  return (
+    <div className="dashboard">
+      <Profiler id="Dashboard-Header" onRender={onRender}>
+        <DashboardHeader />
+      </Profiler>
+
+      <Profiler id="Dashboard-Filters" onRender={onRender}>
+        <FilterPanel filter={filter} onFilterChange={setFilter} />
+      </Profiler>
+
+      <Profiler id="Dashboard-Content" onRender={onRender}>
+        <DashboardContent filter={filter} />
+      </Profiler>
+
+      <Profiler id="Dashboard-Sidebar" onRender={onRender}>
+        <Sidebar />
+      </Profiler>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+## Performance Monitoring Patterns
+
+### Component-Level Monitoring
+
+```javascript
+import React, { Profiler, memo } from "react";
+
+// Higher-order component for automatic profiling
+function withProfiler(WrappedComponent, profileId) {
+  const ProfiledComponent = memo((props) => {
+    const onRender = (id, phase, actualDuration) => {
+      if (actualDuration > 5) {
+        // Only log renders > 5ms
+        console.log(`${id} (${phase}): ${actualDuration.toFixed(2)}ms`);
+      }
+    };
+
+    return (
+      <Profiler id={profileId} onRender={onRender}>
+        <WrappedComponent {...props} />
+      </Profiler>
+    );
+  });
+
+  ProfiledComponent.displayName = `withProfiler(${WrappedComponent.displayName || WrappedComponent.name})`;
+  return ProfiledComponent;
+}
+
+// Usage
+const ProfiledUserCard = withProfiler(UserCard, "UserCard");
+const ProfiledProductList = withProfiler(ProductList, "ProductList");
+```
+
+<BackToTop />
+
+### Route-Level Performance Monitoring
+
+```javascript
+import React, { Profiler } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
+
+function PerformanceMonitoredRoutes() {
+  const location = useLocation();
+
+  const onRouteRender = (id, phase, actualDuration, baseDuration) => {
+    // Track route-level performance
+    const routeMetrics = {
+      route: location.pathname,
+      component: id,
+      phase,
+      actualDuration,
+      baseDuration,
+      timestamp: Date.now(),
+    };
+
+    // Send to analytics
+    analytics.track("route_render_performance", routeMetrics);
+
+    // Alert on slow route renders
+    if (actualDuration > 100) {
+      console.warn(
+        `Slow route render: ${location.pathname} took ${actualDuration}ms`
+      );
+    }
+  };
+
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <Profiler id="HomePage" onRender={onRouteRender}>
+            <HomePage />
+          </Profiler>
+        }
+      />
+      <Route
+        path="/products"
+        element={
+          <Profiler id="ProductsPage" onRender={onRouteRender}>
+            <ProductsPage />
+          </Profiler>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <Profiler id="ProfilePage" onRender={onRouteRender}>
+            <ProfilePage />
+          </Profiler>
+        }
+      />
+    </Routes>
+  );
+}
+```
+
+<BackToTop />
+
+### Real-Time Performance Dashboard
+
+```javascript
+import React, { Profiler, useState, useEffect } from "react";
+
+function PerformanceDashboard() {
+  const [metrics, setMetrics] = useState([]);
+  const [slowComponents, setSlowComponents] = useState([]);
+
+  const onRender = (id, phase, actualDuration, baseDuration) => {
+    const metric = {
+      id,
+      phase,
+      actualDuration,
+      baseDuration,
+      timestamp: Date.now(),
+      efficiency: (
+        ((baseDuration - actualDuration) / baseDuration) *
+        100
+      ).toFixed(1),
+    };
+
+    setMetrics((prev) => [...prev.slice(-50), metric]); // Keep last 50 measurements
+
+    if (actualDuration > 16) {
+      setSlowComponents((prev) => [...prev.slice(-10), metric]); // Keep last 10 slow renders
+    }
+  };
+
+  const averageRenderTime =
+    metrics.length > 0
+      ? (
+          metrics.reduce((sum, m) => sum + m.actualDuration, 0) / metrics.length
+        ).toFixed(2)
+      : 0;
+
+  return (
+    <div className="performance-dashboard">
+      <div className="performance-stats">
+        <div className="stat">
+          <h3>Average Render Time</h3>
+          <span className={averageRenderTime > 16 ? "slow" : "fast"}>
+            {averageRenderTime}ms
+          </span>
+        </div>
+        <div className="stat">
+          <h3>Total Renders</h3>
+          <span>{metrics.length}</span>
+        </div>
+        <div className="stat">
+          <h3>Slow Renders</h3>
+          <span className={slowComponents.length > 0 ? "warning" : ""}>
+            {slowComponents.length}
+          </span>
+        </div>
+      </div>
+
+      {slowComponents.length > 0 && (
+        <div className="slow-components">
+          <h3>Recent Slow Components</h3>
+          <ul>
+            {slowComponents.map((component, index) => (
+              <li key={index}>
+                <strong>{component.id}</strong>:{" "}
+                {component.actualDuration.toFixed(2)}ms
+                <small> ({component.phase})</small>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <Profiler id="AppContent" onRender={onRender}>
+        <MainAppContent />
+      </Profiler>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+## Production Considerations
+
+### Performance Impact
+
+The Profiler itself has minimal performance overhead, but in production, you should be strategic about where you place Profilers:
+
+```javascript
+// Good: Strategic profiling of key components
+function App() {
+  const shouldProfile =
+    process.env.NODE_ENV === "development" ||
+    window.location.search.includes("profile=true");
+
+  const ProfilerWrapper = ({ children, id }) => {
+    if (shouldProfile) {
+      return (
+        <Profiler id={id} onRender={productionSafeOnRender}>
+          {children}
+        </Profiler>
+      );
+    }
+    return children;
+  };
+
+  return (
+    <div>
+      <ProfilerWrapper id="CriticalPath">
+        <CriticalUserInterface />
+      </ProfilerWrapper>
+    </div>
+  );
+}
+
+// Production-safe onRender callback
+function productionSafeOnRender(id, phase, actualDuration) {
+  // Only sample a percentage of renders in production
+  if (Math.random() > 0.1) return; // 10% sampling
+
+  // Only track significant renders
+  if (actualDuration < 5) return;
+
+  // Batch and send data efficiently
+  PerformanceTracker.batch(id, phase, actualDuration);
+}
+```
+
+<BackToTop />
+
+### Data Collection and Analysis
+
+```javascript
+class ProductionPerformanceTracker {
+  static batch = [];
+  static batchSize = 10;
+  static flushInterval = 5000; // 5 seconds
+
+  static init() {
+    // Flush batch periodically
+    setInterval(() => this.flush(), this.flushInterval);
+
+    // Flush on page unload
+    window.addEventListener("beforeunload", () => this.flush());
+  }
+
+  static collect(data) {
+    this.batch.push({
+      ...data,
+      userAgent: navigator.userAgent,
+      timestamp: Date.now(),
+      sessionId: this.getSessionId(),
+    });
+
+    if (this.batch.length >= this.batchSize) {
+      this.flush();
+    }
+  }
+
+  static async flush() {
+    if (this.batch.length === 0) return;
+
+    const data = [...this.batch];
+    this.batch = [];
+
+    try {
+      await fetch("/api/performance-metrics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ metrics: data }),
+      });
+    } catch (error) {
+      console.warn("Failed to send performance metrics:", error);
+      // Could implement retry logic here
+    }
+  }
+
+  static getSessionId() {
+    // Implementation for session tracking
+    return sessionStorage.getItem("sessionId") || "anonymous";
+  }
+}
+```
+
+<BackToTop />
+## Best Practices
+
+### Strategic Profiler Placement
+
+```javascript
+// ✅ Good: Profile specific components that are performance-critical
+<Profiler id="DataTable" onRender={onRender}>
+  <DataTable data={largeDataset} />
+</Profiler>
+
+// ❌ Avoid: Profiling every single component
+<Profiler id="Button" onRender={onRender}>
+  <Button>Click me</Button>
+</Profiler>
+```
+
+### Meaningful IDs and Context
+
+```javascript
+// ✅ Good: Descriptive IDs with context
+<Profiler id="ProductList-Page1-FilteredByCategory" onRender={onRender}>
+  <ProductList />
+</Profiler>
+
+// ❌ Avoid: Generic IDs
+<Profiler id="Component1" onRender={onRender}>
+  <ProductList />
+</Profiler>
+```
+
+### Conditional Profiling
+
+```javascript
+// ✅ Good: Conditional profiling based on environment or feature flags
+function ConditionalProfiler({ children, id, enabled = true }) {
+  if (!enabled || (!__DEV__ && !window.enableProfiling)) {
+    return children;
+  }
+
+  return (
+    <Profiler id={id} onRender={handleRender}>
+      {children}
+    </Profiler>
+  );
+}
+```
+
+<BackToTop />
+
+## Common Pitfalls
+
+### Over-Profiling
+
+```javascript
+// ❌ Don't do this - too many Profilers
+function OverProfiledComponent() {
+  return (
+    <Profiler id="Container" onRender={onRender}>
+      <div>
+        <Profiler id="Header" onRender={onRender}>
+          <Header />
+        </Profiler>
+        <Profiler id="Content" onRender={onRender}>
+          <Content />
+        </Profiler>
+        <Profiler id="Footer" onRender={onRender}>
+          <Footer />
+        </Profiler>
+      </div>
+    </Profiler>
+  );
+}
+
+// ✅ Better approach - selective profiling
+function WellProfiledComponent() {
+  return (
+    <div>
+      <Header />
+      <Profiler id="MainContent" onRender={onRender}>
+        <Content />
+      </Profiler>
+      <Footer />
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+### Ignoring Performance Impact
+
+```javascript
+// ❌ Don't do expensive operations in onRender
+function expensiveOnRender(id, phase, actualDuration) {
+  // This will slow down your app!
+  for (let i = 0; i < 1000000; i++) {
+    // Heavy computation
+  }
+  console.log("Render complete");
+}
+
+// ✅ Keep onRender lightweight
+function efficientOnRender(id, phase, actualDuration) {
+  // Quick logging or data collection only
+  if (actualDuration > 16) {
+    console.warn(`Slow render: ${id}`);
+  }
+
+  // Queue heavy operations
+  queueMicrotask(() => {
+    expensiveAnalysis(id, phase, actualDuration);
+  });
+}
+```
+
+<BackToTop />
+
+## Integration with Performance APIs
+
+### Using with Performance Observer
+
+```javascript
+import React, { Profiler, useEffect } from "react";
+
+function PerformanceIntegratedApp() {
+  useEffect(() => {
+    // Set up Performance Observer
+    if ("PerformanceObserver" in window) {
+      const observer = new PerformanceObserver((list) => {
+        list.getEntries().forEach((entry) => {
+          if (entry.entryType === "measure") {
+            console.log(
+              `Performance measure: ${entry.name} - ${entry.duration}ms`
+            );
+          }
+        });
+      });
+
+      observer.observe({ entryTypes: ["measure"] });
+
+      return () => observer.disconnect();
+    }
+  }, []);
+
+  const onRender = (id, phase, actualDuration) => {
+    // Create performance marks and measures
+    const markName = `${id}-${phase}-start`;
+    const measureName = `${id}-${phase}-duration`;
+
+    performance.mark(markName);
+    performance.measure(measureName, markName);
+
+    // Correlate with React render data
+    console.log(`React Profiler: ${id} rendered in ${actualDuration}ms`);
+  };
+
+  return (
+    <Profiler id="AppRoot" onRender={onRender}>
+      <MainApp />
+    </Profiler>
+  );
+}
+```
+
+## Conclusion
+
+The React Profiler is an essential tool for understanding and optimizing your application's rendering performance. By strategically placing Profiler components around performance-critical parts of your application, you can gain valuable insights into rendering bottlenecks and optimization opportunities.
+
+Key takeaways for effective Profiler usage:
+
+- **Use strategically**: Don't profile everything; focus on components that matter
+- **Monitor in production**: Use sampling and batching to minimize performance impact
+- **Act on data**: Use the insights to make informed optimization decisions
+- **Combine with other tools**: Integrate with Performance APIs and analytics services
+- **Consider the context**: Account for user interactions, network conditions, and device capabilities
+
+Remember that the goal isn't just to collect data, but to use that data to create better user experiences through improved performance.
+
+<BackToTop />

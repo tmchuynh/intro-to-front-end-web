@@ -1,0 +1,100 @@
+import BackToTop from "@/components/BackToTop";
+
+# useDebugValue
+
+## Table of Contents
+
+## Overview
+
+useDebugValue is a React hook that allows you to display a label for custom hooks in React DevTools. It is primarily used for debugging purposes, helping developers understand the state and behavior of custom hooks.
+It can be particularly useful when you have complex custom hooks that manage state or perform side effects, as it provides a way to visualize their current state in the React DevTools.
+
+#### Benefits of using `useDebugValue`:
+
+- **Improved Debugging**: It helps you see the state of custom hooks in React DevTools, making it easier to debug complex applications.
+- **Clarity**: It provides a clear label for custom hooks, making it easier to identify them in the DevTools.
+- **Customizable**: You can format the debug value to display relevant information about the hook's state or behavior.
+- **Performance Monitoring**: It can be used to monitor the performance of custom hooks by displaying relevant metrics in React DevTools.
+- **Error Handling**: It allows you to display error messages or statuses related to the custom hook in the DevTools.
+- **Lifecycle Tracking**: It can help track the lifecycle of custom hooks in React DevTools, providing insights into when they are mounted, updated, or unmounted.
+- **Contextual Information**: It provides additional context or information about the custom hook's state, which can be useful for understanding its behavior during development.
+- **Visual Representation**: It allows you to visualize the current state of complex custom hooks in the DevTools, making it easier to understand their behavior.
+- **Labeling**: It provides a label that describes the custom hook's purpose or functionality, making it easier to identify in the DevTools.
+- **Status Monitoring**: It can be used to monitor the status of asynchronous operations performed by custom hooks, such as loading, error, or success states.
+
+#### When to use `useDebugValue`:
+
+- When you have custom hooks that manage state or perform side effects.
+- When you want to improve the debugging experience in React DevTools.
+- When you want to provide additional context or information about the custom hook's state.
+- When you want to visualize the current state of complex custom hooks in the DevTools.
+- When you want to monitor the performance or behavior of custom hooks during development.
+- When you want to display error messages or statuses related to the custom hook in the DevTools.
+- When you want to provide a label that describes the custom hook's purpose or functionality.
+- When you want to track the lifecycle of custom hooks in React DevTools.
+
+## Common Use Cases
+
+- **Custom Hooks**: Use `useDebugValue` in custom hooks to provide a label that describes the hook's state or behavior.
+- **Complex State Management**: When managing complex state in custom hooks, use `useDebugValue` to display the current state in React DevTools.
+- **Asynchronous Operations**: If your custom hook performs asynchronous operations, use `useDebugValue` to show the current status (e.g., loading, error, success) in the DevTools.
+- **Performance Monitoring**: Use `useDebugValue` to monitor the performance of custom hooks by displaying relevant metrics in React DevTools.
+- **Error Handling**: When your custom hook handles errors, use `useDebugValue` to display error messages or statuses in the DevTools.
+
+## How It Works
+
+The `useDebugValue` hook takes a value as an argument and displays it in React DevTools. You can also provide a formatting function to customize how the value is displayed. The value can be a simple string, an object, or any other data type that you want to visualize in the DevTools.
+
+### Initialization
+
+```javascript
+import { useDebugValue } from "react";
+function useCustomHook(value) {
+  // Use useDebugValue to display the value in React DevTools
+  useDebugValue(value);
+
+  // Custom hook logic here
+  return value;
+}
+```
+
+### Parameters
+
+- `value`: The value you want to display in React DevTools. This can be a string, object, or any other data type.
+- `format`: An optional formatting function that takes the value and returns a formatted string for display in the DevTools.
+
+### Execution
+
+When the component using the custom hook is rendered, `useDebugValue` will display the provided value in React DevTools under the custom hook's name. If a formatting function is provided, it will be used to format the value before displaying it.
+
+## What to Avoid
+
+- Avoid using `useDebugValue` in components that do not use custom hooks, as it is specifically designed for custom hooks.
+- Avoid using `useDebugValue` in performance-critical paths, as it may introduce a slight overhead due to the additional rendering in React DevTools.
+- Avoid using `useDebugValue` for values that are not relevant for debugging, as it may clutter the React DevTools with unnecessary information.
+
+## Examples
+
+```javascript
+import { useDebugValue, useState } from "react";
+function useCustomHook() {
+  const [state, setState] = useState("Initial State");
+  // Use useDebugValue to display the current state in React DevTools
+  useDebugValue(state, (value) => `Current State: ${value}`);
+  return [state, setState];
+}
+```
+
+```javascript
+import { useDebugValue, useState } from "react";
+function useAsyncData() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  // Use useDebugValue to display the loading status in React DevTools
+  useDebugValue(
+    loading ? "Loading..." : error ? `Error: ${error}` : "Data Loaded"
+  );
+  return { data, loading, error, setData };
+}
+```

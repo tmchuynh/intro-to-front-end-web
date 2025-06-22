@@ -1,0 +1,981 @@
+import BackToTop from "@/components/BackToTop";
+
+# StrictMode
+
+## Table of Contents
+
+## Overview
+
+React StrictMode is a development-only tool that helps you write better React applications by intentionally highlighting potential problems and ensuring your components are resilient to future React features. It's a wrapper component that activates additional checks and warnings for its descendants, but only in development mode—it has no effect on production builds.
+
+StrictMode acts as a safety net that helps catch common mistakes early in development, encourages best practices, and prepares your application for future React features like concurrent rendering. It's particularly valuable for detecting side effects, deprecated APIs, and components that aren't compatible with React's concurrent features.
+
+### Key Benefits
+
+- **Early Problem Detection**: Identifies potential issues before they become production bugs
+- **Future-Proofing**: Helps ensure compatibility with upcoming React features
+- **Best Practices Enforcement**: Encourages writing components that follow React principles
+- **Side Effect Detection**: Helps identify and eliminate unintended side effects
+- **Performance Insights**: Highlights components that may cause performance issues
+
+### What StrictMode Does
+
+StrictMode enables several development-only behaviors:
+
+- **Double Rendering**: Components are rendered twice to detect side effects
+- **Lifecycle Auditing**: Checks for usage of deprecated lifecycle methods
+- **Legacy API Warnings**: Warns about deprecated APIs and patterns
+- **Effect Cleanup Verification**: Ensures effects are properly cleaned up
+- **State Update Detection**: Identifies unsafe state mutations
+  <BackToTop />
+
+## How StrictMode Works
+
+### Double Rendering in Development
+
+One of StrictMode's most important features is intentionally double-rendering components to help detect side effects:
+
+```javascript
+// Without StrictMode - component renders once
+function RegularComponent() {
+  console.log("Component rendered"); // Logs once
+  return <div>Hello World</div>;
+}
+
+// With StrictMode - component renders twice in development
+function StrictComponent() {
+  console.log("Component rendered"); // Logs twice in development
+  return <div>Hello World</div>;
+}
+```
+
+This double rendering helps identify components that aren't "pure" and have unintended side effects.
+
+### Effect Double Execution
+
+StrictMode also runs effects twice to ensure they're properly cleaning up:
+
+```javascript
+function ComponentWithEffect() {
+  useEffect(() => {
+    console.log("Effect running"); // Runs twice in StrictMode
+
+    // This will help catch missing cleanup
+    const subscription = subscribeToSomething();
+
+    return () => {
+      console.log("Effect cleanup"); // Should also run twice
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  return <div>Component with effect</div>;
+}
+```
+
+<BackToTop />
+
+## Basic Usage
+
+### Wrapping Your Entire App
+
+The most common pattern is to wrap your entire application in StrictMode:
+
+```javascript
+import React, { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App";
+
+const root = createRoot(document.getElementById("root"));
+root.render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+```
+
+### Selective StrictMode Usage
+
+You can also apply StrictMode to specific parts of your application:
+
+```javascript
+import React, { StrictMode } from "react";
+
+function App() {
+  return (
+    <div>
+      <Header />
+
+      {/* Only this section will have StrictMode checks */}
+      <StrictMode>
+        <UserDashboard />
+        <DataVisualization />
+      </StrictMode>
+
+      <Footer />
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+### Nested StrictMode
+
+StrictMode can be nested, and inner StrictMode components inherit the behavior:
+
+```javascript
+function App() {
+  return (
+    <StrictMode>
+      <div>
+        <ComponentA />
+        <StrictMode>
+          {/* This is redundant but harmless */}
+          <ComponentB />
+        </StrictMode>
+        <ComponentC />
+      </div>
+    </StrictMode>
+  );
+}
+```
+
+<BackToTop />
+
+## What StrictMode Detects
+
+### Components with Side Effects
+
+StrictMode helps identify components that have side effects in their render methods:
+
+```javascript
+// ❌ Bad - side effect in render
+function BadComponent({ items }) {
+  // This will run twice in StrictMode, potentially causing issues
+  items.push("new item"); // Mutating props - side effect!
+
+  return (
+    <ul>
+      {items.map((item) => (
+        <li key={item}>{item}</li>
+      ))}
+    </ul>
+  );
+}
+
+// ✅ Good - no side effects in render
+function GoodComponent({ items }) {
+  // Pure rendering - safe to run multiple times
+  const itemsWithDefault = items.length === 0 ? ["No items"] : items;
+
+  return (
+    <ul>
+      {itemsWithDefault.map((item) => (
+        <li key={item}>{item}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+<BackToTop />
+
+### Deprecated Lifecycle Methods
+
+StrictMode warns about deprecated lifecycle methods:
+
+```javascript
+// ❌ StrictMode will warn about these deprecated methods
+class DeprecatedComponent extends React.Component {
+  componentWillMount() {
+    // Warning: componentWillMount is deprecated
+    this.fetchData();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // Warning: componentWillReceiveProps is deprecated
+    if (nextProps.userId !== this.props.userId) {
+      this.fetchUserData(nextProps.userId);
+    }
+  }
+
+  render() {
+    return <div>{this.state.data}</div>;
+  }
+}
+
+// ✅ Modern equivalent using hooks
+function ModernComponent({ userId }) {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetchUserData(userId).then(setData);
+  }, [userId]);
+
+  return <div>{data}</div>;
+}
+```
+
+<BackToTop />
+
+### Legacy String Refs
+
+StrictMode warns about legacy string ref usage:
+
+```javascript
+// ❌ Legacy string ref - StrictMode will warn
+class LegacyComponent extends React.Component {
+  handleClick = () => {
+    this.refs.myInput.focus(); // Warning about string refs
+  };
+
+  render() {
+    return (
+      <div>
+        <input ref="myInput" />
+        <button onClick={this.handleClick}>Focus Input</button>
+      </div>
+    );
+  }
+}
+
+// ✅ Modern ref usage
+function ModernComponent() {
+  const inputRef = useRef(null);
+
+  const handleClick = () => {
+    inputRef.current.focus();
+  };
+
+  return (
+    <div>
+      <input ref={inputRef} />
+      <button onClick={handleClick}>Focus Input</button>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+### Unexpected Effects and Cleanup Issues
+
+StrictMode helps identify effects that don't clean up properly:
+
+```javascript
+// ❌ Bad - no cleanup, will cause memory leaks
+function BadEffectComponent() {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log("Timer tick");
+    }, 1000);
+
+    // Missing cleanup - StrictMode's double execution will help spot this
+    // as you'll see multiple intervals running
+  }, []);
+
+  return <div>Component with leaky effect</div>;
+}
+
+// ✅ Good - proper cleanup
+function GoodEffectComponent() {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log("Timer tick");
+    }, 1000);
+
+    // Proper cleanup
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  return <div>Component with clean effect</div>;
+}
+```
+
+<BackToTop />
+
+### State Mutation Detection
+
+StrictMode can help detect direct state mutations:
+
+```javascript
+// ❌ Bad - direct state mutation
+function BadStateComponent() {
+  const [items, setItems] = useState([]);
+
+  const addItem = (newItem) => {
+    // This mutates the existing array - dangerous!
+    items.push(newItem);
+    setItems(items); // May not trigger re-render
+  };
+
+  return (
+    <div>
+      <button onClick={() => addItem("New Item")}>Add Item</button>
+      <ul>
+        {items.map((item, index) => (
+          <li key={index}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// ✅ Good - immutable state updates
+function GoodStateComponent() {
+  const [items, setItems] = useState([]);
+
+  const addItem = (newItem) => {
+    // Creates new array - safe immutable update
+    setItems((prevItems) => [...prevItems, newItem]);
+  };
+
+  return (
+    <div>
+      <button onClick={() => addItem("New Item")}>Add Item</button>
+      <ul>
+        {items.map((item, index) => (
+          <li key={index}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+## Examples
+
+### Data Fetching Component
+
+```javascript
+import React, { useState, useEffect, StrictMode } from "react";
+
+// Component that properly handles data fetching in StrictMode
+function UserProfile({ userId }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchUser = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(`/api/users/${userId}`);
+        const userData = await response.json();
+
+        // Check if effect was cancelled before setting state
+        if (!cancelled) {
+          setUser(userData);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err.message);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchUser();
+
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  if (loading) return <div>Loading user...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!user) return <div>No user found</div>;
+
+  return (
+    <div className="user-profile">
+      <h2>{user.name}</h2>
+      <p>{user.email}</p>
+    </div>
+  );
+}
+
+// Usage with StrictMode
+function App() {
+  return (
+    <StrictMode>
+      <UserProfile userId="123" />
+    </StrictMode>
+  );
+}
+```
+
+<BackToTop />
+
+### Subscription Management
+
+```javascript
+import React, { useState, useEffect, StrictMode } from "react";
+
+// Custom hook for managing subscriptions safely
+function useWebSocketSubscription(url) {
+  const [data, setData] = useState(null);
+  const [connectionStatus, setConnectionStatus] = useState("Disconnected");
+
+  useEffect(() => {
+    let ws = null;
+
+    const connect = () => {
+      ws = new WebSocket(url);
+
+      ws.onopen = () => {
+        setConnectionStatus("Connected");
+      };
+
+      ws.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        setData(message);
+      };
+
+      ws.onclose = () => {
+        setConnectionStatus("Disconnected");
+      };
+
+      ws.onerror = () => {
+        setConnectionStatus("Error");
+      };
+    };
+
+    connect();
+
+    // Cleanup function - crucial for StrictMode compatibility
+    return () => {
+      if (ws) {
+        ws.close();
+        ws = null;
+      }
+    };
+  }, [url]);
+
+  return { data, connectionStatus };
+}
+
+function RealtimeComponent() {
+  const { data, connectionStatus } = useWebSocketSubscription(
+    "ws://localhost:8080"
+  );
+
+  return (
+    <div>
+      <div>Status: {connectionStatus}</div>
+      <div>Data: {JSON.stringify(data)}</div>
+    </div>
+  );
+}
+
+// This will work correctly even with StrictMode's double execution
+function App() {
+  return (
+    <StrictMode>
+      <RealtimeComponent />
+    </StrictMode>
+  );
+}
+```
+
+<BackToTop />
+
+### Form Component with Proper State Management
+
+```javascript
+import React, { useState, useCallback, StrictMode } from "react";
+
+function ContactForm({ onSubmit }) {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [errors, setErrors] = useState({});
+
+  // Memoized callback to prevent unnecessary re-renders
+  const handleInputChange = useCallback(
+    (field) => (event) => {
+      const value = event.target.value;
+
+      // Immutable state update - StrictMode safe
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+
+      // Clear error when user starts typing
+      if (errors[field]) {
+        setErrors((prev) => ({
+          ...prev,
+          [field]: "",
+        }));
+      }
+    },
+    [errors]
+  );
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email is invalid";
+    }
+
+    if (!formData.message.trim()) {
+      newErrors.message = "Message is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (validateForm()) {
+      onSubmit(formData);
+      // Reset form after successful submission
+      setFormData({ name: "", email: "", message: "" });
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="contact-form">
+      <div className="form-group">
+        <label htmlFor="name">Name:</label>
+        <input
+          id="name"
+          type="text"
+          value={formData.name}
+          onChange={handleInputChange("name")}
+          className={errors.name ? "error" : ""}
+        />
+        {errors.name && <span className="error-message">{errors.name}</span>}
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="email">Email:</label>
+        <input
+          id="email"
+          type="email"
+          value={formData.email}
+          onChange={handleInputChange("email")}
+          className={errors.email ? "error" : ""}
+        />
+        {errors.email && <span className="error-message">{errors.email}</span>}
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="message">Message:</label>
+        <textarea
+          id="message"
+          value={formData.message}
+          onChange={handleInputChange("message")}
+          className={errors.message ? "error" : ""}
+        />
+        {errors.message && (
+          <span className="error-message">{errors.message}</span>
+        )}
+      </div>
+
+      <button type="submit">Send Message</button>
+    </form>
+  );
+}
+
+// Usage with StrictMode
+function App() {
+  const handleFormSubmit = (data) => {
+    console.log("Form submitted:", data);
+    // Handle form submission
+  };
+
+  return (
+    <StrictMode>
+      <ContactForm onSubmit={handleFormSubmit} />
+    </StrictMode>
+  );
+}
+```
+
+<BackToTop />
+
+## Common Issues and Solutions
+
+### Console Logs Appearing Twice
+
+**Problem**: You see duplicate console logs in development.
+
+```javascript
+// This will log twice in StrictMode
+function Component() {
+  console.log("Component rendering"); // Appears twice in development
+  return <div>Hello</div>;
+}
+```
+
+**Solution**: This is expected behavior. Use it to identify side effects in your render methods.
+
+```javascript
+// If you need to log for debugging, make it conditional
+function Component() {
+  if (process.env.NODE_ENV === "development") {
+    console.log("Component rendering (this may appear twice in StrictMode)");
+  }
+  return <div>Hello</div>;
+}
+```
+
+<BackToTop />
+
+### Effects Running Twice
+
+**Problem**: useEffect seems to run twice, causing duplicate API calls.
+
+```javascript
+// Problematic - will make duplicate API calls
+function BadComponent() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/data")
+      .then((response) => response.json())
+      .then(setData);
+  }, []);
+
+  return <div>{data}</div>;
+}
+```
+
+**Solution**: Implement proper cleanup and cancellation.
+
+```javascript
+// Fixed - handles cancellation properly
+function GoodComponent() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/data");
+        const result = await response.json();
+
+        if (!cancelled) {
+          setData(result);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Fetch failed:", error);
+        }
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return <div>{data}</div>;
+}
+```
+
+<BackToTop />
+
+### Third-Party Library Integration Issues
+
+**Problem**: Third-party libraries that weren't designed for StrictMode may behave unexpectedly.
+
+```javascript
+// Some third-party libraries might not handle double execution well
+function ProblematicComponent() {
+  useEffect(() => {
+    // This library might not expect to be called twice
+    thirdPartyLibrary.initialize();
+  }, []);
+
+  return <div>Component with third-party library</div>;
+}
+```
+
+**Solution**: Wrap third-party integrations with proper guards.
+
+```javascript
+function SafeThirdPartyComponent() {
+  useEffect(() => {
+    let initialized = false;
+
+    if (!initialized) {
+      thirdPartyLibrary.initialize();
+      initialized = true;
+    }
+
+    return () => {
+      if (thirdPartyLibrary.cleanup) {
+        thirdPartyLibrary.cleanup();
+      }
+      initialized = false;
+    };
+  }, []);
+
+  return <div>Safe third-party integration</div>;
+}
+```
+
+<BackToTop />
+
+## Best Practices
+
+### Always Use StrictMode in Development
+
+```javascript
+// ✅ Good - Enable StrictMode for all development
+import React, { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+
+const root = createRoot(document.getElementById("root"));
+
+root.render(
+  process.env.NODE_ENV === "development" ? (
+    <StrictMode>
+      <App />
+    </StrictMode>
+  ) : (
+    <App />
+  )
+);
+```
+
+### Write Pure Components
+
+```javascript
+// ✅ Good - Pure component, safe for double rendering
+function PureComponent({ user, onUpdate }) {
+  const displayName = user.firstName + " " + user.lastName;
+
+  return (
+    <div>
+      <h2>{displayName}</h2>
+      <button onClick={() => onUpdate(user.id)}>Update</button>
+    </div>
+  );
+}
+
+// ❌ Avoid - Impure component with side effects
+function ImpureComponent({ user, globalCache }) {
+  // Side effect in render - will cause issues in StrictMode
+  globalCache.set(user.id, user);
+
+  return <div>{user.name}</div>;
+}
+```
+
+### Proper Effect Cleanup
+
+```javascript
+// ✅ Good - Comprehensive effect cleanup
+function ComponentWithCleanup() {
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const subscription = eventEmitter.subscribe("event", handleEvent);
+    const timer = setInterval(updateData, 1000);
+    const resizeHandler = () => handleResize();
+
+    window.addEventListener("resize", resizeHandler);
+
+    // Comprehensive cleanup
+    return () => {
+      controller.abort();
+      subscription.unsubscribe();
+      clearInterval(timer);
+      window.removeEventListener("resize", resizeHandler);
+    };
+  }, []);
+
+  return <div>Component with proper cleanup</div>;
+}
+```
+
+### Handle Async Operations Safely
+
+```javascript
+// ✅ Good - Safe async handling
+function SafeAsyncComponent() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadData = async () => {
+      if (!mounted) return;
+
+      setLoading(true);
+
+      try {
+        const result = await fetchData();
+        if (mounted) {
+          setData(result);
+        }
+      } catch (error) {
+        if (mounted) {
+          console.error("Failed to load data:", error);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadData();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  return <div>{JSON.stringify(data)}</div>;
+}
+```
+
+<BackToTop />
+
+## Migration Strategies
+
+### Gradually Adopting StrictMode
+
+If you have a large existing application, you can gradually adopt StrictMode:
+
+```javascript
+// Step 1: Start with new components only
+function App() {
+  return (
+    <div>
+      <LegacyHeader />
+
+      {/* Wrap only new components initially */}
+      <StrictMode>
+        <NewUserDashboard />
+        <NewDataVisualization />
+      </StrictMode>
+
+      <LegacyFooter />
+    </div>
+  );
+}
+
+// Step 2: Gradually expand StrictMode coverage
+function App() {
+  return (
+    <div>
+      <StrictMode>
+        <RefactoredHeader />
+        <NewUserDashboard />
+        <NewDataVisualization />
+      </StrictMode>
+
+      <LegacyFooter />
+    </div>
+  );
+}
+
+// Step 3: Eventually wrap the entire app
+function App() {
+  return (
+    <StrictMode>
+      <div>
+        <RefactoredHeader />
+        <NewUserDashboard />
+        <NewDataVisualization />
+        <RefactoredFooter />
+      </div>
+    </StrictMode>
+  );
+}
+```
+
+<BackToTop />
+
+### Debugging StrictMode Issues
+
+```javascript
+// Use this pattern to identify which components are causing issues
+function DebugWrapper({ children, name }) {
+  console.log(`${name} rendering`);
+
+  useEffect(() => {
+    console.log(`${name} effect running`);
+
+    return () => {
+      console.log(`${name} effect cleanup`);
+    };
+  });
+
+  return children;
+}
+
+// Usage for debugging
+function App() {
+  return (
+    <StrictMode>
+      <DebugWrapper name="App">
+        <DebugWrapper name="UserList">
+          <UserList />
+        </DebugWrapper>
+        <DebugWrapper name="Navigation">
+          <Navigation />
+        </DebugWrapper>
+      </DebugWrapper>
+    </StrictMode>
+  );
+}
+```
+
+<BackToTop />
+
+## Conclusion
+
+React StrictMode is an invaluable development tool that helps you write more robust, future-proof React applications. By enabling StrictMode in your development environment, you can:
+
+- **Catch bugs early** before they reach production
+- **Ensure compatibility** with React's concurrent features
+- **Write cleaner code** that follows React best practices
+- **Improve performance** by identifying unnecessary side effects
+- **Future-proof your app** for upcoming React features
+
+### Key Takeaways
+
+**Always enable StrictMode** in development environments
+**Embrace the double rendering** as a feature, not a bug
+**Write pure components** that can safely render multiple times
+**Implement proper cleanup** in all your effects
+**Handle async operations safely** with cancellation 6. **Gradually adopt StrictMode** in existing applications
+
+Remember that StrictMode is your friend—it might seem annoying when it exposes issues, but it's helping you build better, more reliable React applications. The temporary inconvenience of fixing StrictMode warnings will save you from much larger problems in production.
+
+<BackToTop />

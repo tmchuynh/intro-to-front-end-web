@@ -92,158 +92,1401 @@ When you call `useContext(MyContext)`, React looks for the nearest `MyContext.Pr
 - **Avoid Mixing Context with Local State**: If a piece of state is only relevant to a single component, it's better to use local state with `useState` or `useReducer` rather than context. Context is best suited for global or shared state.
 - **Avoid Context for Frequent Updates**: If the context value changes frequently, it can cause unnecessary re-renders of all components that consume the context. In such cases, consider using local state or a more specialized state management solution.
 
+<BackToTop />
 ## Examples
 
+### Multi-Theme Design System with Dynamic Switching
+
 ```javascript
-import React, { createContext, useContext } from "react";
-const ThemeContext = createContext("light");
-const ThemedComponent = () => {
-  const theme = useContext(ThemeContext);
-  return (
-    <div
-      style={{
-        background: theme === "light" ? "#fff" : "#333",
-        color: theme === "light" ? "#000" : "#fff",
-      }}
-    >
-      <p>Current Theme: {theme}</p>
-    </div>
-  );
+import React, { createContext, useContext, useState } from "react";
+
+const ThemeContext = createContext();
+
+const themes = {
+  light: {
+    name: 'Light',
+    colors: {
+      primary: '#007bff',
+      secondary: '#6c757d',
+      background: '#ffffff',
+      surface: '#f8f9fa',
+      text: '#212529',
+      textSecondary: '#6c757d',
+      border: '#dee2e6',
+      success: '#28a745',
+      warning: '#ffc107',
+      error: '#dc3545'
+    },
+    spacing: {
+      small: '8px',
+      medium: '16px',
+      large: '24px'
+    },
+    borderRadius: '8px',F
+    shadows: {
+      small: '0 2px 4px rgba(0,0,0,0.1)',
+      medium: '0 4px 8px rgba(0,0,0,0.15)',
+      large: '0 8px 16px rgba(0,0,0,0.2)'
+    }
+  },
+  dark: {
+    name: 'Dark',
+    colors: {
+      primary: '#0d6efd',
+      secondary: '#6c757d',
+      background: '#121212',
+      surface: '#1e1e1e',
+      text: '#ffffff',
+      textSecondary: '#adb5bd',
+      border: '#343a40',
+      success: '#198754',
+      warning: '#fd7e14',
+      error: '#dc3545'
+    },
+    spacing: {
+      small: '8px',
+      medium: '16px',
+      large: '24px'
+    },
+    borderRadius: '8px',
+    shadows: {
+      small: '0 2px 4px rgba(0,0,0,0.3)',
+      medium: '0 4px 8px rgba(0,0,0,0.4)',
+      large: '0 8px 16px rgba(0,0,0,0.5)'
+    }
+  },
+  ocean: {
+    name: 'Ocean',
+    colors: {
+      primary: '#0077be',
+      secondary: '#4a90a4',
+      background: '#f0f8ff',
+      surface: '#e6f3ff',
+      text: '#003d5c',
+      textSecondary: '#4a90a4',
+      border: '#b3d9ff',
+      success: '#20b2aa',
+      warning: '#ffa500',
+      error: '#cd5c5c'
+    },
+    spacing: {
+      small: '8px',
+      medium: '16px',
+      large: '24px'
+    },
+    borderRadius: '12px',
+    shadows: {
+      small: '0 2px 4px rgba(0,119,190,0.1)',
+      medium: '0 4px 8px rgba(0,119,190,0.15)',
+      large: '0 8px 16px rgba(0,119,190,0.2)'
+    }
+  }
 };
-const App = () => {
+
+const ThemeProvider = ({ children }) => {
+  const [currentTheme, setCurrentTheme] = useState('light');
+  const [customSettings, setCustomSettings] = useState({
+    fontSize: 'medium',
+    animations: true,
+    compactMode: false
+  });
+
+  const theme = {
+    ...themes[currentTheme],
+    current: currentTheme,
+    settings: customSettings,
+    switchTheme: setCurrentTheme,
+    updateSettings: setCustomSettings,
+    availableThemes: Object.keys(themes)
+  };
+
   return (
-    <ThemeContext.Provider value="dark">
-      <ThemedComponent />
+    <ThemeContext.Provider value={theme}>
+      <div style={{
+        backgroundColor: theme.colors.background,
+        color: theme.colors.text,
+        minHeight: '100vh',
+        transition: 'all 0.3s ease'
+      }}>
+        {children}
+      </div>
     </ThemeContext.Provider>
   );
 };
-export default App;
-```
 
-```javascript
-import React, { createContext, useContext } from "react";
-const UserContext = createContext({ name: "Guest" });
-const UserProfile = () => {
-  const user = useContext(UserContext);
+const ThemeControls = () => {
+  const theme = useContext(ThemeContext);
+
   return (
-    <div>
-      <h1>User Profile</h1>
-      <p>Name: {user.name}</p>
+    <div style={{
+      padding: theme.spacing.medium,
+      backgroundColor: theme.colors.surface,
+      border: `1px solid ${theme.colors.border}`,
+      borderRadius: theme.borderRadius,
+      boxShadow: theme.shadows.small,
+      marginBottom: theme.spacing.large
+    }}>
+      <h3 style={{ margin: `0 0 ${theme.spacing.medium} 0` }}>Theme Controls</h3>
+
+      <div style={{ marginBottom: theme.spacing.medium }}>
+        <label style={{ display: 'block', marginBottom: theme.spacing.small }}>
+          Choose Theme:
+        </label>
+        <div style={{ display: 'flex', gap: theme.spacing.small, flexWrap: 'wrap' }}>
+          {theme.availableThemes.map(themeName => (
+            <button
+              key={themeName}
+              onClick={() => theme.switchTheme(themeName)}
+              style={{
+                padding: `${theme.spacing.small} ${theme.spacing.medium}`,
+                backgroundColor: theme.current === themeName ? theme.colors.primary : theme.colors.surface,
+                color: theme.current === themeName ? 'white' : theme.colors.text,
+                border: `1px solid ${theme.colors.border}`,
+                borderRadius: theme.borderRadius,
+                cursor: 'pointer',
+                textTransform: 'capitalize'
+              }}
+            >
+              {themes[themeName].name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: theme.spacing.medium }}>
+        <div>
+          <label style={{ display: 'block', marginBottom: theme.spacing.small }}>
+            Font Size:
+          </label>
+          <select
+            value={theme.settings.fontSize}
+            onChange={(e) => theme.updateSettings(prev => ({ ...prev, fontSize: e.target.value }))}
+            style={{
+              padding: theme.spacing.small,
+              backgroundColor: theme.colors.background,
+              color: theme.colors.text,
+              border: `1px solid ${theme.colors.border}`,
+              borderRadius: theme.borderRadius
+            }}
+          >
+            <option value="small">Small</option>
+            <option value="medium">Medium</option>
+            <option value="large">Large</option>
+          </select>
+        </div>
+
+        <div>
+          <label style={{ display: 'flex', alignItems: 'center', gap: theme.spacing.small }}>
+            <input
+              type="checkbox"
+              checked={theme.settings.animations}
+              onChange={(e) => theme.updateSettings(prev => ({ ...prev, animations: e.target.checked }))}
+            />
+            Enable Animations
+          </label>
+        </div>
+
+        <div>
+          <label style={{ display: 'flex', alignItems: 'center', gap: theme.spacing.small }}>
+            <input
+              type="checkbox"
+              checked={theme.settings.compactMode}
+              onChange={(e) => theme.updateSettings(prev => ({ ...prev, compactMode: e.target.checked }))}
+            />
+            Compact Mode
+          </label>
+        </div>
+      </div>
     </div>
   );
 };
-const App = () => {
-  return (
-    <UserContext.Provider value={{ name: "John Doe" }}>
-      <UserProfile />
-    </UserContext.Provider>
-  );
-};
-export default App;
-```
 
-```javascript
-import React, { createContext, useContext } from "react";
-const LanguageContext = createContext("en");
-const Greeting = () => {
-  const language = useContext(LanguageContext);
-  const greetings = {
-    en: "Hello",
-    es: "Hola",
-    fr: "Bonjour",
-  };
-  return <h1>{greetings[language]}</h1>;
-};
-const App = () => {
-  return (
-    <LanguageContext.Provider value="es">
-      <Greeting />
-    </LanguageContext.Provider>
-  );
-};
-export default App;
-```
+const ThemedCard = ({ title, children }) => {
+  const theme = useContext(ThemeContext);
 
-```javascript
-import React, { createContext, useContext } from "react";
-const AuthContext = createContext({ isAuthenticated: false });
-const AuthStatus = () => {
-  const auth = useContext(AuthContext);
   return (
-    <div>
-      <h1>Authentication Status</h1>
-      <p>{auth.isAuthenticated ? "Logged In" : "Logged Out"}</p>
+    <div style={{
+      padding: theme.settings.compactMode ? theme.spacing.small : theme.spacing.large,
+      backgroundColor: theme.colors.surface,
+      border: `1px solid ${theme.colors.border}`,
+      borderRadius: theme.borderRadius,
+      boxShadow: theme.shadows.medium,
+      marginBottom: theme.spacing.medium,
+      transition: theme.settings.animations ? 'all 0.3s ease' : 'none'
+    }}>
+      <h4 style={{
+        margin: `0 0 ${theme.spacing.medium} 0`,
+        color: theme.colors.primary,
+        fontSize: theme.settings.fontSize === 'large' ? '1.5em' : theme.settings.fontSize === 'small' ? '1em' : '1.2em'
+      }}>
+        {title}
+      </h4>
+      {children}
     </div>
   );
 };
-const App = () => {
-  return (
-    <AuthContext.Provider value={{ isAuthenticated: true }}>
-      <AuthStatus />
-    </AuthContext.Provider>
-  );
-};
-export default App;
-```
 
-```javascript
-import React, { createContext, useContext } from "react";
-const CartContext = createContext([]);
-const Cart = () => {
-  const cartItems = useContext(CartContext);
+const ColorPalette = () => {
+  const theme = useContext(ThemeContext);
+
   return (
-    <div>
-      <h1>Shopping Cart</h1>
-      <ul>
-        {cartItems.map((item, index) => (
-          <li key={index}>
-            {item.name} - ${item.price}
-          </li>
+    <ThemedCard title="Color Palette">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: theme.spacing.small }}>
+        {Object.entries(theme.colors).map(([name, color]) => (
+          <div key={name} style={{ textAlign: 'center' }}>
+            <div style={{
+              width: '100%',
+              height: '60px',
+              backgroundColor: color,
+              border: `1px solid ${theme.colors.border}`,
+              borderRadius: theme.borderRadius,
+              marginBottom: theme.spacing.small
+            }} />
+            <div style={{
+              fontSize: theme.settings.fontSize === 'large' ? '0.9em' : theme.settings.fontSize === 'small' ? '0.7em' : '0.8em',
+              textTransform: 'capitalize'
+            }}>
+              {name}
+            </div>
+            <div style={{
+              fontSize: theme.settings.fontSize === 'large' ? '0.8em' : theme.settings.fontSize === 'small' ? '0.6em' : '0.7em',
+              color: theme.colors.textSecondary
+            }}>
+              {color}
+            </div>
+          </div>
         ))}
-      </ul>
-    </div>
+      </div>
+    </ThemedCard>
   );
 };
-const App = () => {
-  const cartItems = [
-    { name: "Apple", price: 1.2 },
-    { name: "Banana", price: 0.8 },
-    { name: "Cherry", price: 2.5 },
-  ];
+
+const ThemeApp = () => {
   return (
-    <CartContext.Provider value={cartItems}>
-      <Cart />
-    </CartContext.Provider>
+    <ThemeProvider>
+      <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+        <h1>Dynamic Theme System</h1>
+        <ThemeControls />
+        <ColorPalette />
+        <ThemedCard title="Sample Content">
+          <p>This is a sample of how content looks with the current theme. The theme affects colors, spacing, shadows, and even user preferences like font size and animations.</p>
+        </ThemedCard>
+      </div>
+    </ThemeProvider>
   );
 };
-export default App;
+
+export default ThemeApp;
 ```
 
+<BackToTop />
+
+### Advanced Shopping Cart with Persistent State
+
 ```javascript
-import React, { createContext, useContext } from "react";
-const CurrencyContext = createContext("USD");
-const CurrencyConverter = () => {
-  const currency = useContext(CurrencyContext);
-  const exchangeRate = {
-    USD: 1,
-    EUR: 0.85,
-    GBP: 0.75,
+import React, { createContext, useContext, useState, useEffect } from "react";
+
+const CartContext = createContext();
+
+const CartProvider = ({ children }) => {
+  const [items, setItems] = useState([]);
+  const [discounts, setDiscounts] = useState([]);
+  const [shippingInfo, setShippingInfo] = useState({
+    method: "standard",
+    cost: 5.99,
+    estimatedDays: "5-7",
+  });
+  const [currency, setCurrency] = useState("USD");
+
+  // Load cart from localStorage on mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem("shopping-cart");
+    if (savedCart) {
+      try {
+        const parsed = JSON.parse(savedCart);
+        setItems(parsed.items || []);
+        setDiscounts(parsed.discounts || []);
+        setShippingInfo(parsed.shippingInfo || shippingInfo);
+        setCurrency(parsed.currency || "USD");
+      } catch (error) {
+        console.error("Error loading cart from localStorage:", error);
+      }
+    }
+  }, []);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    const cartData = {
+      items,
+      discounts,
+      shippingInfo,
+      currency,
+      lastUpdated: new Date().toISOString(),
+    };
+    localStorage.setItem("shopping-cart", JSON.stringify(cartData));
+  }, [items, discounts, shippingInfo, currency]);
+
+  const addItem = (product, quantity = 1) => {
+    setItems((prev) => {
+      const existing = prev.find((item) => item.id === product.id);
+      if (existing) {
+        return prev.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+      }
+      return [
+        ...prev,
+        { ...product, quantity, addedAt: new Date().toISOString() },
+      ];
+    });
   };
+
+  const removeItem = (productId) => {
+    setItems((prev) => prev.filter((item) => item.id !== productId));
+  };
+
+  const updateQuantity = (productId, quantity) => {
+    if (quantity <= 0) {
+      removeItem(productId);
+      return;
+    }
+    setItems((prev) =>
+      prev.map((item) => (item.id === productId ? { ...item, quantity } : item))
+    );
+  };
+
+  const applyDiscount = (code, type, value) => {
+    const discount = {
+      id: Date.now(),
+      code,
+      type, // 'percentage' or 'fixed'
+      value,
+      appliedAt: new Date().toISOString(),
+    };
+    setDiscounts((prev) => [...prev, discount]);
+  };
+
+  const removeDiscount = (discountId) => {
+    setDiscounts((prev) => prev.filter((d) => d.id !== discountId));
+  };
+
+  const clearCart = () => {
+    setItems([]);
+    setDiscounts([]);
+  };
+
+  const getSubtotal = () => {
+    return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  };
+
+  const getDiscountAmount = () => {
+    const subtotal = getSubtotal();
+    return discounts.reduce((total, discount) => {
+      if (discount.type === "percentage") {
+        return total + (subtotal * discount.value) / 100;
+      }
+      return total + discount.value;
+    }, 0);
+  };
+
+  const getTotalItems = () => {
+    return items.reduce((sum, item) => sum + item.quantity, 0);
+  };
+
+  const getTotal = () => {
+    return getSubtotal() - getDiscountAmount() + shippingInfo.cost;
+  };
+
+  const currencySymbols = {
+    USD: "$",
+    EUR: "€",
+    GBP: "£",
+    JPY: "¥",
+  };
+
+  const formatPrice = (amount) => {
+    const symbol = currencySymbols[currency] || "$";
+    return `${symbol}${amount.toFixed(2)}`;
+  };
+
+  const value = {
+    items,
+    discounts,
+    shippingInfo,
+    currency,
+    addItem,
+    removeItem,
+    updateQuantity,
+    applyDiscount,
+    removeDiscount,
+    clearCart,
+    setShippingInfo,
+    setCurrency,
+    getSubtotal,
+    getDiscountAmount,
+    getTotalItems,
+    getTotal,
+    formatPrice,
+  };
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+};
+
+const CartSummary = () => {
+  const cart = useContext(CartContext);
+
   return (
-    <div>
-      <h1>Currency Converter</h1>
-      <p>
-        1 USD = {exchangeRate[currency]} {currency}
-      </p>
+    <div
+      style={{
+        position: "fixed",
+        top: "20px",
+        right: "20px",
+        padding: "15px",
+        backgroundColor: "#f8f9fa",
+        border: "1px solid #dee2e6",
+        borderRadius: "8px",
+        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+        minWidth: "200px",
+      }}
+    >
+      <h4 style={{ margin: "0 0 10px 0" }}>Cart Summary</h4>
+      <div style={{ fontSize: "14px" }}>
+        <div>Items: {cart.getTotalItems()}</div>
+        <div>Subtotal: {cart.formatPrice(cart.getSubtotal())}</div>
+        {cart.getDiscountAmount() > 0 && (
+          <div style={{ color: "#28a745" }}>
+            Discount: -{cart.formatPrice(cart.getDiscountAmount())}
+          </div>
+        )}
+        <div>Shipping: {cart.formatPrice(cart.shippingInfo.cost)}</div>
+        <hr style={{ margin: "8px 0" }} />
+        <div style={{ fontWeight: "bold" }}>
+          Total: {cart.formatPrice(cart.getTotal())}
+        </div>
+      </div>
     </div>
   );
 };
-const App = () => {
+
+const ProductCard = ({ product }) => {
+  const cart = useContext(CartContext);
+  const [quantity, setQuantity] = useState(1);
+
+  const handleAddToCart = () => {
+    cart.addItem(product, quantity);
+    setQuantity(1);
+  };
+
   return (
-    <CurrencyContext.Provider value="EUR">
-      <CurrencyConverter />
-    </CurrencyContext.Provider>
+    <div
+      style={{
+        border: "1px solid #dee2e6",
+        borderRadius: "8px",
+        padding: "15px",
+        marginBottom: "15px",
+        backgroundColor: "white",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <div>
+          <h4 style={{ margin: "0 0 5px 0" }}>{product.name}</h4>
+          <p
+            style={{ margin: "0 0 10px 0", color: "#6c757d", fontSize: "14px" }}
+          >
+            {product.description}
+          </p>
+          <div style={{ fontWeight: "bold", fontSize: "18px" }}>
+            {cart.formatPrice(product.price)}
+          </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <input
+            type="number"
+            min="1"
+            value={quantity}
+            onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+            style={{ width: "60px", padding: "5px" }}
+          />
+          <button
+            onClick={handleAddToCart}
+            style={{
+              padding: "8px 16px",
+              backgroundColor: "#007bff",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
-export default App;
+
+const CartItems = () => {
+  const cart = useContext(CartContext);
+
+  if (cart.items.length === 0) {
+    return (
+      <div style={{ textAlign: "center", padding: "40px", color: "#6c757d" }}>
+        Your cart is empty
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ marginBottom: "20px" }}>
+      <h3>Cart Items</h3>
+      {cart.items.map((item) => (
+        <div
+          key={item.id}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "15px",
+            border: "1px solid #dee2e6",
+            borderRadius: "8px",
+            marginBottom: "10px",
+            backgroundColor: "white",
+          }}
+        >
+          <div>
+            <h5 style={{ margin: "0 0 5px 0" }}>{item.name}</h5>
+            <p style={{ margin: 0, color: "#6c757d" }}>
+              {cart.formatPrice(item.price)} each
+            </p>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <input
+              type="number"
+              min="0"
+              value={item.quantity}
+              onChange={(e) =>
+                cart.updateQuantity(item.id, parseInt(e.target.value) || 0)
+              }
+              style={{ width: "60px", padding: "5px" }}
+            />
+            <span style={{ fontWeight: "bold" }}>
+              {cart.formatPrice(item.price * item.quantity)}
+            </span>
+            <button
+              onClick={() => cart.removeItem(item.id)}
+              style={{
+                padding: "4px 8px",
+                backgroundColor: "#dc3545",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const DiscountManager = () => {
+  const cart = useContext(CartContext);
+  const [discountCode, setDiscountCode] = useState("");
+
+  const predefinedDiscounts = {
+    SAVE10: { type: "percentage", value: 10 },
+    WELCOME: { type: "fixed", value: 5 },
+    FREESHIP: { type: "fixed", value: cart.shippingInfo.cost },
+  };
+
+  const handleApplyDiscount = () => {
+    const discount = predefinedDiscounts[discountCode.toUpperCase()];
+    if (discount) {
+      cart.applyDiscount(
+        discountCode.toUpperCase(),
+        discount.type,
+        discount.value
+      );
+      setDiscountCode("");
+    } else {
+      alert("Invalid discount code");
+    }
+  };
+
+  return (
+    <div
+      style={{
+        padding: "15px",
+        backgroundColor: "#f8f9fa",
+        border: "1px solid #dee2e6",
+        borderRadius: "8px",
+        marginBottom: "20px",
+      }}
+    >
+      <h4>Discount Codes</h4>
+      <div style={{ display: "flex", gap: "10px", marginBottom: "15px" }}>
+        <input
+          type="text"
+          placeholder="Enter discount code"
+          value={discountCode}
+          onChange={(e) => setDiscountCode(e.target.value)}
+          style={{ flex: 1, padding: "8px" }}
+        />
+        <button
+          onClick={handleApplyDiscount}
+          style={{
+            padding: "8px 16px",
+            backgroundColor: "#28a745",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          Apply
+        </button>
+      </div>
+
+      {cart.discounts.length > 0 && (
+        <div>
+          <h5>Applied Discounts:</h5>
+          {cart.discounts.map((discount) => (
+            <div
+              key={discount.id}
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "5px 0",
+              }}
+            >
+              <span>
+                {discount.code} (
+                {discount.type === "percentage"
+                  ? `${discount.value}%`
+                  : cart.formatPrice(discount.value)}{" "}
+                off)
+              </span>
+              <button
+                onClick={() => cart.removeDiscount(discount.id)}
+                style={{
+                  padding: "2px 6px",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "3px",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                }}
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div style={{ marginTop: "15px", fontSize: "12px", color: "#6c757d" }}>
+        Try codes: SAVE10, WELCOME, FREESHIP
+      </div>
+    </div>
+  );
+};
+
+const ShoppingApp = () => {
+  const sampleProducts = [
+    {
+      id: 1,
+      name: "Wireless Headphones",
+      description: "High-quality bluetooth headphones",
+      price: 79.99,
+    },
+    {
+      id: 2,
+      name: "Smart Watch",
+      description: "Fitness tracking smartwatch",
+      price: 199.99,
+    },
+    {
+      id: 3,
+      name: "Phone Case",
+      description: "Protective phone case",
+      price: 24.99,
+    },
+    {
+      id: 4,
+      name: "Portable Charger",
+      description: "10000mAh power bank",
+      price: 39.99,
+    },
+  ];
+
+  return (
+    <CartProvider>
+      <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+        <h1>Advanced Shopping Cart</h1>
+
+        <CartSummary />
+
+        <div style={{ marginTop: "60px" }}>
+          <h2>Products</h2>
+          {sampleProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+
+          <CartItems />
+          <DiscountManager />
+        </div>
+      </div>
+    </CartProvider>
+  );
+};
+
+export default ShoppingApp;
 ```
+
+<BackToTop />
+
+### Real-time Notification System with Priority Management
+
+```javascript
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+
+const NotificationContext = createContext();
+
+const NotificationProvider = ({ children }) => {
+  const [notifications, setNotifications] = useState([]);
+  const [settings, setSettings] = useState({
+    soundEnabled: true,
+    showDesktop: true,
+    maxVisible: 5,
+    autoHideDuration: 5000,
+    priority: {
+      high: { color: "#dc3545", persistent: true },
+      medium: { color: "#ffc107", persistent: false },
+      low: { color: "#28a745", persistent: false },
+    },
+  });
+
+  const addNotification = useCallback(
+    (notification) => {
+      const id = Date.now() + Math.random();
+      const newNotification = {
+        id,
+        timestamp: new Date().toISOString(),
+        priority: "medium",
+        type: "info",
+        persistent: false,
+        ...notification,
+      };
+
+      setNotifications((prev) => {
+        const updated = [newNotification, ...prev];
+
+        // Sort by priority and timestamp
+        return updated.sort((a, b) => {
+          const priorityOrder = { high: 3, medium: 2, low: 1 };
+          if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
+            return priorityOrder[b.priority] - priorityOrder[a.priority];
+          }
+          return new Date(b.timestamp) - new Date(a.timestamp);
+        });
+      });
+
+      // Play sound if enabled
+      if (settings.soundEnabled && newNotification.priority === "high") {
+        // In a real app, you'd play an actual sound file
+        console.log("🔔 High priority notification sound");
+      }
+
+      // Show desktop notification if enabled and permitted
+      if (
+        settings.showDesktop &&
+        "Notification" in window &&
+        Notification.permission === "granted"
+      ) {
+        new Notification(newNotification.title, {
+          body: newNotification.message,
+          icon: "/notification-icon.png",
+          tag: newNotification.id,
+        });
+      }
+
+      // Auto-hide non-persistent notifications
+      if (
+        !newNotification.persistent &&
+        !settings.priority[newNotification.priority].persistent
+      ) {
+        setTimeout(() => {
+          removeNotification(id);
+        }, settings.autoHideDuration);
+      }
+
+      return id;
+    },
+    [settings]
+  );
+
+  const removeNotification = useCallback((id) => {
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  }, []);
+
+  const clearAll = useCallback(() => {
+    setNotifications([]);
+  }, []);
+
+  const clearByType = useCallback((type) => {
+    setNotifications((prev) => prev.filter((n) => n.type !== type));
+  }, []);
+
+  const markAsRead = useCallback((id) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+    );
+  }, []);
+
+  const markAllAsRead = useCallback(() => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  }, []);
+
+  const requestDesktopPermission = useCallback(async () => {
+    if ("Notification" in window && Notification.permission === "default") {
+      const permission = await Notification.requestPermission();
+      return permission === "granted";
+    }
+    return Notification.permission === "granted";
+  }, []);
+
+  const getVisibleNotifications = useCallback(() => {
+    return notifications.slice(0, settings.maxVisible);
+  }, [notifications, settings.maxVisible]);
+
+  const getUnreadCount = useCallback(() => {
+    return notifications.filter((n) => !n.read).length;
+  }, [notifications]);
+
+  const getNotificationsByType = useCallback(
+    (type) => {
+      return notifications.filter((n) => n.type === type);
+    },
+    [notifications]
+  );
+
+  const value = {
+    notifications,
+    settings,
+    addNotification,
+    removeNotification,
+    clearAll,
+    clearByType,
+    markAsRead,
+    markAllAsRead,
+    setSettings,
+    requestDesktopPermission,
+    getVisibleNotifications,
+    getUnreadCount,
+    getNotificationsByType,
+  };
+
+  return (
+    <NotificationContext.Provider value={value}>
+      {children}
+    </NotificationContext.Provider>
+  );
+};
+
+const NotificationToast = ({ notification }) => {
+  const { removeNotification, markAsRead, settings } =
+    useContext(NotificationContext);
+  const [isVisible, setIsVisible] = useState(true);
+
+  const priorityConfig = settings.priority[notification.priority];
+  const typeIcons = {
+    success: "✅",
+    error: "❌",
+    warning: "⚠️",
+    info: "ℹ️",
+  };
+
+  const handleClose = () => {
+    setIsVisible(false);
+    setTimeout(() => removeNotification(notification.id), 300);
+  };
+
+  const handleClick = () => {
+    markAsRead(notification.id);
+    if (notification.onClick) {
+      notification.onClick();
+    }
+  };
+
+  return (
+    <div
+      style={{
+        transform: isVisible ? "translateX(0)" : "translateX(100%)",
+        opacity: isVisible ? 1 : 0,
+        transition: "all 0.3s ease",
+        padding: "12px 16px",
+        backgroundColor: "white",
+        border: `1px solid ${priorityConfig.color}`,
+        borderLeft: `4px solid ${priorityConfig.color}`,
+        borderRadius: "8px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        marginBottom: "8px",
+        cursor: notification.onClick ? "pointer" : "default",
+        position: "relative",
+        minWidth: "300px",
+        maxWidth: "400px",
+      }}
+      onClick={handleClick}
+    >
+      <div style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+        <span style={{ fontSize: "20px", flexShrink: 0 }}>
+          {typeIcons[notification.type] || "ℹ️"}
+        </span>
+
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+            }}
+          >
+            <h4
+              style={{
+                margin: "0 0 4px 0",
+                fontSize: "14px",
+                fontWeight: "bold",
+                color: "#333",
+              }}
+            >
+              {notification.title}
+            </h4>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                flexShrink: 0,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "10px",
+                  textTransform: "uppercase",
+                  color: priorityConfig.color,
+                  fontWeight: "bold",
+                }}
+              >
+                {notification.priority}
+              </span>
+              {!notification.persistent && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleClose();
+                  }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    fontSize: "16px",
+                    cursor: "pointer",
+                    color: "#999",
+                    padding: "0",
+                    lineHeight: 1,
+                  }}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
+
+          <p
+            style={{
+              margin: "0 0 8px 0",
+              fontSize: "13px",
+              color: "#666",
+              lineHeight: 1.4,
+            }}
+          >
+            {notification.message}
+          </p>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <span style={{ fontSize: "11px", color: "#999" }}>
+              {new Date(notification.timestamp).toLocaleTimeString()}
+            </span>
+            {!notification.read && (
+              <span
+                style={{
+                  width: "6px",
+                  height: "6px",
+                  backgroundColor: priorityConfig.color,
+                  borderRadius: "50%",
+                }}
+              />
+            )}
+          </div>
+
+          {notification.actions && (
+            <div style={{ marginTop: "8px", display: "flex", gap: "8px" }}>
+              {notification.actions.map((action, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    action.handler();
+                    if (action.closeOnClick !== false) {
+                      handleClose();
+                    }
+                  }}
+                  style={{
+                    padding: "4px 8px",
+                    fontSize: "11px",
+                    border: `1px solid ${priorityConfig.color}`,
+                    backgroundColor: action.primary
+                      ? priorityConfig.color
+                      : "transparent",
+                    color: action.primary ? "white" : priorityConfig.color,
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                >
+                  {action.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const NotificationContainer = () => {
+  const { getVisibleNotifications } = useContext(NotificationContext);
+  const visibleNotifications = getVisibleNotifications();
+
+  if (visibleNotifications.length === 0) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: "20px",
+        right: "20px",
+        zIndex: 1000,
+        pointerEvents: "none",
+      }}
+    >
+      <div style={{ pointerEvents: "auto" }}>
+        {visibleNotifications.map((notification) => (
+          <NotificationToast
+            key={notification.id}
+            notification={notification}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const NotificationControls = () => {
+  const {
+    addNotification,
+    clearAll,
+    markAllAsRead,
+    getUnreadCount,
+    notifications,
+    settings,
+    setSettings,
+    requestDesktopPermission,
+  } = useContext(NotificationContext);
+
+  const addSampleNotification = (type, priority) => {
+    const messages = {
+      success: {
+        high: {
+          title: "Critical Success!",
+          message: "System backup completed successfully. All data is secure.",
+        },
+        medium: {
+          title: "Task Completed",
+          message: "Your file upload has finished processing.",
+        },
+        low: { title: "Nice Work", message: "Profile updated successfully." },
+      },
+      error: {
+        high: {
+          title: "System Error",
+          message:
+            "Database connection failed. Please contact support immediately.",
+        },
+        medium: {
+          title: "Upload Failed",
+          message: "Unable to upload file. Please try again.",
+        },
+        low: {
+          title: "Minor Issue",
+          message: "Some settings couldn't be saved.",
+        },
+      },
+      warning: {
+        high: {
+          title: "Security Alert",
+          message: "Unusual login activity detected on your account.",
+        },
+        medium: {
+          title: "Storage Warning",
+          message: "You're running low on storage space.",
+        },
+        low: { title: "Reminder", message: "Don't forget to save your work." },
+      },
+      info: {
+        high: {
+          title: "Important Update",
+          message: "New security features are now available.",
+        },
+        medium: {
+          title: "Feature Update",
+          message: "Check out the new dashboard layout.",
+        },
+        low: {
+          title: "Tip",
+          message: "You can customize your notification preferences.",
+        },
+      },
+    };
+
+    const notification = {
+      ...messages[type][priority],
+      type,
+      priority,
+      actions:
+        priority === "high"
+          ? [
+              {
+                label: "View Details",
+                handler: () => alert("Viewing details..."),
+                primary: true,
+              },
+              { label: "Dismiss", handler: () => {}, closeOnClick: true },
+            ]
+          : undefined,
+    };
+
+    addNotification(notification);
+  };
+
+  return (
+    <div style={{ padding: "20px", maxWidth: "600px" }}>
+      <h2>Notification System Demo</h2>
+
+      <div style={{ marginBottom: "20px" }}>
+        <h3>Add Notifications</h3>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: "10px",
+            marginBottom: "15px",
+          }}
+        >
+          {["success", "error", "warning", "info"].map((type) => (
+            <div key={type} style={{ textAlign: "center" }}>
+              <h4 style={{ margin: "0 0 8px 0", textTransform: "capitalize" }}>
+                {type}
+              </h4>
+              {["high", "medium", "low"].map((priority) => (
+                <button
+                  key={priority}
+                  onClick={() => addSampleNotification(type, priority)}
+                  style={{
+                    display: "block",
+                    width: "100%",
+                    margin: "4px 0",
+                    padding: "6px",
+                    fontSize: "12px",
+                    border: "1px solid #ddd",
+                    borderRadius: "4px",
+                    backgroundColor:
+                      priority === "high"
+                        ? "#dc3545"
+                        : priority === "medium"
+                          ? "#ffc107"
+                          : "#28a745",
+                    color: priority === "medium" ? "#000" : "#fff",
+                    cursor: "pointer",
+                  }}
+                >
+                  {priority}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <h3>Controls</h3>
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+          <button
+            onClick={clearAll}
+            style={{
+              padding: "8px 16px",
+              backgroundColor: "#dc3545",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            Clear All ({notifications.length})
+          </button>
+          <button
+            onClick={markAllAsRead}
+            style={{
+              padding: "8px 16px",
+              backgroundColor: "#007bff",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            Mark All Read ({getUnreadCount()} unread)
+          </button>
+          <button
+            onClick={requestDesktopPermission}
+            style={{
+              padding: "8px 16px",
+              backgroundColor: "#28a745",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            Enable Desktop Notifications
+          </button>
+        </div>
+      </div>
+
+      <div style={{ marginBottom: "20px" }}>
+        <h3>Settings</h3>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: "15px",
+          }}
+        >
+          <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <input
+              type="checkbox"
+              checked={settings.soundEnabled}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  soundEnabled: e.target.checked,
+                }))
+              }
+            />
+            Sound Notifications
+          </label>
+
+          <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <input
+              type="checkbox"
+              checked={settings.showDesktop}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  showDesktop: e.target.checked,
+                }))
+              }
+            />
+            Desktop Notifications
+          </label>
+
+          <div>
+            <label>Max Visible: </label>
+            <input
+              type="number"
+              min="1"
+              max="10"
+              value={settings.maxVisible}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  maxVisible: parseInt(e.target.value),
+                }))
+              }
+              style={{ width: "60px", padding: "4px" }}
+            />
+          </div>
+
+          <div>
+            <label>Auto-hide (ms): </label>
+            <input
+              type="number"
+              min="1000"
+              max="30000"
+              step="1000"
+              value={settings.autoHideDuration}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  autoHideDuration: parseInt(e.target.value),
+                }))
+              }
+              style={{ width: "80px", padding: "4px" }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const NotificationApp = () => {
+  return (
+    <NotificationProvider>
+      <div>
+        <NotificationControls />
+        <NotificationContainer />
+      </div>
+    </NotificationProvider>
+  );
+};
+
+export default NotificationApp;
+```
+
+<BackToTop />

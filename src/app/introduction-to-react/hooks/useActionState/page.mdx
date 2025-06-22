@@ -1,0 +1,173 @@
+import BackToTop from "@/components/BackToTop";
+
+# useActionState
+
+## Table of Contents
+
+## Overview
+
+The `useActionState` hook is a custom React hook that allows you to manage the state of actions in your application. It provides a way to handle asynchronous operations, such as API calls or other side effects, while keeping track of the loading and error states.
+It is particularly useful for managing the state of actions that can be triggered by user interactions, such as form submissions or button clicks.
+
+#### Benefits of using `useActionState`:
+
+- **Simplified State Management**: It abstracts the complexity of managing loading and error states, allowing you to focus on the core logic of your application.
+- **Improved User Experience**: By providing feedback on the status of actions, it enhances the user experience by indicating when an action is in progress or has failed.
+- **Reusability**: The hook can be reused across different components, promoting consistency in how actions are handled throughout your application.
+
+#### When to use `useActionState`:
+
+- When you need to manage the state of asynchronous actions in your application.
+- When you want to provide feedback to users about the status of actions, such as loading indicators or error messages.
+- When you want to simplify the management of action states in your components.
+
+### Syntax
+
+```javascript
+const [state, action] = useActionState(initialState);
+```
+
+### Parameters
+
+- `initialState`: The initial state of the action, which can be an object containing properties like `loading`, `error`, and `data`.
+
+### Returns
+
+- An array containing:
+  - `state`: The current state of the action, including properties like `loading`, `error`, and `data`.
+  - `action`: An object containing methods to update the state, such as `start`, `success`, and `error`.
+    <BackToTop />
+
+## Common Use Cases
+
+- **Form Submissions**: Managing the state of form submissions, including loading indicators and error messages.
+- **API Calls**: Handling the state of API calls, such as fetching data or submitting data to a server.
+- **User Interactions**: Managing the state of user interactions, such as button clicks or other events that trigger actions in your application.
+
+## How It Works
+
+The `useActionState` hook works by maintaining an internal state that tracks the status of an action. It provides methods to update this state based on the lifecycle of the action, such as when it starts, succeeds, or fails. The hook returns the current state and the action methods, allowing you to easily manage and respond to changes in the action's status.
+
+### Initial Render
+
+When the hook is first called, it initializes the state with the provided `initialState`. This state typically includes properties like `loading`, `error`, and `data`.
+
+### Action Methods
+
+The `action` object returned by the hook contains methods to update the state:
+
+- `start`: Call this method to set the `loading` state to `true` and reset any previous `error` state.
+- `success`: Call this method to set the `loading` state to `false`, clear any `error` state, and update the `data` with the result of the action.
+- `error`: Call this method to set the `loading` state to `false` and update the `error` state with the provided error message.
+
+## What to Avoid
+
+- Avoid using `useActionState` for synchronous actions, as it is designed for managing asynchronous operations.
+- Avoid directly mutating the state returned by the hook; always use the provided action methods to update the state.
+- Avoid using the hook in non-functional components, as it relies on React's hooks system, which is only available in functional components.
+
+  <BackToTop />
+
+## Examples
+
+### Basic Usage
+
+```javascript
+import React from "react";
+import { useActionState } from "your-hook-library";
+const MyComponent = () => {
+  const [state, action] = useActionState({
+    loading: false,
+    error: null,
+    data: null,
+  });
+
+  const handleSubmit = async () => {
+    action.start();
+    try {
+      const response = await fetch("/api/data");
+      const data = await response.json();
+      action.success(data);
+    } catch (error) {
+      action.error(error.message);
+    }
+  };
+
+  return (
+    <div>
+      <button onClick={handleSubmit} disabled={state.loading}>
+        {state.loading ? "Loading..." : "Submit"}
+      </button>
+      {state.error && <p>Error: {state.error}</p>}
+      {state.data && <p>Data: {JSON.stringify(state.data)}</p>}
+    </div>
+  );
+};
+```
+
+<BackToTop />
+### Form Submission Example
+
+```javascript
+import React, { useState } from "react";
+import { useActionState } from "your-hook-library";
+const FormComponent = () => {
+  const [formData, setFormData] = useState({ name: "", email: "" });
+  const [state, action] = useActionState({
+    loading: false,
+    error: null,
+    data: null,
+  });
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    action.start();
+    try {
+      const response = await fetch("/api/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      action.success(data);
+    } catch (error) {
+      action.error(error.message);
+    }
+  };
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        name="name"
+        value={formData.name}
+        onChange={handleChange}
+        placeholder="Name"
+      />
+      <input
+        type="email"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+        placeholder="Email"
+      />
+      <button type="submit" disabled={state.loading}>
+        {state.loading ? "Submitting..." : "Submit"}
+      </button>
+      {state.error && <p>Error: {state.error}</p>}
+      {state.data && <p>Success: {JSON.stringify(state.data)}</p>}
+    </form>
+  );
+};
+```
+
+<BackToTop />
+
+## Best Practices
+
+- **Use Descriptive State Names**: When defining the initial state, use descriptive names for properties like `loading`, `error`, and `data` to make the code more readable.
+- **Handle Errors Gracefully**: Always handle errors in your action methods to provide feedback to users when something goes wrong.
+- **Keep State Management Simple**: Use the `useActionState` hook to manage the state of actions in a simple and consistent way, avoiding unnecessary complexity in your components.
+- **Reuse the Hook**: If you find yourself managing similar action states in multiple components, consider creating a custom hook that encapsulates the logic of `useActionState` to promote reusability and maintainability.
+  <BackToTop />

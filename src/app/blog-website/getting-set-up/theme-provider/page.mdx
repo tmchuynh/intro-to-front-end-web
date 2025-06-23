@@ -53,6 +53,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 - **`disableTransitionOnChange`**: Disables transitions when changing themes, which can improve performance.
 - **`storageKey="intro-to-web-theme"`**: Sets a custom key for storing the theme preference in local storage.
 - **`children`**: This prop allows you to pass the rest of your application components to be wrapped by the `ThemeProvider`.
+  <BackToTop />
 
 ## Using the Theme Provider
 
@@ -91,4 +92,402 @@ export default function RootLayout({
 - **`metadata`**: This object contains metadata for your application, such as the title and description.
 - **`Inter` Font**: The Inter font is imported from Google Fonts and applied to the `html` element.
 - **`children`**: This prop represents the rest of your application components that will be rendered within the layout.
+  <BackToTop />
+
+## Creating a Theme Toggle Component
+
+Once you have the `ThemeProvider` set up, you'll want to create a component that allows users to toggle between themes. Here's how to create a theme toggle button:
+
+```tsx
+"use client";
+
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
+import { Moon, Sun, Monitor } from "lucide-react";
+
+export function ThemeToggle() {
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
+  return (
+    <div className="flex items-center space-x-2">
+      <button
+        onClick={() => setTheme("light")}
+        className={`p-2 rounded-md ${
+          theme === "light"
+            ? "bg-blue-500 text-white"
+            : "bg-gray-200 dark:bg-gray-700"
+        }`}
+        aria-label="Light theme"
+      >
+        <Sun size={16} />
+      </button>
+      <button
+        onClick={() => setTheme("dark")}
+        className={`p-2 rounded-md ${
+          theme === "dark"
+            ? "bg-blue-500 text-white"
+            : "bg-gray-200 dark:bg-gray-700"
+        }`}
+        aria-label="Dark theme"
+      >
+        <Moon size={16} />
+      </button>
+      <button
+        onClick={() => setTheme("system")}
+        className={`p-2 rounded-md ${
+          theme === "system"
+            ? "bg-blue-500 text-white"
+            : "bg-gray-200 dark:bg-gray-700"
+        }`}
+        aria-label="System theme"
+      >
+        <Monitor size={16} />
+      </button>
+    </div>
+  );
+}
+```
+
+##### Explanation of the Theme Toggle Component
+
+- **`useTheme` Hook**: This hook from `next-themes` provides access to the current theme and the ability to change it.
+- **`mounted` State**: We use this to prevent hydration mismatches between server and client rendering.
+- **`useEffect`**: Sets mounted to true after the component has rendered on the client.
+- **Theme Buttons**: Three buttons for light, dark, and system themes with visual feedback for the active theme.
+- **Icons**: Using Lucide React icons for a better user experience (install with `npm install lucide-react`).
+- **Accessibility**: Each button has an `aria-label` for screen readers.
+  <BackToTop />
+
+## Implementing Dark Mode Styles
+
+To make your themes work properly, you need to add dark mode styles to your CSS. Here are some examples:
+
+### Global CSS Setup
+
+Add these styles to your `globals.css` file:
+
+```css
+/* Light theme (default) */
+:root {
+  --background: 255 255 255;
+  --foreground: 0 0 0;
+  --card: 255 255 255;
+  --card-foreground: 0 0 0;
+  --primary: 59 130 246;
+  --primary-foreground: 255 255 255;
+  --secondary: 243 244 246;
+  --secondary-foreground: 17 24 39;
+  --muted: 243 244 246;
+  --muted-foreground: 107 114 128;
+  --accent: 243 244 246;
+  --accent-foreground: 17 24 39;
+  --destructive: 239 68 68;
+  --destructive-foreground: 255 255 255;
+  --border: 229 231 235;
+  --input: 229 231 235;
+  --ring: 59 130 246;
+  --radius: 0.5rem;
+}
+
+/* Dark theme */
+.dark {
+  --background: 17 24 39;
+  --foreground: 243 244 246;
+  --card: 31 41 55;
+  --card-foreground: 243 244 246;
+  --primary: 59 130 246;
+  --primary-foreground: 255 255 255;
+  --secondary: 55 65 81;
+  --secondary-foreground: 243 244 246;
+  --muted: 55 65 81;
+  --muted-foreground: 156 163 175;
+  --accent: 55 65 81;
+  --accent-foreground: 243 244 246;
+  --destructive: 239 68 68;
+  --destructive-foreground: 255 255 255;
+  --border: 55 65 81;
+  --input: 55 65 81;
+  --ring: 59 130 246;
+}
+
+/* Apply theme colors */
+body {
+  background-color: rgb(var(--background));
+  color: rgb(var(--foreground));
+}
+```
+
+<BackToTop />
+
+### Tailwind CSS Integration
+
+If you're using Tailwind CSS, update your `tailwind.config.ts` file to support dark mode:
+
+```typescript
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  darkMode: "class", // Enable class-based dark mode
+  theme: {
+    extend: {
+      colors: {
+        background: "rgb(var(--background) / <alpha-value>)",
+        foreground: "rgb(var(--foreground) / <alpha-value>)",
+        card: {
+          DEFAULT: "rgb(var(--card) / <alpha-value>)",
+          foreground: "rgb(var(--card-foreground) / <alpha-value>)",
+        },
+        primary: {
+          DEFAULT: "rgb(var(--primary) / <alpha-value>)",
+          foreground: "rgb(var(--primary-foreground) / <alpha-value>)",
+        },
+        secondary: {
+          DEFAULT: "rgb(var(--secondary) / <alpha-value>)",
+          foreground: "rgb(var(--secondary-foreground) / <alpha-value>)",
+        },
+        muted: {
+          DEFAULT: "rgb(var(--muted) / <alpha-value>)",
+          foreground: "rgb(var(--muted-foreground) / <alpha-value>)",
+        },
+        accent: {
+          DEFAULT: "rgb(var(--accent) / <alpha-value>)",
+          foreground: "rgb(var(--accent-foreground) / <alpha-value>)",
+        },
+        destructive: {
+          DEFAULT: "rgb(var(--destructive) / <alpha-value>)",
+          foreground: "rgb(var(--destructive-foreground) / <alpha-value>)",
+        },
+        border: "rgb(var(--border) / <alpha-value>)",
+        input: "rgb(var(--input) / <alpha-value>)",
+        ring: "rgb(var(--ring) / <alpha-value>)",
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+    },
+  },
+  plugins: [],
+};
+
+export default config;
+```
+
+<BackToTop />
+
+## Advanced Theme Customization
+
+### Creating Custom Themes
+
+You can extend beyond just light and dark themes by creating custom color schemes:
+
+```tsx
+"use client";
+
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+
+interface ThemeProviderProps {
+  children: React.ReactNode;
+}
+
+export function ThemeProvider({ children }: ThemeProviderProps) {
+  return (
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+      storageKey="intro-to-web-theme"
+      themes={["light", "dark", "blue", "green", "purple"]} // Custom themes
+    >
+      {children}
+    </NextThemesProvider>
+  );
+}
+```
+
+### Theme-Specific Components
+
+Create components that adapt to the current theme:
+
+```tsx
+"use client";
+
+import { useTheme } from "next-themes";
+
+export function ThemedCard({ children }: { children: React.ReactNode }) {
+  const { theme } = useTheme();
+
+  const getCardStyles = () => {
+    switch (theme) {
+      case "dark":
+        return "bg-gray-800 border-gray-700 text-white";
+      case "blue":
+        return "bg-blue-50 border-blue-200 text-blue-900";
+      case "green":
+        return "bg-green-50 border-green-200 text-green-900";
+      default:
+        return "bg-white border-gray-200 text-gray-900";
+    }
+  };
+
+  return (
+    <div className={`p-6 rounded-lg border ${getCardStyles()}`}>{children}</div>
+  );
+}
+```
+
+<BackToTop />
+
+## Best Practices
+
+### 1. Prevent Hydration Mismatches
+
+Always check if the component is mounted before rendering theme-dependent content:
+
+```tsx
+"use client";
+
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
+
+export function ThemeAwareComponent() {
+  const [mounted, setMounted] = useState(false);
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return <div>Loading...</div>; // Or a skeleton
+  }
+
+  return <div>Current theme: {theme}</div>;
+}
+```
+
+### 2. Use CSS Variables for Consistency
+
+Define your color palette using CSS variables to maintain consistency across themes:
+
+```css
+:root {
+  --primary-color: #3b82f6;
+  --secondary-color: #6b7280;
+  --background-color: #ffffff;
+  --text-color: #1f2937;
+}
+
+.dark {
+  --primary-color: #60a5fa;
+  --secondary-color: #9ca3af;
+  --background-color: #111827;
+  --text-color: #f9fafb;
+}
+```
+
+### 3. Test Accessibility
+
+Ensure your themes meet accessibility standards:
+
+- Maintain proper contrast ratios (at least 4.5:1 for normal text)
+- Test with screen readers
+- Provide clear visual indicators for theme changes
+
+### 4. Respect User Preferences
+
+Always respect the user's system preferences by setting `defaultTheme="system"` and `enableSystem={true}`.
+
+## Troubleshooting
+
+### Common Issues and Solutions
+
+#### 1. Hydration Mismatch Errors
+
+**Problem**: Getting hydration errors when using theme-dependent content.
+
+**Solution**: Use the mounted state pattern shown above to prevent server-client mismatches.
+
+#### 2. Theme Not Persisting
+
+**Problem**: Theme resets after page refresh.
+
+**Solution**: Ensure the `storageKey` is unique and not conflicting with other applications.
+
+#### 3. Flashing of Unstyled Content (FOUC)
+
+**Problem**: Brief flash of light theme before dark theme loads.
+
+**Solution**: Add a script to your `layout.tsx` to set the theme before the page renders:
+
+```tsx
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                if (localStorage.getItem('intro-to-web-theme') === 'dark' || 
+                    (!localStorage.getItem('intro-to-web-theme') && 
+                     window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                  document.documentElement.classList.add('dark')
+                }
+              } catch (_) {}
+            `,
+          }}
+        />
+      </head>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+#### 4. Styles Not Applying in Dark Mode
+
+**Problem**: Dark mode styles not being applied correctly.
+
+**Solution**: Ensure your CSS is properly structured and that the `darkMode: "class"` is set in your Tailwind config.
+
+## Next Steps
+
+Now that you have a fully functional theme provider set up, you can:
+
+1. **Add the ThemeToggle component** to your navigation bar or header
+2. **Create theme-specific components** for different parts of your application
+3. **Implement custom themes** beyond just light and dark modes
+4. **Add animations** for smooth theme transitions
+5. **Test your themes** across different devices and browsers
+
+### Recommended Enhancements
+
+- Add a keyboard shortcut for theme switching (e.g., Ctrl+Shift+T)
+- Implement theme previews in your settings page
+- Add seasonal or time-based automatic theme switching
+- Create theme presets for different user types (developer, designer, etc.)
+
   <BackToTop />

@@ -1634,12 +1634,143 @@ The Floating Action Button (FAB) provides a persistent, accessible way to share 
 #### Example #2: Using a Simple Share Button
 
 ```tsx
+import React, { useState } from "react";
+import { BlogPost } from "@/types/blog";
 
+interface SimpleShareProps {
+  post: BlogPost;
+  className?: string;
+}
+
+const SimpleShare: React.FC<SimpleShareProps> = ({ post, className = "" }) => {
+  const [showToast, setShowToast] = useState(false);
+  
+  const postUrl = `${window.location.origin}/blog/${post.slug}`;
+  
+  const handleShare = async () => {
+    // Try native Web Share API first (mobile browsers)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: post.title,
+          text: post.description,
+          url: postUrl,
+        });
+        return;
+      } catch (err) {
+        console.log("Native sharing failed:", err);
+      }
+    }
+    
+    // Fallback to clipboard
+    try {
+      await navigator.clipboard.writeText(`${post.title} - ${postUrl}`);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    } catch (err) {
+      // Final fallback - manual copy
+      const textArea = document.createElement("textarea");
+      textArea.value = `${post.title} - ${postUrl}`;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={handleShare}
+        className={`inline-flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors ${className}`}
+        aria-label={`Share ${post.title}`}
+      >
+        <svg 
+          className="w-4 h-4" 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            strokeWidth={2} 
+            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" 
+          />
+        </svg>
+        <span>Share</span>
+      </button>
+      
+      {/* Success Toast */}
+      {showToast && (
+        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-green-600 text-white text-sm px-3 py-2 rounded-lg shadow-lg whitespace-nowrap z-10">
+          <div className="flex items-center space-x-2">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+            <span>Link copied to clipboard!</span>
+          </div>
+          {/* Toast Arrow */}
+          <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-green-600 rotate-45"></div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Enhanced BlogCard with integrated share button
+const BlogCardWithShare: React.FC<{ post: BlogPost }> = ({ post }) => {
+  return (
+    <div className="max-w-sm rounded-lg overflow-hidden shadow-lg bg-white">
+      <img className="w-full h-48 object-cover" src={post.imageUrl} alt={post.title} />
+      <div className="p-6">
+        <div className="flex items-start justify-between mb-3">
+          <h3 className="font-bold text-xl leading-tight flex-1">{post.title}</h3>
+          <SimpleShare post={post} className="ml-3 flex-shrink-0" />
+        </div>
+        <p className="text-gray-700 text-base mb-4">{post.description}</p>
+        
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <img 
+              src={post.authorImage || "/default-avatar.jpg"} 
+              alt={post.author}
+              className="w-8 h-8 rounded-full"
+            />
+            <div>
+              <p className="text-sm font-medium">{post.author}</p>
+              <p className="text-xs text-gray-500">{post.date}</p>
+            </div>
+          </div>
+          
+          <Link href={`/blog/${post.slug}`}>
+            <a className="text-blue-600 hover:text-blue-800 font-medium">
+              Read more →
+            </a>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SimpleShare;
 ```
 
 ##### How It Works
 
+This simple share component provides a clean, unobtrusive sharing solution that leverages the browser's native Web Share API when available (primarily on mobile devices). For desktop browsers, it falls back to copying the post title and URL to the clipboard. The component provides clear feedback through a toast notification and integrates seamlessly into blog cards.
+
 ##### Customization Options
+
+- **Share content**: Customize what gets shared (URL only, title + URL, full description)
+- **Fallback behavior**: Implement different fallback strategies for unsupported browsers
+- **Visual feedback**: Customize the toast notification style and duration
+- **Button styling**: Adapt the button design to match your blog's aesthetic
+- **Analytics**: Track sharing events for blog analytics
 
 <BackToTop />
 

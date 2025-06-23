@@ -98,9 +98,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <ol className="space-y-1 my-1 list-decimal list-outside">{children}</ol>
     ),
     li: ({ children }) => <li className="mb-1 ml-9">{children}</li>,
-    strong: ({ children }) => (
-      <strong className="font-extrabold text-tertiary">{children}</strong>
-    ),
     code: ({ children }) => (
       <code className="my-5 py-1 font-mono text-sm">{children}</code>
     ),
@@ -129,17 +126,13 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     table: ({ children }) => (
       <>
         <br />
-        <table className="shadow-sm border border-gray-200 dark:border-gray-700 rounded-lg min-w-full">
-          {children}
-        </table>
+        <table className="shadow-sm rounded-lg min-w-full">{children}</table>
         <br />
       </>
     ),
-    thead: ({ children }) => (
-      <thead className="bg-gray-50 dark:bg-gray-700">{children}</thead>
-    ),
+    thead: ({ children }) => <thead className="">{children}</thead>,
     tbody: ({ children }) => (
-      <tbody className="bg-table-body divide-gray-200 dark:divide-gray-600 divide-y">
+      <tbody className="bg-table-body divide-gray-200 dark:divide-gray-600 divide-y text-table-body-foreground">
         {children}
       </tbody>
     ),
@@ -149,12 +142,12 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       </tr>
     ),
     th: ({ children }) => (
-      <th className="bg-muted px-6 py-3 border-b font-medium text-center tracking-wider uppercase">
+      <th className="bg-table-head px-6 py-3 border-b font-medium text-center text-table-head-foreground tracking-wider uppercase">
         {children}
       </th>
     ),
     td: ({ children }) => (
-      <td className="px-6 py-4 border-gray-200 dark:border-gray-600 border-b text-gray-900 text-sm dark:text-gray-100">
+      <td className="px-6 py-4 border-gray-200 dark:border-gray-600 border-b text-sm dark:text-gray-100">
         {children}
       </td>
     ),

@@ -1,0 +1,2120 @@
+import BackToTop from "@/components/BackToTop";
+
+# Navigation Components
+
+## Table of Contents
+
+## Overview
+
+There are multiple components that are used to handle navigation in the blog website. These components are designed to work together to provide a seamless navigation experience.
+
+For example, the `Navigation` component is used to render the navigation bar, while the `NavigationLink` component is used to render individual links in the navigation bar. The `NavigationDropdown` component is used to render dropdown menus in the navigation bar.
+
+In the example regarding the `layout.tsx` file, a sidebar is used alongside a top navbar to provide a comprehensive navigation experience. The sidebar contains links to different sections of the website, while the top navbar can include additional controls or branding.
+
+Below are some examples of sidebars, top navbars, and other navigation components that can be used in the blog website.
+
+<BackToTop />
+
+## Simple Horizontal Navigation
+
+This is a standard horizontal navigation bar that can be used at the top of the page.
+
+```tsx
+import Link from "next/link";
+
+export default function SimpleHorizontalNav() {
+  return (
+    <nav className="bg-white shadow-md border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">
+              Your Logo
+            </Link>
+          </div>
+          
+          {/* Navigation Links */}
+          <div className="hidden md:block">
+            <div className="ml-10 flex items-baseline space-x-4">
+              <Link
+                href="/"
+                className="text-gray-900 hover:text-blue-600 dark:text-white dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Home
+              </Link>
+              <Link
+                href="/about"
+                className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                About
+              </Link>
+              <Link
+                href="/services"
+                className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Services
+              </Link>
+              <Link
+                href="/portfolio"
+                className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Portfolio
+              </Link>
+              <Link
+                href="/contact"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+              >
+                Contact
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+}
+```
+
+##### Customization Options
+
+**Styling Customizations:**
+- **Colors**: Change `bg-white` to any background color, modify `text-gray-900` for text colors
+- **Spacing**: Adjust `space-x-4` for link spacing, `h-16` for navbar height
+- **Typography**: Modify `text-sm font-medium` for different text sizes and weights
+- **Hover Effects**: Customize `hover:text-blue-600` for different hover colors
+
+**Layout Modifications:**
+- **Logo Position**: Move logo to center by changing flex classes
+- **Link Alignment**: Use `justify-center` instead of `justify-between` for centered links
+- **Responsive Behavior**: Modify `hidden md:block` to control mobile visibility
+
+**Additional Features to Add:**
+- Active link highlighting with conditional classes
+- Dropdown menus for categories
+- User authentication buttons (Login/Signup)
+- Shopping cart icon for e-commerce sites
+
+<BackToTop />
+
+## A Sidebar with Dropdowns
+
+This is a sidebar navigation that includes dropdown menus for sub-sections. It can be used to organize content into categories and subcategories. Sidebars are particularly useful for websites with a lot of content, as they allow users to easily navigate through different sections. They are typically placed on the left side of the page, but can also be positioned on the right side.
+
+```tsx
+"use client";
+import Link from "next/link";
+import { useState } from "react";
+import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+
+export default function SidebarWithDropdowns() {
+  const [openDropdowns, setOpenDropdowns] = useState<string[]>([]);
+
+  const toggleDropdown = (section: string) => {
+    setOpenDropdowns(prev => 
+      prev.includes(section) 
+        ? prev.filter(item => item !== section)
+        : [...prev, section]
+    );
+  };
+
+  return (
+    <aside className="w-64 bg-gray-50 dark:bg-gray-800 min-h-screen border-r border-gray-200 dark:border-gray-700">
+      <div className="p-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Navigation
+        </h2>
+        
+        <nav className="space-y-1">
+          {/* Simple Link */}
+          <Link
+            href="/dashboard"
+            className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 rounded-md transition-colors"
+          >
+            Dashboard
+          </Link>
+
+          {/* Dropdown Section - Getting Started */}
+          <div>
+            <button
+              onClick={() => toggleDropdown('getting-started')}
+              className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 rounded-md transition-colors"
+            >
+              <span>Getting Started</span>
+              {openDropdowns.includes('getting-started') ? (
+                <ChevronDownIcon className="w-4 h-4" />
+              ) : (
+                <ChevronRightIcon className="w-4 h-4" />
+              )}
+            </button>
+            
+            {openDropdowns.includes('getting-started') && (
+              <div className="ml-4 mt-1 space-y-1">
+                <Link
+                  href="/getting-started/installation"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 rounded-md transition-colors"
+                >
+                  Installation
+                </Link>
+                <Link
+                  href="/getting-started/configuration"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 rounded-md transition-colors"
+                >
+                  Configuration
+                </Link>
+                <Link
+                  href="/getting-started/first-steps"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 rounded-md transition-colors"
+                >
+                  First Steps
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Dropdown Section - Components */}
+          <div>
+            <button
+              onClick={() => toggleDropdown('components')}
+              className="flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 rounded-md transition-colors"
+            >
+              <span>Components</span>
+              {openDropdowns.includes('components') ? (
+                <ChevronDownIcon className="w-4 h-4" />
+              ) : (
+                <ChevronRightIcon className="w-4 h-4" />
+              )}
+            </button>
+            
+            {openDropdowns.includes('components') && (
+              <div className="ml-4 mt-1 space-y-1">
+                <Link
+                  href="/components/buttons"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 rounded-md transition-colors"
+                >
+                  Buttons
+                </Link>
+                <Link
+                  href="/components/forms"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 rounded-md transition-colors"
+                >
+                  Forms
+                </Link>
+                <Link
+                  href="/components/navigation"
+                  className="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 rounded-md transition-colors"
+                >
+                  Navigation
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Simple Link */}
+          <Link
+            href="/api-reference"
+            className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 rounded-md transition-colors"
+          >
+            API Reference
+          </Link>
+        </nav>
+      </div>
+    </aside>
+  );
+}
+```
+
+##### Customization Options
+
+**State Management:**
+- **Open by Default**: Initialize `openDropdowns` with section names to start expanded
+- **Single Dropdown**: Modify state logic to only allow one dropdown open at a time
+- **Persist State**: Use localStorage to remember which dropdowns were open
+
+**Styling Modifications:**
+- **Width**: Change `w-64` to `w-48`, `w-72`, or `w-80` for different sidebar widths
+- **Background**: Modify `bg-gray-50` for different background colors
+- **Icons**: Replace Heroicons with your preferred icon library (Lucide, Feather, etc.)
+- **Animations**: Add `transition-all duration-200` for smooth open/close animations
+
+**Layout Adjustments:**
+- **Right Sidebar**: Add `ml-auto` and position on the right side of layout
+- **Collapsible**: Add a toggle button to show/hide entire sidebar
+- **Mobile Responsive**: Add mobile overlay with backdrop for smaller screens
+
+**Advanced Features to Add:**
+- Search functionality within sidebar items
+- Badge indicators for new or updated sections
+- Nested multi-level dropdowns (3+ levels deep)
+- Drag and drop reordering of navigation items
+
+<BackToTop />
+
+## A Top Navbar with a Search Bar
+
+This is a top navigation bar that includes a search bar. It can be used to provide quick access to search functionality, allowing users to find content quickly. The search bar can be integrated with a search engine or a custom search function to provide relevant results based on user queries.
+
+```tsx
+"use client";
+import Link from "next/link";
+import { useState } from "react";
+import { MagnifyingGlassIcon, BellIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+
+export default function TopNavbarWithSearch() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Implement search functionality here
+    console.log("Searching for:", searchQuery);
+  };
+
+  return (
+    <nav className="bg-white shadow-sm border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo and Primary Navigation */}
+          <div className="flex items-center space-x-8">
+            <Link href="/" className="flex-shrink-0">
+              <span className="text-xl font-bold text-gray-900 dark:text-white">
+                Your Brand
+              </span>
+            </Link>
+            
+            <div className="hidden md:flex space-x-6">
+              <Link
+                href="/home"
+                className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors"
+              >
+                Home
+              </Link>
+              <Link
+                href="/products"
+                className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors"
+              >
+                Products
+              </Link>
+              <Link
+                href="/about"
+                className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors"
+              >
+                About
+              </Link>
+            </div>
+          </div>
+
+          {/* Search Bar */}
+          <div className="flex-1 max-w-lg mx-8">
+            <form onSubmit={handleSearch} className="relative">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search..."
+                  className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500 text-sm"
+                />
+              </div>
+            </form>
+          </div>
+
+          {/* Right Side Actions */}
+          <div className="flex items-center space-x-4">
+            {/* Notifications */}
+            <button className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 relative">
+              <BellIcon className="h-6 w-6" />
+              <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+            </button>
+
+            {/* User Menu */}
+            <div className="relative">
+              <button className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                <UserCircleIcon className="h-8 w-8" />
+                <span className="hidden md:block text-sm font-medium">John Doe</span>
+              </button>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button className="md:hidden p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+}
+```
+
+##### Customization Options
+
+**Search Functionality:**
+- **Live Search**: Add debounced search that triggers as user types
+- **Search Suggestions**: Implement dropdown with search suggestions
+- **Advanced Filters**: Add filter buttons next to search bar
+- **Search Results Page**: Redirect to dedicated search results page
+
+**Layout Modifications:**
+- **Search Position**: Move search bar to far right or center
+- **Search Bar Size**: Adjust `max-w-lg` to `max-w-md`, `max-w-xl`, or `max-w-2xl`
+- **Mobile Search**: Add collapsible search for mobile devices
+- **Search Icon Position**: Move search icon to the right side of input
+
+**Additional Features:**
+- **Voice Search**: Add microphone icon for voice search capability
+- **Search History**: Store and display recent searches
+- **Keyboard Shortcuts**: Add Cmd+K or Ctrl+K to focus search
+- **Search Categories**: Add dropdown to search within specific categories
+
+**User Menu Enhancements:**
+- **Dropdown Menu**: Add dropdown with Profile, Settings, Logout options
+- **Avatar Image**: Replace UserCircleIcon with actual user avatar
+- **Login State**: Show different content for logged in vs logged out users
+- **Notifications Badge**: Make notification badge dynamic with count
+
+<BackToTop />
+
+## Mega Menu
+
+A mega menu is a large, expandable menu that can display multiple levels of navigation in a single dropdown. It is useful for websites with a lot of content, as it allows users to see all available options at once without having to navigate through multiple pages. Mega menus can include images, icons, and other rich content to enhance the user experience.
+
+```tsx
+"use client";
+import Link from "next/link";
+import { useState } from "react";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
+
+export default function MegaMenu() {
+  const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null);
+
+  const handleMenuEnter = (menuId: string) => {
+    setActiveMegaMenu(menuId);
+  };
+
+  const handleMenuLeave = () => {
+    setActiveMegaMenu(null);
+  };
+
+  return (
+    <nav className="bg-white shadow-sm border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">
+            MegaBrand
+          </Link>
+
+          {/* Navigation with Mega Menus */}
+          <div className="hidden lg:flex space-x-8">
+            {/* Products Mega Menu */}
+            <div
+              className="relative"
+              onMouseEnter={() => handleMenuEnter('products')}
+              onMouseLeave={handleMenuLeave}
+            >
+              <button className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors">
+                <span>Products</span>
+                <ChevronDownIcon className="w-4 h-4" />
+              </button>
+
+              {activeMegaMenu === 'products' && (
+                <div className="absolute top-full left-0 w-screen max-w-4xl bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 z-50">
+                  <div className="p-8">
+                    <div className="grid grid-cols-4 gap-8">
+                      {/* Category 1 */}
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Web Development</h3>
+                        <div className="space-y-3">
+                          <Link href="/products/frontend" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            Frontend Frameworks
+                          </Link>
+                          <Link href="/products/backend" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            Backend Solutions
+                          </Link>
+                          <Link href="/products/database" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            Database Tools
+                          </Link>
+                          <Link href="/products/hosting" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            Hosting Services
+                          </Link>
+                        </div>
+                      </div>
+
+                      {/* Category 2 */}
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Mobile Apps</h3>
+                        <div className="space-y-3">
+                          <Link href="/products/ios" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            iOS Development
+                          </Link>
+                          <Link href="/products/android" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            Android Development
+                          </Link>
+                          <Link href="/products/crossplatform" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            Cross-Platform
+                          </Link>
+                          <Link href="/products/testing" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            App Testing
+                          </Link>
+                        </div>
+                      </div>
+
+                      {/* Category 3 */}
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Design Tools</h3>
+                        <div className="space-y-3">
+                          <Link href="/products/ui-design" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            UI Design
+                          </Link>
+                          <Link href="/products/prototyping" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            Prototyping
+                          </Link>
+                          <Link href="/products/icons" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            Icon Libraries
+                          </Link>
+                          <Link href="/products/illustrations" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            Illustrations
+                          </Link>
+                        </div>
+                      </div>
+
+                      {/* Featured Product */}
+                      <div>
+                        <div className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 p-4 rounded-lg">
+                          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Featured</h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                            New AI-powered development suite
+                          </p>
+                          <Link
+                            href="/products/ai-suite"
+                            className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                          >
+                            Learn More
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Solutions Mega Menu */}
+            <div
+              className="relative"
+              onMouseEnter={() => handleMenuEnter('solutions')}
+              onMouseLeave={handleMenuLeave}
+            >
+              <button className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors">
+                <span>Solutions</span>
+                <ChevronDownIcon className="w-4 h-4" />
+              </button>
+
+              {activeMegaMenu === 'solutions' && (
+                <div className="absolute top-full left-0 w-screen max-w-3xl bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700 z-50">
+                  <div className="p-8">
+                    <div className="grid grid-cols-2 gap-8">
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-4">By Industry</h3>
+                        <div className="space-y-3">
+                          <Link href="/solutions/ecommerce" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            E-commerce
+                          </Link>
+                          <Link href="/solutions/healthcare" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            Healthcare
+                          </Link>
+                          <Link href="/solutions/education" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            Education
+                          </Link>
+                          <Link href="/solutions/finance" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            Finance
+                          </Link>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-4">By Company Size</h3>
+                        <div className="space-y-3">
+                          <Link href="/solutions/startups" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            Startups
+                          </Link>
+                          <Link href="/solutions/small-business" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            Small Business
+                          </Link>
+                          <Link href="/solutions/enterprise" className="block text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                            Enterprise
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Regular Links */}
+            <Link href="/pricing" className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors">
+              Pricing
+            </Link>
+            <Link href="/contact" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+              Contact
+            </Link>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+}
+```
+
+##### Customization Options
+
+**Layout Configurations:**
+- **Grid Columns**: Change `grid-cols-4` to `grid-cols-2`, `grid-cols-3`, or `grid-cols-5` for different layouts
+- **Menu Width**: Adjust `max-w-4xl` to control mega menu width
+- **Content Sections**: Add or remove sections like featured products, testimonials, or images
+
+**Interaction Behavior:**
+- **Click vs Hover**: Change `onMouseEnter`/`onMouseLeave` to `onClick` for click-to-open behavior
+- **Delay**: Add timer delays before opening/closing menus
+- **Mobile Behavior**: Implement accordion-style mega menus for mobile devices
+
+**Visual Enhancements:**
+- **Images**: Add product images or category illustrations
+- **Icons**: Include icons next to menu items for better visual hierarchy
+- **Backgrounds**: Add gradient backgrounds or subtle patterns to sections
+- **Animations**: Include fade-in/fade-out transitions with CSS or Framer Motion
+
+**Content Customization:**
+- **Featured Content**: Add special promotions, new products, or popular items
+- **Rich Media**: Include videos, GIFs, or interactive previews
+- **Search Integration**: Add quick search within mega menu categories
+- **User-Specific Content**: Show personalized recommendations or recently viewed items
+
+<BackToTop />
+
+## Hamburger Menu
+
+A hamburger menu is a compact navigation menu that is typically represented by three horizontal lines. It is commonly used in mobile applications and responsive designs to save space. When clicked, it expands to reveal the full navigation menu. Hamburger menus are useful for mobile devices where screen space is limited, allowing users to access the navigation options without cluttering the interface.
+
+Typically, hamburger menus are used in conjunction with responsive design techniques to ensure that the navigation remains accessible across different screen sizes.
+
+```tsx
+"use client";
+import Link from "next/link";
+import { useState } from "react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+
+export default function HamburgerMenu() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const closeMenu = () => {
+    setIsOpen(false);
+  };
+
+  return (
+    <>
+      {/* Main Navigation Bar */}
+      <nav className="bg-white shadow-md border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo */}
+            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">
+              YourBrand
+            </Link>
+
+            {/* Desktop Navigation - Hidden on mobile */}
+            <div className="hidden md:flex space-x-6">
+              <Link href="/" className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors">
+                Home
+              </Link>
+              <Link href="/about" className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors">
+                About
+              </Link>
+              <Link href="/services" className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors">
+                Services
+              </Link>
+              <Link href="/contact" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                Contact
+              </Link>
+            </div>
+
+            {/* Hamburger Button - Visible on mobile */}
+            <button
+              onClick={toggleMenu}
+              className="md:hidden p-2 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
+              aria-label="Toggle menu"
+            >
+              {isOpen ? (
+                <XMarkIcon className="h-6 w-6" />
+              ) : (
+                <Bars3Icon className="h-6 w-6" />
+              )}
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Menu Overlay */}
+      {isOpen && (
+        <div className="md:hidden fixed inset-0 z-50 bg-black bg-opacity-50" onClick={closeMenu}>
+          <div 
+            className="fixed top-0 right-0 h-full w-64 bg-white dark:bg-gray-900 shadow-xl transform transition-transform duration-300 ease-in-out"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Mobile Menu Header */}
+            <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+              <span className="text-lg font-semibold text-gray-900 dark:text-white">Menu</span>
+              <button
+                onClick={closeMenu}
+                className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <XMarkIcon className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Mobile Menu Items */}
+            <div className="p-4 space-y-2">
+              <Link
+                href="/"
+                onClick={closeMenu}
+                className="block px-4 py-3 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+              >
+                Home
+              </Link>
+              <Link
+                href="/about"
+                onClick={closeMenu}
+                className="block px-4 py-3 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+              >
+                About
+              </Link>
+              
+              {/* Submenu Example */}
+              <div className="space-y-1">
+                <div className="px-4 py-3 text-gray-900 dark:text-white font-medium">
+                  Services
+                </div>
+                <div className="ml-4 space-y-1">
+                  <Link
+                    href="/services/web-design"
+                    onClick={closeMenu}
+                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors text-sm"
+                  >
+                    Web Design
+                  </Link>
+                  <Link
+                    href="/services/development"
+                    onClick={closeMenu}
+                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors text-sm"
+                  >
+                    Development
+                  </Link>
+                  <Link
+                    href="/services/consulting"
+                    onClick={closeMenu}
+                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors text-sm"
+                  >
+                    Consulting
+                  </Link>
+                </div>
+              </div>
+
+              <Link
+                href="/portfolio"
+                onClick={closeMenu}
+                className="block px-4 py-3 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+              >
+                Portfolio
+              </Link>
+              <Link
+                href="/contact"
+                onClick={closeMenu}
+                className="block px-4 py-3 bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-colors text-center font-medium"
+              >
+                Contact Us
+              </Link>
+            </div>
+
+            {/* Mobile Menu Footer */}
+            <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex space-x-4 justify-center">
+                <Link href="/privacy" onClick={closeMenu} className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                  Privacy
+                </Link>
+                <Link href="/terms" onClick={closeMenu} className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+                  Terms
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+```
+
+##### Customization Options
+
+**Animation and Transitions:**
+- **Slide Direction**: Change `right-0` to `left-0` for left-side slide-in
+- **Animation Speed**: Modify `duration-300` to `duration-150` or `duration-500`
+- **Animation Type**: Use `ease-out`, `ease-in-out`, or custom cubic-bezier curves
+- **Scale Animation**: Add scale transforms for zoom-in/zoom-out effects
+
+**Menu Positioning:**
+- **Full Screen**: Change `w-64` to `w-full` for full-screen mobile menu
+- **Partial Overlay**: Use `w-3/4` or `w-80` for different widths
+- **Bottom Sheet**: Position menu at bottom instead of side
+- **Top Dropdown**: Create dropdown-style menu below navbar
+
+**Visual Customization:**
+- **Background**: Add gradient backgrounds or blur effects
+- **Icons**: Add icons next to each menu item
+- **Borders**: Customize border styles and colors
+- **Typography**: Adjust font sizes, weights, and spacing
+
+**Advanced Features:**
+- **Nested Submenus**: Add multiple levels of navigation
+- **Search Integration**: Include search bar in mobile menu
+- **User Account**: Add login/profile section to mobile menu
+- **Social Links**: Include social media links in menu footer
+- **Dark Mode Toggle**: Add theme switcher in mobile menu
+
+<BackToTop />
+
+## Sticky Navigation
+
+Sticky navigation remains fixed at the top of the viewport as the user scrolls down the page. It provides a persistent navigation experience, allowing users to access the navigation menu without having to scroll back to the top. Sticky navigation is particularly useful for long pages or articles, as it keeps the navigation options readily available without interrupting the reading experience.
+
+```tsx
+"use client";
+import Link from "next/link";
+import { useState, useEffect } from "react";
+
+export default function StickyNavigation() {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <nav 
+      className={`
+        fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out
+        ${isScrolled 
+          ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg border-b border-gray-200/50 dark:border-gray-700/50' 
+          : 'bg-transparent'
+        }
+      `}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <Link 
+            href="/" 
+            className={`
+              text-xl font-bold transition-colors duration-300
+              ${isScrolled 
+                ? 'text-gray-900 dark:text-white' 
+                : 'text-white'
+              }
+            `}
+          >
+            StickyBrand
+          </Link>
+
+          {/* Navigation Links */}
+          <div className="hidden md:flex space-x-6">
+            <Link
+              href="/"
+              className={`
+                px-3 py-2 text-sm font-medium transition-all duration-300
+                ${isScrolled 
+                  ? 'text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400' 
+                  : 'text-white/90 hover:text-white'
+                }
+              `}
+            >
+              Home
+            </Link>
+            <Link
+              href="/about"
+              className={`
+                px-3 py-2 text-sm font-medium transition-all duration-300
+                ${isScrolled 
+                  ? 'text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400' 
+                  : 'text-white/90 hover:text-white'
+                }
+              `}
+            >
+              About
+            </Link>
+            <Link
+              href="/services"
+              className={`
+                px-3 py-2 text-sm font-medium transition-all duration-300
+                ${isScrolled 
+                  ? 'text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400' 
+                  : 'text-white/90 hover:text-white'
+                }
+              `}
+            >
+              Services
+            </Link>
+            <Link
+              href="/portfolio"
+              className={`
+                px-3 py-2 text-sm font-medium transition-all duration-300
+                ${isScrolled 
+                  ? 'text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400' 
+                  : 'text-white/90 hover:text-white'
+                }
+              `}
+            >
+              Portfolio
+            </Link>
+            <Link
+              href="/contact"
+              className={`
+                px-4 py-2 rounded-md text-sm font-medium transition-all duration-300
+                ${isScrolled 
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                  : 'bg-white/20 hover:bg-white/30 text-white border border-white/30 hover:border-white/50'
+                }
+              `}
+            >
+              Contact
+            </Link>
+          </div>
+
+          {/* Mobile Menu Button */}
+          <button 
+            className={`
+              md:hidden p-2 rounded-md transition-colors duration-300
+              ${isScrolled 
+                ? 'text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white' 
+                : 'text-white hover:text-white/80'
+              }
+            `}
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Progress Bar (Optional) */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-600 transform scale-x-0 origin-left transition-transform duration-300 ease-out" 
+           style={{
+             transform: `scaleX(${Math.min(window.scrollY / (document.documentElement.scrollHeight - window.innerHeight), 1)})`
+           }}>
+      </div>
+    </nav>
+  );
+}
+
+// Example usage with content
+export function StickyNavigationDemo() {
+  return (
+    <div>
+      <StickyNavigation />
+      
+      {/* Hero Section */}
+      <div className="h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center">
+        <div className="text-center text-white">
+          <h1 className="text-5xl font-bold mb-4">Sticky Navigation Demo</h1>
+          <p className="text-xl mb-8">Scroll down to see the navigation stick to the top</p>
+          <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+            Get Started
+          </button>
+        </div>
+      </div>
+
+      {/* Content Sections */}
+      <div className="max-w-4xl mx-auto py-16 px-4 space-y-16">
+        <section className="prose lg:prose-xl">
+          <h2>Section 1</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua...</p>
+        </section>
+        
+        <section className="prose lg:prose-xl">
+          <h2>Section 2</h2>
+          <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat...</p>
+        </section>
+        
+        <section className="prose lg:prose-xl">
+          <h2>Section 3</h2>
+          <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur...</p>
+        </section>
+      </div>
+    </div>
+  );
+}
+```
+
+##### Customization Options
+
+**Scroll Behavior:**
+- **Trigger Point**: Change `scrollTop > 10` to different values (50, 100) for later activation
+- **Hide on Scroll Down**: Add logic to hide navbar when scrolling down, show when scrolling up
+- **Smooth Transitions**: Adjust `duration-300` for faster or slower transitions
+- **Scroll Progress**: Add progress bar showing reading progress
+
+**Visual Effects:**
+- **Blur Effect**: Modify `backdrop-blur-md` to `backdrop-blur-sm` or `backdrop-blur-lg`
+- **Background Opacity**: Change `bg-white/95` to different opacity levels
+- **Shadow Intensity**: Adjust `shadow-lg` to `shadow-sm`, `shadow-xl`, or custom shadows
+- **Color Schemes**: Change color transitions for different brand colors
+
+**Animation Options:**
+- **Slide Down**: Add `transform translateY(-100%)` initially, then `translateY(0)` when sticky
+- **Scale Effect**: Add subtle scale animations when transitioning
+- **Fade In**: Use opacity transitions instead of background changes
+- **Micro-interactions**: Add hover effects that change based on scroll state
+
+**Advanced Features:**
+- **Auto-hide**: Hide navigation after period of inactivity
+- **Smart Sticky**: Only stick when scrolling up
+- **Section Highlighting**: Highlight nav items based on current section in view
+- **Mobile Optimization**: Different behavior for mobile vs desktop scrolling
+
+<BackToTop />
+
+## Breadcrumb Navigation
+
+Breadcrumb navigation provides a trail of links that shows the user's current location within the website's hierarchy. It allows users to easily navigate back to previous sections or the homepage. Breadcrumbs are especially useful for websites with deep content structures, as they provide context and help users understand their position within the site.
+
+```tsx
+import Link from "next/link";
+import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
+
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+  current?: boolean;
+}
+
+interface BreadcrumbNavigationProps {
+  items: BreadcrumbItem[];
+  showHome?: boolean;
+}
+
+export default function BreadcrumbNavigation({ 
+  items, 
+  showHome = true 
+}: BreadcrumbNavigationProps) {
+  return (
+    <nav className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 py-4">
+      {/* Home Link */}
+      {showHome && (
+        <>
+          <Link 
+            href="/" 
+            className="flex items-center hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+          >
+            <HomeIcon className="w-4 h-4 mr-1" />
+            <span className="sr-only">Home</span>
+          </Link>
+          {items.length > 0 && (
+            <ChevronRightIcon className="w-4 h-4 text-gray-400" />
+          )}
+        </>
+      )}
+
+      {/* Breadcrumb Items */}
+      {items.map((item, index) => (
+        <div key={index} className="flex items-center space-x-2">
+          {item.href && !item.current ? (
+            <Link 
+              href={item.href}
+              className="hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+            >
+              {item.label}
+            </Link>
+          ) : (
+            <span 
+              className={`${
+                item.current 
+                  ? 'font-medium text-gray-900 dark:text-white' 
+                  : 'text-gray-500 dark:text-gray-400'
+              }`}
+            >
+              {item.label}
+            </span>
+          )}
+          
+          {/* Separator */}
+          {index < items.length - 1 && (
+            <ChevronRightIcon className="w-4 h-4 text-gray-400" />
+          )}
+        </div>
+      ))}
+    </nav>
+  );
+}
+
+// Example Usage Component
+export function BreadcrumbExample() {
+  const breadcrumbItems: BreadcrumbItem[] = [
+    { label: "Products", href: "/products" },
+    { label: "Electronics", href: "/products/electronics" },
+    { label: "Smartphones", href: "/products/electronics/smartphones" },
+    { label: "iPhone 15 Pro", current: true }
+  ];
+
+  return (
+    <div className="max-w-4xl mx-auto p-6">
+      {/* Standard Breadcrumb */}
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold mb-2">Standard Breadcrumb</h3>
+        <BreadcrumbNavigation items={breadcrumbItems} />
+      </div>
+
+      {/* Without Home Icon */}
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold mb-2">Without Home Icon</h3>
+        <BreadcrumbNavigation items={breadcrumbItems} showHome={false} />
+      </div>
+
+      {/* Custom Styled Breadcrumb */}
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold mb-2">Custom Styled</h3>
+        <nav className="flex items-center space-x-2 text-sm bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+          <Link href="/" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+            Home
+          </Link>
+          {breadcrumbItems.map((item, index) => (
+            <div key={index} className="flex items-center space-x-2">
+              <span className="text-gray-400">/</span>
+              {item.href && !item.current ? (
+                <Link 
+                  href={item.href}
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <span className="font-medium text-gray-900 dark:text-white">
+                  {item.label}
+                </span>
+              )}
+            </div>
+          ))}
+        </nav>
+      </div>
+    </div>
+  );
+}
+```
+
+##### Customization Options
+
+**Visual Styling:**
+- **Separators**: Change `ChevronRightIcon` to `/`, `>`, `•`, or custom icons
+- **Background**: Add `bg-gray-100` or gradient backgrounds to breadcrumb container
+- **Borders**: Include borders or shadow effects for more definition
+- **Color Schemes**: Customize link colors, hover states, and current page highlighting
+
+**Layout Modifications:**
+- **Spacing**: Adjust `space-x-2` for tighter or looser spacing between items
+- **Size**: Change text size from `text-sm` to `text-xs` or `text-base`
+- **Alignment**: Use different flex alignments or center the breadcrumb
+- **Mobile Responsive**: Hide certain breadcrumb levels on smaller screens
+
+**Interactive Features:**
+- **Dropdown Menus**: Add dropdowns on breadcrumb items showing sub-pages
+- **Truncation**: Implement text truncation for very long breadcrumb labels
+- **Collapse on Mobile**: Show only last 2-3 items on mobile devices
+- **Click Analytics**: Track which breadcrumb links are clicked most
+
+**Advanced Functionality:**
+- **Schema Markup**: Add structured data for SEO benefits
+- **Keyboard Navigation**: Implement arrow key navigation between breadcrumb items
+- **Auto-generation**: Create breadcrumbs automatically from URL structure
+- **Custom Icons**: Add category-specific icons for different breadcrumb levels
+
+<BackToTop />
+
+## Dynamic Breadcrumbs
+
+Dynamic breadcrumbs automatically update based on the user's current location within the website. They can be generated based on the URL structure or the content hierarchy, providing a real-time navigation aid. Dynamic breadcrumbs enhance user experience by ensuring that users always have access to relevant navigation links, regardless of where they are on the site.
+
+```tsx
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ChevronRightIcon, HomeIcon } from "@heroicons/react/24/outline";
+import { useMemo } from "react";
+
+interface RouteMapping {
+  [key: string]: {
+    label: string;
+    icon?: React.ComponentType<{ className?: string }>;
+  };
+}
+
+// Define custom labels for routes
+const routeMapping: RouteMapping = {
+  'blog': { label: 'Blog' },
+  'products': { label: 'Products' },
+  'electronics': { label: 'Electronics' },
+  'smartphones': { label: 'Smartphones' },
+  'laptops': { label: 'Laptops' },
+  'categories': { label: 'Categories' },
+  'about': { label: 'About Us' },
+  'contact': { label: 'Contact' },
+  'support': { label: 'Support' },
+  'documentation': { label: 'Documentation' },
+  'api': { label: 'API Reference' },
+  'getting-started': { label: 'Getting Started' },
+  'tutorials': { label: 'Tutorials' },
+};
+
+interface DynamicBreadcrumbsProps {
+  homeLabel?: string;
+  maxItems?: number;
+  showHome?: boolean;
+  customRoutes?: RouteMapping;
+}
+
+export default function DynamicBreadcrumbs({
+  homeLabel = "Home",
+  maxItems = 5,
+  showHome = true,
+  customRoutes = {}
+}: DynamicBreadcrumbsProps) {
+  const pathname = usePathname();
+  
+  const breadcrumbs = useMemo(() => {
+    // Combine default routes with custom routes
+    const allRoutes = { ...routeMapping, ...customRoutes };
+    
+    // Split pathname and filter out empty strings
+    const pathSegments = pathname.split('/').filter(segment => segment !== '');
+    
+    // If we're on home page, return empty array
+    if (pathSegments.length === 0) {
+      return [];
+    }
+    
+    // Build breadcrumb items
+    const items = pathSegments.map((segment, index) => {
+      const href = '/' + pathSegments.slice(0, index + 1).join('/');
+      const isLast = index === pathSegments.length - 1;
+      
+      // Get custom label or format the segment
+      const label = allRoutes[segment]?.label || 
+                   segment.split('-').map(word => 
+                     word.charAt(0).toUpperCase() + word.slice(1)
+                   ).join(' ');
+      
+      return {
+        label,
+        href: isLast ? undefined : href,
+        current: isLast,
+        icon: allRoutes[segment]?.icon
+      };
+    });
+    
+    // Limit items if maxItems is set
+    if (items.length > maxItems) {
+      return [
+        ...items.slice(0, 1), // Keep first item
+        { label: '...', ellipsis: true },
+        ...items.slice(-(maxItems - 2)) // Keep last items
+      ];
+    }
+    
+    return items;
+  }, [pathname, maxItems, customRoutes]);
+
+  return (
+    <nav 
+      className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400 py-4"
+      aria-label="Breadcrumb"
+    >
+      {/* Home Link */}
+      {showHome && (
+        <>
+          <Link 
+            href="/" 
+            className="flex items-center hover:text-gray-700 dark:hover:text-gray-200 transition-colors group"
+          >
+            <HomeIcon className="w-4 h-4 mr-1 group-hover:scale-110 transition-transform" />
+            <span className="hidden sm:inline">{homeLabel}</span>
+          </Link>
+          {breadcrumbs.length > 0 && (
+            <ChevronRightIcon className="w-4 h-4 text-gray-400 flex-shrink-0" />
+          )}
+        </>
+      )}
+
+      {/* Dynamic Breadcrumb Items */}
+      {breadcrumbs.map((item, index) => (
+        <div key={index} className="flex items-center space-x-2">
+          {item.ellipsis ? (
+            <span className="text-gray-400 px-2">...</span>
+          ) : (
+            <>
+              {item.href ? (
+                <Link 
+                  href={item.href}
+                  className="hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center"
+                >
+                  {item.icon && <item.icon className="w-4 h-4 mr-1" />}
+                  <span className="truncate max-w-[120px] sm:max-w-none">
+                    {item.label}
+                  </span>
+                </Link>
+              ) : (
+                <span 
+                  className={`font-medium text-gray-900 dark:text-white flex items-center ${
+                    item.current ? 'text-blue-600 dark:text-blue-400' : ''
+                  }`}
+                >
+                  {item.icon && <item.icon className="w-4 h-4 mr-1" />}
+                  <span className="truncate max-w-[120px] sm:max-w-none">
+                    {item.label}
+                  </span>
+                </span>
+              )}
+            </>
+          )}
+          
+          {/* Separator */}
+          {index < breadcrumbs.length - 1 && !item.ellipsis && (
+            <ChevronRightIcon className="w-4 h-4 text-gray-400 flex-shrink-0" />
+          )}
+        </div>
+      ))}
+    </nav>
+  );
+}
+
+// Enhanced version with dropdown navigation
+export function EnhancedDynamicBreadcrumbs() {
+  const pathname = usePathname();
+  
+  return (
+    <div className="space-y-4">
+      {/* Standard Dynamic Breadcrumb */}
+      <DynamicBreadcrumbs />
+      
+      {/* Compact Mobile Version */}
+      <div className="sm:hidden">
+        <nav className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+          <Link 
+            href="/"
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+          >
+            ← Back to Home
+          </Link>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            Current: {pathname.split('/').pop()?.replace(/-/g, ' ') || 'Home'}
+          </span>
+        </nav>
+      </div>
+      
+      {/* Structured Data Example */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": pathname.split('/').filter(Boolean).map((segment, index, array) => ({
+              "@type": "ListItem",
+              "position": index + 1,
+              "name": segment.split('-').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+              ).join(' '),
+              "item": `${window.location.origin}/${array.slice(0, index + 1).join('/')}`
+            }))
+          })
+        }}
+      />
+    </div>
+  );
+}
+```
+
+##### Customization Options
+
+**Dynamic Generation:**
+- **URL-based**: Automatically generate from URL structure (current implementation)
+- **Content-based**: Generate from page metadata or content hierarchy
+- **API-driven**: Fetch breadcrumb structure from backend API
+- **Route Config**: Define breadcrumb structure in routing configuration
+
+**Smart Features:**
+- **Category Detection**: Automatically detect and group similar page types
+- **Multi-language**: Support for internationalized breadcrumb labels
+- **User Preferences**: Remember user's preferred breadcrumb style
+- **Context Awareness**: Show different breadcrumbs based on user role or permissions
+
+**Performance Optimizations:**
+- **Memoization**: Cache breadcrumb calculations for better performance
+- **Lazy Loading**: Load breadcrumb data only when needed
+- **Preloading**: Preload parent page data for faster navigation
+- **SEO Integration**: Automatically generate structured data markup
+
+**Mobile Adaptations:**
+- **Collapsible**: Show only current page and back button on mobile
+- **Swipe Navigation**: Allow swiping between breadcrumb levels
+- **Overflow Handling**: Smart truncation for long breadcrumb chains
+- **Touch Targets**: Larger touch areas for mobile interaction
+
+<BackToTop />
+
+## Simple Footer Navigation
+
+Footer navigation is typically placed at the bottom of the page and provides links to important sections such as "About Us," "Contact," "Privacy Policy," and "Terms of Service." It serves as a secondary navigation option, allowing users to access important information without cluttering the main navigation menu. Footer navigation can also include social media links, copyright information, and other relevant links that users may need to access.
+
+```tsx
+import Link from "next/link";
+
+export default function SimpleFooterNavigation() {
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <footer className="bg-gray-900 text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* Company Info */}
+          <div className="col-span-1 md:col-span-2">
+            <h3 className="text-lg font-semibold mb-4">Your Company</h3>
+            <p className="text-gray-400 mb-4 max-w-md">
+              We're dedicated to providing the best web development solutions 
+              and helping businesses succeed online.
+            </p>
+            <div className="text-sm text-gray-400">
+              <p>123 Business Street</p>
+              <p>City, State 12345</p>
+              <p className="mt-2">
+                Email: <Link href="mailto:info@company.com" className="hover:text-white transition-colors">
+                  info@company.com
+                </Link>
+              </p>
+              <p>
+                Phone: <Link href="tel:+1234567890" className="hover:text-white transition-colors">
+                  (123) 456-7890
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-md font-semibold mb-4">Quick Links</h4>
+            <nav className="space-y-2">
+              <Link 
+                href="/about" 
+                className="block text-gray-400 hover:text-white transition-colors"
+              >
+                About Us
+              </Link>
+              <Link 
+                href="/services" 
+                className="block text-gray-400 hover:text-white transition-colors"
+              >
+                Services
+              </Link>
+              <Link 
+                href="/portfolio" 
+                className="block text-gray-400 hover:text-white transition-colors"
+              >
+                Portfolio
+              </Link>
+              <Link 
+                href="/blog" 
+                className="block text-gray-400 hover:text-white transition-colors"
+              >
+                Blog
+              </Link>
+              <Link 
+                href="/contact" 
+                className="block text-gray-400 hover:text-white transition-colors"
+              >
+                Contact
+              </Link>
+            </nav>
+          </div>
+
+          {/* Support */}
+          <div>
+            <h4 className="text-md font-semibold mb-4">Support</h4>
+            <nav className="space-y-2">
+              <Link 
+                href="/help" 
+                className="block text-gray-400 hover:text-white transition-colors"
+              >
+                Help Center
+              </Link>
+              <Link 
+                href="/faq" 
+                className="block text-gray-400 hover:text-white transition-colors"
+              >
+                FAQ
+              </Link>
+              <Link 
+                href="/documentation" 
+                className="block text-gray-400 hover:text-white transition-colors"
+              >
+                Documentation
+              </Link>
+              <Link 
+                href="/support" 
+                className="block text-gray-400 hover:text-white transition-colors"
+              >
+                Customer Support
+              </Link>
+              <Link 
+                href="/status" 
+                className="block text-gray-400 hover:text-white transition-colors"
+              >
+                System Status
+              </Link>
+            </nav>
+          </div>
+        </div>
+
+        {/* Bottom Section */}
+        <div className="mt-12 pt-8 border-t border-gray-800">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            {/* Copyright */}
+            <div className="text-gray-400 text-sm mb-4 md:mb-0">
+              © {currentYear} Your Company. All rights reserved.
+            </div>
+
+            {/* Legal Links */}
+            <nav className="flex space-x-6 text-sm">
+              <Link 
+                href="/privacy" 
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                Privacy Policy
+              </Link>
+              <Link 
+                href="/terms" 
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                Terms of Service
+              </Link>
+              <Link 
+                href="/cookies" 
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                Cookie Policy
+              </Link>
+              <Link 
+                href="/sitemap" 
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                Sitemap
+              </Link>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+```
+
+##### Customization Options
+
+**Layout Variations:**
+- **Column Count**: Change `grid-cols-4` to 2, 3, 5, or 6 for different layouts
+- **Section Ordering**: Rearrange company info, links, and legal sections
+- **Responsive Breakpoints**: Adjust `md:grid-cols-4` for different responsive behavior
+- **Spacing**: Modify `gap-8` and padding values for tighter or looser layouts
+
+**Visual Styling:**
+- **Color Schemes**: Change from dark theme to light, brand colors, or gradients
+- **Typography**: Adjust font sizes, weights, and line heights
+- **Borders**: Add or modify border styles between sections
+- **Background**: Use solid colors, gradients, or background images
+
+**Content Customization:**
+- **Link Categories**: Add or remove link groups (Products, Resources, Company, etc.)
+- **Contact Methods**: Include additional contact options like live chat or social links
+- **Multilingual**: Add language selector or translated footer content
+- **Dynamic Content**: Show different links based on user authentication status
+
+**Interactive Features:**
+- **Accordion on Mobile**: Collapse sections into expandable accordions
+- **Newsletter Signup**: Add email subscription form
+- **Back to Top**: Include smooth scroll to top functionality
+- **Hover Effects**: Add subtle animations and hover states
+
+<BackToTop />
+
+## Footer with Social Media Links
+
+A footer with social media links provides quick access to the website's social media profiles. It allows users to connect with the website on various social media platforms, such as Facebook, Twitter, Instagram, and LinkedIn. Including social media links in the footer helps increase engagement and allows users to follow the website for updates and news. It also provides an additional way for users to interact with the website beyond the main content.
+
+```tsx
+import Link from "next/link";
+
+// Social Media Icons (you can replace these with your preferred icon library)
+const FacebookIcon = ({ className }: { className?: string }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+  </svg>
+);
+
+const TwitterIcon = ({ className }: { className?: string }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+  </svg>
+);
+
+const InstagramIcon = ({ className }: { className?: string }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987 6.62 0 11.987-5.367 11.987-11.987C24.004 5.367 18.637.001 12.017.001zM12 16.24c-2.34 0-4.24-1.9-4.24-4.24S9.66 7.76 12 7.76s4.24 1.9 4.24 4.24-1.9 4.24-4.24 4.24zm4.83-7.674c-.547 0-.991-.444-.991-.991s.444-.991.991-.991.991.444.991.991-.444.991-.991.991z"/>
+  </svg>
+);
+
+const LinkedInIcon = ({ className }: { className?: string }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+  </svg>
+);
+
+const YouTubeIcon = ({ className }: { className?: string }) => (
+  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
+    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+  </svg>
+);
+
+export default function FooterWithSocialLinks() {
+  const currentYear = new Date().getFullYear();
+
+  const socialLinks = [
+    {
+      name: "Facebook",
+      href: "https://facebook.com/yourcompany",
+      icon: FacebookIcon,
+      hoverColor: "hover:text-blue-500"
+    },
+    {
+      name: "Twitter",
+      href: "https://twitter.com/yourcompany",
+      icon: TwitterIcon,
+      hoverColor: "hover:text-sky-400"
+    },
+    {
+      name: "Instagram",
+      href: "https://instagram.com/yourcompany",
+      icon: InstagramIcon,
+      hoverColor: "hover:text-pink-500"
+    },
+    {
+      name: "LinkedIn",
+      href: "https://linkedin.com/company/yourcompany",
+      icon: LinkedInIcon,
+      hoverColor: "hover:text-blue-600"
+    },
+    {
+      name: "YouTube",
+      href: "https://youtube.com/yourcompany",
+      icon: YouTubeIcon,
+      hoverColor: "hover:text-red-500"
+    }
+  ];
+
+  return (
+    <footer className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Company Info */}
+          <div>
+            <h3 className="text-xl font-bold mb-4">Your Brand</h3>
+            <p className="text-gray-300 mb-6 leading-relaxed">
+              Creating amazing digital experiences that connect people and 
+              businesses. Follow us on social media for the latest updates.
+            </p>
+            
+            {/* Social Media Links */}
+            <div className="flex space-x-4 mb-6">
+              {socialLinks.map((social) => (
+                <Link
+                  key={social.name}
+                  href={social.href}
+                  className={`text-gray-400 ${social.hoverColor} transition-colors duration-300 transform hover:scale-110`}
+                  aria-label={`Follow us on ${social.name}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <social.icon className="w-6 h-6" />
+                </Link>
+              ))}
+            </div>
+
+            {/* Social Stats */}
+            <div className="text-sm text-gray-400 space-y-1">
+              <p>🎯 Follow for daily updates</p>
+              <p>📱 10K+ followers across platforms</p>
+            </div>
+          </div>
+
+          {/* Navigation Links */}
+          <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-8">
+            {/* Company */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4 text-gray-100">Company</h4>
+              <nav className="space-y-3">
+                <Link href="/about" className="block text-gray-400 hover:text-white transition-colors">
+                  About Us
+                </Link>
+                <Link href="/careers" className="block text-gray-400 hover:text-white transition-colors">
+                  Careers
+                </Link>
+                <Link href="/news" className="block text-gray-400 hover:text-white transition-colors">
+                  News & Press
+                </Link>
+                <Link href="/investors" className="block text-gray-400 hover:text-white transition-colors">
+                  Investors
+                </Link>
+              </nav>
+            </div>
+
+            {/* Products */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4 text-gray-100">Products</h4>
+              <nav className="space-y-3">
+                <Link href="/web-design" className="block text-gray-400 hover:text-white transition-colors">
+                  Web Design
+                </Link>
+                <Link href="/development" className="block text-gray-400 hover:text-white transition-colors">
+                  Development
+                </Link>
+                <Link href="/marketing" className="block text-gray-400 hover:text-white transition-colors">
+                  Digital Marketing
+                </Link>
+                <Link href="/consulting" className="block text-gray-400 hover:text-white transition-colors">
+                  Consulting
+                </Link>
+              </nav>
+            </div>
+
+            {/* Support */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4 text-gray-100">Support</h4>
+              <nav className="space-y-3">
+                <Link href="/help" className="block text-gray-400 hover:text-white transition-colors">
+                  Help Center
+                </Link>
+                <Link href="/contact" className="block text-gray-400 hover:text-white transition-colors">
+                  Contact Us
+                </Link>
+                <Link href="/community" className="block text-gray-400 hover:text-white transition-colors">
+                  Community
+                </Link>
+                <Link href="/resources" className="block text-gray-400 hover:text-white transition-colors">
+                  Resources
+                </Link>
+              </nav>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Section */}
+        <div className="mt-12 pt-8 border-t border-gray-700">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="text-gray-400 text-sm mb-4 md:mb-0">
+              © {currentYear} Your Brand. All rights reserved. Made with ❤️
+            </div>
+            
+            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-6">
+              <nav className="flex space-x-6 text-sm">
+                <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
+                  Privacy
+                </Link>
+                <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">
+                  Terms
+                </Link>
+                <Link href="/cookies" className="text-gray-400 hover:text-white transition-colors">
+                  Cookies
+                </Link>
+              </nav>
+              
+              {/* Newsletter signup link */}
+              <Link 
+                href="/newsletter" 
+                className="text-sm bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md transition-colors"
+              >
+                📧 Subscribe to Newsletter
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+```
+
+##### Customization Options
+
+**Social Media Configuration:**
+- **Platform Selection**: Add/remove social platforms (TikTok, Discord, GitHub, etc.)
+- **Icon Styles**: Use different icon libraries (Heroicons, Lucide, Font Awesome)
+- **Hover Effects**: Customize hover colors to match brand colors
+- **Icon Size**: Adjust icon sizes for different visual impact
+
+**Visual Enhancements:**
+- **Brand Colors**: Replace gray theme with your brand color palette
+- **Gradients**: Modify gradient directions and colors
+- **Animations**: Add subtle hover animations and transitions
+- **Background Patterns**: Include subtle background patterns or textures
+
+**Content Customization:**
+- **Social Stats**: Display follower counts, engagement metrics
+- **Featured Content**: Highlight recent posts or achievements
+- **Call-to-Action**: Add newsletter signup or special promotions
+- **Localization**: Translate social platform names and descriptions
+
+**Layout Modifications:**
+- **Social Position**: Move social links to different sections (top, center, separate row)
+- **Grid Structure**: Change from 3-column to 2, 4, or 5-column layout
+- **Mobile Optimization**: Stack elements differently on mobile devices
+- **Sticky Social**: Make social links stick to viewport edge
+
+<BackToTop />
+
+## Footer with Contact Information and Newsletter Signup
+
+A footer with contact information and a newsletter signup form provides users with a way to get in touch with the website owner or subscribe to updates. The contact information can include an email address, phone number, and physical address, allowing users to reach out for inquiries or support. The newsletter signup form allows users to subscribe to the website's newsletter, keeping them informed about new content, updates, and promotions. This helps build a community around the website and keeps users engaged with the content.
+
+```tsx
+"use client";
+import Link from "next/link";
+import { useState } from "react";
+import { 
+  MapPinIcon, 
+  PhoneIcon, 
+  EnvelopeIcon, 
+  ClockIcon,
+  CheckCircleIcon,
+  ExclamationCircleIcon
+} from "@heroicons/react/24/outline";
+
+export default function FooterWithContactAndNewsletter() {
+  const [email, setEmail] = useState("");
+  const [subscriptionStatus, setSubscriptionStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [message, setMessage] = useState("");
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !email.includes('@')) {
+      setSubscriptionStatus('error');
+      setMessage('Please enter a valid email address');
+      return;
+    }
+
+    setSubscriptionStatus('loading');
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Here you would typically call your newsletter API
+      // await fetch('/api/newsletter', { method: 'POST', body: JSON.stringify({ email }) });
+      
+      setSubscriptionStatus('success');
+      setMessage('Thank you for subscribing!');
+      setEmail("");
+      
+      // Reset status after 3 seconds
+      setTimeout(() => {
+        setSubscriptionStatus('idle');
+        setMessage("");
+      }, 3000);
+    } catch (error) {
+      setSubscriptionStatus('error');
+      setMessage('Something went wrong. Please try again.');
+      
+      setTimeout(() => {
+        setSubscriptionStatus('idle');
+        setMessage("");
+      }, 3000);
+    }
+  };
+
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <footer className="bg-gray-900 text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          
+          {/* Contact Information */}
+          <div className="lg:col-span-1">
+            <h3 className="text-xl font-bold mb-6">Get in Touch</h3>
+            
+            <div className="space-y-4">
+              {/* Address */}
+              <div className="flex items-start space-x-3">
+                <MapPinIcon className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" />
+                <div>
+                  <p className="font-medium text-gray-200">Address</p>
+                  <p className="text-gray-400">
+                    123 Business Street<br />
+                    Suite 100<br />
+                    City, State 12345
+                  </p>
+                </div>
+              </div>
+
+              {/* Phone */}
+              <div className="flex items-start space-x-3">
+                <PhoneIcon className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" />
+                <div>
+                  <p className="font-medium text-gray-200">Phone</p>
+                  <Link 
+                    href="tel:+1234567890"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    (123) 456-7890
+                  </Link>
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="flex items-start space-x-3">
+                <EnvelopeIcon className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" />
+                <div>
+                  <p className="font-medium text-gray-200">Email</p>
+                  <Link 
+                    href="mailto:info@company.com"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    info@company.com
+                  </Link>
+                </div>
+              </div>
+
+              {/* Business Hours */}
+              <div className="flex items-start space-x-3">
+                <ClockIcon className="w-6 h-6 text-blue-400 flex-shrink-0 mt-1" />
+                <div>
+                  <p className="font-medium text-gray-200">Business Hours</p>
+                  <div className="text-gray-400 text-sm">
+                    <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
+                    <p>Saturday: 10:00 AM - 4:00 PM</p>
+                    <p>Sunday: Closed</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Contact CTA */}
+            <div className="mt-6">
+              <Link 
+                href="/contact"
+                className="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition-colors"
+              >
+                <EnvelopeIcon className="w-5 h-5 mr-2" />
+                Send Message
+              </Link>
+            </div>
+          </div>
+
+          {/* Newsletter Signup */}
+          <div className="lg:col-span-1">
+            <h3 className="text-xl font-bold mb-6">Stay Updated</h3>
+            
+            <p className="text-gray-400 mb-6">
+              Subscribe to our newsletter and get the latest updates, 
+              news, and exclusive offers delivered to your inbox.
+            </p>
+
+            <form onSubmit={handleNewsletterSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="newsletter-email" className="sr-only">
+                  Email address
+                </label>
+                <input
+                  id="newsletter-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email address"
+                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  disabled={subscriptionStatus === 'loading'}
+                />
+              </div>
+              
+              <button
+                type="submit"
+                disabled={subscriptionStatus === 'loading'}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-3 rounded-md font-medium transition-colors flex items-center justify-center"
+              >
+                {subscriptionStatus === 'loading' ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Subscribing...
+                  </>
+                ) : (
+                  'Subscribe Now'
+                )}
+              </button>
+            </form>
+
+            {/* Status Message */}
+            {message && (
+              <div className={`mt-4 p-3 rounded-md flex items-center space-x-2 ${
+                subscriptionStatus === 'success' 
+                  ? 'bg-green-900 text-green-200 border border-green-800' 
+                  : 'bg-red-900 text-red-200 border border-red-800'
+              }`}>
+                {subscriptionStatus === 'success' ? (
+                  <CheckCircleIcon className="w-5 h-5 flex-shrink-0" />
+                ) : (
+                  <ExclamationCircleIcon className="w-5 h-5 flex-shrink-0" />
+                )}
+                <span className="text-sm">{message}</span>
+              </div>
+            )}
+
+            {/* Newsletter Benefits */}
+            <div className="mt-6 text-sm text-gray-400">
+              <p className="font-medium text-gray-300 mb-2">What you'll get:</p>
+              <ul className="space-y-1">
+                <li>✅ Weekly industry insights</li>
+                <li>✅ Exclusive promotions</li>
+                <li>✅ Early access to new features</li>
+                <li>✅ No spam, unsubscribe anytime</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div className="lg:col-span-1">
+            <h3 className="text-xl font-bold mb-6">Quick Links</h3>
+            
+            <div className="grid grid-cols-2 gap-8">
+              <div>
+                <h4 className="font-semibold text-gray-200 mb-4">Company</h4>
+                <nav className="space-y-2">
+                  <Link href="/about" className="block text-gray-400 hover:text-white transition-colors text-sm">
+                    About Us
+                  </Link>
+                  <Link href="/team" className="block text-gray-400 hover:text-white transition-colors text-sm">
+                    Our Team
+                  </Link>
+                  <Link href="/careers" className="block text-gray-400 hover:text-white transition-colors text-sm">
+                    Careers
+                  </Link>
+                  <Link href="/news" className="block text-gray-400 hover:text-white transition-colors text-sm">
+                    News
+                  </Link>
+                </nav>
+              </div>
+              
+              <div>
+                <h4 className="font-semibold text-gray-200 mb-4">Support</h4>
+                <nav className="space-y-2">
+                  <Link href="/help" className="block text-gray-400 hover:text-white transition-colors text-sm">
+                    Help Center
+                  </Link>
+                  <Link href="/faq" className="block text-gray-400 hover:text-white transition-colors text-sm">
+                    FAQ
+                  </Link>
+                  <Link href="/contact" className="block text-gray-400 hover:text-white transition-colors text-sm">
+                    Contact
+                  </Link>
+                  <Link href="/feedback" className="block text-gray-400 hover:text-white transition-colors text-sm">
+                    Feedback
+                  </Link>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Section */}
+        <div className="mt-12 pt-8 border-t border-gray-800">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="text-gray-400 text-sm mb-4 md:mb-0">
+              © {currentYear} Your Company. All rights reserved.
+            </div>
+            
+            <nav className="flex space-x-6 text-sm">
+              <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">
+                Terms of Service
+              </Link>
+              <Link href="/accessibility" className="text-gray-400 hover:text-white transition-colors">
+                Accessibility
+              </Link>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+```
+
+##### Customization Options
+
+**Contact Information:**
+- **Additional Methods**: Add live chat, WhatsApp, or Skype contact options
+- **Multiple Locations**: Display different office locations with separate contact info
+- **Department-Specific**: Provide contacts for sales, support, and different departments
+- **Interactive Maps**: Embed Google Maps or other mapping services
+
+**Newsletter Features:**
+- **Multi-language**: Support newsletter subscriptions in different languages
+- **Subscription Preferences**: Allow users to choose newsletter frequency and topics
+- **Double Opt-in**: Implement email confirmation for subscription verification
+- **GDPR Compliance**: Add privacy consent checkboxes and compliance features
+
+**Form Enhancements:**
+- **Additional Fields**: Collect name, company, or preferences during signup
+- **Social Media Integration**: Allow newsletter signup through social accounts
+- **Email Validation**: Implement real-time email validation and suggestions
+- **A/B Testing**: Test different copy and form layouts for better conversion
+
+**Visual Customizations:**
+- **Color Schemes**: Match footer colors to your brand palette
+- **Layout Options**: Switch between different grid layouts (2-column, 4-column)
+- **Background Patterns**: Add subtle patterns or gradients
+- **Mobile Optimization**: Customize layout specifically for mobile devices
+
+**Integration Options:**
+- **CRM Integration**: Connect newsletter signup to Mailchimp, ConvertKit, or other services
+- **Analytics**: Track newsletter signup rates and user behavior
+- **Marketing Automation**: Trigger welcome emails and drip campaigns
+- **API Integration**: Connect to your existing customer management system
+
+<BackToTop />

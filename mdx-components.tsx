@@ -92,7 +92,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       return <span className="block mb-4 leading-relaxed">{children}</span>;
     },
     ul: ({ children }) => (
-      <ul className="space-y-1 my-1 list-disc list-outside">{children}</ul>
+      <ul className="space-y-1 my-5 list-disc list-outside">{children}</ul>
     ),
     ol: ({ children }) => (
       <ol className="space-y-1 my-1 list-decimal list-outside">{children}</ol>

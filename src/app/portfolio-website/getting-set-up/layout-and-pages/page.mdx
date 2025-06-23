@@ -12,6 +12,7 @@ Welcome to one of the most exciting moments in your web development journey - bu
 ### What You'll Learn
 
 By the end of this section, you'll understand:
+
 - How to structure a modern web application
 - The concept of layouts and how they create consistency across your site
 - How to build reusable components that make your code more maintainable
@@ -21,6 +22,7 @@ By the end of this section, you'll understand:
 ### Why Start with a Portfolio Website?
 
 A portfolio website is the perfect first project because it:
+
 - **Showcases your skills** - Demonstrates your ability to build a complete application
 - **Provides practical value** - You'll actually use this to show potential employers your work
 - **Covers essential concepts** - Navigation, responsive design, component architecture, and state management
@@ -29,6 +31,7 @@ A portfolio website is the perfect first project because it:
 ### Project Overview
 
 We're building a modern portfolio website with these features:
+
 - **Responsive design** that looks great on all devices
 - **Dark/light theme toggle** for user preference
 - **Smooth navigation** with a professional header and footer
@@ -47,7 +50,6 @@ Think of a layout as the "template" or "frame" for your website. Just like a hou
 - **Footer** - Contains copyright info, social links, and additional navigation
 - **Main content area** - Where the unique content of each page lives
 - **Theme providers** - Manage global styling and preferences
-
 
 The `layout.tsx` file is used to define the global layout for the application. It includes the `Header`, `Footer`, and `BackToTop` components, as well as the `Providers` component to wrap the application in necessary context providers.
 
@@ -85,7 +87,6 @@ In this example, the `Layout` component includes a `Header`, `Footer`, and `Back
 
 You can also create nested layouts by defining multiple layout components and using them in different parts of your application. This allows for more complex structures, such as having a different layout for admin pages compared to public pages.
 
-
 #### Using Layouts Within Routes
 
 To use layouts with pages in Next.js, you can wrap your page components with the layout component. This allows you to apply the layout structure to multiple pages without duplicating code.
@@ -118,6 +119,7 @@ Here, each folder contains a `layout.tsx` file that defines the layout for that 
 ##### Understanding Nested Layouts
 
 When you have nested layouts, they work like Russian dolls - one inside the other:
+
 ```plaintext
 Global layout (outermost)
   Section-specific layout
@@ -130,6 +132,7 @@ Global layout (outermost)
 When using layouts, ensure that you do not create circular dependencies between layouts and pages. This can lead to unexpected behavior and errors in your application.
 
 Also make sure you do not have conflicting styles or components that might interfere with the layout structure. Always test your layouts across different pages to ensure consistency.
+
 </blockquote>
 
 <BackToTop />
@@ -139,7 +142,6 @@ Also make sure you do not have conflicting styles or components that might inter
 Components are reusable pieces of your website. Instead of writing the same code multiple times, you create a component once and use it everywhere. It's like having a blueprint for a door that you can use throughout your house.
 
 For example, if you have a button that appears on multiple pages, you create a `Button` component and reuse it rather than writing button code over and over.
-
 
 #### Understanding the Component Hierarchy
 
@@ -151,7 +153,6 @@ When you visit a page on your website, here's what happens:
 4. **Footer** appears at the bottom with additional links and info
 5. **BackToTop** floats as a button when you scroll down
 
-
 ### How Do You Make Pages?
 
 Pages in Next.js are defined as React components that export a default function. Each page corresponds to a route in your application, and the file structure determines the routing.
@@ -159,11 +160,13 @@ Pages in Next.js are defined as React components that export a default function.
 ##### Understanding Next.js Routing
 
 Next.js uses "file-based routing," which means:
+
 - The folder structure directly maps to your website's URLs
 - Each `page.tsx` file becomes a route that users can visit
 - Folders without `page.tsx` files don't create accessible routes
 
 ##### Examples
+
 - `src/app/portfolio-website/getting-set-up/page.tsx` <FaChevronRight className="inline h-3" /> `/portfolio-website/getting-set-up`
 - `src/app/about/page.tsx` <FaChevronRight className="inline h-3" /> `/about`
 - `src/app/contact/page.tsx` <FaChevronRight className="inline h-3" /> `/contact`
@@ -214,6 +217,7 @@ When building applications, it's often helpful to build from the smallest pieces
 The `Header` component is typically used to display the navigation menu and branding for your application. This will be stored in `src/components/Header.tsx`.
 
 ##### What Makes a Good Header
+
 - Clear navigation to important pages
 - Consistent branding (logo or site name)
 - Responsive design that works on mobile
@@ -275,6 +279,7 @@ export default function Header() {
 The `ToggleButton` component is used to toggle the theme of your application. This will be stored in `src/components/ToggleButton.tsx`. This component uses the `next-themes` package to manage the theme state.
 
 ##### Why Theme Switching Matters
+
 - Improves accessibility for users with visual sensitivities
 - Provides personal preference options
 - Reduces eye strain in different lighting conditions
@@ -287,7 +292,7 @@ import { SunIcon, MoonIcon } from "@heroicons/react/24/outline";
 
 export default function ToggleButton() {
   const { theme, setTheme } = useTheme();
-  
+
   return (
     <button
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -319,6 +324,7 @@ export default function ToggleButton() {
 The `Footer` component is typically used to display copyright information, links to social media, and other relevant information at the bottom of your application. This will be stored in `src/components/Footer.tsx`.
 
 ##### Footer Best Practices
+
 - Keep it simple and not too cluttered
 - Include essential links and contact information
 - Add copyright information
@@ -335,22 +341,22 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} Your Name. All rights reserved.
           </p>
           <div className="flex space-x-4">
-            <a 
-              href="#" 
+            <a
+              href="#"
               className="text-muted hover:text-secondary"
               aria-label="Visit our Facebook page"
             >
               Facebook
             </a>
-            <a 
-              href="#" 
+            <a
+              href="#"
               className="text-muted hover:text-secondary"
               aria-label="Follow us on Twitter"
             >
               Twitter
             </a>
-            <a 
-              href="#" 
+            <a
+              href="#"
               className="text-muted hover:text-secondary"
               aria-label="Connect with us on LinkedIn"
             >
@@ -365,6 +371,7 @@ export default function Footer() {
 ```
 
 ##### Understanding Dynamic Copyright
+
 - `new Date().getFullYear()` automatically updates the year
 - No need to manually change copyright dates
 - Always shows current year
@@ -383,9 +390,9 @@ import { ThemeProvider } from "next-themes";
 
 export default function Providers({ children }) {
   return (
-    <ThemeProvider 
-      attribute="class" 
-      defaultTheme="system" 
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
       enableSystem
       disableTransitionOnChange={false}
     >
@@ -396,6 +403,7 @@ export default function Providers({ children }) {
 ```
 
 ##### Provider Configuration Explained
+
 - **attribute="class"**: Applies theme by adding CSS classes to HTML elements
 - **defaultTheme="system"**: Respects user's operating system theme preference
 - **enableSystem**: Allows automatic theme switching based on system settings
@@ -408,6 +416,7 @@ export default function Providers({ children }) {
 The `BackToTop` component is used to provide a button that allows users to quickly scroll back to the top of the page. This will be stored in `src/components/BackToTop.tsx`.
 
 ##### Why Back to Top Buttons Matter
+
 - Improves user experience on long pages
 - Reduces scrolling fatigue
 - Provides quick navigation
@@ -429,15 +438,15 @@ export default function BackToTop() {
 
     // Add event listener when component mounts
     window.addEventListener("scroll", handleScroll);
-    
+
     // Clean up event listener when component unmounts
     return () => window.removeEventListener("scroll", handleScroll);
   }, []); // Empty dependency array means this runs once on mount
 
   const scrollToTop = () => {
-    window.scrollTo({ 
-      top: 0, 
-      behavior: "smooth" // Creates smooth scrolling animation
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth", // Creates smooth scrolling animation
     });
   };
 
@@ -513,6 +522,7 @@ You can create a new page by creating a new file in the `src/app/portfolio-websi
 ### Remember: This is Just the Beginning
 
 This portfolio website is your first step into web development. As you continue learning, you'll:
+
 - Add more interactive features
 - Integrate with APIs and databases
 - Implement advanced animations

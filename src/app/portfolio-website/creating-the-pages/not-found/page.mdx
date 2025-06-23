@@ -29,34 +29,1143 @@ Though all your routes are defined and your links are working correctly, it's st
 
 ## Examples
 
-### Basic Not Found Page
+### Example #1: Basic Not Found Page
 
-- Displays a simple message indicating that the page was not found.
-- Uses simple, understandable language to inform users of the issue.
-- Includes navigation options to help users find their way back to the main site.
-  <BackToTop />
+A clean and simple Not Found page that clearly communicates the error and provides navigation options.
 
-### Not-Found Page with Data Fetching
+```tsx
+import React from "react";
+import Link from "next/link";
 
-- If your application uses data fetching, you can still implement a Not Found page.
-- Ensure that the page is rendered correctly even when data fetching fails or returns no results.
-  <BackToTop />
+export default function BasicNotFound() {
+  return (
+    <div className="min-h-screen bg-white flex items-center justify-center px-6">
+      <div className="max-w-md w-full text-center">
+        {/* 404 Number */}
+        <div className="mb-8">
+          <h1 className="text-9xl font-bold text-slate-200 leading-none">404</h1>
+        </div>
 
-### Not-Found Page with Animated Elements
+        {/* Error Message */}
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">
+            Page Not Found
+          </h2>
+          <p className="text-lg text-slate-600 mb-6">
+            Sorry, the page you are looking for doesn't exist or has been moved.
+          </p>
+        </div>
 
-- You can enhance the user experience by adding animations or illustrations to the Not Found page.
-- This can make the page more engaging and less frustrating for users who land there by mistake.
-  <BackToTop />
+        {/* Navigation Options */}
+        <div className="space-y-4">
+          <Link
+            href="/"
+            className="inline-block w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+          >
+            Go Back Home
+          </Link>
+          
+          <button
+            onClick={() => window.history.back()}
+            className="inline-block w-full bg-slate-100 text-slate-700 px-6 py-3 rounded-lg hover:bg-slate-200 transition-colors font-semibold"
+          >
+            Go Back
+          </button>
+        </div>
 
-### Not-Found Page with Search Functionality
+        {/* Additional Help */}
+        <div className="mt-8 pt-6 border-t border-slate-200">
+          <p className="text-sm text-slate-500 mb-3">
+            If you believe this is an error, please contact us:
+          </p>
+          <a
+            href="mailto:support@example.com"
+            className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+          >
+            support@example.com
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
 
-- Consider adding a search bar to the Not Found page to help users find what they are looking for.
-- This can be particularly useful if your site has a lot of content or if users frequently land on the Not Found page due to typos or incorrect links.
-  <BackToTop />
+##### Customization Options
+- **Error messages**: Modify the heading and description text to match your brand tone
+- **Colors**: Update the color scheme to match your site's branding
+- **Navigation**: Add links to specific popular pages or sections
+- **Contact information**: Include your actual support email or contact form link
+- **Layout**: Adjust spacing and sizing for different screen sizes
 
-### Not-Found Page with Links to Popular Sections
+<BackToTop />
 
-- Include links to popular sections of your site or a sitemap to help users navigate.
-- This can help users find relevant content even if the specific page they were looking for does not exist.
+### Example #2: Not-Found Page with Data Fetching Error Handling
+
+A Not Found page that handles both routing errors and data fetching failures gracefully.
+
+```tsx
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+
+interface SuggestedPage {
+  title: string;
+  href: string;
+  description: string;
+}
+
+export default function NotFoundWithDataFetching() {
+  const [suggestedPages, setSuggestedPages] = useState<SuggestedPage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorType, setErrorType] = useState<'route' | 'data' | 'mixed'>('route');
+
+  useEffect(() => {
+    const fetchSuggestedPages = async () => {
+      try {
+        // Simulate API call to get suggested pages
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Simulate different error scenarios
+        const shouldSimulateDataError = Math.random() > 0.7;
+        
+        if (shouldSimulateDataError) {
+          throw new Error('Failed to load suggestions');
+        }
+
+        const mockSuggestions: SuggestedPage[] = [
+          {
+            title: "Home",
+            href: "/",
+            description: "Return to our homepage"
+          },
+          {
+            title: "About",
+            href: "/about",
+            description: "Learn more about us"
+          },
+          {
+            title: "Contact",
+            href: "/contact",
+            description: "Get in touch with our team"
+          },
+          {
+            title: "Portfolio",
+            href: "/portfolio",
+            description: "View our latest work"
+          }
+        ];
+
+        setSuggestedPages(mockSuggestions);
+        setErrorType('route');
+      } catch (error) {
+        console.error('Failed to fetch suggested pages:', error);
+        setErrorType('mixed');
+        // Provide fallback suggestions even when data fetching fails
+        setSuggestedPages([
+          {
+            title: "Home",
+            href: "/",
+            description: "Return to our homepage"
+          }
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSuggestedPages();
+  }, []);
+
+  const getErrorMessage = () => {
+    switch (errorType) {
+      case 'route':
+        return "The page you're looking for doesn't exist.";
+      case 'data':
+        return "We couldn't load the requested content.";
+      case 'mixed':
+        return "The page doesn't exist and we're having trouble loading suggestions.";
+      default:
+        return "Something went wrong.";
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center px-6">
+      <div className="max-w-2xl w-full">
+        {/* Error Display */}
+        <div className="text-center mb-12">
+          <div className="mb-6">
+            <span className="text-8xl">🔍</span>
+          </div>
+          <h1 className="text-4xl font-bold text-slate-900 mb-4">
+            Oops! Page Not Found
+          </h1>
+          <p className="text-xl text-slate-600 mb-2">
+            {getErrorMessage()}
+          </p>
+          {errorType === 'mixed' && (
+            <p className="text-sm text-orange-600 bg-orange-50 border border-orange-200 rounded-lg px-4 py-2 inline-block">
+              ⚠️ Some features may be temporarily unavailable
+            </p>
+          )}
+        </div>
+
+        {/* Suggested Pages */}
+        <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
+          <h2 className="text-2xl font-semibold text-slate-900 mb-6">
+            Where would you like to go?
+          </h2>
+          
+          {isLoading ? (
+            <div className="space-y-4">
+              {[...Array(3)].map((_, index) => (
+                <div key={index} className="animate-pulse">
+                  <div className="bg-slate-200 h-16 rounded-lg"></div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {suggestedPages.map((page, index) => (
+                <Link
+                  key={index}
+                  href={page.href}
+                  className="block p-4 border border-slate-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold text-slate-900 group-hover:text-blue-700">
+                        {page.title}
+                      </h3>
+                      <p className="text-sm text-slate-600">
+                        {page.description}
+                      </p>
+                    </div>
+                    <span className="text-slate-400 group-hover:text-blue-500">
+                      →
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Error Recovery Actions */}
+        <div className="bg-slate-100 rounded-xl p-6 text-center">
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">
+            Still can't find what you're looking for?
+          </h3>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+            >
+              Refresh Page
+            </button>
+            <Link
+              href="/contact"
+              className="bg-white text-slate-700 px-6 py-3 rounded-lg hover:bg-slate-50 transition-colors font-semibold border border-slate-300"
+            >
+              Contact Support
+            </Link>
+          </div>
+        </div>
+
+        {/* Technical Details (for development) */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <h4 className="text-sm font-semibold text-red-800 mb-2">
+              Development Info:
+            </h4>
+            <div className="text-xs text-red-700 space-y-1">
+              <p>Error Type: {errorType}</p>
+              <p>Suggested Pages Loaded: {suggestedPages.length}</p>
+              <p>Current URL: {typeof window !== 'undefined' ? window.location.href : 'SSR'}</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+##### Customization Options
+- **Data sources**: Replace mock data with actual API calls to get page suggestions
+- **Error handling**: Customize error messages and recovery actions based on your needs
+- **Loading states**: Adjust loading animations and skeleton screens
+- **Suggested pages**: Dynamically generate suggestions based on user behavior or site analytics
+- **Retry logic**: Add automatic retry mechanisms for failed data fetching
+
+<BackToTop />
+
+### Example #3: Animated Not Found Page
+
+An engaging Not Found page with animations and interactive elements to make the error experience more pleasant.
+
+```tsx
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+
+export default function AnimatedNotFound() {
+  const [isVisible, setIsVisible] = useState(false);
+  const [currentMessage, setCurrentMessage] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  const messages = [
+    "Looks like you found a secret path! 🗺️",
+    "This page is on vacation! 🏖️",
+    "We're still building this part! 🚧",
+    "You've discovered uncharted territory! 🧭"
+  ];
+
+  useEffect(() => {
+    setIsVisible(true);
+    
+    // Cycle through messages
+    const messageInterval = setInterval(() => {
+      setCurrentMessage((prev) => (prev + 1) % messages.length);
+    }, 3000);
+
+    return () => clearInterval(messageInterval);
+  }, []);
+
+  const handleEasterEgg = () => {
+    setShowConfetti(true);
+    setTimeout(() => setShowConfetti(false), 3000);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 overflow-hidden relative">
+      {/* Floating Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={i}
+            className={`absolute w-20 h-20 bg-blue-200 rounded-full opacity-20 animate-float`}
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${i * 0.5}s`,
+              animationDuration: `${3 + Math.random() * 2}s`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Confetti Effect */}
+      {showConfetti && (
+        <div className="absolute inset-0 pointer-events-none">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-3 h-3 bg-yellow-400 rounded-full animate-confetti"
+              style={{
+                left: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 0.5}s`
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      <div className="min-h-screen flex items-center justify-center px-6">
+        <div className={`max-w-lg w-full text-center transition-all duration-1000 transform ${
+          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+        }`}>
+          
+          {/* Animated 404 */}
+          <div className="mb-8 relative">
+            <h1 className="text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 animate-pulse">
+              4
+            </h1>
+            <div 
+              className="inline-block text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 animate-bounce cursor-pointer"
+              onClick={handleEasterEgg}
+              title="Click me for a surprise!"
+            >
+              0
+            </div>
+            <h1 className="inline-block text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 animate-pulse">
+              4
+            </h1>
+          </div>
+
+          {/* Animated Character */}
+          <div className="mb-8">
+            <div className="text-6xl animate-bounce">
+              🤖
+            </div>
+            <div className="mt-4 h-2 w-16 bg-blue-200 rounded-full mx-auto animate-pulse"></div>
+          </div>
+
+          {/* Dynamic Messages */}
+          <div className="mb-8 h-16 flex items-center justify-center">
+            <h2 className={`text-2xl font-bold text-slate-800 transition-all duration-500 transform ${
+              isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+            }`}>
+              {messages[currentMessage]}
+            </h2>
+          </div>
+
+          {/* Progress Bar Animation */}
+          <div className="mb-8">
+            <div className="bg-slate-200 rounded-full h-2 overflow-hidden">
+              <div className="bg-gradient-to-r from-purple-500 to-blue-500 h-full rounded-full animate-progress"></div>
+            </div>
+            <p className="text-sm text-slate-600 mt-2">
+              Redirecting your adventure...
+            </p>
+          </div>
+
+          {/* Interactive Navigation */}
+          <div className="space-y-4">
+            <Link
+              href="/"
+              className="inline-block w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 font-semibold shadow-lg"
+            >
+              🏠 Beam Me Home
+            </Link>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => window.history.back()}
+                className="bg-white text-slate-700 px-6 py-3 rounded-xl hover:bg-slate-50 transition-all duration-300 transform hover:scale-105 font-semibold shadow-md border border-slate-200"
+              >
+                ⬅️ Go Back
+              </button>
+              
+              <Link
+                href="/contact"
+                className="bg-white text-slate-700 px-6 py-3 rounded-xl hover:bg-slate-50 transition-all duration-300 transform hover:scale-105 font-semibold shadow-md border border-slate-200"
+              >
+                💬 Get Help
+              </Link>
+            </div>
+          </div>
+
+          {/* Fun Facts */}
+          <div className="mt-8 p-4 bg-white/70 backdrop-blur-sm rounded-xl border border-white/20">
+            <p className="text-sm text-slate-600 mb-2">
+              <span className="font-semibold">Fun Fact:</span> 404 errors got their name from room 404 at CERN, where the web was born! 🌐
+            </p>
+            <div className="flex items-center justify-center space-x-2 text-xs text-slate-500">
+              <span>Error Code: ADVENTURE_NOT_FOUND</span>
+              <span>•</span>
+              <span>Status: Having Fun</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Custom CSS for animations */}
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes confetti {
+          0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        @keyframes progress {
+          0% { transform: translateX(-100%); }
+          50% { transform: translateX(0%); }
+          100% { transform: translateX(100%); }
+        }
+        
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+        
+        .animate-confetti {
+          animation: confetti 2s ease-out forwards;
+        }
+        
+        .animate-progress {
+          animation: progress 3s ease-in-out infinite;
+        }
+      `}</style>
+    </div>
+  );
+}
+```
+
+##### Customization Options
+- **Animation timing**: Adjust animation durations and delays for different effects
+- **Color schemes**: Modify gradients and colors to match your brand
+- **Interactive elements**: Add more clickable easter eggs or hover effects
+- **Messages**: Customize the rotating messages to fit your brand personality
+- **Characters**: Replace the robot emoji with custom illustrations or animations
+
+<BackToTop />
+
+### Example #4: Not Found Page with Search Functionality
+
+A comprehensive Not Found page that includes search functionality to help users find what they're looking for.
+
+```tsx
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+
+interface SearchResult {
+  id: string;
+  title: string;
+  href: string;
+  description: string;
+  category: string;
+}
+
+export default function NotFoundWithSearch() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  // Mock search data - replace with your actual content
+  const mockContent: SearchResult[] = [
+    {
+      id: "1",
+      title: "About Us",
+      href: "/about",
+      description: "Learn more about our company and mission",
+      category: "Page"
+    },
+    {
+      id: "2",
+      title: "Contact Information",
+      href: "/contact",
+      description: "Get in touch with our team",
+      category: "Page"
+    },
+    {
+      id: "3",
+      title: "Portfolio Projects",
+      href: "/portfolio",
+      description: "View our latest work and case studies",
+      category: "Page"
+    },
+    {
+      id: "4",
+      title: "Web Development Services",
+      href: "/services/web-development",
+      description: "Professional web development solutions",
+      category: "Service"
+    },
+    {
+      id: "5",
+      title: "React Development Guide",
+      href: "/blog/react-guide",
+      description: "Complete guide to modern React development",
+      category: "Blog"
+    },
+    {
+      id: "6",
+      title: "UI/UX Design Process",
+      href: "/blog/design-process",
+      description: "Our approach to creating user-centered designs",
+      category: "Blog"
+    }
+  ];
+
+  const performSearch = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setHasSearched(false);
+      return;
+    }
+
+    setIsSearching(true);
+    setHasSearched(true);
+
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Filter mock content based on search query
+    const filtered = mockContent.filter(
+      item =>
+        item.title.toLowerCase().includes(query.toLowerCase()) ||
+        item.description.toLowerCase().includes(query.toLowerCase()) ||
+        item.category.toLowerCase().includes(query.toLowerCase())
+    );
+
+    setSearchResults(filtered);
+    setIsSearching(false);
+  };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      performSearch(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
+
+  const popularPages = [
+    { title: "Home", href: "/", icon: "🏠" },
+    { title: "About", href: "/about", icon: "👥" },
+    { title: "Portfolio", href: "/portfolio", icon: "💼" },
+    { title: "Contact", href: "/contact", icon: "📧" },
+    { title: "Blog", href: "/blog", icon: "📝" },
+    { title: "Services", href: "/services", icon: "⚡" }
+  ];
+
+  const getCategoryColor = (category: string) => {
+    const colors = {
+      'Page': 'bg-blue-100 text-blue-700',
+      'Service': 'bg-green-100 text-green-700',
+      'Blog': 'bg-purple-100 text-purple-700'
+    };
+    return colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-700';
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm">
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-slate-900 mb-4">
+              Page Not Found
+            </h1>
+            <p className="text-lg text-slate-600">
+              Don't worry! Let's help you find what you're looking for.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-6 py-12">
+        {/* Search Section */}
+        <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
+          <div className="text-center mb-6">
+            <div className="text-4xl mb-4">🔍</div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">
+              Search Our Site
+            </h2>
+            <p className="text-slate-600">
+              Try searching for what you need
+            </p>
+          </div>
+
+          {/* Search Input */}
+          <div className="relative mb-6">
+            <input
+              type="text"
+              placeholder="Search for pages, posts, or topics..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-6 py-4 text-lg border-2 border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+            />
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+              {isSearching ? (
+                <div className="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+              ) : (
+                <span className="text-slate-400 text-xl">🔍</span>
+              )}
+            </div>
+          </div>
+
+          {/* Search Results */}
+          {hasSearched && (
+            <div>
+              {searchResults.length > 0 ? (
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                    Search Results ({searchResults.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {searchResults.map((result) => (
+                      <Link
+                        key={result.id}
+                        href={result.href}
+                        className="block p-4 border border-slate-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3 mb-2">
+                              <h4 className="font-semibold text-slate-900 group-hover:text-blue-700">
+                                {result.title}
+                              </h4>
+                              <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(result.category)}`}>
+                                {result.category}
+                              </span>
+                            </div>
+                            <p className="text-sm text-slate-600">
+                              {result.description}
+                            </p>
+                          </div>
+                          <span className="text-slate-400 group-hover:text-blue-500 ml-4">
+                            →
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <div className="text-4xl mb-4">😔</div>
+                  <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                    No results found
+                  </h3>
+                  <p className="text-slate-600">
+                    Try adjusting your search terms or browse our popular pages below
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Popular Pages */}
+        <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
+          <h2 className="text-2xl font-bold text-slate-900 mb-6">
+            Popular Pages
+          </h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {popularPages.map((page, index) => (
+              <Link
+                key={index}
+                href={page.href}
+                className="flex items-center space-x-3 p-4 border border-slate-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors group"
+              >
+                <span className="text-2xl">{page.icon}</span>
+                <span className="font-medium text-slate-900 group-hover:text-blue-700">
+                  {page.title}
+                </span>
+                <span className="text-slate-400 group-hover:text-blue-500 ml-auto">
+                  →
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Help Section */}
+        <div className="bg-blue-50 rounded-xl border border-blue-200 p-8 text-center">
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">
+            Still Need Help?
+          </h2>
+          <p className="text-slate-600 mb-6">
+            If you can't find what you're looking for, our team is here to help.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/contact"
+              className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+            >
+              Contact Support
+            </Link>
+            <Link
+              href="/"
+              className="bg-white text-slate-700 px-8 py-3 rounded-lg hover:bg-slate-50 transition-colors font-semibold border border-slate-300"
+            >
+              Go to Homepage
+            </Link>
+          </div>
+        </div>
+
+        {/* SEO and Error Info */}
+        <div className="mt-8 text-center">
+          <p className="text-sm text-slate-500">
+            Error 404 - Page not found | 
+            <Link href="/sitemap" className="text-blue-600 hover:text-blue-700 ml-1">
+              View Sitemap
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+##### Customization Options
+- **Search implementation**: Replace mock search with real search API or static site search
+- **Content indexing**: Connect to your CMS or build a search index of your content
+- **Search filters**: Add category filters or advanced search options
+- **Popular pages**: Update with actual popular pages from analytics
+- **Styling**: Customize colors and layout to match your design system
+
+<BackToTop />
+
+### Example #5: Not Found Page with Sitemap and Popular Sections
+
+A comprehensive Not Found page that includes a sitemap view and links to popular sections to help users navigate effectively.
+
+```tsx
+import React, { useState } from "react";
+import Link from "next/link";
+
+interface SiteSection {
+  title: string;
+  href: string;
+  icon: string;
+  description: string;
+  subsections?: Array<{
+    title: string;
+    href: string;
+    description: string;
+  }>;
+}
+
+export default function NotFoundWithSitemap() {
+  const [expandedSection, setExpandedSection] = useState<string | null>(null);
+
+  const siteStructure: SiteSection[] = [
+    {
+      title: "Home",
+      href: "/",
+      icon: "🏠",
+      description: "Welcome to our website - your starting point for everything we offer",
+      subsections: [
+        {
+          title: "Featured Projects",
+          href: "/#featured",
+          description: "Showcase of our best work"
+        },
+        {
+          title: "Services Overview",
+          href: "/#services",
+          description: "Quick look at what we do"
+        }
+      ]
+    },
+    {
+      title: "About",
+      href: "/about",
+      icon: "👥",
+      description: "Learn about our team, mission, and company story",
+      subsections: [
+        {
+          title: "Our Story",
+          href: "/about#story",
+          description: "How we started and where we're going"
+        },
+        {
+          title: "Team Members",
+          href: "/about#team",
+          description: "Meet the people behind the work"
+        },
+        {
+          title: "Values & Mission",
+          href: "/about#mission",
+          description: "What drives us every day"
+        }
+      ]
+    },
+    {
+      title: "Portfolio",
+      href: "/portfolio",
+      icon: "💼",
+      description: "Explore our work and see what we can create for you",
+      subsections: [
+        {
+          title: "Web Development",
+          href: "/portfolio/web-development",
+          description: "Custom websites and web applications"
+        },
+        {
+          title: "Mobile Apps",
+          href: "/portfolio/mobile-apps",
+          description: "iOS and Android app development"
+        },
+        {
+          title: "UI/UX Design",
+          href: "/portfolio/design",
+          description: "User interface and experience design"
+        }
+      ]
+    },
+    {
+      title: "Services",
+      href: "/services",
+      icon: "⚡",
+      description: "Comprehensive solutions for all your digital needs",
+      subsections: [
+        {
+          title: "Web Development",
+          href: "/services/web-development",
+          description: "Full-stack web development services"
+        },
+        {
+          title: "Consulting",
+          href: "/services/consulting",
+          description: "Technical consulting and strategy"
+        },
+        {
+          title: "Maintenance",
+          href: "/services/maintenance",
+          description: "Ongoing support and updates"
+        }
+      ]
+    },
+    {
+      title: "Blog",
+      href: "/blog",
+      icon: "📝",
+      description: "Insights, tutorials, and industry news",
+      subsections: [
+        {
+          title: "Latest Posts",
+          href: "/blog/latest",
+          description: "Most recent articles and updates"
+        },
+        {
+          title: "Tutorials",
+          href: "/blog/tutorials",
+          description: "Step-by-step guides and how-tos"
+        },
+        {
+          title: "Industry News",
+          href: "/blog/news",
+          description: "Latest trends and developments"
+        }
+      ]
+    },
+    {
+      title: "Contact",
+      href: "/contact",
+      icon: "📧",
+      description: "Get in touch with us for projects and inquiries",
+      subsections: [
+        {
+          title: "Contact Form",
+          href: "/contact#form",
+          description: "Send us a message directly"
+        },
+        {
+          title: "Office Locations",
+          href: "/contact#locations",
+          description: "Find us in person"
+        },
+        {
+          title: "Phone & Email",
+          href: "/contact#direct",
+          description: "Direct contact information"
+        }
+      ]
+    }
+  ];
+
+  const popularLinks = [
+    { title: "Latest Project", href: "/portfolio/latest", views: "1.2k", icon: "🌟" },
+    { title: "Getting Started Guide", href: "/blog/getting-started", views: "856", icon: "📚" },
+    { title: "Pricing Information", href: "/services/pricing", views: "743", icon: "💰" },
+    { title: "FAQ", href: "/support/faq", views: "692", icon: "❓" },
+    { title: "Free Consultation", href: "/contact/consultation", views: "634", icon: "💬" }
+  ];
+
+  const toggleSection = (sectionTitle: string) => {
+    setExpandedSection(expandedSection === sectionTitle ? null : sectionTitle);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <div className="bg-white border-b">
+        <div className="max-w-6xl mx-auto px-6 py-16 text-center">
+          <div className="mb-8">
+            <span className="text-8xl">🗺️</span>
+          </div>
+          <h1 className="text-4xl font-bold text-slate-900 mb-4">
+            Let's Find Your Way
+          </h1>
+          <p className="text-xl text-slate-600 mb-8">
+            The page you're looking for doesn't exist, but we can help you discover everything else we have to offer.
+          </p>
+          <Link
+            href="/"
+            className="inline-block bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-lg"
+          >
+            Take Me Home
+          </Link>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        <div className="grid lg:grid-cols-3 gap-8">
+          
+          {/* Site Map */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl shadow-lg p-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center">
+                <span className="mr-3">🗂️</span>
+                Site Map
+              </h2>
+              <p className="text-slate-600 mb-8">
+                Explore all sections of our website to find exactly what you need.
+              </p>
+
+              <div className="space-y-4">
+                {siteStructure.map((section) => (
+                  <div key={section.title} className="border border-slate-200 rounded-lg overflow-hidden">
+                    {/* Main Section */}
+                    <div
+                      className="p-4 hover:bg-slate-50 cursor-pointer transition-colors"
+                      onClick={() => toggleSection(section.title)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <Link
+                          href={section.href}
+                          className="flex items-center space-x-3 flex-1 group"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <span className="text-2xl">{section.icon}</span>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-slate-900 group-hover:text-blue-600">
+                              {section.title}
+                            </h3>
+                            <p className="text-sm text-slate-600">
+                              {section.description}
+                            </p>
+                          </div>
+                        </Link>
+                        {section.subsections && (
+                          <button
+                            className="p-2 text-slate-400 hover:text-slate-600"
+                            onClick={() => toggleSection(section.title)}
+                          >
+                            <span className={`transform transition-transform ${
+                              expandedSection === section.title ? 'rotate-180' : ''
+                            }`}>
+                              ▼
+                            </span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Subsections */}
+                    {section.subsections && expandedSection === section.title && (
+                      <div className="bg-slate-50 border-t border-slate-200">
+                        {section.subsections.map((subsection, index) => (
+                          <Link
+                            key={index}
+                            href={subsection.href}
+                            className="block p-4 pl-16 hover:bg-white transition-colors group border-b border-slate-100 last:border-b-0"
+                          >
+                            <h4 className="font-medium text-slate-800 group-hover:text-blue-600">
+                              {subsection.title}
+                            </h4>
+                            <p className="text-sm text-slate-600">
+                              {subsection.description}
+                            </p>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-8">
+            
+            {/* Popular Pages */}
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center">
+                <span className="mr-2">🔥</span>
+                Popular Pages
+              </h3>
+              <div className="space-y-3">
+                {popularLinks.map((link, index) => (
+                  <Link
+                    key={index}
+                    href={link.href}
+                    className="block p-3 rounded-lg hover:bg-blue-50 transition-colors group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-lg">{link.icon}</span>
+                        <div>
+                          <h4 className="font-medium text-slate-900 group-hover:text-blue-600">
+                            {link.title}
+                          </h4>
+                          <p className="text-xs text-slate-500">
+                            {link.views} views
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-slate-400 group-hover:text-blue-500">
+                        →
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="bg-blue-50 rounded-xl border border-blue-200 p-6">
+              <h3 className="text-lg font-bold text-slate-900 mb-4">
+                Quick Actions
+              </h3>
+              <div className="space-y-3">
+                <Link
+                  href="/contact"
+                  className="block w-full bg-blue-600 text-white text-center py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                >
+                  Get in Touch
+                </Link>
+                <Link
+                  href="/portfolio"
+                  className="block w-full bg-white text-slate-700 text-center py-3 rounded-lg hover:bg-slate-50 transition-colors font-semibold border border-slate-300"
+                >
+                  View Our Work
+                </Link>
+                <button
+                  onClick={() => window.history.back()}
+                  className="block w-full bg-slate-100 text-slate-700 text-center py-3 rounded-lg hover:bg-slate-200 transition-colors font-semibold"
+                >
+                  Go Back
+                </button>
+              </div>
+            </div>
+
+            {/* Support Info */}
+            <div className="bg-green-50 rounded-xl border border-green-200 p-6">
+              <h3 className="text-lg font-bold text-slate-900 mb-3">
+                Need Help?
+              </h3>
+              <p className="text-sm text-slate-600 mb-4">
+                Can't find what you're looking for? Our support team is here to help.
+              </p>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center space-x-2">
+                  <span>📧</span>
+                  <a href="mailto:support@example.com" className="text-blue-600 hover:text-blue-700">
+                    support@example.com
+                  </a>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span>💬</span>
+                  <Link href="/support/chat" className="text-blue-600 hover:text-blue-700">
+                    Live Chat Support
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+##### Customization Options
+- **Site structure**: Update the siteStructure array to match your actual site organization
+- **Popular pages**: Replace with real analytics data to show actually popular content
+- **Subsection management**: Add/remove subsections based on your site's depth
+- **Contact information**: Update support email and chat links with your actual contact details
+- **Analytics integration**: Connect to Google Analytics or similar to show real view counts
+- **Search integration**: Add a search bar that works with the sitemap structure
 
 <BackToTop />

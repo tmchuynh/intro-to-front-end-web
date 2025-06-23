@@ -34,33 +34,1610 @@ Keep in mind that this page is part of a larger portfolio website, and it is des
 
 ## Examples
 
-### Minimalist Contact Form with Basic Validation
+### Example #1: Minimalist Contact Form with Basic Validation
 
-- A simple contact form with basic styling and validation.
-- This example focuses on the essential fields and functionality without additional features.
-  <BackToTop />
+A simple contact form with clean styling and essential validation.
 
-### Using Consent Checkboxes and Privacy Policies
+```tsx
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 
-- A contact form that includes a checkbox for user consent.
-- This example demonstrates how to add a checkbox for users to agree to terms or privacy policies before submitting the form.
-  <BackToTop />
+interface ContactFormData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
 
-### Incorporating Integrating Maps
+export default function MinimalistContact() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-- A contact page that includes an embedded map to show the location.
-- This example demonstrates how to integrate a map service to provide users with location information.
-  <BackToTop />
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset
+  } = useForm<ContactFormData>();
 
-### Using Custom Input Fields, Validation, Error Handling, and Success Messages
+  const onSubmit = async (data: ContactFormData) => {
+    setIsSubmitting(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('Form submitted:', data);
+      setSubmitStatus('success');
+      reset();
+    } catch (error) {
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
-- A contact form that uses custom input fields for better styling.
-- This example includes validation, error handling, and success messages to enhance the user experience.
-  <BackToTop />
+  return (
+    <div className="min-h-screen bg-white py-16">
+      <div className="max-w-2xl mx-auto px-6">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-light text-gray-900 mb-4">Get In Touch</h1>
+          <p className="text-gray-600 leading-relaxed">
+            I'd love to hear from you. Send me a message and I'll get back to you as soon as possible.
+          </p>
+        </div>
 
-### Supporting Multiple Languages (i18n)
+        {submitStatus === 'success' && (
+          <div className="mb-8 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-green-700">Thank you for your message! I'll get back to you soon.</p>
+          </div>
+        )}
 
-- A contact page that supports multiple languages using i18n.
-- This example demonstrates how to implement internationalization for the contact form, allowing users to switch languages easily.
+        {submitStatus === 'error' && (
+          <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-700">Something went wrong. Please try again later.</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+              Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              {...register("name", { required: "Name is required" })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+              placeholder="Your full name"
+            />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: "Invalid email address"
+                }
+              })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+              placeholder="your.email@example.com"
+            />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+              Subject
+            </label>
+            <input
+              type="text"
+              id="subject"
+              {...register("subject", { required: "Subject is required" })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+              placeholder="What's this about?"
+            />
+            {errors.subject && (
+              <p className="mt-1 text-sm text-red-600">{errors.subject.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+              Message
+            </label>
+            <textarea
+              id="message"
+              rows={6}
+              {...register("message", { required: "Message is required" })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent resize-none"
+              placeholder="Tell me about your project or just say hello..."
+            />
+            {errors.message && (
+              <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-gray-900 text-white py-3 px-6 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? "Sending..." : "Send Message"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+```
+
+##### Customization Options
+- **Colors**: Replace gray theme with your brand colors
+- **Typography**: Adjust font weights and sizes to match your style
+- **Input styling**: Modify border styles, padding, and focus states
+- **Button design**: Change background colors and hover effects
+- **Spacing**: Adjust margins and padding for different layouts
+- **Success/error messages**: Customize messaging and styling
+
+<BackToTop />
+
+### Example #2: Contact Form with Consent Checkboxes and Privacy Policies
+
+A comprehensive contact form with privacy consent and terms agreement.
+
+```tsx
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import Link from "next/link";
+
+interface ContactFormData {
+  name: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  subject: string;
+  message: string;
+  privacyConsent: boolean;
+  marketingConsent: boolean;
+}
+
+export default function ConsentContactForm() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    watch
+  } = useForm<ContactFormData>();
+
+  const privacyConsent = watch('privacyConsent');
+
+  const onSubmit = async (data: ContactFormData) => {
+    setIsSubmitting(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log('Form submitted with consent:', data);
+      setSubmitStatus('success');
+      reset();
+    } catch (error) {
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-16">
+      <div className="max-w-3xl mx-auto px-6">
+        <div className="bg-white rounded-xl shadow-sm p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-slate-900 mb-4">Contact Us</h1>
+            <p className="text-slate-600">
+              We're here to help! Fill out the form below and we'll get back to you promptly.
+            </p>
+          </div>
+
+          {submitStatus === 'success' && (
+            <div className="mb-8 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center">
+                <span className="text-green-500 mr-2">✓</span>
+                <p className="text-green-700">
+                  Your message has been sent successfully! We'll respond within 24 hours.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {submitStatus === 'error' && (
+            <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-center">
+                <span className="text-red-500 mr-2">✗</span>
+                <p className="text-red-700">
+                  There was an error sending your message. Please try again.
+                </p>
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  {...register("name", { required: "Full name is required" })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="John Doe"
+                />
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Please enter a valid email address"
+                    }
+                  })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="john@example.com"
+                />
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="phone" className="block text-sm font-semibold text-slate-700 mb-2">
+                  Phone Number (Optional)
+                </label>
+                <input
+                  type="tel"
+                  id="phone"
+                  {...register("phone")}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="+1 (555) 123-4567"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="company" className="block text-sm font-semibold text-slate-700 mb-2">
+                  Company (Optional)
+                </label>
+                <input
+                  type="text"
+                  id="company"
+                  {...register("company")}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Your Company"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="subject" className="block text-sm font-semibold text-slate-700 mb-2">
+                Subject *
+              </label>
+              <select
+                id="subject"
+                {...register("subject", { required: "Please select a subject" })}
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="">Select a subject</option>
+                <option value="general">General Inquiry</option>
+                <option value="project">New Project</option>
+                <option value="collaboration">Collaboration</option>
+                <option value="support">Support</option>
+                <option value="other">Other</option>
+              </select>
+              {errors.subject && (
+                <p className="mt-1 text-sm text-red-600">{errors.subject.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="message" className="block text-sm font-semibold text-slate-700 mb-2">
+                Message *
+              </label>
+              <textarea
+                id="message"
+                rows={6}
+                {...register("message", { 
+                  required: "Message is required",
+                  minLength: {
+                    value: 10,
+                    message: "Message must be at least 10 characters long"
+                  }
+                })}
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                placeholder="Tell us about your project, ask a question, or just say hello..."
+              />
+              {errors.message && (
+                <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
+              )}
+            </div>
+
+            {/* Privacy and Consent Section */}
+            <div className="border-t border-slate-200 pt-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Privacy & Consent</h3>
+              
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <input
+                    type="checkbox"
+                    id="privacyConsent"
+                    {...register("privacyConsent", { required: "You must agree to the privacy policy" })}
+                    className="mt-1 w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                  />
+                  <label htmlFor="privacyConsent" className="ml-3 text-sm text-slate-700">
+                    I agree to the{" "}
+                    <Link href="/privacy-policy" className="text-blue-600 hover:text-blue-800 underline">
+                      Privacy Policy
+                    </Link>{" "}
+                    and consent to the processing of my personal data for the purpose of responding to my inquiry. *
+                  </label>
+                </div>
+                {errors.privacyConsent && (
+                  <p className="ml-7 text-sm text-red-600">{errors.privacyConsent.message}</p>
+                )}
+
+                <div className="flex items-start">
+                  <input
+                    type="checkbox"
+                    id="marketingConsent"
+                    {...register("marketingConsent")}
+                    className="mt-1 w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                  />
+                  <label htmlFor="marketingConsent" className="ml-3 text-sm text-slate-700">
+                    I would like to receive occasional updates about new projects, blog posts, and other relevant content. 
+                    You can unsubscribe at any time.
+                  </label>
+                </div>
+              </div>
+
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                <p className="text-xs text-slate-600">
+                  <strong>Data Protection:</strong> Your personal information will be stored securely and used only 
+                  for the purposes stated above. We will never sell or share your data with third parties without 
+                  your explicit consent.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <button
+                type="submit"
+                disabled={isSubmitting || !privacyConsent}
+                className="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Sending Message...
+                  </span>
+                ) : (
+                  "Send Message"
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => reset()}
+                className="px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-semibold"
+              >
+                Clear Form
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+##### Customization Options
+- **Consent requirements**: Modify required vs optional checkboxes
+- **Privacy policy links**: Update links to your actual privacy policy
+- **Subject options**: Customize dropdown options for your business
+- **Data protection notice**: Update text to match your privacy practices
+- **Form fields**: Add or remove optional fields as needed
+- **Color scheme**: Change blue accents to match your brand
+
+<BackToTop />
+
+### Example #3: Contact Form with Integrated Map
+
+A contact page that includes an embedded map to show location and multiple contact methods.
+
+```tsx
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+
+interface ContactFormData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  preferredContact: 'email' | 'phone' | 'meeting';
+}
+
+export default function ContactWithMap() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset
+  } = useForm<ContactFormData>();
+
+  const onSubmit = async (data: ContactFormData) => {
+    setIsSubmitting(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      console.log('Form submitted:', data);
+      setSubmitStatus('success');
+      reset();
+    } catch (error) {
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header Section */}
+      <div className="bg-slate-900 text-white py-16">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <h1 className="text-4xl font-bold mb-4">Get In Touch</h1>
+          <p className="text-xl text-slate-300">
+            Ready to start your project? Let's discuss how we can work together.
+          </p>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-16">
+        <div className="grid lg:grid-cols-2 gap-12">
+          {/* Contact Form */}
+          <div className="bg-white rounded-xl shadow-lg p-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Send a Message</h2>
+
+            {submitStatus === 'success' && (
+              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center">
+                  <span className="text-green-500 text-xl mr-3">✓</span>
+                  <div>
+                    <p className="text-green-700 font-semibold">Message sent successfully!</p>
+                    <p className="text-green-600 text-sm">I'll get back to you within 24 hours.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {submitStatus === 'error' && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center">
+                  <span className="text-red-500 text-xl mr-3">✗</span>
+                  <p className="text-red-700">Failed to send message. Please try again.</p>
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div>
+                <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  {...register("name", { required: "Name is required" })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Your full name"
+                />
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address"
+                    }
+                  })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="your.email@example.com"
+                />
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="subject" className="block text-sm font-semibold text-slate-700 mb-2">
+                  Subject
+                </label>
+                <select
+                  id="subject"
+                  {...register("subject", { required: "Please select a subject" })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Choose a subject</option>
+                  <option value="web-development">Web Development</option>
+                  <option value="consultation">Consultation</option>
+                  <option value="collaboration">Collaboration</option>
+                  <option value="general">General Inquiry</option>
+                </select>
+                {errors.subject && (
+                  <p className="mt-1 text-sm text-red-600">{errors.subject.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-3">
+                  Preferred Contact Method
+                </label>
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { value: 'email', label: 'Email', icon: '📧' },
+                    { value: 'phone', label: 'Phone', icon: '📞' },
+                    { value: 'meeting', label: 'Video Call', icon: '💻' }
+                  ].map((option) => (
+                    <label key={option.value} className="flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        value={option.value}
+                        {...register("preferredContact", { required: "Please select a contact method" })}
+                        className="sr-only"
+                      />
+                      <div className="flex-1 text-center p-3 border-2 border-slate-200 rounded-lg hover:border-blue-300 transition-colors peer-checked:border-blue-500 peer-checked:bg-blue-50">
+                        <div className="text-2xl mb-1">{option.icon}</div>
+                        <div className="text-sm font-medium text-slate-700">{option.label}</div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+                {errors.preferredContact && (
+                  <p className="mt-2 text-sm text-red-600">{errors.preferredContact.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="message" className="block text-sm font-semibold text-slate-700 mb-2">
+                  Message
+                </label>
+                <textarea
+                  id="message"
+                  rows={5}
+                  {...register("message", { required: "Message is required" })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  placeholder="Tell me about your project..."
+                />
+                {errors.message && (
+                  <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+              >
+                {isSubmitting ? "Sending..." : "Send Message"}
+              </button>
+            </form>
+          </div>
+
+          {/* Contact Information & Map */}
+          <div className="space-y-8">
+            {/* Contact Info Cards */}
+            <div className="grid gap-6">
+              <div className="bg-white p-6 rounded-xl shadow-lg">
+                <div className="flex items-start">
+                  <div className="bg-blue-100 p-3 rounded-lg mr-4">
+                    <span className="text-2xl">📍</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-1">Office Location</h3>
+                    <p className="text-slate-600">
+                      123 Business Street<br />
+                      San Francisco, CA 94105<br />
+                      United States
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-xl shadow-lg">
+                <div className="flex items-start">
+                  <div className="bg-green-100 p-3 rounded-lg mr-4">
+                    <span className="text-2xl">📧</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-1">Email</h3>
+                    <p className="text-slate-600">hello@example.com</p>
+                    <p className="text-slate-500 text-sm mt-1">Response within 24 hours</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-xl shadow-lg">
+                <div className="flex items-start">
+                  <div className="bg-purple-100 p-3 rounded-lg mr-4">
+                    <span className="text-2xl">📞</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-1">Phone</h3>
+                    <p className="text-slate-600">+1 (555) 123-4567</p>
+                    <p className="text-slate-500 text-sm mt-1">Mon-Fri, 9AM-6PM PST</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Map Container */}
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              <div className="h-80 bg-slate-100 relative">
+                {/* Placeholder for map - Replace with actual map integration */}
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">🗺️</div>
+                    <h3 className="text-xl font-semibold text-slate-700 mb-2">Interactive Map</h3>
+                    <p className="text-slate-500">
+                      Integrate with Google Maps, Mapbox, or OpenStreetMap
+                    </p>
+                  </div>
+                </div>
+                {/* Example Google Maps iframe (replace with your actual location) */}
+                {/* 
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.0154...your-map-embed-url"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+                */}
+              </div>
+              <div className="p-4 bg-slate-50">
+                <p className="text-sm text-slate-600 text-center">
+                  📍 Click to view directions and nearby landmarks
+                </p>
+              </div>
+            </div>
+
+            {/* Business Hours */}
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Business Hours</h3>
+              <div className="space-y-2">
+                {[
+                  { day: 'Monday - Friday', hours: '9:00 AM - 6:00 PM' },
+                  { day: 'Saturday', hours: '10:00 AM - 4:00 PM' },
+                  { day: 'Sunday', hours: 'Closed' }
+                ].map((schedule, index) => (
+                  <div key={index} className="flex justify-between">
+                    <span className="text-slate-600">{schedule.day}</span>
+                    <span className="text-slate-900 font-medium">{schedule.hours}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+##### Customization Options
+- **Map integration**: Replace placeholder with Google Maps, Mapbox, or OpenStreetMap
+- **Contact information**: Update with your actual address, phone, and email
+- **Business hours**: Modify schedule to match your availability
+- **Location details**: Add specific directions or landmarks
+- **Contact methods**: Customize the preferred contact options
+- **Color scheme**: Adjust colors to match your brand
+
+<BackToTop />
+
+### Example #4: Advanced Contact Form with Custom Validation
+
+A sophisticated contact form with multi-step validation, custom input components, and enhanced user experience.
+
+```tsx
+import React, { useState, useRef } from "react";
+import { useForm, Controller } from "react-hook-form";
+
+interface ContactFormData {
+  name: string;
+  email: string;
+  company?: string;
+  phone: string;
+  projectType: string;
+  budget: string;
+  timeline: string;
+  description: string;
+  attachments?: FileList;
+  newsletter: boolean;
+}
+
+interface CustomInputProps {
+  label: string;
+  error?: string;
+  required?: boolean;
+  children: React.ReactNode;
+}
+
+const CustomInput: React.FC<CustomInputProps> = ({ label, error, required, children }) => (
+  <div className="space-y-2">
+    <label className="block text-sm font-semibold text-slate-700">
+      {label}
+      {required && <span className="text-red-500 ml-1">*</span>}
+    </label>
+    {children}
+    {error && (
+      <div className="flex items-center space-x-2">
+        <span className="text-red-500 text-sm">⚠</span>
+        <p className="text-red-600 text-sm">{error}</p>
+      </div>
+    )}
+  </div>
+);
+
+const PhoneInput: React.FC<{
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+}> = ({ value, onChange, error }) => {
+  const formatPhoneNumber = (phone: string) => {
+    const cleaned = phone.replace(/\D/g, '');
+    const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+    if (match) {
+      return `(${match[1]}) ${match[2]}-${match[3]}`;
+    }
+    return phone;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    onChange(formatted);
+  };
+
+  return (
+    <input
+      type="tel"
+      value={value}
+      onChange={handleChange}
+      placeholder="(555) 123-4567"
+      className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${
+        error
+          ? 'border-red-300 focus:border-red-500'
+          : 'border-slate-300 focus:border-blue-500'
+      }`}
+    />
+  );
+};
+
+export default function AdvancedContactForm() {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors, isValid },
+    watch,
+    trigger
+  } = useForm<ContactFormData>({
+    mode: 'onChange',
+    defaultValues: {
+      newsletter: false
+    }
+  });
+
+  const watchedFields = watch();
+
+  const steps = [
+    { number: 1, title: 'Personal Info', fields: ['name', 'email', 'company', 'phone'] },
+    { number: 2, title: 'Project Details', fields: ['projectType', 'budget', 'timeline'] },
+    { number: 3, title: 'Description', fields: ['description', 'attachments'] }
+  ];
+
+  const nextStep = async () => {
+    const fieldsToValidate = steps[currentStep - 1].fields;
+    const isStepValid = await trigger(fieldsToValidate as any);
+    
+    if (isStepValid && currentStep < steps.length) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const onSubmit = async (data: ContactFormData) => {
+    setIsSubmitting(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('Advanced form submitted:', data);
+      setSubmitStatus('success');
+    } catch (error) {
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const getStepCompletion = (stepNumber: number) => {
+    const stepFields = steps[stepNumber - 1].fields;
+    const completedFields = stepFields.filter(field => {
+      const value = watchedFields[field as keyof ContactFormData];
+      return value && value !== '';
+    });
+    return (completedFields.length / stepFields.length) * 100;
+  };
+
+  if (submitStatus === 'success') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-6">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-4xl">✅</span>
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">Message Sent Successfully!</h2>
+          <p className="text-slate-600 mb-6">
+            Thank you for reaching out. I'll review your project details and get back to you within 24 hours.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Send Another Message
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12">
+      <div className="max-w-4xl mx-auto px-6">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-slate-900 mb-4">Start Your Project</h1>
+          <p className="text-xl text-slate-600">
+            Tell us about your vision and let's bring it to life
+          </p>
+        </div>
+
+        {/* Progress Steps */}
+        <div className="mb-12">
+          <div className="flex justify-between items-center">
+            {steps.map((step, index) => {
+              const isActive = currentStep === step.number;
+              const isCompleted = currentStep > step.number;
+              const completion = getStepCompletion(step.number);
+              
+              return (
+                <div key={step.number} className="flex-1">
+                  <div className="flex items-center">
+                    <div className="relative">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${
+                        isCompleted 
+                          ? 'bg-green-500 border-green-500 text-white' 
+                          : isActive 
+                          ? 'bg-blue-500 border-blue-500 text-white' 
+                          : 'bg-white border-slate-300 text-slate-400'
+                      }`}>
+                        {isCompleted ? '✓' : step.number}
+                      </div>
+                      {isActive && (
+                        <div className="absolute -bottom-1 left-0 w-full bg-blue-200 h-1 rounded-full">
+                          <div 
+                            className="bg-blue-500 h-full rounded-full transition-all duration-300"
+                            style={{ width: `${completion}%` }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    {index < steps.length - 1 && (
+                      <div className={`flex-1 h-0.5 mx-4 ${
+                        isCompleted ? 'bg-green-500' : 'bg-slate-300'
+                      }`} />
+                    )}
+                  </div>
+                  <div className="text-center mt-3">
+                    <p className={`text-sm font-medium ${
+                      isActive ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-slate-400'
+                    }`}>
+                      {step.title}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Form */}
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          <form onSubmit={handleSubmit(onSubmit)}>
+            {/* Step 1: Personal Information */}
+            {currentStep === 1 && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">Personal Information</h2>
+                
+                <div className="grid md:grid-cols-2 gap-6">
+                  <CustomInput label="Full Name" error={errors.name?.message} required>
+                    <input
+                      type="text"
+                      {...register("name", { required: "Name is required" })}
+                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
+                      placeholder="John Doe"
+                    />
+                  </CustomInput>
+
+                  <CustomInput label="Email Address" error={errors.email?.message} required>
+                    <input
+                      type="email"
+                      {...register("email", {
+                        required: "Email is required",
+                        pattern: {
+                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                          message: "Invalid email address"
+                        }
+                      })}
+                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
+                      placeholder="john@example.com"
+                    />
+                  </CustomInput>
+
+                  <CustomInput label="Company" error={errors.company?.message}>
+                    <input
+                      type="text"
+                      {...register("company")}
+                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
+                      placeholder="Your Company (Optional)"
+                    />
+                  </CustomInput>
+
+                  <CustomInput label="Phone Number" error={errors.phone?.message} required>
+                    <Controller
+                      name="phone"
+                      control={control}
+                      rules={{ required: "Phone number is required" }}
+                      render={({ field }) => (
+                        <PhoneInput
+                          value={field.value || ''}
+                          onChange={field.onChange}
+                          error={errors.phone?.message}
+                        />
+                      )}
+                    />
+                  </CustomInput>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Project Details */}
+            {currentStep === 2 && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">Project Details</h2>
+                
+                <CustomInput label="Project Type" error={errors.projectType?.message} required>
+                  <select
+                    {...register("projectType", { required: "Please select a project type" })}
+                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
+                  >
+                    <option value="">Select project type</option>
+                    <option value="website">Website Design & Development</option>
+                    <option value="webapp">Web Application</option>
+                    <option value="mobile">Mobile App</option>
+                    <option value="ecommerce">E-commerce Platform</option>
+                    <option value="redesign">Website Redesign</option>
+                    <option value="consulting">Consulting</option>
+                    <option value="other">Other</option>
+                  </select>
+                </CustomInput>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <CustomInput label="Budget Range" error={errors.budget?.message} required>
+                    <select
+                      {...register("budget", { required: "Please select a budget range" })}
+                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
+                    >
+                      <option value="">Select budget range</option>
+                      <option value="under-5k">Under $5,000</option>
+                      <option value="5k-10k">$5,000 - $10,000</option>
+                      <option value="10k-25k">$10,000 - $25,000</option>
+                      <option value="25k-50k">$25,000 - $50,000</option>
+                      <option value="over-50k">Over $50,000</option>
+                      <option value="discuss">Let's discuss</option>
+                    </select>
+                  </CustomInput>
+
+                  <CustomInput label="Timeline" error={errors.timeline?.message} required>
+                    <select
+                      {...register("timeline", { required: "Please select a timeline" })}
+                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
+                    >
+                      <option value="">Select timeline</option>
+                      <option value="asap">ASAP</option>
+                      <option value="1-month">Within 1 month</option>
+                      <option value="2-3months">2-3 months</option>
+                      <option value="3-6months">3-6 months</option>
+                      <option value="6months+">6+ months</option>
+                      <option value="flexible">Flexible</option>
+                    </select>
+                  </CustomInput>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Description & Files */}
+            {currentStep === 3 && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">Project Description</h2>
+                
+                <CustomInput label="Project Description" error={errors.description?.message} required>
+                  <textarea
+                    {...register("description", { required: "Project description is required" })}
+                    rows={6}
+                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors resize-none"
+                    placeholder="Tell us about your project goals, requirements, and any specific features you need..."
+                  />
+                </CustomInput>
+
+                <CustomInput label="Attachments (Optional)">
+                  <div 
+                    className="w-full p-6 border-2 border-dashed border-slate-300 rounded-lg hover:border-blue-400 transition-colors cursor-pointer"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <div className="text-center">
+                      <div className="text-4xl mb-2">📎</div>
+                      <p className="text-slate-600 mb-1">Click to upload files</p>
+                      <p className="text-sm text-slate-500">
+                        Documents, images, wireframes, etc. (Max 10MB each)
+                      </p>
+                    </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      multiple
+                      accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.gif"
+                      {...register("attachments")}
+                      className="hidden"
+                    />
+                  </div>
+                </CustomInput>
+
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <label className="flex items-start space-x-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      {...register("newsletter")}
+                      className="mt-1 w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                    />
+                    <div className="text-sm">
+                      <p className="text-slate-700">
+                        Subscribe to our newsletter for web development tips and industry insights.
+                      </p>
+                      <p className="text-slate-500 text-xs mt-1">
+                        You can unsubscribe at any time. No spam, ever.
+                      </p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {/* Navigation Buttons */}
+            <div className="flex justify-between mt-8 pt-6 border-t border-slate-200">
+              <button
+                type="button"
+                onClick={prevStep}
+                disabled={currentStep === 1}
+                className="px-6 py-3 text-slate-600 hover:text-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                ← Previous
+              </button>
+
+              <div className="flex space-x-4">
+                {currentStep < steps.length ? (
+                  <button
+                    type="button"
+                    onClick={nextStep}
+                    className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                  >
+                    Next →
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={isSubmitting || !isValid}
+                    className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+                  >
+                    {isSubmitting ? "Sending..." : "Send Project Details"}
+                  </button>
+                )}
+              </div>
+            </div>
+          </form>
+        </div>
+
+        {submitStatus === 'error' && (
+          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center">
+              <span className="text-red-500 text-xl mr-3">⚠</span>
+              <p className="text-red-700">
+                Failed to send your message. Please try again or contact us directly.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+```
+
+##### Customization Options
+- **Multi-step navigation**: Adjust the number of steps and fields per step
+- **Custom validation**: Add specific validation rules for different input types
+- **File upload**: Configure file types, size limits, and storage handling
+- **Progress tracking**: Customize the progress indicator styling and behavior
+- **Form fields**: Add or remove fields based on your project requirements
+- **Styling**: Modify colors, spacing, and layout to match your design system
+
+<BackToTop />
+
+### Example #5: Internationalized Contact Form (i18n Support)
+
+A contact page that supports multiple languages using internationalization, allowing users to switch languages easily.
+
+```tsx
+import React, { useState, createContext, useContext } from "react";
+import { useForm } from "react-hook-form";
+
+// Language context and translations
+const translations = {
+  en: {
+    title: "Contact Us",
+    subtitle: "Get in touch and let's discuss your project",
+    name: "Full Name",
+    email: "Email Address",
+    subject: "Subject",
+    message: "Message",
+    send: "Send Message",
+    sending: "Sending...",
+    success: "Message sent successfully!",
+    successDesc: "Thank you for your message. We'll get back to you soon.",
+    error: "Failed to send message. Please try again.",
+    required: "This field is required",
+    invalidEmail: "Please enter a valid email address",
+    namePlaceholder: "Your full name",
+    emailPlaceholder: "your.email@example.com",
+    subjectPlaceholder: "How can we help you?",
+    messagePlaceholder: "Tell us about your project or inquiry...",
+    subjects: {
+      general: "General Inquiry",
+      project: "Project Discussion",
+      support: "Support",
+      partnership: "Partnership"
+    }
+  },
+  es: {
+    title: "Contáctanos",
+    subtitle: "Ponte en contacto y hablemos de tu proyecto",
+    name: "Nombre Completo",
+    email: "Correo Electrónico",
+    subject: "Asunto",
+    message: "Mensaje",
+    send: "Enviar Mensaje",
+    sending: "Enviando...",
+    success: "¡Mensaje enviado con éxito!",
+    successDesc: "Gracias por tu mensaje. Te responderemos pronto.",
+    error: "Error al enviar el mensaje. Por favor, inténtalo de nuevo.",
+    required: "Este campo es obligatorio",
+    invalidEmail: "Por favor, introduce un email válido",
+    namePlaceholder: "Tu nombre completo",
+    emailPlaceholder: "tu.email@ejemplo.com",
+    subjectPlaceholder: "¿Cómo podemos ayudarte?",
+    messagePlaceholder: "Cuéntanos sobre tu proyecto o consulta...",
+    subjects: {
+      general: "Consulta General",
+      project: "Discusión de Proyecto",
+      support: "Soporte",
+      partnership: "Asociación"
+    }
+  },
+  fr: {
+    title: "Contactez-nous",
+    subtitle: "Prenez contact et discutons de votre projet",
+    name: "Nom Complet",
+    email: "Adresse Email",
+    subject: "Sujet",
+    message: "Message",
+    send: "Envoyer le Message",
+    sending: "Envoi en cours...",
+    success: "Message envoyé avec succès !",
+    successDesc: "Merci pour votre message. Nous vous répondrons bientôt.",
+    error: "Échec de l'envoi du message. Veuillez réessayer.",
+    required: "Ce champ est obligatoire",
+    invalidEmail: "Veuillez entrer une adresse email valide",
+    namePlaceholder: "Votre nom complet",
+    emailPlaceholder: "votre.email@exemple.com",
+    subjectPlaceholder: "Comment pouvons-nous vous aider ?",
+    messagePlaceholder: "Parlez-nous de votre projet ou demande...",
+    subjects: {
+      general: "Demande Générale",
+      project: "Discussion de Projet",
+      support: "Support",
+      partnership: "Partenariat"
+    }
+  }
+};
+
+type Language = keyof typeof translations;
+type TranslationKey = keyof typeof translations.en;
+
+const LanguageContext = createContext<{
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: (key: TranslationKey | string) => string;
+}>({
+  language: 'en',
+  setLanguage: () => {},
+  t: () => ''
+});
+
+const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [language, setLanguage] = useState<Language>('en');
+
+  const t = (key: TranslationKey | string): string => {
+    const keys = key.split('.');
+    let value: any = translations[language];
+    
+    for (const k of keys) {
+      value = value?.[k];
+    }
+    
+    return value || key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+};
+
+const useLanguage = () => useContext(LanguageContext);
+
+const LanguageSelector: React.FC = () => {
+  const { language, setLanguage } = useLanguage();
+
+  const languages = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' }
+  ];
+
+  return (
+    <div className="flex items-center space-x-2">
+      {languages.map((lang) => (
+        <button
+          key={lang.code}
+          onClick={() => setLanguage(lang.code as Language)}
+          className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
+            language === lang.code
+              ? 'bg-blue-100 text-blue-700 border border-blue-300'
+              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+          }`}
+        >
+          <span className="text-lg">{lang.flag}</span>
+          <span className="text-sm font-medium">{lang.name}</span>
+        </button>
+      ))}
+    </div>
+  );
+};
+
+interface ContactFormData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+const ContactForm: React.FC = () => {
+  const { t } = useLanguage();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset
+  } = useForm<ContactFormData>();
+
+  const onSubmit = async (data: ContactFormData) => {
+    setIsSubmitting(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log('Form submitted:', data);
+      setSubmitStatus('success');
+      reset();
+    } catch (error) {
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-xl shadow-lg p-8">
+      {submitStatus === 'success' && (
+        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div className="flex items-center">
+            <span className="text-green-500 text-xl mr-3">✓</span>
+            <div>
+              <p className="text-green-700 font-semibold">{t('success')}</p>
+              <p className="text-green-600 text-sm">{t('successDesc')}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {submitStatus === 'error' && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex items-center">
+            <span className="text-red-500 text-xl mr-3">✗</span>
+            <p className="text-red-700">{t('error')}</p>
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div>
+          <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">
+            {t('name')}
+          </label>
+          <input
+            type="text"
+            id="name"
+            {...register("name", { required: t('required') })}
+            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder={t('namePlaceholder')}
+          />
+          {errors.name && (
+            <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
+            {t('email')}
+          </label>
+          <input
+            type="email"
+            id="email"
+            {...register("email", {
+              required: t('required'),
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: t('invalidEmail')
+              }
+            })}
+            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder={t('emailPlaceholder')}
+          />
+          {errors.email && (
+            <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label htmlFor="subject" className="block text-sm font-semibold text-slate-700 mb-2">
+            {t('subject')}
+          </label>
+          <select
+            id="subject"
+            {...register("subject", { required: t('required') })}
+            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">{t('subjectPlaceholder')}</option>
+            <option value="general">{t('subjects.general')}</option>
+            <option value="project">{t('subjects.project')}</option>
+            <option value="support">{t('subjects.support')}</option>
+            <option value="partnership">{t('subjects.partnership')}</option>
+          </select>
+          {errors.subject && (
+            <p className="mt-1 text-sm text-red-600">{errors.subject.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label htmlFor="message" className="block text-sm font-semibold text-slate-700 mb-2">
+            {t('message')}
+          </label>
+          <textarea
+            id="message"
+            rows={5}
+            {...register("message", { required: t('required') })}
+            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            placeholder={t('messagePlaceholder')}
+          />
+          {errors.message && (
+            <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
+          )}
+        </div>
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+        >
+          {isSubmitting ? t('sending') : t('send')}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default function InternationalizedContact() {
+  return (
+    <LanguageProvider>
+      <InternationalizedContactContent />
+    </LanguageProvider>
+  );
+}
+
+const InternationalizedContactContent: React.FC = () => {
+  const { t } = useLanguage();
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm">
+        <div className="max-w-6xl mx-auto px-6 py-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">{t('title')}</h1>
+            </div>
+            <LanguageSelector />
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="py-16">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-slate-900 mb-4">{t('title')}</h2>
+            <p className="text-xl text-slate-600">{t('subtitle')}</p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12">
+            {/* Contact Form */}
+            <ContactForm />
+
+            {/* Contact Information */}
+            <div className="space-y-8">
+              <div className="bg-white rounded-xl shadow-lg p-8">
+                <h3 className="text-2xl font-bold text-slate-900 mb-6">Contact Information</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="bg-blue-100 p-3 rounded-lg">
+                      <span className="text-xl">📍</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-900">Address</p>
+                      <p className="text-slate-600">123 Business Street, City, Country</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <div className="bg-green-100 p-3 rounded-lg">
+                      <span className="text-xl">📧</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-900">Email</p>
+                      <p className="text-slate-600">hello@example.com</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <div className="bg-purple-100 p-3 rounded-lg">
+                      <span className="text-xl">📞</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-900">Phone</p>
+                      <p className="text-slate-600">+1 (555) 123-4567</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Additional Features */}
+              <div className="bg-blue-50 rounded-xl p-6">
+                <h4 className="text-lg font-semibold text-slate-900 mb-3">Multi-language Support</h4>
+                <p className="text-slate-600 text-sm mb-3">
+                  This contact form supports multiple languages and automatically adapts validation messages and placeholders.
+                </p>
+                <ul className="text-sm text-slate-600 space-y-1">
+                  <li>• Dynamic translation system</li>
+                  <li>• Context-aware validation messages</li>
+                  <li>• Localized date and number formats</li>
+                  <li>• RTL language support ready</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </LanguageProvider>
+  );
+};
+```
+
+##### Customization Options
+- **Add more languages**: Extend the translations object with additional language objects
+- **Translation management**: Integrate with services like i18next, react-intl, or Crowdin
+- **RTL support**: Add right-to-left language support for Arabic, Hebrew, etc.
+- **Dynamic loading**: Load translations asynchronously based on user preference
+- **Locale-specific formatting**: Add date, time, and number formatting for each locale
+- **URL-based language**: Sync language selection with URL parameters
 
 <BackToTop />

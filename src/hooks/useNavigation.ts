@@ -1,8 +1,8 @@
 "use client";
 
 import type { NavigationSection } from "@/utils/navigation";
-import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export function useNavigation() {
   const [navigation, setNavigation] = useState<NavigationSection[]>([]);

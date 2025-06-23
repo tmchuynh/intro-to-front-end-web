@@ -1,0 +1,94 @@
+import BackToTop from "@/components/BackToTop";
+
+# Theme Provider
+
+## Table of Contents
+
+## Overview
+
+The Theme Provider is a crucial part of your blog website, allowing you to manage and apply themes consistently across your application. It provides a way to define and switch between different visual styles, enhancing the user experience.
+
+We will be using the `ThemeProvider` component from `next-themes`, which simplifies theme management in Next.js applications.
+
+## Setting Up the Theme Provider
+
+1. **Install the `next-themes` package** if you haven't already:
+
+```bash
+npm install next-themes
+```
+
+2. **Create a `ThemeProvider` component** in your project. This component will wrap your application and provide the theme context.
+
+```tsx
+"use client";
+
+import { ThemeProvider as NextThemesProvider } from "next-themes";
+
+interface ThemeProviderProps {
+  children: React.ReactNode;
+}
+
+export function ThemeProvider({ children }: ThemeProviderProps) {
+  return (
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+      storageKey="intro-to-web-theme"
+    >
+      {children}
+    </NextThemesProvider>
+  );
+}
+```
+
+##### Explanation of the Code
+
+- **`ThemeProvider` Component**: This component uses `next-themes` to provide theme management capabilities.
+- **`attribute="class"`**: This allows the theme to be applied as a class on the `<html>` element, which is useful for styling with CSS.
+- **`defaultTheme="system"`**: Sets the default theme to the user's system preference.
+- **`enableSystem`**: Enables automatic switching based on the user's system theme.
+- **`disableTransitionOnChange`**: Disables transitions when changing themes, which can improve performance.
+- **`storageKey="intro-to-web-theme"`**: Sets a custom key for storing the theme preference in local storage.
+- **`children`**: This prop allows you to pass the rest of your application components to be wrapped by the `ThemeProvider`.
+
+## Using the Theme Provider
+
+To use the `ThemeProvider`, wrap your application in it. This is typically done in the `layout.tsx` file of your Next.js application.
+
+```tsx
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { Metadata } from "next";
+import { Inter } from "next/font/google";
+const inter = Inter({ subsets: ["latin"] });
+export const metadata: Metadata = {
+  title: "Intro to Web Development",
+  description:
+    "Learn the basics of web development with this comprehensive guide.",
+};
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" className={inter.className}>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+##### Explanation of the Code
+
+- **`RootLayout` Component**: This is the main layout component for your application.
+- **`ThemeProvider`**: The `ThemeProvider` wraps the `children`, allowing all components within the application to access the theme context.
+- **`html` and `body`**: The `html` and `body` elements are set up with the appropriate language and font settings.
+- **`metadata`**: This object contains metadata for your application, such as the title and description.
+- **`Inter` Font**: The Inter font is imported from Google Fonts and applied to the `html` element.
+- **`children`**: This prop represents the rest of your application components that will be rendered within the layout.
+  <BackToTop />

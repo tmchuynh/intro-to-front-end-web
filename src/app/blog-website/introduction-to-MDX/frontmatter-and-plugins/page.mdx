@@ -1,0 +1,129 @@
+import BackToTop from "@/components/BackToTop";
+
+# Frontmatter and Plugins
+
+## Table of Contents
+
+## Overview
+
+Frontmatter is a YAML like key/value pairing that can be used to store data about a page. `@next/mdx` does not support frontmatter by default, though there are many solutions for adding frontmatter to your MDX content. Plugins can also be used to extend the functionality of MDX, allowing you to add custom features or modify the behavior of MDX processing.
+
+## Frontmatter
+
+Frontmatter is typically placed at the top of an MDX file, enclosed in triple dashes (`---`). It allows you to define metadata for the page, such as title, date, author, and other custom fields. This metadata can be used for various purposes, such as generating a table of contents or displaying information about the page.
+
+```mdx
+---
+title: "My MDX Page"
+date: "2023-10-01"
+author: "John Doe"
+tags: ["mdx", "nextjs"]
+---
+
+# My MDX Page
+
+This is an example of an MDX page with frontmatter.
+```
+
+## Plugins
+
+Plugins are extensions that can be used to enhance the functionality of MDX. They can be used to add custom components, modify the rendering process, or integrate with other libraries. For example, you can create a plugin that automatically generates a table of contents based on the headings in your MDX content.
+
+```tsx
+import { createMdxPlugin } from "next-mdx-plugins";
+import { TableOfContents } from "./components/TableOfContents";
+const myMdxPlugin = createMdxPlugin({
+  components: {
+    TableOfContents,
+  },
+});
+export default myMdxPlugin;
+```
+
+## What We Will Use
+
+In this project, we will use the following plugins:
+
+- **remark-frontmatter**: To parse frontmatter from MDX files.
+- **remark-mdx-frontmatter**: To handle frontmatter in MDX files.
+- **rehype-slug**: To add slugs to headings for linking.
+- **rehype-autolink-headings**: To automatically add links to headings.
+- **remark-gfm**: To support GitHub Flavored Markdown features like tables and task lists.
+- **rehype-highlight**: To add syntax highlighting to code blocks.
+- **rehype-toc**: To generate a table of contents from headings in the MDX content.
+
+### Configurations
+
+To configure these plugins, you will need to update your `next.config.mjs` file to include the necessary settings. Here’s an example configuration:
+
+```typescript
+import createMDX from "@next/mdx";
+import type { NextConfig } from "next";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeHighlight from "rehype-highlight";
+import rehypeSlug from "rehype-slug";
+import remarkGfm from "remark-gfm";
+import remarkToc from "remark-toc";
+
+/** @type {import('next').NextConfig} */
+const nextConfig: NextConfig = {
+  // Configure `pageExtensions` to include MDX files
+  pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
+  // Other config options here
+};
+
+const withMDX = createMDX({
+  extension: /\.mdx?$/,
+  // Add markdown plugins here, as desired
+  options: {
+    remarkPlugins: [
+      remarkGfm,
+      [
+        remarkToc,
+        {
+          maxDepth: 3, // Limit TOC depth to 3 levels
+        },
+      ],
+    ],
+    rehypePlugins: [
+      rehypeSlug,
+      [
+        rehypeHighlight,
+        {
+          // Ignore code blocks without language specified
+          ignoreMissing: true,
+        },
+      ],
+      [
+        rehypeAutolinkHeadings,
+        {
+          behavior: "wrap",
+          properties: {
+            className: ["anchor"],
+          },
+        },
+      ],
+    ],
+  },
+});
+
+// Wrap MDX and Next.js config with each other
+export default withMDX(nextConfig);
+```
+
+#### Explanation of the Code
+
+- **createMDX**: This function is used to create an MDX configuration for Next.js, allowing you to use MDX files in your project.
+- **rehypePlugins**: This array contains plugins that enhance the rendering of MDX content, such as adding slugs to headings, syntax highlighting for code blocks, and autolinking headings.
+- **remarkPlugins**: This array contains plugins that process the Markdown content before it is converted to HTML, such as supporting GitHub Flavored Markdown and generating a table of contents.
+- **nextConfig**: This object contains the Next.js configuration, including the `pageExtensions` setting to allow MDX files to be treated as pages in your application.
+
+#### Customizations
+
+You can customize the plugins and their options based on your specific needs.
+
+- **Table of Contents**: You can adjust the `maxDepth` option in the `remark-toc` plugin to control how deep the table of contents should go.
+- **Syntax Highlighting**: The `rehype-highlight` plugin can be configured to ignore code blocks without a specified language, preventing unnecessary warnings or errors.
+- **Autolinking Headings**: The `rehype-autolink-headings` plugin can be customized to change the behavior of how links are added to headings, such as wrapping the heading text with a link or adding specific classes to the link elements.
+
+<BackToTop />

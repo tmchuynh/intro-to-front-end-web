@@ -1,0 +1,89 @@
+import BackToTop from "@/components/BackToTop";
+
+# Utility Functions
+
+## Table of Contents
+
+## Overview
+
+Utility functions are essential for enhancing the functionality of your portfolio website. They can help with tasks such as formatting dates, generating unique IDs, or handling common operations that are reused across different components.
+
+## Date Formatting
+
+A utility function to format dates can be very useful, especially if you want to display project dates in a user-friendly format. You can use libraries like `date-fns` or `moment.js`, or you can create a simple function using JavaScript's built-in `Date` object.
+
+```typescript
+export function formatDate(date: string | Date): string {
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+  return new Date(date).toLocaleDateString(undefined, options);
+}
+```
+
+## Unique ID Generation
+
+If you need to generate unique IDs for your projects or components, you can create a simple utility function. This can be useful for ensuring that each project has a unique identifier, especially if you are using dynamic routing.
+
+```typescript
+export function generateUniqueId(prefix: string = "id"): string {
+  return `${prefix}-${Math.random().toString(36).substr(2, 9)}`;
+}
+```
+
+## Debounce Function
+
+A debounce function can be useful for handling events like scrolling or resizing, where you want to limit the number of times a function is called. This can improve performance and user experience.
+
+```typescript
+export function debounce(func: Function, delay: number): Function {
+  let timeoutId: NodeJS.Timeout;
+  return function (...args: any[]) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+}
+```
+
+## Sorting Function
+
+If you want to sort your projects based on different criteria (e.g., date, title), you can create a utility function to handle sorting.
+
+```typescript
+export function sortProjects(
+  projects: any[],
+  key: string,
+  ascending: boolean = true
+): any[] {
+  return projects.sort((a, b) => {
+    if (a[key] < b[key]) return ascending ? -1 : 1;
+    if (a[key] > b[key]) return ascending ? 1 : -1;
+    return 0;
+  });
+}
+```
+
+## Fetch Data Utility
+
+If you need to fetch data from an API or a database, you can create a utility function to handle the fetching process. This can include error handling and response parsing.
+
+```typescript
+export async function fetchData(url: string): Promise<any> {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Fetch error:", error);
+    throw error;
+  }
+}
+```
+
+<BackToTop />

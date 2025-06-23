@@ -1466,12 +1466,168 @@ You can add social sharing buttons to each blog card, allowing users to easily s
 #### Example #1: Using a Floating Action Button (FAB) for Social Sharing
 
 ```tsx
+import React, { useState } from "react";
+import { BlogPost } from "@/types/blog";
 
+interface SocialFABProps {
+  post: BlogPost;
+  url?: string;
+}
+
+const SocialFAB: React.FC<SocialFABProps> = ({ post, url }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  
+  const postUrl = url || `${window.location.origin}/blog/${post.slug}`;
+  const encodedUrl = encodeURIComponent(postUrl);
+  const encodedTitle = encodeURIComponent(post.title);
+  const encodedDescription = encodeURIComponent(post.description || "");
+
+  const socialLinks = [
+    {
+      name: "Twitter",
+      icon: "🐦",
+      url: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
+      color: "bg-blue-400 hover:bg-blue-500"
+    },
+    {
+      name: "Facebook",
+      icon: "📘",
+      url: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+      color: "bg-blue-600 hover:bg-blue-700"
+    },
+    {
+      name: "LinkedIn",
+      icon: "💼",
+      url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+      color: "bg-blue-700 hover:bg-blue-800"
+    },
+    {
+      name: "Reddit",
+      icon: "🔗",
+      url: `https://reddit.com/submit?url=${encodedUrl}&title=${encodedTitle}`,
+      color: "bg-orange-600 hover:bg-orange-700"
+    },
+    {
+      name: "WhatsApp",
+      icon: "💬",
+      url: `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`,
+      color: "bg-green-600 hover:bg-green-700"
+    }
+  ];
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(postUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
+  };
+
+  const handleShare = (shareUrl: string) => {
+    window.open(shareUrl, "_blank", "noopener,noreferrer,width=600,height=400");
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="fixed bottom-6 right-6 z-50">
+      {/* Social Links */}
+      <div className={`mb-4 space-y-2 transition-all duration-300 ${
+        isOpen ? "opacity-100 transform translate-y-0" : "opacity-0 transform translate-y-4 pointer-events-none"
+      }`}>
+        {/* Copy Link Button */}
+        <button
+          onClick={copyToClipboard}
+          className="flex items-center justify-center w-12 h-12 bg-gray-600 hover:bg-gray-700 text-white rounded-full shadow-lg transition-all hover:scale-110"
+          title="Copy Link"
+        >
+          {copied ? "✓" : "📋"}
+        </button>
+        
+        {/* Social Media Buttons */}
+        {socialLinks.map((social, index) => (
+          <button
+            key={social.name}
+            onClick={() => handleShare(social.url)}
+            className={`flex items-center justify-center w-12 h-12 text-white rounded-full shadow-lg transition-all hover:scale-110 ${social.color}`}
+            title={`Share on ${social.name}`}
+            style={{ 
+              transitionDelay: `${index * 50}ms`,
+              transform: isOpen ? "scale(1)" : "scale(0)"
+            }}
+          >
+            {social.icon}
+          </button>
+        ))}
+      </div>
+
+      {/* Main FAB Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center justify-center w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-xl transition-all hover:scale-110 ${
+          isOpen ? "rotate-45" : ""
+        }`}
+        aria-label="Share options"
+      >
+        <svg 
+          className="w-6 h-6" 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            strokeWidth={2} 
+            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" 
+          />
+        </svg>
+      </button>
+
+      {/* Backdrop */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 -z-10"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+      
+      {/* Copy Success Toast */}
+      {copied && (
+        <div className="fixed bottom-24 right-6 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg animate-bounce">
+          Link copied!
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Usage in BlogCard component
+const BlogCardWithFAB: React.FC<{ post: BlogPost }> = ({ post }) => {
+  return (
+    <div className="relative">
+      <BlogCard post={post} />
+      <SocialFAB post={post} />
+    </div>
+  );
+};
+
+export default SocialFAB;
 ```
 
 ##### How It Works
 
+The Floating Action Button (FAB) provides a persistent, accessible way to share blog posts. It appears as a fixed button in the bottom-right corner and expands to reveal social sharing options when clicked. The component includes popular social platforms, a copy-to-clipboard function, and smooth animations for better user experience.
+
 ##### Customization Options
+
+- **Position**: Adjust the FAB position (bottom-left, top-right, etc.)
+- **Social platforms**: Add or remove social media platforms
+- **Animation timing**: Customize the stagger effect and transition speeds
+- **Icons**: Replace emoji icons with custom SVG icons or icon library
+- **Mobile behavior**: Adapt the FAB for mobile touch interactions
 
 <BackToTop />
 

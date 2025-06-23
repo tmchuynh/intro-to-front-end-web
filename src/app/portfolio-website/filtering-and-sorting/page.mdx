@@ -81,9 +81,150 @@ Sorting allows users to organize content in a way that makes sense to them, such
 
 ```tsx
 import React, { useState } from "react";
+
+interface Project {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  date: string;
+}
+
+const mockProjects: Project[] = [
+  {
+    id: "1",
+    title: "E-commerce Website",
+    category: "Web Development",
+    description: "React-based online store",
+    date: "2024-01-15",
+  },
+  {
+    id: "2",
+    title: "Mobile Banking App",
+    category: "Mobile Apps",
+    description: "Flutter banking application",
+    date: "2024-02-20",
+  },
+  {
+    id: "3",
+    title: "Data Visualization Dashboard",
+    category: "Data Science",
+    description: "Python dashboard with charts",
+    date: "2024-03-10",
+  },
+  {
+    id: "4",
+    title: "Portfolio Website",
+    category: "Web Development",
+    description: "Personal portfolio site",
+    date: "2024-04-05",
+  },
+  {
+    id: "5",
+    title: "Weather App",
+    category: "Mobile Apps",
+    description: "React Native weather app",
+    date: "2024-05-12",
+  },
+];
+
+const CategoryFilter: React.FC = () => {
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [projects] = useState<Project[]>(mockProjects);
+
+  const categories = Array.from(
+    new Set(projects.map((project) => project.category))
+  );
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((c) => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const filteredProjects =
+    selectedCategories.length === 0
+      ? projects
+      : projects.filter((project) =>
+          selectedCategories.includes(project.category)
+        );
+
+  return (
+    <div className="max-w-4xl mx-auto p-6">
+      <h3 className="text-2xl font-bold mb-4">Filter Projects by Category</h3>
+
+      {/* Filter Controls */}
+      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+        <h4 className="font-semibold mb-3">Categories:</h4>
+        <div className="flex flex-wrap gap-4">
+          {categories.map((category) => (
+            <label
+              key={category}
+              className="flex items-center space-x-2 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                checked={selectedCategories.includes(category)}
+                onChange={() => handleCategoryChange(category)}
+                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+              />
+              <span className="text-sm font-medium">{category}</span>
+              <span className="text-xs text-gray-500">
+                ({projects.filter((p) => p.category === category).length})
+              </span>
+            </label>
+          ))}
+        </div>
+
+        {selectedCategories.length > 0 && (
+          <button
+            onClick={() => setSelectedCategories([])}
+            className="mt-3 px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+          >
+            Clear All Filters
+          </button>
+        )}
+      </div>
+
+      {/* Results */}
+      <div className="mb-4">
+        <p className="text-gray-600">
+          Showing {filteredProjects.length} of {projects.length} projects
+        </p>
+      </div>
+
+      {/* Project Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredProjects.map((project) => (
+          <div
+            key={project.id}
+            className="bg-white p-4 rounded-lg border shadow-sm"
+          >
+            <h5 className="font-semibold text-lg mb-2">{project.title}</h5>
+            <p className="text-sm text-blue-600 mb-2">{project.category}</p>
+            <p className="text-gray-600 text-sm mb-2">{project.description}</p>
+            <p className="text-xs text-gray-500">
+              {new Date(project.date).toLocaleDateString()}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default CategoryFilter;
 ```
 
 ##### Customization Options
+
+- **Styling**: Customize checkbox styles, colors, and layout to match your design system
+- **Animation**: Add smooth transitions when projects appear/disappear
+- **Persistence**: Save selected filters to localStorage or URL parameters
+- **Badge Counts**: Show the number of projects in each category
+- **Select All**: Add a "Select All" option for easier bulk selection
 
 <BackToTop />
 
@@ -93,10 +234,283 @@ import React, { useState } from "react";
 - The selected tags and technologies are stored in the component state, and the displayed projects are filtered based on the selected options.
 
 ```tsx
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
+
+interface Project {
+  id: string;
+  title: string;
+  tags: string[];
+  technologies: string[];
+  description: string;
+}
+
+const mockProjects: Project[] = [
+  {
+    id: "1",
+    title: "E-commerce Platform",
+    tags: ["frontend", "fullstack", "responsive"],
+    technologies: ["React", "Node.js", "MongoDB"],
+    description: "Complete online shopping platform",
+  },
+  {
+    id: "2",
+    title: "Task Management App",
+    tags: ["productivity", "mobile", "realtime"],
+    technologies: ["React Native", "Firebase", "TypeScript"],
+    description: "Team collaboration tool",
+  },
+  {
+    id: "3",
+    title: "Data Analytics Dashboard",
+    tags: ["analytics", "visualization", "backend"],
+    technologies: ["Python", "Django", "D3.js"],
+    description: "Business intelligence dashboard",
+  },
+  {
+    id: "4",
+    title: "Blog Platform",
+    tags: ["cms", "seo", "responsive"],
+    technologies: ["Next.js", "PostgreSQL", "Tailwind"],
+    description: "Content management system",
+  },
+];
+
+interface MultiSelectProps {
+  options: string[];
+  selected: string[];
+  onChange: (selected: string[]) => void;
+  placeholder: string;
+  label: string;
+}
+
+const MultiSelect: React.FC<MultiSelectProps> = ({
+  options,
+  selected,
+  onChange,
+  placeholder,
+  label,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleOptionToggle = (option: string) => {
+    const newSelected = selected.includes(option)
+      ? selected.filter((item) => item !== option)
+      : [...selected, option];
+    onChange(newSelected);
+  };
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-3 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+      >
+        <span className="block truncate">
+          {selected.length === 0 ? placeholder : `${selected.length} selected`}
+        </span>
+        <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+          <svg
+            className="w-5 h-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </span>
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+          {options.map((option) => (
+            <label
+              key={option}
+              className="flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                checked={selected.includes(option)}
+                onChange={() => handleOptionToggle(option)}
+                className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+              />
+              <span className="ml-2 text-sm text-gray-900">{option}</span>
+            </label>
+          ))}
+        </div>
+      )}
+
+      {selected.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1">
+          {selected.map((item) => (
+            <span
+              key={item}
+              className="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full"
+            >
+              {item}
+              <button
+                onClick={() => handleOptionToggle(item)}
+                className="ml-1 text-blue-600 hover:text-blue-800"
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const TagTechnologyFilter: React.FC = () => {
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedTechnologies, setSelectedTechnologies] = useState<string[]>(
+    []
+  );
+  const [projects] = useState<Project[]>(mockProjects);
+
+  const allTags = Array.from(
+    new Set(projects.flatMap((project) => project.tags))
+  );
+  const allTechnologies = Array.from(
+    new Set(projects.flatMap((project) => project.technologies))
+  );
+
+  const filteredProjects = projects.filter((project) => {
+    const tagMatch =
+      selectedTags.length === 0 ||
+      selectedTags.some((tag) => project.tags.includes(tag));
+    const techMatch =
+      selectedTechnologies.length === 0 ||
+      selectedTechnologies.some((tech) => project.technologies.includes(tech));
+    return tagMatch && techMatch;
+  });
+
+  const clearAllFilters = () => {
+    setSelectedTags([]);
+    setSelectedTechnologies([]);
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-6">
+      <h3 className="text-2xl font-bold mb-4">
+        Filter by Tags and Technologies
+      </h3>
+
+      {/* Filter Controls */}
+      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <MultiSelect
+            options={allTags}
+            selected={selectedTags}
+            onChange={setSelectedTags}
+            placeholder="Select tags..."
+            label="Filter by Tags"
+          />
+          <MultiSelect
+            options={allTechnologies}
+            selected={selectedTechnologies}
+            onChange={setSelectedTechnologies}
+            placeholder="Select technologies..."
+            label="Filter by Technologies"
+          />
+        </div>
+
+        {(selectedTags.length > 0 || selectedTechnologies.length > 0) && (
+          <button
+            onClick={clearAllFilters}
+            className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+          >
+            Clear All Filters
+          </button>
+        )}
+      </div>
+
+      {/* Results */}
+      <div className="mb-4">
+        <p className="text-gray-600">
+          Showing {filteredProjects.length} of {projects.length} projects
+        </p>
+      </div>
+
+      {/* Project Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {filteredProjects.map((project) => (
+          <div
+            key={project.id}
+            className="bg-white p-4 rounded-lg border shadow-sm"
+          >
+            <h5 className="font-semibold text-lg mb-2">{project.title}</h5>
+            <p className="text-gray-600 text-sm mb-3">{project.description}</p>
+
+            <div className="mb-2">
+              <span className="text-xs text-gray-500 font-medium">Tags:</span>
+              <div className="flex flex-wrap gap-1 mt-1">
+                {project.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <span className="text-xs text-gray-500 font-medium">
+                Technologies:
+              </span>
+              <div className="flex flex-wrap gap-1 mt-1">
+                {project.technologies.map((tech) => (
+                  <span
+                    key={tech}
+                    className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default TagTechnologyFilter;
 ```
 
 ##### Customization Options
+
+- **Search within Dropdown**: Add search functionality within the multi-select dropdowns
+- **Grouping**: Group technologies by category (Frontend, Backend, Database, etc.)
+- **Icons**: Add technology-specific icons next to each option
+- **Drag and Drop**: Allow reordering of selected items
+- **Keyboard Navigation**: Implement arrow key navigation within dropdowns
 
 <BackToTop />
 
@@ -106,10 +520,300 @@ import React, { useState } from "react";
 - The search input uses a debounce function to delay the search operation until the user stops typing for a specified period, improving performance and reducing unnecessary re-renders.
 
 ```tsx
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  technologies: string[];
+  date: string;
+}
+
+const mockProjects: Project[] = [
+  {
+    id: "1",
+    title: "E-commerce Platform",
+    description:
+      "Full-stack online shopping platform with React frontend and Node.js backend",
+    category: "Web Development",
+    technologies: ["React", "Node.js", "MongoDB", "Stripe"],
+    date: "2024-01-15",
+  },
+  {
+    id: "2",
+    title: "Mobile Banking Application",
+    description:
+      "Secure banking app with biometric authentication and real-time transactions",
+    category: "Mobile Apps",
+    technologies: ["React Native", "Firebase", "TypeScript"],
+    date: "2024-02-20",
+  },
+  {
+    id: "3",
+    title: "Data Visualization Dashboard",
+    description:
+      "Interactive dashboard for business analytics with charts and graphs",
+    category: "Data Science",
+    technologies: ["Python", "Django", "D3.js", "PostgreSQL"],
+    date: "2024-03-10",
+  },
+  {
+    id: "4",
+    title: "Personal Portfolio Website",
+    description:
+      "Responsive portfolio site showcasing projects and skills with modern design",
+    category: "Web Development",
+    technologies: ["Next.js", "Tailwind CSS", "Vercel"],
+    date: "2024-04-05",
+  },
+  {
+    id: "5",
+    title: "Weather Forecast App",
+    description:
+      "Real-time weather application with location-based forecasts and alerts",
+    category: "Mobile Apps",
+    technologies: ["Flutter", "OpenWeather API", "SQLite"],
+    date: "2024-05-12",
+  },
+  {
+    id: "6",
+    title: "Machine Learning Model",
+    description:
+      "Predictive model for customer behavior analysis using neural networks",
+    category: "Data Science",
+    technologies: ["Python", "TensorFlow", "Pandas", "Jupyter"],
+    date: "2024-06-01",
+  },
+];
+
+// Custom hook for debounced value
+const useDebounce = (value: string, delay: number): string => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+
+const SearchWithDebounce: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [projects] = useState<Project[]>(mockProjects);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Debounce search term with 300ms delay
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  // Show loading state while debouncing
+  useEffect(() => {
+    if (searchTerm !== debouncedSearchTerm) {
+      setIsSearching(true);
+    } else {
+      setIsSearching(false);
+    }
+  }, [searchTerm, debouncedSearchTerm]);
+
+  // Memoized filtered projects for performance
+  const filteredProjects = useMemo(() => {
+    if (!debouncedSearchTerm.trim()) {
+      return projects;
+    }
+
+    const searchLower = debouncedSearchTerm.toLowerCase();
+    return projects.filter((project) => {
+      return (
+        project.title.toLowerCase().includes(searchLower) ||
+        project.description.toLowerCase().includes(searchLower) ||
+        project.category.toLowerCase().includes(searchLower) ||
+        project.technologies.some((tech) =>
+          tech.toLowerCase().includes(searchLower)
+        )
+      );
+    });
+  }, [projects, debouncedSearchTerm]);
+
+  const handleClearSearch = () => {
+    setSearchTerm("");
+  };
+
+  const highlightText = (text: string, searchTerm: string) => {
+    if (!searchTerm.trim()) return text;
+
+    const regex = new RegExp(`(${searchTerm})`, "gi");
+    const parts = text.split(regex);
+
+    return parts.map((part, index) =>
+      regex.test(part) ? (
+        <mark key={index} className="bg-yellow-200 px-1 rounded">
+          {part}
+        </mark>
+      ) : (
+        part
+      )
+    );
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-6">
+      <h3 className="text-2xl font-bold mb-4">
+        Search Projects with Debouncing
+      </h3>
+
+      {/* Search Input */}
+      <div className="mb-6">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg
+              className="w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search projects by title, description, category, or technology..."
+            className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+          />
+          {searchTerm && (
+            <button
+              onClick={handleClearSearch}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
+
+        {/* Search Status */}
+        <div className="mt-2 flex items-center justify-between text-sm text-gray-600">
+          <div className="flex items-center gap-2">
+            {isSearching && (
+              <div className="flex items-center gap-1">
+                <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <span>Searching...</span>
+              </div>
+            )}
+            {!isSearching && debouncedSearchTerm && (
+              <span>
+                Found {filteredProjects.length} result
+                {filteredProjects.length !== 1 ? "s" : ""}
+                for "{debouncedSearchTerm}"
+              </span>
+            )}
+            {!isSearching && !debouncedSearchTerm && (
+              <span>Showing all {projects.length} projects</span>
+            )}
+          </div>
+          {debouncedSearchTerm && (
+            <span className="text-xs">Search delay: 300ms</span>
+          )}
+        </div>
+      </div>
+
+      {/* Results */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {filteredProjects.length === 0 ? (
+          <div className="col-span-full text-center py-8">
+            <svg
+              className="w-16 h-16 text-gray-300 mx-auto mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.569-.787-6.33-2.119M9.75 7.5A7.966 7.966 0 0112 6c2.55 0 4.97.791 6.75 2.25"
+              />
+            </svg>
+            <p className="text-gray-500">
+              No projects found matching your search.
+            </p>
+            <button
+              onClick={handleClearSearch}
+              className="mt-2 text-blue-600 hover:text-blue-800 underline"
+            >
+              Clear search to see all projects
+            </button>
+          </div>
+        ) : (
+          filteredProjects.map((project) => (
+            <div
+              key={project.id}
+              className="bg-white p-4 rounded-lg border shadow-sm"
+            >
+              <h5 className="font-semibold text-lg mb-2">
+                {highlightText(project.title, debouncedSearchTerm)}
+              </h5>
+              <p className="text-sm text-blue-600 mb-2">
+                {highlightText(project.category, debouncedSearchTerm)}
+              </p>
+              <p className="text-gray-600 text-sm mb-3">
+                {highlightText(project.description, debouncedSearchTerm)}
+              </p>
+              <div className="flex flex-wrap gap-1 mb-2">
+                {project.technologies.map((tech) => (
+                  <span
+                    key={tech}
+                    className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded"
+                  >
+                    {highlightText(tech, debouncedSearchTerm)}
+                  </span>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500">
+                {new Date(project.date).toLocaleDateString()}
+              </p>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default SearchWithDebounce;
 ```
 
 ##### Customization Options
+
+- **Search Suggestions**: Add autocomplete suggestions based on previous searches
+- **Advanced Search**: Implement filters for specific fields (title only, description only, etc.)
+- **Search History**: Store and display recent search terms
+- **Fuzzy Search**: Use libraries like Fuse.js for more flexible matching
+- **Search Analytics**: Track popular search terms for insights
 
 <BackToTop />
 
@@ -120,9 +824,362 @@ import React, { useState } from "react";
 
 ```tsx
 import React, { useState } from "react";
+
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  createdDate: string;
+  updatedDate: string;
+  status: "completed" | "in-progress" | "planning";
+}
+
+const mockProjects: Project[] = [
+  {
+    id: "1",
+    title: "E-commerce Platform",
+    description: "Full-stack online shopping platform",
+    category: "Web Development",
+    createdDate: "2024-01-15",
+    updatedDate: "2024-02-28",
+    status: "completed",
+  },
+  {
+    id: "2",
+    title: "Mobile Banking App",
+    description: "Secure banking application",
+    category: "Mobile Apps",
+    createdDate: "2024-02-20",
+    updatedDate: "2024-03-15",
+    status: "completed",
+  },
+  {
+    id: "3",
+    title: "Data Analytics Dashboard",
+    description: "Business intelligence dashboard",
+    category: "Data Science",
+    createdDate: "2024-03-10",
+    updatedDate: "2024-04-22",
+    status: "in-progress",
+  },
+  {
+    id: "4",
+    title: "Portfolio Website",
+    description: "Personal portfolio site",
+    category: "Web Development",
+    createdDate: "2024-04-05",
+    updatedDate: "2024-05-10",
+    status: "completed",
+  },
+  {
+    id: "5",
+    title: "Weather App",
+    description: "Real-time weather application",
+    category: "Mobile Apps",
+    createdDate: "2024-05-12",
+    updatedDate: "2024-06-20",
+    status: "in-progress",
+  },
+  {
+    id: "6",
+    title: "AI Chatbot",
+    description: "Customer service chatbot",
+    category: "AI/ML",
+    createdDate: "2024-06-01",
+    updatedDate: "2024-06-15",
+    status: "planning",
+  },
+];
+
+type DateField = "createdDate" | "updatedDate";
+
+const DateFilter: React.FC = () => {
+  const [projects] = useState<Project[]>(mockProjects);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [dateField, setDateField] = useState<DateField>("createdDate");
+  const [quickFilter, setQuickFilter] = useState("");
+
+  // Quick filter options
+  const getQuickFilterDate = (
+    option: string
+  ): { start: string; end: string } => {
+    const now = new Date();
+    const today = now.toISOString().split("T")[0];
+
+    switch (option) {
+      case "last7days":
+        const week = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        return { start: week.toISOString().split("T")[0], end: today };
+      case "last30days":
+        const month = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        return { start: month.toISOString().split("T")[0], end: today };
+      case "last3months":
+        const threeMonths = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+        return { start: threeMonths.toISOString().split("T")[0], end: today };
+      case "thisYear":
+        return { start: `${now.getFullYear()}-01-01`, end: today };
+      default:
+        return { start: "", end: "" };
+    }
+  };
+
+  const handleQuickFilter = (option: string) => {
+    setQuickFilter(option);
+    const { start, end } = getQuickFilterDate(option);
+    setStartDate(start);
+    setEndDate(end);
+  };
+
+  const clearFilters = () => {
+    setStartDate("");
+    setEndDate("");
+    setQuickFilter("");
+  };
+
+  // Filter projects based on date range
+  const filteredProjects = projects.filter((project) => {
+    const projectDate = new Date(project[dateField]);
+    const start = startDate ? new Date(startDate) : null;
+    const end = endDate ? new Date(endDate) : null;
+
+    if (start && projectDate < start) return false;
+    if (end && projectDate > end) return false;
+    return true;
+  });
+
+  // Sort filtered projects by selected date field
+  const sortedProjects = [...filteredProjects].sort((a, b) => {
+    return new Date(b[dateField]).getTime() - new Date(a[dateField]).getTime();
+  });
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "in-progress":
+        return "bg-blue-100 text-blue-800";
+      case "planning":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-6">
+      <h3 className="text-2xl font-bold mb-4">Filter Projects by Date</h3>
+
+      {/* Filter Controls */}
+      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+        {/* Date Field Selection */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Filter by Date Field:
+          </label>
+          <div className="flex gap-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="dateField"
+                value="createdDate"
+                checked={dateField === "createdDate"}
+                onChange={(e) => setDateField(e.target.value as DateField)}
+                className="w-4 h-4 text-blue-600"
+              />
+              <span className="ml-2 text-sm">Created Date</span>
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="dateField"
+                value="updatedDate"
+                checked={dateField === "updatedDate"}
+                onChange={(e) => setDateField(e.target.value as DateField)}
+                className="w-4 h-4 text-blue-600"
+              />
+              <span className="ml-2 text-sm">Last Updated</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Quick Filter Buttons */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Quick Filters:
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: "Last 7 Days", value: "last7days" },
+              { label: "Last 30 Days", value: "last30days" },
+              { label: "Last 3 Months", value: "last3months" },
+              { label: "This Year", value: "thisYear" },
+            ].map((filter) => (
+              <button
+                key={filter.value}
+                onClick={() => handleQuickFilter(filter.value)}
+                className={`px-3 py-1 text-sm rounded border transition-colors ${
+                  quickFilter === filter.value
+                    ? "bg-blue-500 text-white border-blue-500"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                }`}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Custom Date Range */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Start Date:
+            </label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                setQuickFilter("");
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              End Date:
+            </label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+                setQuickFilter("");
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        </div>
+
+        {/* Clear Filters */}
+        {(startDate || endDate || quickFilter) && (
+          <button
+            onClick={clearFilters}
+            className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+          >
+            Clear Date Filters
+          </button>
+        )}
+      </div>
+
+      {/* Results Summary */}
+      <div className="mb-4 flex items-center justify-between">
+        <p className="text-gray-600">
+          Showing {sortedProjects.length} of {projects.length} projects
+          {(startDate || endDate) && (
+            <span className="ml-2 text-sm">
+              {startDate && endDate
+                ? `(${formatDate(startDate)} - ${formatDate(endDate)})`
+                : startDate
+                  ? `(from ${formatDate(startDate)})`
+                  : `(until ${formatDate(endDate)})`}
+            </span>
+          )}
+        </p>
+        <p className="text-sm text-gray-500">
+          Sorted by{" "}
+          {dateField === "createdDate" ? "Created Date" : "Last Updated"}{" "}
+          (newest first)
+        </p>
+      </div>
+
+      {/* Project Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {sortedProjects.length === 0 ? (
+          <div className="col-span-full text-center py-8">
+            <p className="text-gray-500">
+              No projects found in the selected date range.
+            </p>
+            <button
+              onClick={clearFilters}
+              className="mt-2 text-blue-600 hover:text-blue-800 underline"
+            >
+              Clear filters to see all projects
+            </button>
+          </div>
+        ) : (
+          sortedProjects.map((project) => (
+            <div
+              key={project.id}
+              className="bg-white p-4 rounded-lg border shadow-sm"
+            >
+              <div className="flex items-start justify-between mb-2">
+                <h5 className="font-semibold text-lg">{project.title}</h5>
+                <span
+                  className={`px-2 py-1 text-xs rounded-full ${getStatusColor(project.status)}`}
+                >
+                  {project.status.replace("-", " ")}
+                </span>
+              </div>
+              <p className="text-sm text-blue-600 mb-2">{project.category}</p>
+              <p className="text-gray-600 text-sm mb-3">
+                {project.description}
+              </p>
+
+              <div className="text-xs text-gray-500 space-y-1">
+                <div className="flex justify-between">
+                  <span>Created:</span>
+                  <span
+                    className={
+                      dateField === "createdDate"
+                        ? "font-medium text-blue-600"
+                        : ""
+                    }
+                  >
+                    {formatDate(project.createdDate)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Updated:</span>
+                  <span
+                    className={
+                      dateField === "updatedDate"
+                        ? "font-medium text-blue-600"
+                        : ""
+                    }
+                  >
+                    {formatDate(project.updatedDate)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default DateFilter;
 ```
 
 ##### Customization Options
+
+- **Calendar Widget**: Replace date inputs with a visual calendar component
+- **Relative Dates**: Add options like "Last Week", "Next Month", etc.
+- **Time Range**: Include time selection for more precise filtering
+- **Date Validation**: Ensure end date is not before start date
+- **Preset Ranges**: Add custom preset date ranges specific to your needs
 
 <BackToTop />
 
@@ -133,9 +1190,385 @@ import React, { useState } from "react";
 
 ```tsx
 import React, { useState } from "react";
+
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  createdDate: string;
+  updatedDate: string;
+  priority: "low" | "medium" | "high";
+  views: number;
+  likes: number;
+}
+
+const mockProjects: Project[] = [
+  {
+    id: "1",
+    title: "E-commerce Platform",
+    description: "Full-stack online shopping platform with payment integration",
+    category: "Web Development",
+    createdDate: "2024-01-15",
+    updatedDate: "2024-02-28",
+    priority: "high",
+    views: 1250,
+    likes: 89,
+  },
+  {
+    id: "2",
+    title: "Mobile Banking App",
+    description: "Secure banking application with biometric authentication",
+    category: "Mobile Apps",
+    createdDate: "2024-02-20",
+    updatedDate: "2024-03-15",
+    priority: "high",
+    views: 980,
+    likes: 67,
+  },
+  {
+    id: "3",
+    title: "Data Analytics Dashboard",
+    description: "Interactive business intelligence dashboard",
+    category: "Data Science",
+    createdDate: "2024-03-10",
+    updatedDate: "2024-04-22",
+    priority: "medium",
+    views: 756,
+    likes: 45,
+  },
+  {
+    id: "4",
+    title: "Portfolio Website",
+    description: "Personal portfolio site with modern design",
+    category: "Web Development",
+    createdDate: "2024-04-05",
+    updatedDate: "2024-05-10",
+    priority: "low",
+    views: 543,
+    likes: 32,
+  },
+  {
+    id: "5",
+    title: "Weather Forecast App",
+    description: "Real-time weather application with location services",
+    category: "Mobile Apps",
+    createdDate: "2024-05-12",
+    updatedDate: "2024-06-20",
+    priority: "medium",
+    views: 432,
+    likes: 28,
+  },
+  {
+    id: "6",
+    title: "AI Chatbot",
+    description: "Customer service chatbot with natural language processing",
+    category: "AI/ML",
+    createdDate: "2024-06-01",
+    updatedDate: "2024-06-15",
+    priority: "high",
+    views: 234,
+    likes: 19,
+  },
+];
+
+type SortField =
+  | "createdDate"
+  | "updatedDate"
+  | "title"
+  | "views"
+  | "likes"
+  | "priority";
+type SortDirection = "asc" | "desc";
+
+interface SortOption {
+  field: SortField;
+  direction: SortDirection;
+  label: string;
+}
+
+const ProjectSorting: React.FC = () => {
+  const [projects] = useState<Project[]>(mockProjects);
+  const [sortField, setSortField] = useState<SortField>("createdDate");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+
+  const sortOptions: { field: SortField; label: string }[] = [
+    { field: "createdDate", label: "Created Date" },
+    { field: "updatedDate", label: "Last Updated" },
+    { field: "title", label: "Title (A-Z)" },
+    { field: "views", label: "Views" },
+    { field: "likes", label: "Likes" },
+    { field: "priority", label: "Priority" },
+  ];
+
+  const handleSort = (field: SortField) => {
+    if (field === sortField) {
+      // Toggle direction if same field
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      // Set new field with appropriate default direction
+      setSortField(field);
+      setSortDirection(
+        field === "title" ? "asc" : "desc" // Title defaults to A-Z, others to highest first
+      );
+    }
+  };
+
+  const getPriorityWeight = (priority: string): number => {
+    switch (priority) {
+      case "high":
+        return 3;
+      case "medium":
+        return 2;
+      case "low":
+        return 1;
+      default:
+        return 0;
+    }
+  };
+
+  const sortedProjects = [...projects].sort((a, b) => {
+    let aValue: any = a[sortField];
+    let bValue: any = b[sortField];
+
+    // Handle different data types
+    switch (sortField) {
+      case "createdDate":
+      case "updatedDate":
+        aValue = new Date(aValue).getTime();
+        bValue = new Date(bValue).getTime();
+        break;
+      case "title":
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+        break;
+      case "priority":
+        aValue = getPriorityWeight(aValue);
+        bValue = getPriorityWeight(bValue);
+        break;
+      case "views":
+      case "likes":
+        // Already numbers, no conversion needed
+        break;
+    }
+
+    // Apply sorting direction
+    if (sortDirection === "asc") {
+      return aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+    } else {
+      return aValue < bValue ? 1 : aValue > bValue ? -1 : 0;
+    }
+  });
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "bg-red-100 text-red-800";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800";
+      case "low":
+        return "bg-green-100 text-green-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getSortIcon = (field: SortField) => {
+    if (field !== sortField) {
+      return (
+        <svg
+          className="w-4 h-4 text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+          />
+        </svg>
+      );
+    }
+
+    return sortDirection === "asc" ? (
+      <svg
+        className="w-4 h-4 text-blue-600"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M5 15l7-7 7 7"
+        />
+      </svg>
+    ) : (
+      <svg
+        className="w-4 h-4 text-blue-600"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M19 9l-7 7-7-7"
+        />
+      </svg>
+    );
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto p-6">
+      <h3 className="text-2xl font-bold mb-4">Sort Projects</h3>
+
+      {/* Sorting Controls */}
+      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+        <div className="flex flex-wrap items-center gap-4">
+          <span className="text-sm font-medium text-gray-700">Sort by:</span>
+          {sortOptions.map((option) => (
+            <button
+              key={option.field}
+              onClick={() => handleSort(option.field)}
+              className={`flex items-center gap-1 px-3 py-2 text-sm rounded-md border transition-colors ${
+                sortField === option.field
+                  ? "bg-blue-500 text-white border-blue-500"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+              }`}
+            >
+              {option.label}
+              {getSortIcon(option.field)}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-3 text-sm text-gray-600">
+          Currently sorted by{" "}
+          <span className="font-medium">
+            {sortOptions.find((opt) => opt.field === sortField)?.label}
+          </span>{" "}
+          <span className="font-medium">
+            ({sortDirection === "asc" ? "ascending" : "descending"})
+          </span>
+        </div>
+      </div>
+
+      {/* Project List */}
+      <div className="space-y-4">
+        {sortedProjects.map((project, index) => (
+          <div
+            key={project.id}
+            className="bg-white p-4 rounded-lg border shadow-sm"
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-sm text-gray-500 font-mono">
+                    #{index + 1}
+                  </span>
+                  <h5 className="font-semibold text-lg">{project.title}</h5>
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full ${getPriorityColor(project.priority)}`}
+                  >
+                    {project.priority}
+                  </span>
+                </div>
+                <p className="text-sm text-blue-600 mb-1">{project.category}</p>
+                <p className="text-gray-600 text-sm mb-3">
+                  {project.description}
+                </p>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-gray-500">
+                  <div>
+                    <span className="font-medium">Created:</span>
+                    <div
+                      className={
+                        sortField === "createdDate"
+                          ? "text-blue-600 font-medium"
+                          : ""
+                      }
+                    >
+                      {formatDate(project.createdDate)}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="font-medium">Updated:</span>
+                    <div
+                      className={
+                        sortField === "updatedDate"
+                          ? "text-blue-600 font-medium"
+                          : ""
+                      }
+                    >
+                      {formatDate(project.updatedDate)}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="font-medium">Views:</span>
+                    <div
+                      className={
+                        sortField === "views" ? "text-blue-600 font-medium" : ""
+                      }
+                    >
+                      {project.views.toLocaleString()}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="font-medium">Likes:</span>
+                    <div
+                      className={
+                        sortField === "likes" ? "text-blue-600 font-medium" : ""
+                      }
+                    >
+                      {project.likes}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Sorting Summary */}
+      <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+        <h4 className="font-medium text-blue-900 mb-2">Sorting Information</h4>
+        <div className="text-sm text-blue-800 space-y-1">
+          <p>• Click any sort button to change the sorting field</p>
+          <p>• Click the same button again to reverse the sort direction</p>
+          <p>
+            • The active sort field is highlighted and shows the direction arrow
+          </p>
+          <p>• Numbers in front of each project show their current position</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProjectSorting;
 ```
 
 ##### Customization Options
+
+- **Multi-Level Sorting**: Allow sorting by multiple fields (primary, secondary, etc.)
+- **Drag and Drop**: Enable manual reordering of projects
+- **Save Preferences**: Remember user's preferred sorting in localStorage
+- **Custom Sort Orders**: Allow users to create and save custom sort configurations
+- **Animation**: Add smooth transitions when items reorder
 
 <BackToTop />
 
@@ -146,9 +1579,509 @@ import React, { useState } from "react";
 - A cascading filter approach is used to dynamically update available tags and technologies based on the selected category.
 
 ```tsx
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
+
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  tags: string[];
+  technologies: string[];
+  status: "completed" | "in-progress" | "planning";
+  difficulty: "beginner" | "intermediate" | "advanced";
+  createdDate: string;
+}
+
+const mockProjects: Project[] = [
+  {
+    id: "1",
+    title: "E-commerce Platform",
+    description: "Full-stack online shopping platform with payment integration",
+    category: "Web Development",
+    tags: ["frontend", "backend", "responsive", "payment"],
+    technologies: ["React", "Node.js", "MongoDB", "Stripe"],
+    status: "completed",
+    difficulty: "advanced",
+    createdDate: "2024-01-15",
+  },
+  {
+    id: "2",
+    title: "Mobile Banking App",
+    description: "Secure banking application with biometric authentication",
+    category: "Mobile Apps",
+    tags: ["mobile", "security", "fintech", "biometric"],
+    technologies: ["React Native", "Firebase", "TypeScript"],
+    status: "completed",
+    difficulty: "advanced",
+    createdDate: "2024-02-20",
+  },
+  {
+    id: "3",
+    title: "Data Visualization Dashboard",
+    description: "Interactive business intelligence dashboard",
+    category: "Data Science",
+    tags: ["analytics", "visualization", "dashboard", "business"],
+    technologies: ["Python", "Django", "D3.js", "PostgreSQL"],
+    status: "in-progress",
+    difficulty: "intermediate",
+    createdDate: "2024-03-10",
+  },
+  {
+    id: "4",
+    title: "Portfolio Website",
+    description: "Personal portfolio site with modern design",
+    category: "Web Development",
+    tags: ["portfolio", "responsive", "seo", "personal"],
+    technologies: ["Next.js", "Tailwind CSS", "Vercel"],
+    status: "completed",
+    difficulty: "beginner",
+    createdDate: "2024-04-05",
+  },
+  {
+    id: "5",
+    title: "Weather Forecast App",
+    description: "Real-time weather application with location services",
+    category: "Mobile Apps",
+    tags: ["mobile", "weather", "geolocation", "api"],
+    technologies: ["Flutter", "OpenWeather API", "SQLite"],
+    status: "in-progress",
+    difficulty: "intermediate",
+    createdDate: "2024-05-12",
+  },
+  {
+    id: "6",
+    title: "Machine Learning Model",
+    description: "Predictive analytics model for customer behavior",
+    category: "Data Science",
+    tags: ["ml", "prediction", "analytics", "ai"],
+    technologies: ["Python", "TensorFlow", "Pandas", "Jupyter"],
+    status: "planning",
+    difficulty: "advanced",
+    createdDate: "2024-06-01",
+  },
+  {
+    id: "7",
+    title: "Blog Platform",
+    description: "Content management system with admin panel",
+    category: "Web Development",
+    tags: ["cms", "blog", "admin", "content"],
+    technologies: ["Vue.js", "Laravel", "MySQL"],
+    status: "completed",
+    difficulty: "intermediate",
+    createdDate: "2024-02-15",
+  },
+  {
+    id: "8",
+    title: "Fitness Tracking App",
+    description: "Health and fitness tracking mobile application",
+    category: "Mobile Apps",
+    tags: ["health", "fitness", "tracking", "wellness"],
+    technologies: ["React Native", "SQLite", "HealthKit"],
+    status: "planning",
+    difficulty: "intermediate",
+    createdDate: "2024-05-20",
+  },
+];
+
+interface Filters {
+  categories: string[];
+  tags: string[];
+  technologies: string[];
+  statuses: string[];
+  difficulties: string[];
+}
+
+const MultiCriteriaFilter: React.FC = () => {
+  const [projects] = useState<Project[]>(mockProjects);
+  const [filters, setFilters] = useState<Filters>({
+    categories: [],
+    tags: [],
+    technologies: [],
+    statuses: [],
+    difficulties: [],
+  });
+
+  // Get all unique values for each filter type
+  const allCategories = Array.from(new Set(projects.map((p) => p.category)));
+  const allStatuses = Array.from(new Set(projects.map((p) => p.status)));
+  const allDifficulties = Array.from(
+    new Set(projects.map((p) => p.difficulty))
+  );
+
+  // Cascading filters: available options based on selected categories
+  const availableProjects = useMemo(() => {
+    return filters.categories.length === 0
+      ? projects
+      : projects.filter((p) => filters.categories.includes(p.category));
+  }, [projects, filters.categories]);
+
+  const availableTags = Array.from(
+    new Set(availableProjects.flatMap((p) => p.tags))
+  );
+  const availableTechnologies = Array.from(
+    new Set(availableProjects.flatMap((p) => p.technologies))
+  );
+
+  // Filter projects based on all selected criteria
+  const filteredProjects = useMemo(() => {
+    return projects.filter((project) => {
+      // Category filter
+      const categoryMatch =
+        filters.categories.length === 0 ||
+        filters.categories.includes(project.category);
+
+      // Tags filter (project must have at least one selected tag)
+      const tagsMatch =
+        filters.tags.length === 0 ||
+        filters.tags.some((tag) => project.tags.includes(tag));
+
+      // Technologies filter (project must have at least one selected technology)
+      const technologiesMatch =
+        filters.technologies.length === 0 ||
+        filters.technologies.some((tech) =>
+          project.technologies.includes(tech)
+        );
+
+      // Status filter
+      const statusMatch =
+        filters.statuses.length === 0 ||
+        filters.statuses.includes(project.status);
+
+      // Difficulty filter
+      const difficultyMatch =
+        filters.difficulties.length === 0 ||
+        filters.difficulties.includes(project.difficulty);
+
+      return (
+        categoryMatch &&
+        tagsMatch &&
+        technologiesMatch &&
+        statusMatch &&
+        difficultyMatch
+      );
+    });
+  }, [projects, filters]);
+
+  const updateFilter = (filterType: keyof Filters, value: string) => {
+    setFilters((prev) => {
+      const currentValues = prev[filterType] as string[];
+      const newValues = currentValues.includes(value)
+        ? currentValues.filter((v) => v !== value)
+        : [...currentValues, value];
+
+      const newFilters = { ...prev, [filterType]: newValues };
+
+      // Clear dependent filters when categories change
+      if (filterType === "categories") {
+        newFilters.tags = newFilters.tags.filter((tag) =>
+          availableTags.includes(tag)
+        );
+        newFilters.technologies = newFilters.technologies.filter((tech) =>
+          availableTechnologies.includes(tech)
+        );
+      }
+
+      return newFilters;
+    });
+  };
+
+  const clearAllFilters = () => {
+    setFilters({
+      categories: [],
+      tags: [],
+      technologies: [],
+      statuses: [],
+      difficulties: [],
+    });
+  };
+
+  const clearFilterType = (filterType: keyof Filters) => {
+    setFilters((prev) => ({
+      ...prev,
+      [filterType]: [],
+    }));
+  };
+
+  const getActiveFilterCount = () => {
+    return Object.values(filters).reduce((count, arr) => count + arr.length, 0);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "in-progress":
+        return "bg-blue-100 text-blue-800";
+      case "planning":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case "beginner":
+        return "bg-green-100 text-green-800";
+      case "intermediate":
+        return "bg-yellow-100 text-yellow-800";
+      case "advanced":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const FilterSection: React.FC<{
+    title: string;
+    options: string[];
+    selected: string[];
+    onToggle: (value: string) => void;
+    onClear: () => void;
+    disabled?: boolean;
+  }> = ({ title, options, selected, onToggle, onClear, disabled = false }) => (
+    <div className="mb-4">
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="font-medium text-gray-700">
+          {title} ({selected.length})
+        </h4>
+        {selected.length > 0 && (
+          <button
+            onClick={onClear}
+            className="text-xs text-red-600 hover:text-red-800"
+          >
+            Clear
+          </button>
+        )}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {options.map((option) => (
+          <button
+            key={option}
+            onClick={() => onToggle(option)}
+            disabled={disabled}
+            className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+              selected.includes(option)
+                ? "bg-blue-500 text-white border-blue-500"
+                : disabled
+                  ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+            }`}
+          >
+            {option.replace("-", " ")} (
+            {
+              projects.filter((p) => {
+                switch (title.toLowerCase()) {
+                  case "categories":
+                    return p.category === option;
+                  case "statuses":
+                    return p.status === option;
+                  case "difficulties":
+                    return p.difficulty === option;
+                  case "tags":
+                    return p.tags.includes(option);
+                  case "technologies":
+                    return p.technologies.includes(option);
+                  default:
+                    return false;
+                }
+              }).length
+            }
+            )
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="max-w-6xl mx-auto p-6">
+      <h3 className="text-2xl font-bold mb-4">
+        Multi-Criteria Project Filtering
+      </h3>
+
+      {/* Filter Controls */}
+      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-medium">
+            Filters ({getActiveFilterCount()} active)
+          </h3>
+          {getActiveFilterCount() > 0 && (
+            <button
+              onClick={clearAllFilters}
+              className="px-4 py-2 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+            >
+              Clear All Filters
+            </button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <FilterSection
+              title="Categories"
+              options={allCategories}
+              selected={filters.categories}
+              onToggle={(value) => updateFilter("categories", value)}
+              onClear={() => clearFilterType("categories")}
+            />
+
+            <FilterSection
+              title="Tags"
+              options={availableTags}
+              selected={filters.tags}
+              onToggle={(value) => updateFilter("tags", value)}
+              onClear={() => clearFilterType("tags")}
+              disabled={
+                filters.categories.length > 0 && availableTags.length === 0
+              }
+            />
+
+            <FilterSection
+              title="Technologies"
+              options={availableTechnologies}
+              selected={filters.technologies}
+              onToggle={(value) => updateFilter("technologies", value)}
+              onClear={() => clearFilterType("technologies")}
+              disabled={
+                filters.categories.length > 0 &&
+                availableTechnologies.length === 0
+              }
+            />
+          </div>
+
+          <div>
+            <FilterSection
+              title="Statuses"
+              options={allStatuses}
+              selected={filters.statuses}
+              onToggle={(value) => updateFilter("statuses", value)}
+              onClear={() => clearFilterType("statuses")}
+            />
+
+            <FilterSection
+              title="Difficulties"
+              options={allDifficulties}
+              selected={filters.difficulties}
+              onToggle={(value) => updateFilter("difficulties", value)}
+              onClear={() => clearFilterType("difficulties")}
+            />
+          </div>
+        </div>
+
+        {filters.categories.length > 0 && (
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+            <p className="text-sm text-blue-800">
+              <strong>Cascading Filter Active:</strong> Tags and technologies
+              are filtered based on selected categories.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Results */}
+      <div className="mb-4">
+        <p className="text-gray-600">
+          Showing {filteredProjects.length} of {projects.length} projects
+        </p>
+      </div>
+
+      {/* Project Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {filteredProjects.length === 0 ? (
+          <div className="col-span-full text-center py-8">
+            <p className="text-gray-500 mb-2">
+              No projects match your current filter criteria.
+            </p>
+            <button
+              onClick={clearAllFilters}
+              className="text-blue-600 hover:text-blue-800 underline"
+            >
+              Clear all filters to see all projects
+            </button>
+          </div>
+        ) : (
+          filteredProjects.map((project) => (
+            <div
+              key={project.id}
+              className="bg-white p-4 rounded-lg border shadow-sm"
+            >
+              <div className="flex items-start justify-between mb-2">
+                <h5 className="font-semibold text-lg">{project.title}</h5>
+                <div className="flex gap-1">
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full ${getStatusColor(project.status)}`}
+                  >
+                    {project.status.replace("-", " ")}
+                  </span>
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full ${getDifficultyColor(project.difficulty)}`}
+                  >
+                    {project.difficulty}
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-sm text-blue-600 mb-2">{project.category}</p>
+              <p className="text-gray-600 text-sm mb-3">
+                {project.description}
+              </p>
+
+              <div className="mb-2">
+                <span className="text-xs text-gray-500 font-medium">Tags:</span>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {project.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className={`px-2 py-1 text-xs rounded ${
+                        filters.tags.includes(tag)
+                          ? "bg-green-200 text-green-800 font-medium"
+                          : "bg-green-100 text-green-800"
+                      }`}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <span className="text-xs text-gray-500 font-medium">
+                  Technologies:
+                </span>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {project.technologies.map((tech) => (
+                    <span
+                      key={tech}
+                      className={`px-2 py-1 text-xs rounded ${
+                        filters.technologies.includes(tech)
+                          ? "bg-blue-200 text-blue-800 font-medium"
+                          : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default MultiCriteriaFilter;
 ```
 
 ##### Customization Options
+
+- **URL Parameters**: Sync filters with URL for shareable filtered views
+- **Saved Filter Presets**: Allow users to save and name filter combinations
+- **Filter History**: Track and display recently used filter combinations
+- **Advanced Logic**: Add AND/OR logic options between filter groups
+- **Export Results**: Allow exporting filtered results to different formats
 
 <BackToTop />

@@ -1,5 +1,6 @@
 "use client";
 import Button from "@/components/Button";
+import { FaChevronUp } from "react-icons/fa";
 
 interface BackToTopProps {
   className?: string;
@@ -69,23 +70,11 @@ export default function BackToTop({ className = "" }: BackToTopProps) {
     <div className={`flex justify-end mt-6 mb-8 ${className}`}>
       <Button
         onClick={scrollToTop}
-        className="inline-flex items-center px-3 py-2 border-blue-200 hover:border-blue-400 rounded font-medium text-blue-600 text-sm hover:text-blue-800 hover:underline duration-200 transition-colors cursor-pointer"
-        variant="outline"
+        variant={"tertiary"}
+        className="group"
         aria-label="Back to top"
       >
-        <svg
-          className="mr-1 h-4 w-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M7 16l-4-4m0 0l4-4m-4 4h18"
-          />
-        </svg>
+        <FaChevronUp className="duration-300 ease-linear group-hover:-translate-y-1" />
         Back to Top
       </Button>
     </div>

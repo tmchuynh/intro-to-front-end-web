@@ -94,24 +94,208 @@ To enhance the blog page, you can implement pagination to display a limited numb
 #### Example #1: Minimal Pagination
 
 ```tsx
+import React, { useState } from "react";
+import { BlogPost } from "@/types/blog";
+import BlogCard from "@/components/BlogCard";
 
+interface PaginatedBlogProps {
+  posts: BlogPost[];
+  postsPerPage?: number;
+}
+
+const PaginatedBlog: React.FC<PaginatedBlogProps> = ({ 
+  posts, 
+  postsPerPage = 6 
+}) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  const totalPages = Math.ceil(posts.length / postsPerPage);
+  const startIndex = (currentPage - 1) * postsPerPage;
+  const currentPosts = posts.slice(startIndex, startIndex + postsPerPage);
+  
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  return (
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {currentPosts.map((post) => (
+          <BlogCard key={post.slug} post={post} />
+        ))}
+      </div>
+      
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center space-x-4">
+          <button
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-300 transition"
+          >
+            Previous
+          </button>
+          
+          <span className="text-gray-600">
+            Page {currentPage} of {totalPages}
+          </span>
+          
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition"
+          >
+            Next
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default PaginatedBlog;
 ```
 
 ##### How It Works
 
+The minimal pagination component divides the blog posts into pages and provides simple Previous/Next navigation. It calculates the total number of pages based on the posts array length and the desired posts per page. The component maintains the current page state and slices the posts array to show only the relevant posts for the current page.
+
 ##### Customization Options
+
+- **postsPerPage**: Adjust the number of posts displayed per page (default: 6)
+- **Styling**: Customize button colors, spacing, and hover effects
+- **Scroll behavior**: Modify the scroll-to-top behavior when changing pages
+- **Loading states**: Add loading spinners during page transitions
 
 <BackToTop />
 
 #### Example #2: Displays Page Numbers
 
 ```tsx
+import React, { useState } from "react";
+import { BlogPost } from "@/types/blog";
+import BlogCard from "@/components/BlogCard";
 
+interface AdvancedPaginationProps {
+  posts: BlogPost[];
+  postsPerPage?: number;
+}
+
+const AdvancedPagination: React.FC<AdvancedPaginationProps> = ({ 
+  posts, 
+  postsPerPage = 9 
+}) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  const totalPages = Math.ceil(posts.length / postsPerPage);
+  const startIndex = (currentPage - 1) * postsPerPage;
+  const currentPosts = posts.slice(startIndex, startIndex + postsPerPage);
+  
+  const getVisiblePages = () => {
+    const delta = 2;
+    const range = [];
+    const rangeWithDots = [];
+    
+    for (let i = Math.max(2, currentPage - delta); 
+         i <= Math.min(totalPages - 1, currentPage + delta); 
+         i++) {
+      range.push(i);
+    }
+    
+    if (currentPage - delta > 2) {
+      rangeWithDots.push(1, '...');
+    } else {
+      rangeWithDots.push(1);
+    }
+    
+    rangeWithDots.push(...range);
+    
+    if (currentPage + delta < totalPages - 1) {
+      rangeWithDots.push('...', totalPages);
+    } else {
+      rangeWithDots.push(totalPages);
+    }
+    
+    return rangeWithDots;
+  };
+  
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  return (
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {currentPosts.map((post) => (
+          <BlogCard key={post.slug} post={post} />
+        ))}
+      </div>
+      
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center space-x-2">
+          <button
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-2 text-gray-500 hover:text-gray-700 disabled:opacity-50"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
+          {getVisiblePages().map((page, index) => (
+            <React.Fragment key={index}>
+              {page === '...' ? (
+                <span className="px-3 py-2 text-gray-500">...</span>
+              ) : (
+                <button
+                  onClick={() => goToPage(page as number)}
+                  className={`px-3 py-2 rounded-lg transition ${
+                    currentPage === page
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {page}
+                </button>
+              )}
+            </React.Fragment>
+          ))}
+          
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-3 py-2 text-gray-500 hover:text-gray-700 disabled:opacity-50"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      )}
+      
+      <div className="text-center text-gray-600 text-sm">
+        Showing {startIndex + 1}-{Math.min(startIndex + postsPerPage, posts.length)} of {posts.length} posts
+      </div>
+    </div>
+  );
+};
+
+export default AdvancedPagination;
 ```
 
 ##### How It Works
 
+This advanced pagination component displays individual page numbers with smart truncation using ellipsis. It shows the first page, last page, current page, and surrounding pages within a delta range. The `getVisiblePages` function calculates which page numbers to display and where to place ellipsis to keep the pagination bar compact while maintaining usability.
+
 ##### Customization Options
+
+- **Delta range**: Adjust how many pages to show around the current page
+- **Icons**: Replace arrow icons with custom designs or text
+- **Results counter**: Toggle the display of "Showing X-Y of Z posts"
+- **Mobile responsiveness**: Adapt the pagination for smaller screens
+- **URL synchronization**: Sync pagination state with browser URL
 
 <BackToTop />
 
@@ -122,12 +306,148 @@ Adding a search bar allows users to quickly find specific blog posts. You can im
 #### Example #1: Using a `shadcn/ui` Command component with Keyboard shortcuts
 
 ```tsx
+import React, { useState, useEffect } from "react";
+import { BlogPost } from "@/types/blog";
+import BlogCard from "@/components/BlogCard";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
+interface CommandSearchProps {
+  posts: BlogPost[];
+}
+
+const CommandSearch: React.FC<CommandSearchProps> = ({ posts }) => {
+  const [open, setOpen] = useState(false);
+  const [filteredPosts, setFilteredPosts] = useState(posts);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
+      }
+    };
+    
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    const filtered = posts.filter(
+      (post) =>
+        post.title.toLowerCase().includes(query.toLowerCase()) ||
+        post.description?.toLowerCase().includes(query.toLowerCase()) ||
+        post.tags?.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
+    );
+    setFilteredPosts(filtered);
+  };
+
+  const handleSelectPost = (post: BlogPost) => {
+    setOpen(false);
+    // Navigate to post or perform action
+    window.location.href = `/blog/${post.slug}`;
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Blog Posts</h1>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <button className="flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <span>Search posts...</span>
+              <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                <span className="text-xs">⌘</span>K
+              </kbd>
+            </button>
+          </DialogTrigger>
+          <DialogContent className="p-0">
+            <Command className="rounded-lg border shadow-md">
+              <CommandInput 
+                placeholder="Search blog posts..." 
+                onValueChange={handleSearch}
+              />
+              <CommandList>
+                <CommandEmpty>No posts found.</CommandEmpty>
+                <CommandGroup heading="Blog Posts">
+                  {posts
+                    .filter(post => 
+                      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      post.description?.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .slice(0, 10)
+                    .map((post) => (
+                      <CommandItem
+                        key={post.slug}
+                        onSelect={() => handleSelectPost(post)}
+                        className="cursor-pointer"
+                      >
+                        <div className="flex flex-col">
+                          <span className="font-medium">{post.title}</span>
+                          <span className="text-sm text-gray-500 truncate">
+                            {post.description}
+                          </span>
+                        </div>
+                      </CommandItem>
+                    ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredPosts.map((post) => (
+          <BlogCard key={post.slug} post={post} />
+        ))}
+      </div>
+      
+      {filteredPosts.length === 0 && searchQuery && (
+        <div className="text-center py-12">
+          <p className="text-gray-500">No posts found for "{searchQuery}"</p>
+          <button 
+            onClick={() => handleSearch("")}
+            className="mt-2 text-blue-600 hover:text-blue-800"
+          >
+            Clear search
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CommandSearch;
 ```
 
 ##### How It Works
 
+This component uses shadcn/ui's Command component to create a powerful search interface with keyboard shortcuts. Pressing Cmd+K (or Ctrl+K) opens a search dialog where users can quickly find posts by title, description, or tags. The search filters posts in real-time and displays results in a clean, accessible format.
+
 ##### Customization Options
+
+- **Keyboard shortcuts**: Modify the key combination or add additional shortcuts
+- **Search fields**: Include/exclude different post properties in search
+- **Result limit**: Adjust the maximum number of search results shown
+- **Highlighting**: Add text highlighting for search matches
+- **Categories**: Group search results by post categories
 
 #### Example #2: Search with Debounce
 

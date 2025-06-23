@@ -1,88 +1,247 @@
 import BackToTop from "@/components/BackToTop";
 
-# Utility Functions
+# Utility Functions for Portfolio Websites
 
 ## Table of Contents
 
 ## Overview
 
-Utility functions are essential for enhancing the functionality of your portfolio website. They can help with tasks such as formatting dates, generating unique IDs, or handling common operations that are reused across different components.
+Portfolio-specific utility functions help enhance the functionality and user experience of your portfolio website. These utilities are tailored for common portfolio tasks like displaying projects, formatting dates, organizing skills, and handling user interactions.
+
+## Project Sorting
+
+Sort your projects by different criteria to help visitors find relevant work easily.
+
+```typescript
+interface Project {
+  id: string;
+  title: string;
+  date: string;
+  category: string;
+  featured: boolean;
+}
+
+export function sortProjects(
+  projects: Project[],
+  sortBy: "date" | "title" | "category" = "date",
+  ascending: boolean = false
+): Project[] {
+  return [...projects].sort((a, b) => {
+    let aValue = a[sortBy];
+    let bValue = b[sortBy];
+
+    // Convert dates to timestamps for proper sorting
+    if (sortBy === "date") {
+      aValue = new Date(aValue).getTime();
+      bValue = new Date(bValue).getTime();
+    }
+
+    if (aValue < bValue) return ascending ? -1 : 1;
+    if (aValue > bValue) return ascending ? 1 : -1;
+    return 0;
+  });
+}
+
+export function filterProjectsByCategory(
+  projects: Project[],
+  category: string
+): Project[] {
+  if (category === "all") return projects;
+  return projects.filter(
+    (project) => project.category.toLowerCase() === category.toLowerCase()
+  );
+}
+
+export function getFeaturedProjects(projects: Project[]): Project[] {
+  return projects.filter((project) => project.featured);
+}
+```
+
+<BackToTop />
 
 ## Date Formatting
 
-A utility function to format dates can be very useful, especially if you want to display project dates in a user-friendly format. You can use libraries like `date-fns` or `moment.js`, or you can create a simple function using JavaScript's built-in `Date` object.
+Format project dates and experience dates for consistent display across your portfolio.
 
 ```typescript
-export function formatDate(date: string | Date): string {
+export function formatProjectDate(date: string | Date): string {
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "long",
-    day: "numeric",
   };
   return new Date(date).toLocaleDateString(undefined, options);
 }
-```
 
-## Unique ID Generation
+export function formatDateRange(
+  startDate: string | Date,
+  endDate?: string | Date
+): string {
+  const start = formatProjectDate(startDate);
+  if (!endDate) return `${start} - Present`;
+  const end = formatProjectDate(endDate);
+  return `${start} - ${end}`;
+}
 
-If you need to generate unique IDs for your projects or components, you can create a simple utility function. This can be useful for ensuring that each project has a unique identifier, especially if you are using dynamic routing.
+export function getProjectAge(date: string | Date): string {
+  const projectDate = new Date(date);
+  const now = new Date();
+  const diffTime = Math.abs(now.getTime() - projectDate.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-```typescript
-export function generateUniqueId(prefix: string = "id"): string {
-  return `${prefix}-${Math.random().toString(36).substr(2, 9)}`;
+  if (diffDays < 30) return `${diffDays} days ago`;
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+  return `${Math.floor(diffDays / 365)} years ago`;
 }
 ```
 
-## Debounce Function
+<BackToTop />
 
-A debounce function can be useful for handling events like scrolling or resizing, where you want to limit the number of times a function is called. This can improve performance and user experience.
+## Skill Categorization
+
+Organize and display your technical skills effectively.
 
 ```typescript
-export function debounce(func: Function, delay: number): Function {
-  let timeoutId: NodeJS.Timeout;
-  return function (...args: any[]) {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      func.apply(this, args);
-    }, delay);
+interface Skill {
+  name: string;
+  category: "frontend" | "backend" | "design" | "tools" | "other";
+  proficiency: "beginner" | "intermediate" | "advanced" | "expert";
+}
+
+export function groupSkillsByCategory(
+  skills: Skill[]
+): Record<string, Skill[]> {
+  return skills.reduce(
+    (groups, skill) => {
+      const category = skill.category;
+      if (!groups[category]) {
+        groups[category] = [];
+      }
+      groups[category].push(skill);
+      return groups;
+    },
+    {} as Record<string, Skill[]>
+  );
+}
+
+export function getSkillsByProficiency(
+  skills: Skill[],
+  level: Skill["proficiency"]
+): Skill[] {
+  return skills.filter((skill) => skill.proficiency === level);
+}
+
+export function formatSkillCategory(category: string): string {
+  const categoryNames: Record<string, string> = {
+    frontend: "Frontend Development",
+    backend: "Backend Development",
+    design: "Design & UI/UX",
+    tools: "Development Tools",
+    other: "Other Skills",
+  };
+  return categoryNames[category] || category;
+}
+```
+
+<BackToTop />
+
+## URL Slug Generation
+
+Generate clean URLs for project pages and blog posts.
+
+```typescript
+export function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "") // Remove special characters
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/-+/g, "-") // Replace multiple hyphens with single
+    .trim();
+}
+
+export function createProjectUrl(
+  projectTitle: string,
+  baseUrl: string = "/projects"
+): string {
+  const slug = generateSlug(projectTitle);
+  return `${baseUrl}/${slug}`;
+}
+```
+
+<BackToTop />
+
+## Image Loading
+
+Handle image loading and optimization for project galleries.
+
+```typescript
+export function generateImageSizes(baseUrl: string): {
+  thumbnail: string;
+  medium: string;
+  large: string;
+} {
+  return {
+    thumbnail: `${baseUrl}?w=300&h=200&fit=crop`,
+    medium: `${baseUrl}?w=600&h=400&fit=crop`,
+    large: `${baseUrl}?w=1200&h=800&fit=crop`,
   };
 }
-```
 
-## Sorting Function
-
-If you want to sort your projects based on different criteria (e.g., date, title), you can create a utility function to handle sorting.
-
-```typescript
-export function sortProjects(
-  projects: any[],
-  key: string,
-  ascending: boolean = true
-): any[] {
-  return projects.sort((a, b) => {
-    if (a[key] < b[key]) return ascending ? -1 : 1;
-    if (a[key] > b[key]) return ascending ? 1 : -1;
-    return 0;
+export function preloadImage(src: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve();
+    img.onerror = reject;
+    img.src = src;
   });
 }
 ```
 
-## Fetch Data Utility
+<BackToTop />
 
-If you need to fetch data from an API or a database, you can create a utility function to handle the fetching process. This can include error handling and response parsing.
+## Contact Form Validation
+
+Validate contact form inputs for better user experience.
 
 ```typescript
-export async function fetchData(url: string): Promise<any> {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Fetch error:", error);
-    throw error;
+export function validateEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+export function validateContactForm(data: {
+  name: string;
+  email: string;
+  message: string;
+}): { isValid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  if (!data.name.trim()) {
+    errors.push("Name is required");
   }
+
+  if (!data.email.trim()) {
+    errors.push("Email is required");
+  } else if (!validateEmail(data.email)) {
+    errors.push("Please enter a valid email address");
+  }
+
+  if (!data.message.trim()) {
+    errors.push("Message is required");
+  } else if (data.message.trim().length < 10) {
+    errors.push("Message must be at least 10 characters long");
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+export function sanitizeInput(input: string): string {
+  return input
+    .trim()
+    .replace(/[<>]/g, "") // Remove potential HTML tags
+    .substring(0, 1000); // Limit length
 }
 ```
 

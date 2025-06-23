@@ -1,0 +1,234 @@
+import BackToTop from "@/components/BackToTop";
+
+# Routing Folders and Files
+
+## Table of Contents
+
+## Creating a New Route
+
+- Create a new folder in the `app` directory.
+- Name the folder according to the route you want to create.
+- Inside the folder, create a file named `page.tsx`
+- This file will contain the component that renders the content for that route.
+
+The folder structure will look like this:
+
+```
+app/
+  portfolio/
+    page.tsx
+```
+
+## Dynamic Routes
+
+You can create dynamic routes by using square brackets in the folder name.
+For example, to create a dynamic route for a user's profile, you can create a folder named `[username]`.
+
+The folder structure will look like this:
+
+```
+app/
+  [username]/
+    page.tsx
+```
+
+Here, `username` is a dynamic segment that can match any value. When a user visits `/john`, the `page.tsx` file inside the `[username]` folder will be rendered, and you can access the `username` parameter in your component.
+
+You can access the dynamic parameter in your `page.tsx` file using the `params` object provided by Next.js:
+
+```tsx
+import { useParams } from "next/navigation";
+export default function UserProfile() {
+  const params = useParams();
+  const username = params.username;
+
+  return (
+    <div>
+      <h1>User Profile: {username}</h1>
+      {/* Render user profile content here */}
+    </div>
+  );
+}
+```
+
+## Nested Routes
+
+You can create nested routes by creating subfolders inside a route folder. For example, if you want to create a route for a user's posts, you can create a folder named `posts` inside the `[username]` folder.
+
+The folder structure will look like this:
+
+```plaintext
+app/
+  [username]/
+    page.tsx
+    posts/
+      page.tsx
+```
+
+In this case, the `page.tsx` file inside the `posts` folder will be rendered when a user visits `/john/posts`. You can access the dynamic parameter `username` in the nested route as well.
+
+You can access the dynamic parameter in the nested `page.tsx` file using the `params` object:
+
+```tsx
+import { useParams } from "next/navigation";
+export default function UserPosts() {
+  const params = useParams();
+  const username = params.username;
+  return (
+    <div>
+      <h1>User Posts: {username}</h1>
+      {/* Render user posts content here */}
+    </div>
+  );
+}
+```
+
+## Special Files
+
+Next.js provides special files that can be used for specific purposes:
+
+| File Name       | Purpose                                                                                                                                           |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `layout.tsx`    | Used to define a layout for the route. It can wrap the content of the route with common elements like headers, footers, or sidebars.              |
+| `loading.tsx`   | Used to define a loading state for the route. It can be used to show a loading spinner or placeholder while the route is being loaded.            |
+| `error.tsx`     | Used to define an error state for the route. It can be used to show an error message or fallback UI when an error occurs while loading the route. |
+| `not-found.tsx` | Used to define a custom 404 page for the route. It can be used to show a custom message or UI when the route is not found.                        |
+
+These files can be placed in the route folder alongside `page.tsx`.
+
+The folder structure will look like this:
+
+```
+app/
+  [username]/
+    layout.tsx
+    loading.tsx
+    error.tsx
+    page.tsx
+```
+
+In this example, the `layout.tsx` file will wrap the content of the route, the `loading.tsx` file will be shown while the route is loading, the `error.tsx` file will be shown if an error occurs, and the `page.tsx` file will render the main content of the route.
+
+<BackToTop />
+
+### Example of a Layout File for `[username]` Route
+
+```tsx
+import React from "react";
+import { ReactNode } from "react";
+export default function UserLayout({ children }: { children: ReactNode }) {
+  return (
+    <div>
+      <header>
+        <h1>User Profile</h1>
+      </header>
+      <main>{children}</main>
+      <footer>
+        <p>Footer content here</p>
+      </footer>
+    </div>
+  );
+}
+```
+
+### Example of a Loading File for `[username]` Route
+
+```tsx
+export default function UserLoading() {
+  return (
+    <div>
+      <h1>Loading user profile...</h1>
+      <p>Please wait while we load the user profile.</p>
+    </div>
+  );
+}
+```
+
+### Example of an Error File for `[username]` Route
+
+```tsx
+export default function UserError() {
+  return (
+    <div>
+      <h1>Error loading user profile</h1>
+      <p>
+        There was an error loading the user profile. Please try again later.
+      </p>
+    </div>
+  );
+}
+```
+
+### Example of a Not Found File for `[username]` Route
+
+```tsx
+export default function UserNotFound() {
+  return (
+    <div>
+      <h1>User Not Found</h1>
+      <p>The user you are looking for does not exist.</p>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+## Creating Your Folder Structure for the Portfolio Website
+
+### Folder Structure
+
+To create a portfolio website using Next.js, you can follow this folder structure:
+
+```plaintext
+app/
+  portfolio/
+    page.tsx
+    projects/
+      page.tsx
+  about/
+    page.tsx
+  contact/
+    page.tsx
+  layout.tsx
+  loading.tsx
+  error.tsx
+  not-found.tsx
+```
+
+In this structure:
+
+- The `portfolio` folder contains the main portfolio page and a nested `projects` folder for the projects section.
+- The `about` and `contact` folders contain the respective pages.
+- The `layout.tsx` file can be used to define a common layout for the entire website.
+- The `loading.tsx`, `error.tsx`, and `not-found.tsx` files can be used to handle loading states, errors, and 404 pages respectively.
+
+If you remember the `<header>` component we created earlier, these routes have been linked to the components, waiting to be rendered with content.
+
+### Skeletons for `page.tsx` Files
+
+Here are the skeletons for the `page.tsx` files in each route:
+
+```tsx
+import React from "react";
+export default function PortfolioPage() {
+  return (
+    <div>
+      <h1>[Insert the name of the page here]</h1>
+      {/* Add more content here */}
+    </div>
+  );
+}
+```
+
+**TIP**
+
+> Always name the function the same as the file name to avoid confusion. For example, if the file is `page.tsx`, the function should be named `PortfolioPage`.
+
+## Next Steps
+
+It's time to start filling in those pages!!
+
+[Let's get started with the home page](/portfolio-website/creating-the-pages/home-page)
+
+<BackToTop />

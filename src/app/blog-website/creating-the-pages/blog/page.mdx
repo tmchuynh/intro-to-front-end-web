@@ -629,12 +629,216 @@ This search component implements debouncing to prevent excessive API calls or fi
 #### Example #3: Simple Search Bar
 
 ```tsx
+import React, { useState } from "react";
+import { BlogPost } from "@/types/blog";
+import BlogCard from "@/components/BlogCard";
 
+interface SimpleSearchProps {
+  posts: BlogPost[];
+}
+
+const SimpleSearch: React.FC<SimpleSearchProps> = ({ posts }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"date" | "title" | "relevance">("date");
+
+  const filteredAndSortedPosts = React.useMemo(() => {
+    let filtered = posts;
+
+    // Filter posts based on search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = posts.filter((post) =>
+        post.title.toLowerCase().includes(query) ||
+        post.description?.toLowerCase().includes(query) ||
+        post.author?.toLowerCase().includes(query) ||
+        post.tags?.some(tag => tag.toLowerCase().includes(query))
+      );
+    }
+
+    // Sort posts
+    const sorted = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case "title":
+          return a.title.localeCompare(b.title);
+        case "date":
+          return new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime();
+        case "relevance":
+          if (!searchQuery.trim()) return 0;
+          const aRelevance = calculateRelevance(a, searchQuery);
+          const bRelevance = calculateRelevance(b, searchQuery);
+          return bRelevance - aRelevance;
+        default:
+          return 0;
+      }
+    });
+
+    return sorted;
+  }, [posts, searchQuery, sortBy]);
+
+  const calculateRelevance = (post: BlogPost, query: string): number => {
+    const queryLower = query.toLowerCase();
+    let score = 0;
+    
+    // Title matches get higher score
+    if (post.title.toLowerCase().includes(queryLower)) {
+      score += 10;
+      if (post.title.toLowerCase().startsWith(queryLower)) {
+        score += 5;
+      }
+    }
+    
+    // Description matches
+    if (post.description?.toLowerCase().includes(queryLower)) {
+      score += 5;
+    }
+    
+    // Tag matches
+    post.tags?.forEach(tag => {
+      if (tag.toLowerCase().includes(queryLower)) {
+        score += 3;
+      }
+    });
+    
+    // Author matches
+    if (post.author?.toLowerCase().includes(queryLower)) {
+      score += 2;
+    }
+    
+    return score;
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortBy(e.target.value as "date" | "title" | "relevance");
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setSortBy("date");
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Search and Filter Bar */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="relative flex-1 max-w-md">
+          <input
+            type="text"
+            placeholder="Search posts by title, description, author, or tags..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <label htmlFor="sort" className="text-sm font-medium text-gray-700">
+              Sort by:
+            </label>
+            <select
+              id="sort"
+              value={sortBy}
+              onChange={handleSortChange}
+              className="border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="date">Date (Newest)</option>
+              <option value="title">Title (A-Z)</option>
+              {searchQuery && <option value="relevance">Relevance</option>}
+            </select>
+          </div>
+
+          {searchQuery && (
+            <button
+              onClick={clearSearch}
+              className="text-sm text-gray-500 hover:text-gray-700 underline"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Results Summary */}
+      <div className="flex items-center justify-between border-b border-gray-200 pb-4">
+        <p className="text-gray-600">
+          {searchQuery ? (
+            <>
+              {filteredAndSortedPosts.length} result{filteredAndSortedPosts.length !== 1 ? 's' : ''} for "{searchQuery}"
+            </>
+          ) : (
+            `${posts.length} total posts`
+          )}
+        </p>
+        
+        {filteredAndSortedPosts.length > 0 && (
+          <p className="text-sm text-gray-500">
+            Sorted by {sortBy === "date" ? "newest first" : sortBy === "title" ? "alphabetical" : "relevance"}
+          </p>
+        )}
+      </div>
+
+      {/* Posts Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredAndSortedPosts.map((post) => (
+          <BlogCard key={post.slug} post={post} />
+        ))}
+      </div>
+
+      {/* Empty State */}
+      {filteredAndSortedPosts.length === 0 && searchQuery && (
+        <div className="text-center py-12">
+          <div className="max-w-md mx-auto">
+            <svg className="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.5-1.01-6-2.709M7 21l1.5-1.5M21 7l-1.5 1.5" />
+            </svg>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No posts found</h3>
+            <p className="text-gray-500 mb-4">
+              Try different keywords or browse all posts.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button 
+                onClick={clearSearch}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+              >
+                Show all posts
+              </button>
+              <button 
+                onClick={() => setSearchQuery("")}
+                className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
+              >
+                Clear search
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default SimpleSearch;
 ```
 
 ##### How It Works
 
+This simple search component provides real-time filtering with sorting capabilities. It searches across multiple post fields and includes a relevance scoring system that prioritizes title matches. The component maintains clean state management and provides clear feedback about search results and sorting options.
+
 ##### Customization Options
+
+- **Search fields**: Add or remove fields from the search functionality
+- **Sorting options**: Include additional sorting criteria like popularity or category
+- **Relevance scoring**: Adjust the scoring algorithm for better search results
+- **UI styling**: Customize the search bar, filters, and result display
+- **Performance**: Add virtualization for large datasets
 
 <BackToTop />
 

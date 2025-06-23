@@ -35,429 +35,1428 @@ function MyComponent() {
 
 Here are various loading component implementations using different styles and libraries to match different design aesthetics.
 
-### Simple CSS Spinner
+### Example #1: Classic Spinning Loader with CSS Animations
 
-A lightweight loading spinner using pure CSS animations.
+A lightweight, universally compatible loading spinner using pure CSS animations - perfect for any project without external dependencies.
 
 ```tsx
 import React from "react";
 
-const CSSSpinnerLoading: React.FC = () => {
+const ClassicSpinningLoader: React.FC = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <div className="relative">
-        <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-        <p className="mt-4 text-gray-600 text-center">Loading...</p>
-      </div>
-    </div>
-  );
-};
-export default CSSSpinnerLoading;
-```
-
-##### Customization Options
-
-- **Size**: Change `w-12 h-12` to `w-8 h-8` (smaller) or `w-16 h-16` (larger)
-- **Colors**: Replace `border-blue-200` and `border-t-blue-600` with your brand colors (e.g., `border-purple-200` and `border-t-purple-600`)
-- **Background**: Change `bg-gray-50` to match your theme (e.g., `bg-white`, `bg-slate-900`)
-- **Border thickness**: Adjust `border-4` to `border-2` (thinner) or `border-8` (thicker)
-- **Text**: Replace "Loading..." with custom messages like "Please wait..." or "Fetching data..."
-- **Speed**: Add custom CSS or modify with `animate-spin` variants for different speeds
-  <BackToTop />
-
-### Pulsing Dots Animation
-
-A modern loading indicator with pulsing dots effect.
-
-```tsx
-import React from "react";
-
-const PulsingDotsLoading: React.FC = () => {
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-white">
-      <div className="flex flex-col items-center space-y-4">
-        <div className="flex space-x-2">
-          <div className="w-3 h-3 bg-blue-600 rounded-full animate-pulse"></div>
-          <div className="w-3 h-3 bg-blue-600 rounded-full animate-pulse delay-75"></div>
-          <div className="w-3 h-3 bg-blue-600 rounded-full animate-pulse delay-150"></div>
+        {/* Main spinner */}
+        <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        
+        {/* Inner spinner for dual effect */}
+        <div className="absolute top-2 left-2 w-12 h-12 border-3 border-transparent border-t-blue-400 rounded-full animate-spin animate-reverse"></div>
+        
+        {/* Loading text with fade animation */}
+        <div className="mt-6 text-center">
+          <p className="text-gray-600 animate-pulse text-lg font-medium">Loading...</p>
+          <div className="mt-2 flex justify-center space-x-1">
+            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce delay-100"></div>
+            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce delay-200"></div>
+          </div>
         </div>
-        <p className="text-gray-700 font-medium">Loading your content</p>
       </div>
     </div>
   );
 };
-export default PulsingDotsLoading;
+export default ClassicSpinningLoader;
 ```
 
-##### Customization Options
+##### Advanced Customization Options
 
-- **Dot count**: Add more dots by duplicating the div pattern with increasing delays (`delay-225`, `delay-300`)
-- **Dot size**: Change `w-3 h-3` to `w-2 h-2` (smaller) or `w-4 h-4` (larger)
-- **Colors**: Replace `bg-blue-600` with your brand colors (e.g., `bg-red-500`, `bg-green-500`)
-- **Spacing**: Adjust `space-x-2` to `space-x-1` (closer) or `space-x-4` (wider apart)
-- **Animation timing**: Modify delay values (`delay-75`, `delay-150`) to change pulsing rhythm
-- **Text positioning**: Move text above dots or remove entirely
-- **Dot shape**: Change `rounded-full` to `rounded-lg` for squares with rounded corners
+- **Dual spinner effect**: Remove the inner spinner by deleting the second div for a simpler look
+- **Size variations**: Change `w-16 h-16` to `w-12 h-12` (smaller) or `w-20 h-20` (larger)
+- **Color schemes**: Replace `border-blue-200` and `border-t-blue-600` with your brand colors (e.g., `border-purple-200` and `border-t-purple-600`)
+- **Background themes**: Change `bg-gray-50` to `bg-white`, `bg-slate-900`, or gradient backgrounds
+- **Border thickness**: Adjust `border-4` to `border-2` (thinner) or `border-8` (thicker)
+- **Animation speed**: Add custom CSS with different `animation-duration` values
+- **Text customization**: Replace "Loading..." with branded messages like "Preparing your portfolio..."
+- **Reverse animation**: Add `animate-reverse` class for counter-clockwise rotation
+- **Loading dots**: Customize the bouncing dots count and timing delays
+- **Positioning**: Center horizontally only with `justify-center` without `items-center`
   <BackToTop />
 
-### Skeleton Loading
+### Example #2: Modern Pulsing Dots with Wave Animation
 
-A skeleton loader that mimics the layout of the content being loaded.
+A contemporary loading indicator featuring rhythmic pulsing dots with wave-like motion - perfect for modern, minimalist designs.
 
 ```tsx
 import React from "react";
 
-const SkeletonLoading: React.FC = () => {
+const ModernPulsingDots: React.FC = () => {
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      {/* Header Skeleton */}
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="flex flex-col items-center space-y-8">
+        {/* Main dot animation */}
+        <div className="flex space-x-3">
+          {[1, 2, 3, 4, 5].map((dot) => (
+            <div
+              key={dot}
+              className="relative"
+            >
+              {/* Main dot */}
+              <div 
+                className="w-4 h-4 bg-blue-600 rounded-full animate-pulse"
+                style={{ animationDelay: `${dot * 0.15}s` }}
+              ></div>
+              
+              {/* Ripple effect */}
+              <div 
+                className="absolute inset-0 w-4 h-4 bg-blue-400 rounded-full animate-ping opacity-30"
+                style={{ animationDelay: `${dot * 0.15}s` }}
+              ></div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Progress text with typewriter effect */}
+        <div className="text-center space-y-2">
+          <p className="text-slate-700 font-semibold text-lg">Loading your portfolio</p>
+          <div className="flex items-center justify-center space-x-2">
+            <div className="w-6 h-1 bg-blue-200 rounded-full overflow-hidden">
+              <div className="w-full h-full bg-blue-600 rounded-full animate-pulse"></div>
+            </div>
+            <span className="text-sm text-slate-500 animate-pulse">Please wait</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+export default ModernPulsingDots;
+```
+
+##### Advanced Customization Options
+
+- **Dot count**: Modify `[1, 2, 3, 4, 5]` to `[1, 2, 3]` for fewer dots or extend to `[1, 2, 3, 4, 5, 6, 7]` for more
+- **Wave timing**: Adjust `dot * 0.15` to `dot * 0.1` (faster wave) or `dot * 0.3` (slower wave)
+- **Dot sizes**: Change `w-4 h-4` to `w-3 h-3` (smaller) or `w-6 h-6` (larger)
+- **Color variations**: Replace `bg-blue-600` with gradients or multiple colors for each dot
+- **Ripple effects**: Remove ripple divs for simpler animation or adjust opacity and timing
+- **Background gradients**: Customize `from-slate-50 to-blue-50` with your brand colors
+- **Dot spacing**: Modify `space-x-3` to `space-x-2` (closer) or `space-x-6` (wider)
+- **Progress indicators**: Add percentage counters or step indicators
+- **Animation styles**: Replace `animate-pulse` with `animate-bounce` or custom CSS animations
+- **Text effects**: Add typing animations or rotating loading messages
+- **Layout orientation**: Change to vertical layout with `flex-col` and `space-y-3`
+  <BackToTop />
+
+### Example #3: Content-Aware Skeleton Loader
+
+An intelligent skeleton loader that mimics your actual content layout while loading - provides visual continuity and reduces perceived loading time.
+
+```tsx
+import React from "react";
+
+const ContentAwareSkeletonLoader: React.FC = () => {
+  return (
+    <div className="max-w-6xl mx-auto p-6 space-y-8 bg-white min-h-screen">
+      {/* Header Skeleton with Avatar */}
       <div className="animate-pulse">
-        <div className="h-8 bg-gray-300 rounded w-3/4 mb-4"></div>
-        <div className="h-4 bg-gray-300 rounded w-1/2 mb-6"></div>
+        <div className="flex items-center space-x-4 mb-6">
+          <div className="w-16 h-16 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full"></div>
+          <div className="space-y-2">
+            <div className="h-6 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-48"></div>
+            <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-32"></div>
+          </div>
+        </div>
+        <div className="h-8 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-3/4 mb-4"></div>
+        <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-1/2 mb-8"></div>
       </div>
 
-      {/* Card Skeletons */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {[1, 2, 3, 4].map((item) => (
+      {/* Navigation Skeleton */}
+      <div className="animate-pulse">
+        <div className="flex space-x-6 border-b border-gray-200 pb-4">
+          {[1, 2, 3, 4, 5].map((item) => (
+            <div key={item} className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-20"></div>
+          ))}
+        </div>
+      </div>
+
+      {/* Portfolio Grid Skeleton */}
+      <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
+        {[1, 2, 3, 4, 5, 6].map((item) => (
           <div key={item} className="animate-pulse">
-            <div className="h-48 bg-gray-300 rounded-lg mb-4"></div>
-            <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
-            <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+            {/* Project thumbnail */}
+            <div className="h-48 bg-gradient-to-br from-gray-200 via-gray-300 to-gray-200 rounded-xl mb-4 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-shimmer"></div>
+            </div>
+            
+            {/* Project details */}
+            <div className="space-y-3">
+              <div className="h-5 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-4/5"></div>
+              <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-full"></div>
+              <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-3/4"></div>
+              
+              {/* Tech stack indicators */}
+              <div className="flex space-x-2 mt-4">
+                {[1, 2, 3].map((tag) => (
+                  <div key={tag} className="h-6 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full w-16"></div>
+                ))}
+              </div>
+            </div>
           </div>
         ))}
       </div>
+
+      {/* About Section Skeleton */}
+      <div className="animate-pulse mt-12">
+        <div className="h-7 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-40 mb-6"></div>
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="space-y-4">
+            <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-full"></div>
+            <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-5/6"></div>
+            <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-4/5"></div>
+            <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-3/4"></div>
+          </div>
+          <div className="h-64 bg-gradient-to-br from-gray-200 via-gray-300 to-gray-200 rounded-lg"></div>
+        </div>
+      </div>
     </div>
   );
 };
-export default SkeletonLoading;
+export default ContentAwareSkeletonLoader;
 ```
 
-##### Customization Options
+##### Advanced Customization Options
 
-- **Layout**: Match your actual content layout by adjusting grid columns (`md:grid-cols-3` for 3 columns)
-- **Card count**: Change the array `[1, 2, 3, 4]` to `[1, 2, 3, 4, 5, 6]` for more cards
-- **Skeleton colors**: Replace `bg-gray-300` with `bg-slate-200` or `bg-zinc-300` for different themes
-- **Card dimensions**: Adjust `h-48` to match your actual card heights (e.g., `h-32`, `h-64`)
-- **Text widths**: Modify `w-3/4`, `w-1/2` to match your content widths (`w-full`, `w-2/3`)
-- **Corner radius**: Change `rounded-lg` to `rounded-xl` or `rounded-md` to match your design
-- **Container width**: Adjust `max-w-4xl` to `max-w-6xl` or `max-w-2xl` based on your layout
-- **Add elements**: Include avatar placeholders, button skeletons, or navigation bars
+- **Layout matching**: Customize grid layouts to match your actual portfolio structure (`grid-cols-2`, `grid-cols-4`)
+- **Content sections**: Add or remove skeleton sections (testimonials, blog posts, contact forms)
+- **Shimmer effects**: Enable shimmer animation by adding custom CSS for `animate-shimmer`
+- **Gradient colors**: Replace `from-gray-200 to-gray-300` with brand-appropriate colors
+- **Corner radius**: Adjust `rounded-xl`, `rounded-lg` to match your design system
+- **Card dimensions**: Modify heights (`h-48`, `h-64`) to match your actual content cards
+- **Text line widths**: Customize skeleton text widths (`w-3/4`, `w-1/2`) to match real content
+- **Avatar styles**: Change avatar shape to square (`rounded-lg`) or keep circular (`rounded-full`)
+- **Animation timing**: Adjust `animate-pulse` duration with custom CSS
+- **Dark mode**: Create dark theme variants with appropriate skeleton colors
+- **Component-specific**: Create specialized skeletons for different page types (blog, gallery, etc.)
+- **Loading states**: Show different skeleton densities based on connection speed
   <BackToTop />
 
-### Progress Bar Loading
+### Example #4: Dynamic Progress Bar with Real-time Feedback
 
-A loading component with a progress bar for longer operations.
+An interactive progress bar loader with real-time progress tracking and dynamic messaging - ideal for file uploads, data processing, or multi-step operations.
 
 ```tsx
 import React, { useState, useEffect } from "react";
 
-const ProgressBarLoading: React.FC = () => {
+const DynamicProgressLoader: React.FC = () => {
   const [progress, setProgress] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isComplete, setIsComplete] = useState(false);
+
+  const loadingSteps = [
+    { label: "Initializing portfolio", duration: 800 },
+    { label: "Loading projects", duration: 1200 },
+    { label: "Fetching images", duration: 1000 },
+    { label: "Processing data", duration: 600 },
+    { label: "Optimizing performance", duration: 400 },
+    { label: "Finalizing", duration: 300 }
+  ];
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prevProgress) => {
-        if (prevProgress >= 100) {
-          clearInterval(timer);
-          return 100;
-        }
-        return prevProgress + 10;
-      });
-    }, 200);
+    let progressTimer: NodeJS.Timeout;
+    let stepTimer: NodeJS.Timeout;
 
-    return () => clearInterval(timer);
+    const runProgress = () => {
+      if (currentStep < loadingSteps.length) {
+        const step = loadingSteps[currentStep];
+        const stepProgress = 100 / loadingSteps.length;
+        const startProgress = currentStep * stepProgress;
+        const endProgress = (currentStep + 1) * stepProgress;
+        
+        let localProgress = 0;
+        const increment = 2;
+        const interval = step.duration / (stepProgress / increment);
+
+        progressTimer = setInterval(() => {
+          localProgress += increment;
+          const currentProgress = startProgress + localProgress;
+          
+          if (currentProgress >= endProgress) {
+            setProgress(endProgress);
+            clearInterval(progressTimer);
+            
+            stepTimer = setTimeout(() => {
+              setCurrentStep(prev => prev + 1);
+            }, 100);
+          } else {
+            setProgress(currentProgress);
+          }
+        }, interval);
+      } else {
+        setIsComplete(true);
+      }
+    };
+
+    runProgress();
+
+    return () => {
+      clearInterval(progressTimer);
+      clearTimeout(stepTimer);
+    };
+  }, [currentStep]);
+
+  if (isComplete) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto animate-bounce">
+            <span className="text-white text-2xl">✓</span>
+          </div>
+          <h2 className="text-2xl font-bold text-green-700">Ready!</h2>
+          <p className="text-green-600">Your portfolio has loaded successfully</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
+      <div className="w-96 space-y-6 p-8">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            Loading Portfolio
+          </h2>
+          <p className="text-slate-400">Please wait while we prepare everything</p>
+        </div>
+
+        {/* Progress Circle */}
+        <div className="flex justify-center">
+          <div className="relative w-24 h-24">
+            <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+              {/* Background circle */}
+              <circle
+                cx="50"
+                cy="50"
+                r="40"
+                stroke="currentColor"
+                strokeWidth="8"
+                fill="none"
+                className="text-slate-700"
+              />
+              {/* Progress circle */}
+              <circle
+                cx="50"
+                cy="50"
+                r="40"
+                stroke="currentColor"
+                strokeWidth="8"
+                fill="none"
+                strokeLinecap="round"
+                className="text-blue-400"
+                style={{
+                  strokeDasharray: `${2 * Math.PI * 40}`,
+                  strokeDashoffset: `${2 * Math.PI * 40 * (1 - progress / 100)}`,
+                  transition: 'stroke-dashoffset 0.3s ease'
+                }}
+              />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-lg font-bold">{Math.round(progress)}%</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="space-y-2">
+          <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
+            <div
+              className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300 ease-out"
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
+          <div className="flex justify-between text-sm text-slate-400">
+            <span>0%</span>
+            <span>100%</span>
+          </div>
+        </div>
+
+        {/* Current Step */}
+        <div className="space-y-4">
+          <div className="text-center">
+            <p className="text-blue-300 font-medium animate-pulse">
+              {currentStep < loadingSteps.length ? loadingSteps[currentStep].label : "Complete"}
+            </p>
+          </div>
+
+          {/* Step Indicators */}
+          <div className="flex justify-between">
+            {loadingSteps.map((step, index) => (
+              <div key={index} className="flex flex-col items-center space-y-1">
+                <div className={`w-3 h-3 rounded-full transition-colors duration-300 ${
+                  index < currentStep 
+                    ? 'bg-green-400' 
+                    : index === currentStep 
+                    ? 'bg-blue-400 animate-pulse' 
+                    : 'bg-slate-600'
+                }`}></div>
+                <span className="text-xs text-slate-500 text-center max-w-16">
+                  {step.label.split(' ')[0]}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Additional Info */}
+        <div className="bg-slate-800 rounded-lg p-4 text-sm">
+          <div className="flex justify-between items-center">
+            <span className="text-slate-400">Status:</span>
+            <span className="text-blue-300">
+              Step {currentStep + 1} of {loadingSteps.length}
+            </span>
+          </div>
+          <div className="flex justify-between items-center mt-2">
+            <span className="text-slate-400">Estimated time:</span>
+            <span className="text-purple-300">~{Math.max(0, 4 - currentStep)}s remaining</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+export default DynamicProgressLoader;
+```
+
+##### Customization Options
+
+- **Steps Configuration**: Modify the `loadingSteps` array to match your app's actual loading process
+- **Timing**: Adjust `duration` values for each step based on real loading times
+- **Colors**: Change gradient colors from `blue-purple` to match your brand
+- **Progress Indicators**: Switch between circular, linear, or both progress displays
+- **Completion State**: Customize the success message and animation
+- **Real-time Data**: Connect to actual loading events instead of simulated progress
+- **Multiple Bars**: Add separate progress bars for different loading aspects
+- **Sound Effects**: Include audio feedback for step completions
+- **Error Handling**: Add error states for failed loading steps
+
+### Example #5: Interactive Bouncing Balls Loader with Physics
+
+A playful and engaging loader featuring animated bouncing balls with realistic physics, perfect for creative portfolios or fun applications.
+
+```tsx
+import React, { useEffect, useRef } from "react";
+
+interface Ball {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  color: string;
+  bounce: number;
+}
+
+const InteractiveBounceLoader: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number>();
+  const ballsRef = useRef<Ball[]>([]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas size
+    const resizeCanvas = () => {
+      canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+      canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Initialize balls
+    const colors = ['#3B82F6', '#8B5CF6', '#EF4444', '#10B981', '#F59E0B', '#EC4899'];
+    ballsRef.current = Array.from({ length: 6 }, (_, i) => ({
+      x: Math.random() * (canvas.offsetWidth - 40) + 20,
+      y: Math.random() * (canvas.offsetHeight - 40) + 20,
+      vx: (Math.random() - 0.5) * 8,
+      vy: (Math.random() - 0.5) * 8,
+      radius: Math.random() * 15 + 10,
+      color: colors[i % colors.length],
+      bounce: 0.85 + Math.random() * 0.1
+    }));
+
+    // Animation loop
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+
+      ballsRef.current.forEach((ball, index) => {
+        // Update position
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+
+        // Add gravity
+        ball.vy += 0.3;
+
+        // Bounce off walls
+        if (ball.x + ball.radius > canvas.offsetWidth) {
+          ball.x = canvas.offsetWidth - ball.radius;
+          ball.vx *= -ball.bounce;
+        }
+        if (ball.x - ball.radius < 0) {
+          ball.x = ball.radius;
+          ball.vx *= -ball.bounce;
+        }
+        if (ball.y + ball.radius > canvas.offsetHeight) {
+          ball.y = canvas.offsetHeight - ball.radius;
+          ball.vy *= -ball.bounce;
+        }
+        if (ball.y - ball.radius < 0) {
+          ball.y = ball.radius;
+          ball.vy *= -ball.bounce;
+        }
+
+        // Ball-to-ball collision
+        ballsRef.current.forEach((otherBall, otherIndex) => {
+          if (index !== otherIndex) {
+            const dx = ball.x - otherBall.x;
+            const dy = ball.y - otherBall.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < ball.radius + otherBall.radius) {
+              // Simple collision response
+              const angle = Math.atan2(dy, dx);
+              const targetX = otherBall.x + Math.cos(angle) * (ball.radius + otherBall.radius);
+              const targetY = otherBall.y + Math.sin(angle) * (ball.radius + otherBall.radius);
+              
+              ball.x = targetX;
+              ball.y = targetY;
+              
+              const tempVx = ball.vx;
+              const tempVy = ball.vy;
+              ball.vx = otherBall.vx * 0.8;
+              ball.vy = otherBall.vy * 0.8;
+              otherBall.vx = tempVx * 0.8;
+              otherBall.vy = tempVy * 0.8;
+            }
+          }
+        });
+
+        // Draw ball with shadow and gradient
+        ctx.save();
+        
+        // Shadow
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        ctx.shadowBlur = 10;
+        ctx.shadowOffsetX = 3;
+        ctx.shadowOffsetY = 3;
+
+        // Gradient fill
+        const gradient = ctx.createRadialGradient(
+          ball.x - ball.radius * 0.3, 
+          ball.y - ball.radius * 0.3, 
+          0,
+          ball.x, 
+          ball.y, 
+          ball.radius
+        );
+        gradient.addColorStop(0, ball.color);
+        gradient.addColorStop(1, ball.color + '88');
+
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        // Highlight
+        ctx.shadowColor = 'transparent';
+        const highlight = ctx.createRadialGradient(
+          ball.x - ball.radius * 0.4,
+          ball.y - ball.radius * 0.4,
+          0,
+          ball.x - ball.radius * 0.4,
+          ball.y - ball.radius * 0.4,
+          ball.radius * 0.5
+        );
+        highlight.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+        highlight.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+        ctx.fillStyle = highlight;
+        ctx.fill();
+
+        ctx.restore();
+      });
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    // Mouse interaction
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      ballsRef.current.forEach(ball => {
+        const dx = mouseX - ball.x;
+        const dy = mouseY - ball.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 100) {
+          const force = (100 - distance) / 100;
+          ball.vx -= (dx / distance) * force * 0.5;
+          ball.vy -= (dy / distance) * force * 0.5;
+        }
+      });
+    };
+
+    canvas.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      canvas.removeEventListener('mousemove', handleMouseMove);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
   }, []);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-900 text-white">
-      <div className="w-80 space-y-4">
-        <h2 className="text-xl font-semibold text-center">Loading Portfolio</h2>
-        <div className="w-full bg-gray-700 rounded-full h-2">
-          <div
-            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          ></div>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 text-white overflow-hidden">
+      <div className="text-center space-y-6 z-10 relative">
+        <h2 className="text-3xl font-bold bg-gradient-to-r from-pink-400 to-violet-400 bg-clip-text text-transparent">
+          Loading Portfolio
+        </h2>
+        <p className="text-purple-200 max-w-md">
+          Move your mouse around to interact with the bouncing balls while we prepare your content
+        </p>
+        
+        {/* Animated loading text */}
+        <div className="flex items-center justify-center space-x-2">
+          <span className="text-lg">Loading</span>
+          <div className="flex space-x-1">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"
+                style={{
+                  animationDelay: `${i * 0.1}s`,
+                  animationDuration: '0.6s'
+                }}
+              ></div>
+            ))}
+          </div>
         </div>
-        <p className="text-center text-gray-300">{progress}% Complete</p>
       </div>
+
+      {/* Canvas for bouncing balls */}
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full cursor-pointer"
+        style={{ width: '100%', height: '100%' }}
+      />
+
+      {/* Decorative elements */}
+      <div className="absolute top-10 left-10 w-20 h-20 bg-gradient-to-br from-pink-500/20 to-violet-500/20 rounded-full blur-xl animate-pulse"></div>
+      <div className="absolute bottom-10 right-10 w-32 h-32 bg-gradient-to-br from-violet-500/20 to-indigo-500/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      <div className="absolute top-1/2 left-20 w-16 h-16 bg-gradient-to-br from-indigo-500/20 to-pink-500/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
     </div>
   );
 };
-export default ProgressBarLoading;
+
+export default InteractiveBounceLoader;
 ```
 
 ##### Customization Options
+- **Ball Physics**: Adjust gravity, bounce factors, and collision responses
+- **Visual Effects**: Modify shadows, gradients, and highlight effects
+- **Interaction**: Change mouse interaction radius and force strength
+- **Performance**: Reduce ball count or canvas resolution for better performance
+- **Colors**: Update ball colors and background gradients to match your theme
+- **Animation Speed**: Control velocity ranges and dampening factors
+- **Additional Effects**: Add trails, particles, or sound effects
+- **Responsive**: Adapt ball sizes and counts based on screen size
 
-- **Progress speed**: Change the interval timing from `200` milliseconds to `100` (faster) or `500` (slower)
-- **Increment size**: Modify `+ 10` to `+ 5` (slower progress) or `+ 20` (faster progress)
-- **Bar width**: Adjust container width from `w-80` to `w-96` (wider) or `w-64` (narrower)
-- **Bar height**: Change `h-2` to `h-1` (thinner) or `h-4` (thicker)
-- **Colors**: Replace `bg-blue-500` with your brand colors (e.g., `bg-green-500`, `bg-purple-500`)
-- **Background theme**: Change `bg-slate-900` to `bg-white` and adjust text colors accordingly
-- **Loading text**: Customize the title and percentage text to match your application
-- **Animation**: Modify `duration-300` for different transition speeds
-- **Real progress**: Connect to actual loading progress instead of simulated progress
-  <BackToTop />
+### Example #6: Professional Chakra UI-Inspired Spinner
 
-### Bouncing Balls
-
-A playful loading animation with bouncing balls.
+A clean, professional spinner inspired by Chakra UI's design principles with customizable size, colors, and speed options.
 
 ```tsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 
-const BouncingBallsLoading: React.FC = () => {
+interface SpinnerProps {
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  color?: string;
+  thickness?: number;
+  speed?: number;
+}
+
+const ProfessionalSpinnerLoader: React.FC<SpinnerProps> = ({ 
+  size = 'xl', 
+  color = '#3B82F6', 
+  thickness = 4, 
+  speed = 0.65 
+}) => {
+  const [dots, setDots] = useState(0);
+
+  // Animated loading text
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots(prev => (prev + 1) % 4);
+    }, 400);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Size mappings
+  const sizeMap = {
+    sm: { spinner: 24, text: 'text-sm' },
+    md: { spinner: 32, text: 'text-base' },
+    lg: { spinner: 48, text: 'text-lg' },
+    xl: { spinner: 64, text: 'text-xl' }
+  };
+
+  const { spinner: spinnerSize, text: textSize } = sizeMap[size];
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-400 to-blue-500">
-      <div className="flex flex-col items-center space-y-6">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="flex flex-col items-center space-y-8 p-8">
+        {/* Main Spinner */}
+        <div className="relative">
+          {/* Outer ring */}
+          <div 
+            className="rounded-full border-gray-200"
+            style={{ 
+              width: spinnerSize + 16, 
+              height: spinnerSize + 16,
+              borderWidth: thickness + 1 
+            }}
+          ></div>
+          
+          {/* Spinning element */}
+          <div 
+            className="absolute top-2 left-2 rounded-full border-transparent animate-spin"
+            style={{ 
+              width: spinnerSize, 
+              height: spinnerSize,
+              borderWidth: thickness,
+              borderTopColor: color,
+              borderRightColor: color + '80',
+              animationDuration: `${speed}s`
+            }}
+          ></div>
+
+          {/* Center dot */}
+          <div 
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{ 
+              width: thickness * 2, 
+              height: thickness * 2,
+              backgroundColor: color 
+            }}
+          ></div>
+        </div>
+
+        {/* Loading text with animated dots */}
+        <div className="text-center space-y-3">
+          <h2 className={`font-semibold text-slate-700 ${textSize}`}>
+            Loading your portfolio{'.'.repeat(dots)}
+          </h2>
+          <p className="text-slate-500 text-sm max-w-xs">
+            We're preparing an amazing experience for you. This won't take long.
+          </p>
+        </div>
+
+        {/* Progress indicators */}
         <div className="flex space-x-2">
-          {[1, 2, 3].map((ball) => (
+          {[0, 1, 2, 3, 4].map((i) => (
             <div
-              key={ball}
-              className="w-4 h-4 bg-white rounded-full animate-bounce"
-              style={{ animationDelay: `${ball * 0.1}s` }}
+              key={i}
+              className="w-2 h-2 rounded-full bg-slate-300 animate-pulse"
+              style={{
+                animationDelay: `${i * 0.2}s`,
+                animationDuration: '1.5s'
+              }}
             ></div>
           ))}
         </div>
-        <p className="text-white text-lg font-medium">
-          Getting things ready...
-        </p>
+
+        {/* Loading stats (optional) */}
+        <div className="bg-white rounded-lg px-6 py-4 shadow-sm border border-slate-200">
+          <div className="flex items-center space-x-4 text-sm text-slate-600">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span>Optimizing assets</span>
+            </div>
+            <div className="w-px h-4 bg-slate-300"></div>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+              <span>Loading content</span>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Background decoration */}
+      <div className="absolute top-20 left-20 w-32 h-32 bg-blue-100 rounded-full blur-3xl opacity-60 animate-pulse"></div>
+      <div className="absolute bottom-20 right-20 w-24 h-24 bg-purple-100 rounded-full blur-3xl opacity-60 animate-pulse" style={{ animationDelay: '1s' }}></div>
     </div>
   );
 };
-export default BouncingBallsLoading;
+
+export default ProfessionalSpinnerLoader;
 ```
 
 ##### Customization Options
+- **Spinner Size**: Pass `size` prop ('sm', 'md', 'lg', 'xl') or customize the `sizeMap` object
+- **Color Scheme**: Change the `color` prop to match your brand colors
+- **Spinner Thickness**: Adjust the `thickness` prop for different line weights
+- **Animation Speed**: Control rotation speed with the `speed` prop
+- **Background**: Modify gradient from `slate-blue` to any color combination
+- **Loading States**: Add/remove progress indicators or status messages
+- **Typography**: Customize text sizes and colors to match your design system
+- **Additional Elements**: Include logos, progress bars, or step indicators
+- **Professional Polish**: Add shadows, borders, and subtle animations
 
-- **Ball count**: Change `[1, 2, 3]` to `[1, 2, 3, 4, 5]` for more balls
-- **Ball size**: Adjust `w-4 h-4` to `w-3 h-3` (smaller) or `w-6 h-6` (larger)
-- **Ball colors**: Replace `bg-white` with different colors like `bg-yellow-300` or `bg-pink-300`
-- **Gradient background**: Change `from-purple-400 to-blue-500` to other combinations like `from-green-400 to-teal-500`
-- **Animation timing**: Modify `ball * 0.1` to `ball * 0.2` for slower staggered effect
-- **Ball spacing**: Change `space-x-2` to `space-x-4` for wider spacing
-- **Text message**: Customize the loading message to fit your application
-- **Animation type**: Replace `animate-bounce` with `animate-pulse` for different effect
-- **Ball shape**: Change `rounded-full` to `rounded-lg` for square balls with rounded corners
-  <BackToTop />
+### Example #7: Advanced Framer Motion Loader with Smooth Transitions
 
-### Using Chakra UI Spinner
-
-You can use the Chakra UI Spinner component to create a loading indicator with additional customization options.
+A sophisticated loading animation using Framer Motion for smooth, physics-based transitions and micro-interactions.
 
 ```tsx
-import React from "react";
-import { Spinner, VStack, Text } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const ChakraSpinnerLoading: React.FC = () => {
-  return (
-    <VStack
-      justify="center"
-      align="center"
-      minH="100vh"
-      bg="gray.50"
-      spacing={4}
-    >
-      <Spinner size="xl" color="blue.500" thickness="4px" speed="0.65s" />
-      <Text fontSize="lg" color="gray.600">
-        Loading your portfolio...
-      </Text>
-    </VStack>
-  );
-};
-export default ChakraSpinnerLoading;
-```
+interface LoadingStage {
+  id: string;
+  title: string;
+  description: string;
+  color: string;
+}
 
-##### Customization Options
+const AdvancedFramerMotionLoader: React.FC = () => {
+  const [currentStage, setCurrentStage] = useState(0);
+  const [isComplete, setIsComplete] = useState(false);
 
-- **Spinner size**: Change `size="xl"` to `size="sm"`, `size="md"`, `size="lg"`, or custom pixel values
-- **Spinner color**: Replace `color="blue.500"` with any Chakra color like `color="purple.500"` or `color="green.400"`
-- **Thickness**: Adjust `thickness="4px"` to `thickness="2px"` (thinner) or `thickness="6px"` (thicker)
-- **Speed**: Modify `speed="0.65s"` to `speed="0.4s"` (faster) or `speed="1s"` (slower)
-- **Background**: Change `bg="gray.50"` to `bg="white"`, `bg="gray.900"`, or any Chakra background
-- **Text styling**: Customize `fontSize="lg"` and `color="gray.600"` to match your theme
-- **Spacing**: Adjust `spacing={4}` to change the gap between spinner and text
-- **Additional elements**: Add logo, progress text, or other Chakra components
-- **Theme integration**: Use your Chakra theme colors and fonts automatically
-  <BackToTop />
+  const loadingStages: LoadingStage[] = [
+    { id: "init", title: "Initializing", description: "Setting up your workspace", color: "#3B82F6" },
+    { id: "assets", title: "Loading Assets", description: "Fetching images and resources", color: "#8B5CF6" },
+    { id: "content", title: "Processing Content", description: "Organizing your portfolio data", color: "#10B981" },
+    { id: "optimize", title: "Optimizing", description: "Fine-tuning performance", color: "#F59E0B" },
+    { id: "complete", title: "Ready!", description: "Everything is prepared", color: "#EF4444" }
+  ];
 
-### Framer Motion Loading
+  useEffect(() => {
+    const stageTimer = setInterval(() => {
+      setCurrentStage(prev => {
+        if (prev < loadingStages.length - 1) {
+          return prev + 1;
+        } else {
+          setIsComplete(true);
+          clearInterval(stageTimer);
+          return prev;
+        }
+      });
+    }, 1500);
 
-Advanced loading animation using Framer Motion for smooth transitions.
+    return () => clearInterval(stageTimer);
+  }, []);
 
-```tsx
-import React from "react";
-import { motion } from "framer-motion";
-
-const FramerMotionLoading: React.FC = () => {
+  // Container animations
   const containerVariants = {
-    start: {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
       transition: {
-        staggerChildren: 0.2,
-      },
-    },
-    end: {
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
+        delayChildren: 0.3,
+        staggerChildren: 0.1
+      }
+    }
   };
 
+  // Individual element animations
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  // Circle animation variants
   const circleVariants = {
-    start: {
-      y: "0%",
-    },
-    end: {
-      y: "100%",
-    },
+    loading: {
+      rotate: 360,
+      transition: {
+        duration: 2,
+        repeat: Infinity,
+        ease: "linear"
+      }
+    }
   };
 
-  const circleTransition = {
-    duration: 0.5,
-    repeat: Infinity,
-    repeatType: "reverse" as const,
-    ease: "easeInOut",
+  // Floating particle animation
+  const particleVariants = {
+    float: {
+      y: [-10, 10, -10],
+      x: [-5, 5, -5],
+      transition: {
+        duration: 4,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
+    }
   };
+
+  if (isComplete) {
+    return (
+      <motion.div 
+        className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-900 via-emerald-900 to-teal-900"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.6, ease: "backOut" }}
+      >
+        <div className="text-center space-y-6">
+          <motion.div
+            className="w-20 h-20 bg-green-400 rounded-full flex items-center justify-center mx-auto"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.5, ease: "backOut" }}
+          >
+            <motion.span 
+              className="text-3xl"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.5, duration: 0.3 }}
+            >
+              ✓
+            </motion.span>
+          </motion.div>
+          <motion.h2 
+            className="text-4xl font-bold text-green-100"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            Portfolio Ready!
+          </motion.h2>
+          <motion.p 
+            className="text-green-300 text-lg"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          >
+            Welcome to your amazing portfolio experience
+          </motion.p>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black">
-      <div className="flex flex-col items-center space-y-8">
+    <motion.div 
+      className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {/* Floating background particles */}
+      {Array.from({ length: 8 }).map((_, i) => (
         <motion.div
-          className="flex space-x-2"
-          variants={containerVariants}
-          initial="start"
-          animate="end"
+          key={i}
+          className="absolute w-2 h-2 bg-purple-400 rounded-full opacity-30"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+          }}
+          variants={particleVariants}
+          animate="float"
+          transition={{
+            delay: i * 0.5,
+            duration: 3 + Math.random() * 2
+          }}
+        />
+      ))}
+
+      <div className="text-center space-y-8 z-10">
+        {/* Main loading circle */}
+        <motion.div 
+          className="relative w-32 h-32 mx-auto"
+          variants={itemVariants}
         >
-          {[1, 2, 3, 4, 5].map((circle) => (
+          <motion.div
+            className="w-32 h-32 border-4 border-purple-300 border-t-purple-600 rounded-full"
+            variants={circleVariants}
+            animate="loading"
+          />
+          
+          {/* Center progress indicator */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-white">
+                {Math.round((currentStage / (loadingStages.length - 1)) * 100)}%
+              </div>
+              <div className="text-xs text-purple-300">
+                {currentStage + 1}/{loadingStages.length}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Current stage info */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentStage}
+            className="space-y-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4 }}
+          >
+            <h2 className="text-3xl font-bold text-white">
+              {loadingStages[currentStage]?.title}
+            </h2>
+            <p className="text-purple-200 text-lg max-w-md">
+              {loadingStages[currentStage]?.description}
+            </p>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Stage progress dots */}
+        <motion.div 
+          className="flex justify-center space-x-3"
+          variants={itemVariants}
+        >
+          {loadingStages.map((stage, index) => (
             <motion.div
-              key={circle}
-              className="w-4 h-4 bg-white rounded-full"
-              variants={circleVariants}
-              transition={circleTransition}
+              key={stage.id}
+              className={`w-3 h-3 rounded-full transition-colors duration-300 ${
+                index <= currentStage 
+                  ? 'bg-purple-400' 
+                  : 'bg-purple-800'
+              }`}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ scale: 1.2 }}
             />
           ))}
         </motion.div>
-        <motion.p
-          className="text-white text-xl font-light"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
+
+        {/* Animated loading text */}
+        <motion.div 
+          className="flex items-center justify-center space-x-2"
+          variants={itemVariants}
         >
-          Crafting your experience...
-        </motion.p>
+          <span className="text-lg text-purple-200">Loading</span>
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="w-1 h-1 bg-purple-400 rounded-full"
+              animate={{
+                opacity: [0.3, 1, 0.3],
+                scale: [0.8, 1.2, 0.8]
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                delay: i * 0.2
+              }}
+            />
+          ))}
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
-export default FramerMotionLoading;
+
+export default AdvancedFramerMotionLoader;
 ```
 
 ##### Customization Options
+- **Loading Stages**: Modify the `loadingStages` array to match your app's loading process
+- **Animation Timing**: Adjust stage intervals and transition durations
+- **Color Schemes**: Change gradient backgrounds and stage indicator colors
+- **Motion Effects**: Customize particle animations, floating elements, and transitions
+- **Progress Indicators**: Switch between percentage, dots, or progress bars
+- **Completion Animation**: Modify the success screen with custom animations
+- **Interactive Elements**: Add hover effects, click interactions, or sound feedback
+- **Performance**: Optimize for mobile by reducing particle count or animation complexity
+- **Accessibility**: Add reduced motion preferences and screen reader support
 
-- **Circle count**: Change `[1, 2, 3, 4, 5]` to fewer or more circles
-- **Stagger timing**: Modify `staggerChildren: 0.2` to `0.1` (faster) or `0.3` (slower)
-- **Animation duration**: Change `duration: 0.5` to adjust how fast circles move
-- **Movement distance**: Replace `y: "100%"` with `y: "50%"` or `y: "150%"`
-- **Circle colors**: Change `bg-white` to any color or create gradient circles
-- **Background**: Replace `bg-black` with other backgrounds or gradients
-- **Animation type**: Change `y` movement to `x`, `scale`, or `rotate` for different effects
-- **Easing**: Modify `ease: "easeInOut"` to `"easeOut"`, `"easeIn"`, or custom cubic-bezier
-- **Text animation**: Add more complex text animations with `variants`
-- **Entry animations**: Add `initial` and `animate` props for page entry effects
-- **Circle size**: Adjust `w-4 h-4` for different circle sizes
-  <BackToTop />
+### Example #8: Elegant Minimalist Line Loader
 
-### Minimalist Line Loading
-
-A subtle, minimalist loading indicator perfect for clean designs.
+A subtle, refined loading indicator perfect for clean, professional designs with smooth line animations.
 
 ```tsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 
-const MinimalistLineLoading: React.FC = () => {
+const ElegantMinimalistLineLoader: React.FC = () => {
+  const [progress, setProgress] = useState(0);
+  const [loadingText, setLoadingText] = useState("Loading");
+
+  useEffect(() => {
+    // Simulate realistic loading progress
+    const stages = [
+      { target: 15, duration: 800, text: "Connecting" },
+      { target: 35, duration: 600, text: "Loading" },
+      { target: 65, duration: 900, text: "Processing" },
+      { target: 85, duration: 500, text: "Optimizing" },
+      { target: 100, duration: 400, text: "Ready" }
+    ];
+
+    let currentStage = 0;
+    let currentProgress = 0;
+
+    const updateProgress = () => {
+      if (currentStage >= stages.length) return;
+
+      const stage = stages[currentStage];
+      setLoadingText(stage.text);
+
+      const increment = (stage.target - currentProgress) / (stage.duration / 50);
+      
+      const timer = setInterval(() => {
+        currentProgress += increment;
+        
+        if (currentProgress >= stage.target) {
+          currentProgress = stage.target;
+          setProgress(currentProgress);
+          clearInterval(timer);
+          currentStage++;
+          
+          if (currentStage < stages.length) {
+            setTimeout(updateProgress, 200);
+          }
+        } else {
+          setProgress(currentProgress);
+        }
+      }, 50);
+    };
+
+    updateProgress();
+  }, []);
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="text-center space-y-6">
-        <div className="relative w-48 h-1 bg-gray-200 rounded overflow-hidden">
-          <div className="absolute top-0 left-0 h-full bg-gray-800 rounded animate-pulse w-full"></div>
-          <div className="absolute top-0 left-0 h-full bg-gray-600 rounded animate-ping w-1/3"></div>
-        </div>
-        <p className="text-gray-600 text-sm font-medium">Loading</p>
-      </div>
-    </div>
-  );
-};
-export default MinimalistLineLoading;
-```
-
-##### Customization Options
-
-- **Line width**: Change `w-48` to `w-32` (shorter) or `w-64` (longer)
-- **Line height**: Adjust `h-1` to `h-0.5` (thinner) or `h-2` (thicker)
-- **Colors**: Replace `bg-gray-800` and `bg-gray-600` with your brand colors
-- **Background**: Change `bg-gray-50` to `bg-white` or match your page background
-- **Animation style**: Replace `animate-pulse` with `animate-bounce` or custom animations
-- **Moving indicator**: Adjust `w-1/3` to `w-1/4` (smaller) or `w-1/2` (larger)
-- **Corner radius**: Change `rounded` to `rounded-full` for fully rounded ends
-- **Text**: Customize or remove the "Loading" text
-- **Positioning**: Move text above the line or to the side
-- **Multiple lines**: Add multiple progress lines for different loading stages
-- **Gradient effects**: Use gradient backgrounds instead of solid colors
-  <BackToTop />
-
-### Logo Loading Animation
-
-A branded loading screen featuring your logo or brand identity.
-
-```tsx
-import React from "react";
-
-const LogoLoading: React.FC = () => {
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-white">
-      <div className="text-center space-y-6">
-        {/* Logo Placeholder */}
-        <div className="w-24 h-24 mx-auto bg-blue-600 rounded-lg flex items-center justify-center animate-pulse">
-          <span className="text-white text-2xl font-bold">JD</span>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50">
+      <div className="text-center space-y-8 max-w-md w-full px-6">
+        {/* Subtle header */}
+        <div className="space-y-2">
+          <h2 className="text-xl font-light text-gray-800 tracking-wide">
+            Welcome
+          </h2>
+          <p className="text-sm text-gray-500">
+            Preparing your portfolio experience
+          </p>
         </div>
 
-        {/* Brand Name */}
-        <h1 className="text-2xl font-bold text-gray-800">John Doe</h1>
+        {/* Main loading line */}
+        <div className="space-y-4">
+          <div className="relative w-full h-1 bg-gray-100 rounded-full overflow-hidden shadow-inner">
+            {/* Background gradient */}
+            <div className="absolute inset-0 bg-gradient-to-r from-gray-100 to-gray-200"></div>
+            
+            {/* Progress fill */}
+            <div 
+              className="absolute top-0 left-0 h-full bg-gradient-to-r from-slate-600 via-slate-700 to-slate-800 rounded-full transition-all duration-300 ease-out shadow-sm"
+              style={{ width: `${progress}%` }}
+            >
+              {/* Animated shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse"></div>
+            </div>
 
-        {/* Loading Indicator */}
-        <div className="flex justify-center space-x-1">
-          {[1, 2, 3].map((dot) => (
+            {/* Moving indicator dot */}
+            {progress > 0 && (
+              <div 
+                className="absolute top-1/2 w-3 h-3 bg-slate-700 rounded-full shadow-md transform -translate-y-1/2 -translate-x-1/2 transition-all duration-300 ease-out"
+                style={{ left: `${progress}%` }}
+              >
+                <div className="absolute inset-0 bg-slate-500 rounded-full animate-ping opacity-30"></div>
+              </div>
+            )}
+          </div>
+
+          {/* Progress info */}
+          <div className="flex justify-between items-center text-xs text-gray-400">
+            <span>0%</span>
+            <span className="font-medium text-gray-600">{Math.round(progress)}%</span>
+            <span>100%</span>
+          </div>
+        </div>
+
+        {/* Loading text with animated dots */}
+        <div className="space-y-2">
+          <p className="text-gray-600 font-light tracking-wide">
+            {loadingText}
+            <span className="inline-flex ml-1">
+              {[0, 1, 2].map((i) => (
+                <span
+                  key={i}
+                  className="animate-pulse"
+                  style={{
+                    animationDelay: `${i * 0.2}s`,
+                    animationDuration: '1s'
+                  }}
+                >
+                  .
+                </span>
+              ))}
+            </span>
+          </p>
+          
+          {/* Optional: Estimated time */}
+          {progress < 100 && (
+            <p className="text-xs text-gray-400">
+              Estimated time: {Math.max(1, Math.ceil((100 - progress) / 10))}s
+            </p>
+          )}
+        </div>
+
+        {/* Subtle decorative elements */}
+        <div className="flex justify-center space-x-2 opacity-30">
+          {Array.from({ length: 5 }).map((_, i) => (
             <div
-              key={dot}
-              className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
-              style={{ animationDelay: `${dot * 0.1}s` }}
+              key={i}
+              className="w-1 h-1 bg-gray-300 rounded-full animate-pulse"
+              style={{
+                animationDelay: `${i * 0.3}s`,
+                animationDuration: '2s'
+              }}
             ></div>
           ))}
         </div>
 
-        <p className="text-gray-500 text-sm">Portfolio Loading...</p>
+        {progress === 100 && (
+          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-green-700 text-sm font-medium">
+              ✓ Portfolio loaded successfully
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
 };
-export default LogoLoading;
+
+export default ElegantMinimalistLineLoader;
 ```
 
 ##### Customization Options
+- **Progress Stages**: Modify the `stages` array to match your actual loading process
+- **Line Styling**: Adjust height, width, and rounded corners of the progress line
+- **Colors**: Change gradient colors from slate to match your brand palette
+- **Animation Speed**: Control progress timing and transition durations
+- **Loading States**: Customize text messages for different loading phases
+- **Visual Effects**: Add/remove shine effects, shadows, and indicators
+- **Completion State**: Customize the success message and styling
+- **Typography**: Adjust font weights, sizes, and letter spacing
+- **Background**: Modify the gradient background to match your design
 
-- **Logo replacement**: Replace the placeholder div with an actual `<img>` tag or SVG logo
-- **Logo size**: Change `w-24 h-24` to `w-32 h-32` (larger) or `w-16 h-16` (smaller)
-- **Initials**: Replace "JD" with your actual initials or company abbreviation
-- **Brand colors**: Change `bg-blue-600` to match your brand colors (e.g., `bg-purple-600`)
-- **Name**: Replace "John Doe" with your actual name or company name
-- **Logo shape**: Change `rounded-lg` to `rounded-full` for circular logo
-- **Animation**: Replace `animate-pulse` with `animate-bounce` or `animate-spin`
-- **Background**: Adjust `bg-white` to match your brand background
-- **Loading text**: Customize "Portfolio Loading..." to fit your application
-- **Font styling**: Modify text sizes and weights to match your brand typography
-- **Add tagline**: Include a subtitle or tagline below your name
-- **Logo animation**: Add custom CSS animations for logo entrance effects
+### Example #9: Branded Logo Animation Loader
+
+A sophisticated branded loading screen featuring logo animations, brand colors, and professional polish for memorable first impressions.
+
+```tsx
+import React, { useState, useEffect } from "react";
+
+const BrandedLogoAnimationLoader: React.FC = () => {
+  const [loadingStage, setLoadingStage] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+
+  const loadingMessages = [
+    "Initializing Portfolio",
+    "Loading Creative Assets", 
+    "Preparing Experience",
+    "Almost Ready",
+    "Welcome!"
+  ];
+
+  useEffect(() => {
+    // Initial fade in
+    setTimeout(() => setIsVisible(true), 200);
+
+    // Progress through loading stages
+    const stageTimer = setInterval(() => {
+      setLoadingStage(prev => {
+        if (prev < loadingMessages.length - 1) {
+          return prev + 1;
+        }
+        clearInterval(stageTimer);
+        return prev;
+      });
+    }, 1200);
+
+    return () => clearInterval(stageTimer);
+  }, []);
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-br from-indigo-200/30 to-purple-200/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-40 h-40 bg-gradient-to-br from-purple-200/30 to-pink-200/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-10 w-24 h-24 bg-gradient-to-br from-blue-200/30 to-indigo-200/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+
+      <div className={`text-center space-y-8 max-w-md transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+        
+        {/* Animated Logo Container */}
+        <div className="relative">
+          {/* Rotating ring */}
+          <div className="absolute inset-0 w-32 h-32 mx-auto">
+            <div className="w-full h-full border-2 border-indigo-200 rounded-full animate-spin" style={{ animationDuration: '3s' }}></div>
+            <div className="absolute inset-2 border border-purple-300 rounded-full animate-spin" style={{ animationDuration: '4s', animationDirection: 'reverse' }}></div>
+          </div>
+
+          {/* Logo/Initials */}
+          <div className="relative w-32 h-32 mx-auto bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-transform duration-300">
+            {/* Shine effect */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent rounded-2xl"></div>
+            
+            {/* Logo content - replace with your actual logo */}
+            <div className="relative z-10">
+              <div className="text-white text-3xl font-bold tracking-wider transform transition-all duration-500" 
+                   style={{ 
+                     transform: loadingStage > 0 ? 'scale(1)' : 'scale(0.8)',
+                     filter: loadingStage > 2 ? 'none' : 'blur(1px)'
+                   }}>
+                JD
+              </div>
+              {/* Optional: Small loading indicator in corner */}
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
+            </div>
+
+            {/* Pulsing background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl animate-pulse opacity-50"></div>
+          </div>
+
+          {/* Floating particles */}
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full animate-bounce opacity-60"
+              style={{
+                top: `${20 + Math.sin(i) * 30}%`,
+                left: `${20 + Math.cos(i) * 30}%`,
+                animationDelay: `${i * 0.3}s`,
+                animationDuration: `${2 + Math.random()}s`
+              }}
+            ></div>
+          ))}
+        </div>
+
+        {/* Brand Name with Typing Effect */}
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-700 via-purple-700 to-pink-700 bg-clip-text text-transparent">
+            <span className="inline-block">
+              {"John Doe".split('').map((char, index) => (
+                <span
+                  key={index}
+                  className="inline-block transform transition-all duration-300"
+                  style={{
+                    opacity: loadingStage > 1 ? 1 : 0,
+                    transform: loadingStage > 1 ? 'translateY(0)' : 'translateY(10px)',
+                    transitionDelay: `${index * 100}ms`
+                  }}
+                >
+                  {char === ' ' ? '\u00A0' : char}
+                </span>
+              ))}
+            </span>
+          </h1>
+          
+          <p className={`text-gray-600 font-light transition-all duration-500 ${loadingStage > 2 ? 'opacity-100' : 'opacity-0'}`}>
+            Full-Stack Developer & Designer
+          </p>
+        </div>
+
+        {/* Loading Message */}
+        <div className="space-y-4">
+          <p className="text-lg font-medium text-gray-700 transition-all duration-500">
+            {loadingMessages[loadingStage]}
+          </p>
+
+          {/* Progress Indicators */}
+          <div className="flex justify-center space-x-2">
+            {loadingMessages.map((_, index) => (
+              <div
+                key={index}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index <= loadingStage 
+                    ? 'bg-indigo-500 scale-110' 
+                    : 'bg-gray-300 scale-100'
+                }`}
+              ></div>
+            ))}
+          </div>
+
+          {/* Animated Loading Dots */}
+          <div className="flex justify-center space-x-1">
+            {[0, 1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"
+                style={{
+                  animationDelay: `${i * 0.15}s`,
+                  animationDuration: '1s'
+                }}
+              ></div>
+            ))}
+          </div>
+        </div>
+
+        {/* Completion State */}
+        {loadingStage >= loadingMessages.length - 1 && (
+          <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl animate-fade-in">
+            <div className="flex items-center justify-center space-x-2">
+              <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                <span className="text-white text-xs">✓</span>
+              </div>
+              <p className="text-green-700 font-medium">Portfolio Ready!</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Custom CSS for fade-in animation */}
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.5s ease-out;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default BrandedLogoAnimationLoader;
+```
+
+##### Customization Options
+- **Logo Replacement**: Replace the initials with your actual logo image or SVG
+- **Brand Colors**: Update gradient colors to match your brand palette
+- **Personal Info**: Change name, title, and initials to your own
+- **Animation Timing**: Adjust stage durations and transition delays
+- **Loading Messages**: Customize messages to reflect your app's loading process
+- **Visual Effects**: Modify rotating rings, particles, and background decorations
+- **Typography**: Update fonts, sizes, and text styling to match your brand
+- **Logo Shape**: Change from rounded-2xl to rounded-full or other shapes
+- **Interactive Elements**: Add hover effects or click interactions
+- **Sound Effects**: Include branded audio feedback for loading stages
+- **Completion Actions**: Add automatic redirection or next step buttons
+- **Responsive Design**: Optimize for mobile with adaptive sizing and effects
 
 <BackToTop />
 

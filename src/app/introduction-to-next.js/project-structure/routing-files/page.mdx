@@ -12,15 +12,15 @@ Routing files in a Next.js application are essential for defining the structure 
 
 | File/Folder       | Purpose                                                                                                                                  |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `layout.js`       | Defines the layout for a specific route or group of routes, allowing for consistent structure across pages.                              |
-| `page.js`         | Represents the main content of a route, rendering the page's content when accessed.                                                      |
-| `not-found.js`    | Handles cases where a requested route does not exist, providing a custom 404 page for better user experience.                            |
-| `error.js`        | Handles errors that occur within a specific route, providing a custom error page for better user experience.                             |
-| `global-error.js` | Handles unhandled errors in the application, providing a consistent error page for the entire application.                               |
-| `loading.js`      | Displays a loading indicator while data is being fetched for a specific route, improving user experience during data loading operations. |
-| `template.js`     | Defines a reusable template for pages that share similar layouts or functionalities, promoting code reusability.                         |
-| `default.js`      | Defines a fallback route for directories, ensuring that users always have a valid page to access.                                        |
-| `route.js`        | Defines the API endpoint                                                                                                                 |
+| `layout.tsx`       | Defines the layout for a specific route or group of routes, allowing for consistent structure across pages.                              |
+| `page.tsx`         | Represents the main content of a route, rendering the page's content when accessed.                                                      |
+| `not-found.tsx`    | Handles cases where a requested route does not exist, providing a custom 404 page for better user experience.                            |
+| `error.tsx`        | Handles errors that occur within a specific route, providing a custom error page for better user experience.                             |
+| `global-error.tsx` | Handles unhandled errors in the application, providing a consistent error page for the entire application.                               |
+| `loading.tsx`      | Displays a loading indicator while data is being fetched for a specific route, improving user experience during data loading operations. |
+| `template.tsx`     | Defines a reusable template for pages that share similar layouts or functionalities, promoting code reusability.                         |
+| `default.tsx`      | Defines a fallback route for directories, ensuring that users always have a valid page to access.                                        |
+| `route.tsx`        | Defines the API endpoint                                                                                                                 |
 
 **NOTE**
 
@@ -30,21 +30,21 @@ Routing files in a Next.js application are essential for defining the structure 
 
 ```plaintext
 app/
-   about/
-      layout.js
-      page.js
-      error.js
-       loading.js
-   blog/
-      [slug]/
-         page.js
-          not-found.js
-       index.js
-   contact/
-      layout.js
-       page.js
-   global-error.js
-    template.js
+├── global-error.tsx                # Global error handler
+├── template.tsx                    # Global template
+├── about/
+│   ├── layout.tsx                  # About section layout
+│   ├── page.tsx                    # About page
+│   ├── error.tsx                   # About error handler
+│   └── loading.tsx                 # About loading UI
+├── blog/
+│   ├── index.tsx                   # Blog index page
+│   └── [slug]/
+│       ├── page.tsx                # Dynamic blog post page
+│       └── not-found.js            # Blog post not found handler
+└── contact/
+    ├── layout.tsx                  # Contact section layout
+    └── page.tsx                    # Contact page
 ```
 
 ### The Importance of Routing Files
@@ -207,16 +207,16 @@ The file structure for dynamic routing in Next.js typically looks like this:
 
 ```plaintext
 app/
-   blog/
-      [slug]/
-         page.js
-          not-found.js
-       index.js
-   products/
-      [id]/
-         page.js
-          not-found.js
-       index.js
+├── blog/
+│   ├── index.js                    # Blog listing page
+│   └── [slug]/
+│       ├── page.js                 # Dynamic blog post page
+│       └── not-found.js            # Blog post not found handler
+└── products/
+    ├── index.js                    # Products listing page
+    └── [id]/
+        ├── page.js                 # Dynamic product page
+        └── not-found.js            # Product not found handler
 ```
 
 ### Example of Dynamic Routing
@@ -292,13 +292,13 @@ Route groups in Next.js allow developers to group related routes together withou
 
 ```plaintext
 app/
-   (auth)/
-      login.js
-      register.js
-   (dashboard)/
-      index.js
-      settings.js
-    index.js
+├── (auth)/
+│   ├── login.js                    # Login page
+│   └── register.js                 # Registration page
+├── (dashboard)/
+│   ├── index.js                    # Dashboard home
+│   └── settings.js                 # Dashboard settings
+└── index.js                        # Application home page
 ```
 
 When using route groups, the URL structure remains clean and organized, while the codebase can be structured in a way that makes it easier to manage related routes. With route groups, developers can create logical groupings of routes that share common functionality or layout without affecting the URL structure.
@@ -307,15 +307,15 @@ Along with being able to keep the URL structure clean, route groups also allows 
 
 ```plaintext
 app/
-   (auth)/
-      layout.js
-      login.js
-       register.js
-   (dashboard)/
-      layout.js
-      index.js
-       settings.js
-    index.js
+├── (auth)/
+│   ├── layout.js                   # Authentication layout
+│   ├── login.js                    # Login page
+│   └── register.js                 # Registration page
+├── (dashboard)/
+│   ├── layout.js                   # Dashboard layout
+│   ├── index.js                    # Dashboard home
+│   └── settings.js                 # Dashboard settings
+└── index.js                        # Application home page
 ```
 
 Here, the `layout.js` files within each route group define the common structure for the routes in that group. This allows developers to create a consistent user interface across related routes while keeping the code organized.
@@ -328,10 +328,10 @@ Here, the `layout.js` files within each route group define the common structure 
 
 ```plaintext
 app/
-   _private/
-      dashboard.js
-      profile.js
-    index.js
+├── _private/
+│   ├── dashboard.js                # Private dashboard page
+│   └── profile.js                  # Private profile page
+└── index.js                        # Public home page
 ```
 
 ```javascript
@@ -377,13 +377,13 @@ Parallel and intercepted routes in Next.js allow developers to create multiple r
 
 ```plaintext
 app/
-   @sidebar/
-      index.js
-   @header/
-      index.js
-   @footer/
-      index.js
-    index.js
+├── @sidebar/
+│   └── index.js                    # Sidebar component
+├── @header/
+│   └── index.js                    # Header component
+├── @footer/
+│   └── index.js                    # Footer component
+└── index.js                        # Main page content
 ```
 
 ```javascript
@@ -413,11 +413,11 @@ In this example, the `MainPage` component uses parallel routes to render a sideb
 
 ```plaintext
 app/
-   (loading)/
-      index.js
-   (error)/
-      index.js
-    index.js
+├── (loading)/
+│   └── index.js                    # Loading component
+├── (error)/
+│   └── index.js                    # Error component
+└── index.js                        # Main page content
 ```
 
 ```javascript
@@ -461,11 +461,11 @@ In this example, the `MainPage` component uses intercepted routes to handle load
 
 ```plaintext
 app/
-   (nested-sidebar)/
-      index.js
-   (nested-header)/
-      index.js
-    index.js
+├── (nested-sidebar)/
+│   └── index.js                    # Nested sidebar component
+├── (nested-header)/
+│   └── index.js                    # Nested header component
+└── index.js                        # Main page content
 ```
 
 ```javascript
@@ -495,9 +495,9 @@ In this example, the `MainPage` component uses nested parallel routes to render 
 
 ```plaintext
 app/
-   (...params)/
-      index.js
-    index.js
+├── (...params)/
+│   └── index.js                    # Catch-all route handler
+└── index.js                        # Main page content
 ```
 
 ```javascript

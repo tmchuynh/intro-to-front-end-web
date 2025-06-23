@@ -1098,12 +1098,130 @@ You can highlight certain posts as featured posts. This can be done by adding a 
 #### Example #1: Featured Post Displayed at the Top
 
 ```tsx
+import React from "react";
+import { BlogPost } from "@/types/blog";
+import BlogCard from "@/components/BlogCard";
+import Link from "next/link";
 
+interface FeaturedPostProps {
+  posts: BlogPost[];
+}
+
+const FeaturedPostBlog: React.FC<FeaturedPostProps> = ({ posts }) => {
+  const featuredPost = posts.find(post => post.featured);
+  const regularPosts = posts.filter(post => !post.featured);
+
+  return (
+    <div className="space-y-12">
+      {/* Featured Post Hero Section */}
+      {featuredPost && (
+        <section className="relative">
+          <div className="relative h-96 md:h-[500px] rounded-2xl overflow-hidden">
+            <img 
+              src={featuredPost.imageUrl} 
+              alt={featuredPost.title}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+            
+            <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12 text-white">
+              <div className="max-w-4xl">
+                <div className="flex items-center space-x-4 mb-4">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-600 text-white">
+                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    Featured
+                  </span>
+                  <span className="text-white/80">{featuredPost.category}</span>
+                  <span className="text-white/60">•</span>
+                  <span className="text-white/80">{featuredPost.readTime} min read</span>
+                </div>
+                
+                <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">
+                  {featuredPost.title}
+                </h1>
+                
+                <p className="text-lg md:text-xl text-white/90 mb-6 max-w-2xl leading-relaxed">
+                  {featuredPost.description}
+                </p>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <img 
+                      src={featuredPost.authorImage || "/default-avatar.jpg"} 
+                      alt={featuredPost.author}
+                      className="w-12 h-12 rounded-full border-2 border-white/20"
+                    />
+                    <div>
+                      <p className="font-medium">{featuredPost.author}</p>
+                      <p className="text-white/70 text-sm">{featuredPost.date}</p>
+                    </div>
+                  </div>
+                  
+                  <Link href={`/blog/${featuredPost.slug}`}>
+                    <a className="inline-flex items-center px-6 py-3 bg-white text-gray-900 rounded-lg font-medium hover:bg-gray-100 transition group">
+                      Read Article
+                      <svg className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </svg>
+                    </a>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Regular Posts Section */}
+      <section>
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-3xl font-bold text-gray-900">Latest Posts</h2>
+          <Link href="/blog/archive">
+            <a className="text-blue-600 hover:text-blue-800 font-medium">
+              View all posts →
+            </a>
+          </Link>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {regularPosts.slice(0, 6).map(post => (
+            <BlogCard key={post.slug} post={post} />
+          ))}
+        </div>
+        
+        {regularPosts.length > 6 && (
+          <div className="text-center mt-8">
+            <Link href="/blog/archive">
+              <a className="inline-flex items-center px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                Load more posts
+                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+              </a>
+            </Link>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+};
+
+export default FeaturedPostBlog;
 ```
 
 ##### How It Works
 
+This component creates a hero-style featured post section at the top of the blog page with a large image background and overlay text. The featured post is identified by a `featured: true` property in the post metadata. The hero section includes the post title, description, author information, and a prominent call-to-action button, while regular posts are displayed in a grid below.
+
 ##### Customization Options
+
+- **Hero layout**: Adjust the height, text positioning, and overlay opacity
+- **Featured criteria**: Use different fields to determine featured posts (e.g., popularity, date)
+- **Animation**: Add scroll-triggered animations or parallax effects
+- **Multiple featured**: Support multiple featured posts in a carousel
+- **Responsive design**: Customize the mobile and tablet layouts
 
 <BackToTop />
 

@@ -1,9 +1,9 @@
+import { fallbackNav } from "@/utils/fallback";
 import {
   buildNavigationFromFileSystem,
   setExpandedState,
 } from "@/utils/navigation";
 import { NextResponse } from "next/server";
-import { fallbackNav } from "@/utils/fallback";
 
 export async function GET(request: Request) {
   try {

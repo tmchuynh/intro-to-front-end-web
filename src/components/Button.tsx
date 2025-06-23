@@ -1,9 +1,23 @@
 import Link from "next/link";
 import { ReactNode } from "react";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 interface ButtonProps {
   href?: string;
-  variant?: "text" | "default" | "outline" | "secondary" | "tertiary";
+  variant?:
+    | "text"
+    | "default"
+    | "outline"
+    | "secondary"
+    | "tertiary"
+    | "accent"
+    | "muted"
+    | "destructive"
+    | "ghost"
+    | "link"
+    | "success"
+    | "warning";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
   arrow?: "right" | "left";
   className?: string;
   children: ReactNode;
@@ -13,61 +27,54 @@ interface ButtonProps {
 export default function Button({
   href,
   variant = "default",
+  size = "md",
   arrow,
   className = "",
   children,
   onClick,
 }: ButtonProps) {
   const baseClasses =
-    "inline items-center gap-2 font-medium h-7 transition-colors";
+    "inline-flex items-center justify-center gap-2 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
 
-  const variantClasses = {
-    default:
-      "bg-primary text-primary-foreground hover:bg-blue-700 px-4 rounded-lg",
-    secondary:
-      "bg-secondary text-secondary-foreground hover:bg-gray-200 px-4 rounded-lg",
-    tertiary:
-      "bg-tertiary text-tertiary-foreground hover:text-gray-700 px-4 rounded-lg",
-    outline:
-      "border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 rounded-lg",
-    text: "text-blue-600 hover:text-blue-700",
+  const sizeClasses = {
+    xs: "h-6 px-2 text-xs rounded",
+    sm: "h-8 px-3 text-sm rounded-md",
+    md: "h-10 px-4 text-sm rounded-md",
+    lg: "h-12 px-6 text-base rounded-lg",
+    xl: "h-14 px-8 text-lg rounded-lg",
   };
 
-  const classes = `${baseClasses} ${variantClasses[variant]} ${className}`;
+  const variantClasses = {
+    default: "bg-primary text-primary-foreground hover:bg-primary/95",
+    secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/95",
+    tertiary: "bg-tertiary text-tertiary-foreground hover:bg-tertiary/95",
+    accent: "bg-accent text-accent-foreground hover:bg-accent/95",
+    muted: "bg-muted text-muted-foreground hover:bg-muted/95",
+    outline:
+      "border border-border text-tertiary underline text-tertiary underline-offset-2 decoration-2 hover:bg-muted/50 hover:text-foreground",
+    destructive: "bg-destructive text-white hover:bg-destructive/95",
+    ghost: "hover:bg-secondary hover:text-secondary-foreground text-secondary",
+    link: "underline text-tertiary underline-offset-2 decoration-2 hover:no-underline mx-0 px-0",
+    text: "text-blue-600 hover:text-blue-700",
+    success: "bg-green-500 text-white hover:bg-green-600",
+    warning: "bg-yellow-500 text-white hover:bg-yellow-600",
+  };
+
+  const classes = `${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`;
+
+  const iconSizes = {
+    xs: "h-3 w-3",
+    sm: "h-3 w-3",
+    md: "h-4 w-4",
+    lg: "h-5 w-5",
+    xl: "h-6 w-6",
+  };
 
   const content = (
     <>
-      {arrow === "left" && (
-        <svg
-          className="h-4 w-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-      )}
+      {arrow === "left" && <FaChevronLeft className={iconSizes[size]} />}
       {children}
-      {arrow === "right" && (
-        <svg
-          className="h-4 w-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 5l7 7-7 7"
-          />
-        </svg>
-      )}
+      {arrow === "right" && <FaChevronRight className={iconSizes[size]} />}
     </>
   );
 

@@ -1,4 +1,5 @@
 "use client";
+import Button from "@/components/Button";
 
 interface BackToTopProps {
   className?: string;
@@ -66,14 +67,14 @@ export default function BackToTop({ className = "" }: BackToTopProps) {
 
   return (
     <div className={`flex justify-end mt-6 mb-8 ${className}`}>
-      <button
+      <Button
         onClick={scrollToTop}
-        className="inline-flex items-center px-3 py-2 border border-blue-200 hover:border-blue-400 rounded font-medium text-blue-600 text-sm hover:text-blue-800 hover:underline transition-colors duration-200 cursor-pointer"
+        className="inline-flex items-center px-3 py-2 border-blue-200 hover:border-blue-400 rounded font-medium text-blue-600 text-sm hover:text-blue-800 hover:underline duration-200 transition-colors cursor-pointer"
+        variant="outline"
         aria-label="Back to top"
-        type="button"
       >
         <svg
-          className="mr-1 w-4 h-4"
+          className="mr-1 h-4 w-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -86,7 +87,7 @@ export default function BackToTop({ className = "" }: BackToTopProps) {
           />
         </svg>
         Back to Top
-      </button>
+      </Button>
     </div>
   );
 }

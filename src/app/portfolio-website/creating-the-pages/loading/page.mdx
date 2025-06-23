@@ -31,28 +31,497 @@ function MyComponent() {
 }
 ```
 
-## Using Chakra UI Spinner
+## Loading Component Examples
 
-You can use the Chakra UI Spinner component to create a loading indicator. Below is an example of how to implement a simple loading component using Chakra UI.
+Here are various loading component implementations using different styles and libraries to match different design aesthetics.
+
+### Simple CSS Spinner
+
+A lightweight loading spinner using pure CSS animations.
 
 ```tsx
 import React from "react";
-import { Spinner } from "@chakra-ui/react";
-const Loading: React.FC = () => {
+
+const CSSSpinnerLoading: React.FC = () => {
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-      }}
-    >
-      <Spinner size="xl" />
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="relative">
+        <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+        <p className="mt-4 text-gray-600 text-center">Loading...</p>
+      </div>
     </div>
   );
 };
-export default Loading;
+export default CSSSpinnerLoading;
+```
+
+##### Customization Options
+
+- **Size**: Change `w-12 h-12` to `w-8 h-8` (smaller) or `w-16 h-16` (larger)
+- **Colors**: Replace `border-blue-200` and `border-t-blue-600` with your brand colors (e.g., `border-purple-200` and `border-t-purple-600`)
+- **Background**: Change `bg-gray-50` to match your theme (e.g., `bg-white`, `bg-slate-900`)
+- **Border thickness**: Adjust `border-4` to `border-2` (thinner) or `border-8` (thicker)
+- **Text**: Replace "Loading..." with custom messages like "Please wait..." or "Fetching data..."
+- **Speed**: Add custom CSS or modify with `animate-spin` variants for different speeds
+  <BackToTop />
+
+### Pulsing Dots Animation
+
+A modern loading indicator with pulsing dots effect.
+
+```tsx
+import React from "react";
+
+const PulsingDotsLoading: React.FC = () => {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-white">
+      <div className="flex flex-col items-center space-y-4">
+        <div className="flex space-x-2">
+          <div className="w-3 h-3 bg-blue-600 rounded-full animate-pulse"></div>
+          <div className="w-3 h-3 bg-blue-600 rounded-full animate-pulse delay-75"></div>
+          <div className="w-3 h-3 bg-blue-600 rounded-full animate-pulse delay-150"></div>
+        </div>
+        <p className="text-gray-700 font-medium">Loading your content</p>
+      </div>
+    </div>
+  );
+};
+export default PulsingDotsLoading;
+```
+
+##### Customization Options
+
+- **Dot count**: Add more dots by duplicating the div pattern with increasing delays (`delay-225`, `delay-300`)
+- **Dot size**: Change `w-3 h-3` to `w-2 h-2` (smaller) or `w-4 h-4` (larger)
+- **Colors**: Replace `bg-blue-600` with your brand colors (e.g., `bg-red-500`, `bg-green-500`)
+- **Spacing**: Adjust `space-x-2` to `space-x-1` (closer) or `space-x-4` (wider apart)
+- **Animation timing**: Modify delay values (`delay-75`, `delay-150`) to change pulsing rhythm
+- **Text positioning**: Move text above dots or remove entirely
+- **Dot shape**: Change `rounded-full` to `rounded-lg` for squares with rounded corners
+  <BackToTop />
+
+### Skeleton Loading
+
+A skeleton loader that mimics the layout of the content being loaded.
+
+```tsx
+import React from "react";
+
+const SkeletonLoading: React.FC = () => {
+  return (
+    <div className="max-w-4xl mx-auto p-6 space-y-6">
+      {/* Header Skeleton */}
+      <div className="animate-pulse">
+        <div className="h-8 bg-gray-300 rounded w-3/4 mb-4"></div>
+        <div className="h-4 bg-gray-300 rounded w-1/2 mb-6"></div>
+      </div>
+
+      {/* Card Skeletons */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {[1, 2, 3, 4].map((item) => (
+          <div key={item} className="animate-pulse">
+            <div className="h-48 bg-gray-300 rounded-lg mb-4"></div>
+            <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+            <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+export default SkeletonLoading;
+```
+
+##### Customization Options
+
+- **Layout**: Match your actual content layout by adjusting grid columns (`md:grid-cols-3` for 3 columns)
+- **Card count**: Change the array `[1, 2, 3, 4]` to `[1, 2, 3, 4, 5, 6]` for more cards
+- **Skeleton colors**: Replace `bg-gray-300` with `bg-slate-200` or `bg-zinc-300` for different themes
+- **Card dimensions**: Adjust `h-48` to match your actual card heights (e.g., `h-32`, `h-64`)
+- **Text widths**: Modify `w-3/4`, `w-1/2` to match your content widths (`w-full`, `w-2/3`)
+- **Corner radius**: Change `rounded-lg` to `rounded-xl` or `rounded-md` to match your design
+- **Container width**: Adjust `max-w-4xl` to `max-w-6xl` or `max-w-2xl` based on your layout
+- **Add elements**: Include avatar placeholders, button skeletons, or navigation bars
+  <BackToTop />
+
+### Progress Bar Loading
+
+A loading component with a progress bar for longer operations.
+
+```tsx
+import React, { useState, useEffect } from "react";
+
+const ProgressBarLoading: React.FC = () => {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((prevProgress) => {
+        if (prevProgress >= 100) {
+          clearInterval(timer);
+          return 100;
+        }
+        return prevProgress + 10;
+      });
+    }, 200);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-slate-900 text-white">
+      <div className="w-80 space-y-4">
+        <h2 className="text-xl font-semibold text-center">Loading Portfolio</h2>
+        <div className="w-full bg-gray-700 rounded-full h-2">
+          <div
+            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+        <p className="text-center text-gray-300">{progress}% Complete</p>
+      </div>
+    </div>
+  );
+};
+export default ProgressBarLoading;
+```
+
+##### Customization Options
+
+- **Progress speed**: Change the interval timing from `200` milliseconds to `100` (faster) or `500` (slower)
+- **Increment size**: Modify `+ 10` to `+ 5` (slower progress) or `+ 20` (faster progress)
+- **Bar width**: Adjust container width from `w-80` to `w-96` (wider) or `w-64` (narrower)
+- **Bar height**: Change `h-2` to `h-1` (thinner) or `h-4` (thicker)
+- **Colors**: Replace `bg-blue-500` with your brand colors (e.g., `bg-green-500`, `bg-purple-500`)
+- **Background theme**: Change `bg-slate-900` to `bg-white` and adjust text colors accordingly
+- **Loading text**: Customize the title and percentage text to match your application
+- **Animation**: Modify `duration-300` for different transition speeds
+- **Real progress**: Connect to actual loading progress instead of simulated progress
+  <BackToTop />
+
+### Bouncing Balls
+
+A playful loading animation with bouncing balls.
+
+```tsx
+import React from "react";
+
+const BouncingBallsLoading: React.FC = () => {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-400 to-blue-500">
+      <div className="flex flex-col items-center space-y-6">
+        <div className="flex space-x-2">
+          {[1, 2, 3].map((ball) => (
+            <div
+              key={ball}
+              className="w-4 h-4 bg-white rounded-full animate-bounce"
+              style={{ animationDelay: `${ball * 0.1}s` }}
+            ></div>
+          ))}
+        </div>
+        <p className="text-white text-lg font-medium">
+          Getting things ready...
+        </p>
+      </div>
+    </div>
+  );
+};
+export default BouncingBallsLoading;
+```
+
+##### Customization Options
+
+- **Ball count**: Change `[1, 2, 3]` to `[1, 2, 3, 4, 5]` for more balls
+- **Ball size**: Adjust `w-4 h-4` to `w-3 h-3` (smaller) or `w-6 h-6` (larger)
+- **Ball colors**: Replace `bg-white` with different colors like `bg-yellow-300` or `bg-pink-300`
+- **Gradient background**: Change `from-purple-400 to-blue-500` to other combinations like `from-green-400 to-teal-500`
+- **Animation timing**: Modify `ball * 0.1` to `ball * 0.2` for slower staggered effect
+- **Ball spacing**: Change `space-x-2` to `space-x-4` for wider spacing
+- **Text message**: Customize the loading message to fit your application
+- **Animation type**: Replace `animate-bounce` with `animate-pulse` for different effect
+- **Ball shape**: Change `rounded-full` to `rounded-lg` for square balls with rounded corners
+  <BackToTop />
+
+### Using Chakra UI Spinner
+
+You can use the Chakra UI Spinner component to create a loading indicator with additional customization options.
+
+```tsx
+import React from "react";
+import { Spinner, VStack, Text } from "@chakra-ui/react";
+
+const ChakraSpinnerLoading: React.FC = () => {
+  return (
+    <VStack
+      justify="center"
+      align="center"
+      minH="100vh"
+      bg="gray.50"
+      spacing={4}
+    >
+      <Spinner size="xl" color="blue.500" thickness="4px" speed="0.65s" />
+      <Text fontSize="lg" color="gray.600">
+        Loading your portfolio...
+      </Text>
+    </VStack>
+  );
+};
+export default ChakraSpinnerLoading;
+```
+
+##### Customization Options
+
+- **Spinner size**: Change `size="xl"` to `size="sm"`, `size="md"`, `size="lg"`, or custom pixel values
+- **Spinner color**: Replace `color="blue.500"` with any Chakra color like `color="purple.500"` or `color="green.400"`
+- **Thickness**: Adjust `thickness="4px"` to `thickness="2px"` (thinner) or `thickness="6px"` (thicker)
+- **Speed**: Modify `speed="0.65s"` to `speed="0.4s"` (faster) or `speed="1s"` (slower)
+- **Background**: Change `bg="gray.50"` to `bg="white"`, `bg="gray.900"`, or any Chakra background
+- **Text styling**: Customize `fontSize="lg"` and `color="gray.600"` to match your theme
+- **Spacing**: Adjust `spacing={4}` to change the gap between spinner and text
+- **Additional elements**: Add logo, progress text, or other Chakra components
+- **Theme integration**: Use your Chakra theme colors and fonts automatically
+  <BackToTop />
+
+### Framer Motion Loading
+
+Advanced loading animation using Framer Motion for smooth transitions.
+
+```tsx
+import React from "react";
+import { motion } from "framer-motion";
+
+const FramerMotionLoading: React.FC = () => {
+  const containerVariants = {
+    start: {
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+    end: {
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const circleVariants = {
+    start: {
+      y: "0%",
+    },
+    end: {
+      y: "100%",
+    },
+  };
+
+  const circleTransition = {
+    duration: 0.5,
+    repeat: Infinity,
+    repeatType: "reverse" as const,
+    ease: "easeInOut",
+  };
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="flex flex-col items-center space-y-8">
+        <motion.div
+          className="flex space-x-2"
+          variants={containerVariants}
+          initial="start"
+          animate="end"
+        >
+          {[1, 2, 3, 4, 5].map((circle) => (
+            <motion.div
+              key={circle}
+              className="w-4 h-4 bg-white rounded-full"
+              variants={circleVariants}
+              transition={circleTransition}
+            />
+          ))}
+        </motion.div>
+        <motion.p
+          className="text-white text-xl font-light"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          Crafting your experience...
+        </motion.p>
+      </div>
+    </div>
+  );
+};
+export default FramerMotionLoading;
+```
+
+##### Customization Options
+
+- **Circle count**: Change `[1, 2, 3, 4, 5]` to fewer or more circles
+- **Stagger timing**: Modify `staggerChildren: 0.2` to `0.1` (faster) or `0.3` (slower)
+- **Animation duration**: Change `duration: 0.5` to adjust how fast circles move
+- **Movement distance**: Replace `y: "100%"` with `y: "50%"` or `y: "150%"`
+- **Circle colors**: Change `bg-white` to any color or create gradient circles
+- **Background**: Replace `bg-black` with other backgrounds or gradients
+- **Animation type**: Change `y` movement to `x`, `scale`, or `rotate` for different effects
+- **Easing**: Modify `ease: "easeInOut"` to `"easeOut"`, `"easeIn"`, or custom cubic-bezier
+- **Text animation**: Add more complex text animations with `variants`
+- **Entry animations**: Add `initial` and `animate` props for page entry effects
+- **Circle size**: Adjust `w-4 h-4` for different circle sizes
+  <BackToTop />
+
+### Minimalist Line Loading
+
+A subtle, minimalist loading indicator perfect for clean designs.
+
+```tsx
+import React from "react";
+
+const MinimalistLineLoading: React.FC = () => {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+      <div className="text-center space-y-6">
+        <div className="relative w-48 h-1 bg-gray-200 rounded overflow-hidden">
+          <div className="absolute top-0 left-0 h-full bg-gray-800 rounded animate-pulse w-full"></div>
+          <div className="absolute top-0 left-0 h-full bg-gray-600 rounded animate-ping w-1/3"></div>
+        </div>
+        <p className="text-gray-600 text-sm font-medium">Loading</p>
+      </div>
+    </div>
+  );
+};
+export default MinimalistLineLoading;
+```
+
+##### Customization Options
+
+- **Line width**: Change `w-48` to `w-32` (shorter) or `w-64` (longer)
+- **Line height**: Adjust `h-1` to `h-0.5` (thinner) or `h-2` (thicker)
+- **Colors**: Replace `bg-gray-800` and `bg-gray-600` with your brand colors
+- **Background**: Change `bg-gray-50` to `bg-white` or match your page background
+- **Animation style**: Replace `animate-pulse` with `animate-bounce` or custom animations
+- **Moving indicator**: Adjust `w-1/3` to `w-1/4` (smaller) or `w-1/2` (larger)
+- **Corner radius**: Change `rounded` to `rounded-full` for fully rounded ends
+- **Text**: Customize or remove the "Loading" text
+- **Positioning**: Move text above the line or to the side
+- **Multiple lines**: Add multiple progress lines for different loading stages
+- **Gradient effects**: Use gradient backgrounds instead of solid colors
+  <BackToTop />
+
+### Logo Loading Animation
+
+A branded loading screen featuring your logo or brand identity.
+
+```tsx
+import React from "react";
+
+const LogoLoading: React.FC = () => {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-white">
+      <div className="text-center space-y-6">
+        {/* Logo Placeholder */}
+        <div className="w-24 h-24 mx-auto bg-blue-600 rounded-lg flex items-center justify-center animate-pulse">
+          <span className="text-white text-2xl font-bold">JD</span>
+        </div>
+
+        {/* Brand Name */}
+        <h1 className="text-2xl font-bold text-gray-800">John Doe</h1>
+
+        {/* Loading Indicator */}
+        <div className="flex justify-center space-x-1">
+          {[1, 2, 3].map((dot) => (
+            <div
+              key={dot}
+              className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"
+              style={{ animationDelay: `${dot * 0.1}s` }}
+            ></div>
+          ))}
+        </div>
+
+        <p className="text-gray-500 text-sm">Portfolio Loading...</p>
+      </div>
+    </div>
+  );
+};
+export default LogoLoading;
+```
+
+##### Customization Options
+
+- **Logo replacement**: Replace the placeholder div with an actual `<img>` tag or SVG logo
+- **Logo size**: Change `w-24 h-24` to `w-32 h-32` (larger) or `w-16 h-16` (smaller)
+- **Initials**: Replace "JD" with your actual initials or company abbreviation
+- **Brand colors**: Change `bg-blue-600` to match your brand colors (e.g., `bg-purple-600`)
+- **Name**: Replace "John Doe" with your actual name or company name
+- **Logo shape**: Change `rounded-lg` to `rounded-full` for circular logo
+- **Animation**: Replace `animate-pulse` with `animate-bounce` or `animate-spin`
+- **Background**: Adjust `bg-white` to match your brand background
+- **Loading text**: Customize "Portfolio Loading..." to fit your application
+- **Font styling**: Modify text sizes and weights to match your brand typography
+- **Add tagline**: Include a subtitle or tagline below your name
+- **Logo animation**: Add custom CSS animations for logo entrance effects
+
+<BackToTop />
+
+## Implementation Tips
+
+### Choosing the Right Loading Component
+
+- **Simple spinners**: Best for quick operations (< 3 seconds)
+- **Progress bars**: Ideal for operations with measurable progress
+- **Skeleton loaders**: Perfect for content that has a predictable layout
+- **Branded loaders**: Great for initial app loading or page transitions
+
+### Performance Considerations
+
+```tsx
+// Lazy load the loading component to reduce bundle size
+const LazyLoading = React.lazy(() => import("@/components/Loading"));
+
+// Use with Suspense for better UX
+function App() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LazyLoading />
+    </Suspense>
+  );
+}
+```
+
+### Accessibility Best Practices
+
+```tsx
+const AccessibleLoading: React.FC = () => {
+  return (
+    <div
+      role="status"
+      aria-label="Loading content"
+      className="flex items-center justify-center min-h-screen"
+    >
+      <div className="sr-only">Loading, please wait...</div>
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>
+  );
+};
+```
+
+### Using Loading States in Context
+
+```tsx
+import React, { createContext, useContext, useState } from "react";
+
+const LoadingContext = createContext();
+
+export const LoadingProvider = ({ children }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  return (
+    <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
+      {children}
+      {isLoading && <GlobalLoading />}
+    </LoadingContext.Provider>
+  );
+};
+
+export const useLoading = () => useContext(LoadingContext);
 ```
 
 <BackToTop />

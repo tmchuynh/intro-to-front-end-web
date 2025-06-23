@@ -33,26 +33,318 @@ Let us consider "_What is the purpose of having a portfolio website?_" The prima
 
 ## Examples
 
-### Example #1
+### Example #1: Minimalistic Approach
 
 ```tsx
 import React from "react";
-export default function HomePage() {
-  return <div></div>
+import Image from "next/image";
+import Link from "next/link";
+
+export default function MinimalistHomePage() {
+  return (
+    <div className="min-h-screen bg-white text-gray-900 font-light">
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-sm z-50 border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-6 py-4">
+          <div className="flex justify-between items-center">
+            <div className="text-lg font-medium">John Doe</div>
+            <div className="space-x-8 text-sm">
+              <Link href="#work" className="hover:text-gray-600 transition-colors">Work</Link>
+              <Link href="#about" className="hover:text-gray-600 transition-colors">About</Link>
+              <Link href="#contact" className="hover:text-gray-600 transition-colors">Contact</Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-5xl md:text-7xl font-extralight leading-tight mb-8">
+            Web Developer<br />
+            <span className="text-gray-500">& Designer</span>
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl leading-relaxed">
+            I create digital experiences that are simple, elegant, and functional. 
+            Currently available for freelance projects.
+          </p>
+        </div>
+      </section>
+
+      {/* Featured Work */}
+      <section id="work" className="px-6 pb-20">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-2xl font-light mb-16 text-center">Selected Work</h2>
+          <div className="grid md:grid-cols-2 gap-16">
+            {[1, 2, 3, 4].map((item) => (
+              <div key={item} className="group cursor-pointer">
+                <div className="aspect-video bg-gray-100 mb-4 group-hover:bg-gray-200 transition-colors">
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    Project {item}
+                  </div>
+                </div>
+                <h3 className="text-lg font-medium mb-1">Project Title {item}</h3>
+                <p className="text-gray-600 text-sm">Brief description of the project and technologies used.</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact */}
+      <section id="contact" className="px-6 pb-20">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-2xl font-light mb-8">Let's work together</h2>
+          <a 
+            href="mailto:hello@johndoe.com" 
+            className="inline-block text-lg border-b border-gray-900 hover:border-gray-400 transition-colors"
+          >
+            hello@johndoe.com
+          </a>
+        </div>
+      </section>
+    </div>
+  );
+}
 ```
 
-### Example #2
+### Example #2: Bold Fonts and Animations
 
 ```tsx
 import React from "react";
-export default function HomePage() {
-  return <div></div>
+import Image from "next/image";
+import Link from "next/link";
+
+export default function BoldHomePage() {
+  return (
+    <div className="min-h-screen bg-black text-white overflow-hidden">
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full bg-black/90 backdrop-blur-sm z-50">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          <div className="flex justify-between items-center">
+            <div className="text-2xl font-black tracking-wider">ALEX</div>
+            <div className="space-x-8 text-sm font-bold tracking-wide">
+              <Link href="#work" className="hover:text-yellow-400 transition-all duration-300 transform hover:scale-110">WORK</Link>
+              <Link href="#about" className="hover:text-yellow-400 transition-all duration-300 transform hover:scale-110">ABOUT</Link>
+              <Link href="#contact" className="hover:text-yellow-400 transition-all duration-300 transform hover:scale-110">CONTACT</Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section with Animation */}
+      <section className="h-screen flex items-center justify-center relative">
+        <div className="text-center">
+          <div className="overflow-hidden">
+            <h1 className="text-6xl md:text-9xl font-black leading-none mb-6 animate-pulse">
+              <span className="inline-block animate-bounce delay-100">C</span>
+              <span className="inline-block animate-bounce delay-200">R</span>
+              <span className="inline-block animate-bounce delay-300">E</span>
+              <span className="inline-block animate-bounce delay-400">A</span>
+              <span className="inline-block animate-bounce delay-500">T</span>
+              <span className="inline-block animate-bounce delay-600">I</span>
+              <span className="inline-block animate-bounce delay-700">V</span>
+              <span className="inline-block animate-bounce delay-800">E</span>
+            </h1>
+          </div>
+          <div className="text-2xl md:text-4xl font-bold mb-8 text-yellow-400 animate-pulse">
+            FULL-STACK DEVELOPER
+          </div>
+          <p className="text-xl max-w-2xl mx-auto mb-12 opacity-80">
+            I BUILD WEBSITES THAT DON'T JUST LOOK GOOD—THEY PERFORM LIKE ROCKETS 🚀
+          </p>
+          <button className="bg-yellow-400 text-black px-12 py-4 text-lg font-black tracking-wider hover:bg-white transition-all duration-300 transform hover:scale-105 hover:rotate-1">
+            SEE MY WORK
+          </button>
+        </div>
+        
+        {/* Floating elements */}
+        <div className="absolute top-1/4 left-1/4 w-4 h-4 bg-yellow-400 rounded-full animate-ping"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-6 h-6 bg-white rounded-full animate-bounce"></div>
+        <div className="absolute top-1/2 right-1/6 w-3 h-3 bg-yellow-400 transform rotate-45 animate-spin"></div>
+      </section>
+
+      {/* Projects Grid */}
+      <section id="work" className="py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-5xl font-black text-center mb-20 tracking-wider">
+            MY <span className="text-yellow-400">PROJECTS</span>
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <div 
+                key={item} 
+                className="bg-gray-900 p-6 hover:bg-yellow-400 hover:text-black transition-all duration-500 transform hover:scale-105 hover:-rotate-1 cursor-pointer group"
+              >
+                <div className="aspect-video bg-gray-800 group-hover:bg-black mb-4 flex items-center justify-center text-2xl font-black">
+                  {item}
+                </div>
+                <h3 className="text-xl font-black mb-2 tracking-wide">PROJECT #{item}</h3>
+                <p className="font-bold opacity-80">BLAZING FAST • RESPONSIVE • MODERN</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section id="contact" className="py-20 px-6 text-center">
+        <h2 className="text-6xl font-black mb-8 tracking-wider">
+          LET'S <span className="text-yellow-400">CREATE</span>
+        </h2>
+        <p className="text-2xl mb-12 font-bold">SOMETHING AMAZING TOGETHER!</p>
+        <a 
+          href="mailto:alex@creative.dev" 
+          className="inline-block bg-yellow-400 text-black px-16 py-6 text-2xl font-black tracking-wider hover:bg-white transition-all duration-300 transform hover:scale-110 hover:rotate-1"
+        >
+          HIRE ME NOW!
+        </a>
+      </section>
+    </div>
+  );
+}
 ```
 
-### Example #3
+### Example #3: Professional, Clean and Modern
 
 ```tsx
 import React from "react";
-export default function HomePage() {
-  return <div></div>
+import Image from "next/image";
+import Link from "next/link";
+
+export default function ProfessionalHomePage() {
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-800">
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-md z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg"></div>
+              <span className="text-xl font-semibold text-slate-900">Sarah Chen</span>
+            </div>
+            <div className="hidden md:flex space-x-8 text-sm font-medium">
+              <Link href="#about" className="text-slate-600 hover:text-blue-600 transition-colors">About</Link>
+              <Link href="#services" className="text-slate-600 hover:text-blue-600 transition-colors">Services</Link>
+              <Link href="#portfolio" className="text-slate-600 hover:text-blue-600 transition-colors">Portfolio</Link>
+              <Link href="#testimonials" className="text-slate-600 hover:text-blue-600 transition-colors">Testimonials</Link>
+              <Link href="#contact" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">Contact</Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-24 pb-16 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium mb-6">
+                ✨ Available for new projects
+              </div>
+              <h1 className="text-5xl lg:text-6xl font-bold text-slate-900 leading-tight mb-6">
+                Full-Stack Developer & 
+                <span className="text-blue-600"> UI Designer</span>
+              </h1>
+              <p className="text-xl text-slate-600 leading-relaxed mb-8 max-w-xl">
+                I help businesses create exceptional digital experiences through modern web development and thoughtful design.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                  View My Work
+                </button>
+                <button className="border border-slate-300 text-slate-700 px-8 py-3 rounded-lg font-medium hover:bg-slate-100 transition-colors">
+                  Download Resume
+                </button>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="aspect-square bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center">
+                <div className="w-64 h-64 bg-white rounded-xl shadow-lg flex items-center justify-center text-slate-400">
+                  Professional Photo
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services */}
+      <section id="services" className="py-16 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">What I Do</h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">
+              I specialize in creating modern, scalable web applications with a focus on user experience and performance.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { title: "Frontend Development", desc: "React, Next.js, TypeScript", icon: "🎨" },
+              { title: "Backend Development", desc: "Node.js, Python, PostgreSQL", icon: "⚙️" },
+              { title: "UI/UX Design", desc: "Figma, Adobe Creative Suite", icon: "✨" }
+            ].map((service, index) => (
+              <div key={index} className="bg-slate-50 p-8 rounded-xl hover:shadow-lg transition-shadow">
+                <div className="text-3xl mb-4">{service.icon}</div>
+                <h3 className="text-xl font-semibold text-slate-900 mb-3">{service.title}</h3>
+                <p className="text-slate-600">{service.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Portfolio Preview */}
+      <section id="portfolio" className="py-16 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Featured Projects</h2>
+            <p className="text-slate-600">A selection of my recent work</p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3].map((project) => (
+              <div key={project} className="group cursor-pointer">
+                <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl mb-4 overflow-hidden">
+                  <div className="w-full h-full bg-white m-4 rounded-lg shadow-sm flex items-center justify-center text-slate-400 group-hover:scale-105 transition-transform">
+                    Project {project}
+                  </div>
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">E-commerce Platform</h3>
+                <p className="text-slate-600 text-sm mb-3">A modern e-commerce solution built with Next.js and Stripe integration.</p>
+                <div className="flex gap-2">
+                  <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs font-medium">React</span>
+                  <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">Node.js</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section id="contact" className="py-16 px-6 bg-slate-900 text-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-4">Ready to Start Your Project?</h2>
+          <p className="text-slate-300 mb-8 max-w-2xl mx-auto">
+            Let's discuss how I can help bring your ideas to life with modern web development solutions.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a 
+              href="mailto:sarah@example.com" 
+              className="bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            >
+              Get In Touch
+            </a>
+            <a 
+              href="tel:+1234567890" 
+              className="border border-slate-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-slate-800 transition-colors"
+            >
+              Schedule a Call
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
 ```

@@ -1,0 +1,218 @@
+import BackToTop from "@/components/BackToTop";
+
+# The Blog Page
+
+## Table of Contents
+
+## Introduction
+
+The blog page is a central part of any blog website, where users can read and explore various blog posts. It typically includes a list of blog cards, each representing a different post. This page can be designed to showcase the latest posts, popular posts, or posts from specific categories. It is essential to create an engaging and user-friendly layout that encourages visitors to read more.
+
+## Fetching Blog Posts from `.mdx` Files
+
+To fetch blog posts from `.mdx` files, we can use the `getStaticProps` function in Next.js. This function allows us to read the contents of the `.mdx` files and pass them as props to the blog page component.
+
+```typescript
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
+import { GetStaticProps } from "next";
+import { BlogPost } from "@/types/blog";
+export const getStaticProps: GetStaticProps = async () => {
+  const files = fs.readdirSync(
+    path.join("src", "app", "blog-website", "blog-posts")
+  );
+
+  const posts = files.map((fileName) => {
+    const filePath = path.join(
+      "src",
+      "app",
+      "blog-website",
+      "blog-posts",
+      fileName
+    );
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+    const { data } = matter(fileContent);
+
+    return {
+      ...data,
+      slug: fileName.replace(".mdx", ""),
+    } as BlogPost;
+  });
+
+  return {
+    props: {
+      posts,
+    },
+  };
+};
+```
+
+## Displaying Blog Cards
+
+By using the fetched blog posts, we can create a list of blog cards. Each card will display the title, description, and a link to read more about the post.
+
+Here, we need to iterate over the `posts` array and render a card for each post. We can use a simple card component that takes the post data as props.
+
+**NOTE**
+
+> Make sure to visit [Creating the Blog Card Component](/blog-website/creating-the-components/blog-cards) to learn how to create the blog card component if you haven't done so already.
+
+## Blog Page Component
+
+Finally, we can create the main blog page component that uses the `getStaticProps` function to fetch the posts and render the blog cards.
+
+```typescript
+import { GetStaticProps } from "next";
+import { BlogPost } from "@/types/blog";
+import BlogCard from "@/components/BlogCard";
+import BackToTop from "@/components/BackToTop";
+const BlogPage = ({ posts }: { posts: BlogPost[] }) => {
+  return (
+    <div className="blog-page">
+      <h1>Blog</h1>
+      <div className="blog-cards">
+        {posts.map((post) => (
+          <BlogCard key={post.slug} post={post} />
+        ))}
+      </div>
+      <BackToTop />
+    </div>
+  );
+};
+export default BlogPage;
+```
+
+<BackToTop />
+
+## Optional Enhancements
+
+### Pagination
+
+To enhance the blog page, you can implement pagination to display a limited number of posts per page. This can be done by using query parameters to determine which posts to display based on the current page.
+
+#### Example #1: Minimal Pagination
+
+```tsx
+
+```
+
+##### Customization Options
+
+<BackToTop />
+
+#### Example #2: Displays Page Numbers
+
+```tsx
+
+```
+
+##### Customization Options
+
+<BackToTop />
+
+### Search Functionality
+
+Adding a search bar allows users to quickly find specific blog posts. You can implement this by filtering the `posts` array based on the search query entered by the user.
+
+#### Example #1: Using a `shadcn/ui` Command component with Keyboard shortcuts
+
+```tsx
+
+```
+
+##### Customization Options
+
+#### Example #2: Search with Debounce
+
+```tsx
+
+```
+
+##### Customization Options
+
+<BackToTop />
+
+#### Example #3: Simple Search Bar
+
+```tsx
+
+```
+
+##### Customization Options
+
+<BackToTop />
+
+<BackToTop />
+
+### Categories and Tags
+
+You can categorize your blog posts and allow users to filter posts by categories or tags. This can be done by adding a category field to each post and creating a filter component that updates the displayed posts based on the selected category or tag.
+
+#### Example #1: Using Badges
+
+```tsx
+
+```
+
+##### Customization Options
+
+<BackToTop />
+
+### Featured Posts
+
+You can highlight certain posts as featured posts. This can be done by adding a `featured` field to the post metadata and rendering these posts in a separate section at the top of the blog page.
+
+#### Example #1: Featured Post Displayed at the Top
+
+```tsx
+
+```
+
+##### Customization Options
+
+<BackToTop />
+
+#### Example #2: Featured Posts Section
+
+```tsx
+
+```
+
+##### Customization Options
+
+<BackToTop />
+
+### Social Sharing
+
+You can add social sharing buttons to each blog card, allowing users to easily share posts on social media platforms. This can be done by integrating with social media APIs or using third-party libraries that provide social sharing functionality.
+
+#### Example #1: Using a Floating Action Button (FAB) for Social Sharing
+
+```tsx
+
+```
+
+##### Customization Options
+
+<BackToTop />
+
+#### Example #2: Using a Simple Share Button
+
+```tsx
+
+```
+
+##### Customization Options
+
+<BackToTop />
+
+#### Example #3: Using a Dropdown for Social Sharing
+
+```tsx
+
+```
+
+##### Customization Options
+
+<BackToTop />

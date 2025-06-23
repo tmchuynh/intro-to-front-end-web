@@ -101,16 +101,26 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     strong: ({ children }) => (
       <strong className="font-extrabold text-tertiary">{children}</strong>
     ),
-    code: ({ children }) => (
-      <code className="my-5 py-1 font-mono text-sm">{children}</code>
-    ),
+    code: ({ children, className }) => {
+      // If it has a className, it's likely a syntax-highlighted code block
+      if (className) {
+        return <code className={className}>{children}</code>;
+      }
+      // For inline code without syntax highlighting
+      return (
+        <code className="bg-code my-5 px-2 py-1 rounded font-mono text-sm">
+          {children}
+        </code>
+      );
+    },
+
     pre: ({ children }) => {
       const textContent = extractTextContent(children);
       return (
         <>
-          <div className="bg-code-blocks relative my-5 px-4 border-zinc-700 dark:border-zinc-800 rounded-2xl overflow-y-auto">
+          <div className="bg-code-blocks relative my-5 p-5 border-zinc-700 dark:border-zinc-800 rounded-2xl overflow-hidden">
             <CopyButton textToCopy={textContent} />
-            <pre className="my-4 p-4">{children}</pre>
+            <pre className="overflow-x-auto">{children}</pre>
           </div>
           <br />
         </>

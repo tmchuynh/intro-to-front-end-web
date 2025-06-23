@@ -24,7 +24,7 @@ export default function SearchResults({
     return (
       <div className="absolute left-0 right-0 top-full z-50 bg-white dark:bg-gray-800 shadow-lg mt-1 border rounded-md">
         <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-          No results found for "{searchQuery}"
+          No results found for &ldquo;{searchQuery}&rdquo;
         </div>
       </div>
     );
@@ -34,8 +34,8 @@ export default function SearchResults({
     <div className="absolute left-0 right-0 top-full z-50 bg-white dark:bg-gray-800 shadow-lg mt-1 border border-gray-200 dark:border-gray-700 rounded-md max-h-96 overflow-y-auto">
       <div className="p-2">
         <div className="mb-1 px-2 py-1 text-gray-500 text-xs dark:text-gray-400">
-          {results.length} result{results.length !== 1 ? "s" : ""} for "
-          {searchQuery}"
+          {results.length} result{results.length !== 1 ? "s" : ""} for &ldquo;
+          {searchQuery}&rdquo;
         </div>
         {results.map((result, index) => (
           <Link

@@ -850,12 +850,244 @@ You can categorize your blog posts and allow users to filter posts by categories
 #### Example #1: Using Badges
 
 ```tsx
+import React, { useState } from "react";
+import { BlogPost } from "@/types/blog";
+import BlogCard from "@/components/BlogCard";
 
+interface CategoryFilterProps {
+  posts: BlogPost[];
+}
+
+const CategoryFilter: React.FC<CategoryFilterProps> = ({ posts }) => {
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  // Extract unique categories and tags from posts
+  const categories = React.useMemo(() => {
+    const cats = posts.reduce((acc, post) => {
+      if (post.category && !acc.includes(post.category)) {
+        acc.push(post.category);
+      }
+      return acc;
+    }, [] as string[]);
+    return ["all", ...cats.sort()];
+  }, [posts]);
+
+  const allTags = React.useMemo(() => {
+    const tags = posts.reduce((acc, post) => {
+      if (post.tags) {
+        post.tags.forEach(tag => {
+          if (!acc.includes(tag)) {
+            acc.push(tag);
+          }
+        });
+      }
+      return acc;
+    }, [] as string[]);
+    return tags.sort();
+  }, [posts]);
+
+  // Filter posts based on selected category and tags
+  const filteredPosts = React.useMemo(() => {
+    return posts.filter(post => {
+      const categoryMatch = selectedCategory === "all" || post.category === selectedCategory;
+      const tagMatch = selectedTags.length === 0 || 
+        (post.tags && selectedTags.every(tag => post.tags.includes(tag)));
+      
+      return categoryMatch && tagMatch;
+    });
+  }, [posts, selectedCategory, selectedTags]);
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+  };
+
+  const handleTagToggle = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag)
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
+  const clearAllFilters = () => {
+    setSelectedCategory("all");
+    setSelectedTags([]);
+  };
+
+  const getCategoryPostCount = (category: string) => {
+    if (category === "all") return posts.length;
+    return posts.filter(post => post.category === category).length;
+  };
+
+  const getTagPostCount = (tag: string) => {
+    return posts.filter(post => post.tags?.includes(tag)).length;
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Filter Section */}
+      <div className="bg-gray-50 rounded-lg p-6">
+        <div className="space-y-6">
+          {/* Category Filter */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Categories</h3>
+            <div className="flex flex-wrap gap-2">
+              {categories.map(category => (
+                <button
+                  key={category}
+                  onClick={() => handleCategoryChange(category)}
+                  className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    selectedCategory === category
+                      ? "bg-blue-600 text-white"
+                      : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
+                  }`}
+                >
+                  {category === "all" ? "All" : category}
+                  <span className="ml-2 bg-opacity-20 bg-white rounded-full px-2 py-0.5 text-xs">
+                    {getCategoryPostCount(category)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tags Filter */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">Tags</h3>
+            <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
+              {allTags.map(tag => (
+                <button
+                  key={tag}
+                  onClick={() => handleTagToggle(tag)}
+                  className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm transition-colors ${
+                    selectedTags.includes(tag)
+                      ? "bg-green-600 text-white"
+                      : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-100"
+                  }`}
+                >
+                  <span className="mr-2">#</span>
+                  {tag}
+                  <span className="ml-2 bg-opacity-20 bg-white rounded-full px-2 py-0.5 text-xs">
+                    {getTagPostCount(tag)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Active Filters and Clear */}
+          {(selectedCategory !== "all" || selectedTags.length > 0) && (
+            <div className="flex items-center justify-between border-t border-gray-200 pt-4">
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium text-gray-700">Active filters:</span>
+                {selectedCategory !== "all" && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    Category: {selectedCategory}
+                    <button
+                      onClick={() => setSelectedCategory("all")}
+                      className="ml-1.5 text-blue-600 hover:text-blue-800"
+                    >
+                      ×
+                    </button>
+                  </span>
+                )}
+                {selectedTags.map(tag => (
+                  <span key={tag} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    #{tag}
+                    <button
+                      onClick={() => handleTagToggle(tag)}
+                      className="ml-1.5 text-green-600 hover:text-green-800"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <button
+                onClick={clearAllFilters}
+                className="text-sm text-gray-500 hover:text-gray-700 underline"
+              >
+                Clear all
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Results Summary */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">
+          {selectedCategory === "all" ? "All Posts" : selectedCategory}
+        </h2>
+        <p className="text-gray-600">
+          {filteredPosts.length} post{filteredPosts.length !== 1 ? 's' : ''}
+        </p>
+      </div>
+
+      {/* Posts Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredPosts.map(post => (
+          <div key={post.slug} className="space-y-2">
+            <BlogCard post={post} />
+            {/* Show post tags */}
+            <div className="flex flex-wrap gap-1 px-2">
+              {post.tags?.slice(0, 3).map(tag => (
+                <span 
+                  key={tag}
+                  className="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
+                >
+                  #{tag}
+                </span>
+              ))}
+              {post.tags && post.tags.length > 3 && (
+                <span className="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                  +{post.tags.length - 3} more
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Empty State */}
+      {filteredPosts.length === 0 && (
+        <div className="text-center py-12">
+          <div className="max-w-md mx-auto">
+            <svg className="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No posts found</h3>
+            <p className="text-gray-500 mb-4">
+              No posts match your current filter selection.
+            </p>
+            <button 
+              onClick={clearAllFilters}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+            >
+              Clear filters
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default CategoryFilter;
 ```
 
 ##### How It Works
 
+This component creates an interactive filtering system using badge-style buttons for categories and tags. It dynamically extracts unique categories and tags from the posts array and displays them with post counts. Users can select multiple tags and one category, with real-time filtering and clear visual feedback about active filters.
+
 ##### Customization Options
+
+- **Badge styling**: Customize colors, shapes, and hover effects for category and tag badges
+- **Filter layout**: Organize filters in dropdown menus, sidebars, or collapsible sections
+- **Post counts**: Show/hide the number of posts for each filter option
+- **Multi-select**: Allow multiple category selection alongside tag filtering
+- **Filter persistence**: Save filter state in URL parameters or local storage
 
 <BackToTop />
 

@@ -1,0 +1,240 @@
+import BackToTop from "@/components/BackToTop";
+
+# mdx-components.tsx File
+
+## Table of Contents
+
+## Why Another File?
+
+The `mdx-components.tsx` file is used to define custom components that can be used in MDX files. This allows you to create reusable components that can be easily imported and used in your MDX content.
+
+This is useful for creating consistent styles and functionality across your MDX pages.
+
+Create an `mdx-components.tsx` file in the root of your project to define global MDX components. This file will be used to register components that can be used in your MDX files.
+
+```tsx
+import type { MDXComponents } from "mdx/types";
+
+export function useMDXComponents(components: MDXComponents): MDXComponents {
+  return {
+    ...components,
+  };
+}
+```
+
+**NOTE**
+
+> `mdx-components.tsx` is **required** to use `@next/mdx` with App Router. It allows you to define custom components that can be used in your MDX files, making it easier to create reusable components and maintain consistent styles across your MDX pages.
+
+## Styling MDX Components
+
+To style your MDX components, you can use CSS modules or any CSS-in-JS solution you prefer. You can import styles directly into your `mdx-components.tsx` file and apply them to your custom components.
+
+```tsx
+import styles from "./mdx-components.module.css";
+import type { MDXComponents } from "mdx/types";
+export function useMDXComponents(components: MDXComponents): MDXComponents {
+  return {
+    ...components,
+    MyCustomComponent: (props) => (
+      <div className={styles.myCustomComponent} {...props} />
+    ),
+  };
+}
+```
+
+<BackToTop />
+
+## Customizing Built-in Components
+
+To customize built-in MDX components, you can override them in your `mdx-components.tsx` file. This allows you to change the default behavior or styling of components like headings, paragraphs, and images.
+
+```tsx
+import type { MDXComponents } from "mdx/types";
+export function useMDXComponents(components: MDXComponents): MDXComponents {
+  return {
+    // This is the default set of MDX components
+    ...components,
+    // Built-in components can be customized here
+    ul: ({ children }) => (
+      <ul className="space-y-1 list-disc list-outside">{children}</ul>
+    ),
+    ol: ({ children }) => (
+      <ol className="space-y-1 my-1 list-decimal list-outside">{children}</ol>
+    ),
+    li: ({ children }) => <li className="mb-1 ml-9">{children}</li>,
+  };
+}
+```
+
+## Custom Components
+
+This is where you will define your custom components that can be used in your MDX files. You can import and use any React components you have created in your project.
+
+```typescript
+import type { MDXComponents } from "mdx/types";
+import { MyCustomComponent } from "./components/MyCustomComponent";
+export function useMDXComponents(components: MDXComponents): MDXComponents {
+  return {
+    ...components,
+    MyCustomComponent, // Add your custom component here
+  };
+}
+```
+
+<BackToTop />
+
+### Using `mdx-components.tsx` to Enhance Table of Contents
+
+You can also use the `mdx-components.tsx` file to enhance the Table of Contents (ToC) functionality in your MDX files. By customizing the heading components, you can automatically generate a ToC based on the headings in your MDX content.
+
+```tsx
+import type { MDXComponents } from "mdx/types";
+import { JSX } from "react";
+
+// Utility function to extract text content from React children
+function extractTextContent(children: React.ReactNode): string {
+  if (typeof children === "string") {
+    return children;
+  }
+  if (typeof children === "number") {
+    return children.toString();
+  }
+  if (Array.isArray(children)) {
+    return children.map(extractTextContent).join("");
+  }
+  if (children && typeof children === "object" && "props" in children) {
+    const element = children as { props: { children?: React.ReactNode } };
+    return extractTextContent(element.props.children);
+  }
+  return "";
+}
+
+interface Props {
+  children: React.ReactNode;
+  level: number;
+  id: string;
+  className?: string;
+}
+
+export function CustomHeading({ children, level, id, className }: Props) {
+  const Component = `h${level}` as keyof JSX.IntrinsicElements;
+  return (
+    <Component id={id} className={`scroll-mt-24 ${className}`}>
+      {children}
+    </Component>
+  );
+}
+
+export function useMDXComponents(components: MDXComponents): MDXComponents {
+  return {
+    // This is the default set of MDX components
+    ...components,
+    // Built-in components can be customized here
+    h1: ({ children, ...props }) => (
+      <CustomHeading
+        className="my-6 font-bold text-4xl"
+        level={1}
+        id={props.id}
+      >
+        {children}
+      </CustomHeading>
+    ),
+    h2: ({ children, ...props }) => (
+      <CustomHeading level={2} id={props.id} className="my-4 text-3xl">
+        {children}
+      </CustomHeading>
+    ),
+    h3: ({ children, ...props }) => (
+      <CustomHeading
+        level={3}
+        id={props.id}
+        className="my-3 font-medium text-2xl"
+      >
+        {children}
+      </CustomHeading>
+    ),
+    h4: ({ children, ...props }) => (
+      <CustomHeading
+        level={4}
+        id={props.id}
+        className="my-3 font-medium italic text-xl"
+      >
+        {children}
+      </CustomHeading>
+    ),
+    h5: ({ children, ...props }) => (
+      <CustomHeading level={5} id={props.id} className="font-bold uppercase">
+        {children}:
+      </CustomHeading>
+    ),
+}
+```
+
+##### Explanation of the Code
+
+- **CustomHeading Component**: This component is used to render headings with a specific level (h1, h2, etc.). It accepts `children`, `level`, `id`, and `className` as props. The `id` is used for linking the heading in the Table of Contents.
+- **extractTextContent Function**: This utility function extracts text content from React children, which is useful for generating the Table of Contents.
+- **useMDXComponents Function**: This function returns the default MDX components and overrides the heading components to use the `CustomHeading` component.
+- **Heading Customization**: Each heading level (h1, h2, etc.) is customized to apply specific styles and classes. The `id` prop is used to link the heading in the Table of Contents.
+- **Smooth Scrolling**: The `scroll-mt-24` class is used to ensure that when a user clicks on a heading in the Table of Contents, the page scrolls smoothly to the heading. This will enhance the user experience by providing a seamless navigation experience within the MDX content.
+
+<BackToTop />
+
+### Using `globals.css` along with `mdx-components.tsx`
+
+To style your MDX components globally, you can use a `globals.css` file. This file will contain the global styles that will be applied to all MDX components in your application.
+
+**CAUTION**
+
+> The styles applied within `mdx-components.tsx` will override the global styles defined in `globals.css`. This allows you to have specific styles for your MDX components while still maintaining a consistent global style across your application.
+
+```css
+/* globals.css */
+/* Global styles for MDX components */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;  // Smooth scrolling for anchor links
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  code {
+    @apply my-5 py-1 font-mono text-code text-sm;
+  }
+  pre {
+    @apply my-5 py-1 font-mono text-code text-sm;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold;
+  }
+  p {
+    @apply my-3;
+  }
+  a {
+    @apply text-primary underline hover:no-underline;
+  }
+  img {
+    @apply max-w-full h-auto;
+  }
+  strong {
+    @apply font-semibold text-tertiary;
+  }
+}
+```
+
+**NOTE**
+
+> This next section is optional and can be used to further customize the styles of your MDX components. You can add any additional styles you want to apply globally to your MDX content. It will be using the scroll behavior and smooth scrolling for anchor links, which is a nice touch for user experience.
+
+Now, time to handle the navigation of your website. Head on over to [Handling Navigation](/blog-website/navigation/handling-navigation) to learn how to set up navigation for your MDX-based blog website. This will help you create a seamless user experience as visitors navigate through your content.
+
+<BackToTop />

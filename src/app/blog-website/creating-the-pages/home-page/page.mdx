@@ -1,0 +1,1628 @@
+import BackToTop from "@/components/BackToTop";
+
+# The Home Page
+
+The home page is the most important page of your blog website - it's often the first impression visitors get and determines whether they'll explore further. A well-designed home page should be engaging, informative, and easy to navigate.
+
+## Table of Contents
+
+## Essential Sections
+
+These are the core components that every blog home page should include:
+
+##### Header with Navigation
+
+- **Logo/Site Title**: Clear branding that establishes your blog's identity
+- **Main Navigation Menu**: Links to key pages (About, Categories, Contact)
+- **Search Bar**: Helps users find specific content
+- **Social Media Links**: Connect with your audience
+
+##### Hero Section
+
+- **Compelling Headline**: Communicates your blog's purpose and value proposition
+- **Brief Description**: 1-2 sentences explaining what visitors can expect
+- **Call-to-Action**: Subscribe button, featured post, or navigation prompt
+- **Visual Element**: High-quality image, illustration, or video
+
+##### Featured/Recent Blog Posts
+
+- **Latest Posts**: Show 3-6 of your most recent articles
+- **Post Previews**: Title, excerpt, publish date, and featured image
+- **Read More Links**: Clear navigation to full articles
+- **Category Tags**: Help users understand content topics
+
+##### About Section (Brief)
+
+- **Short Bio**: 2-3 sentences about you or your blog
+- **Photo**: Personal touch that builds trust
+- **Link to Full About Page**: For users who want more information
+
+##### Footer
+
+- **Copyright Information**: Legal protection and professionalism
+- **Additional Links**: Privacy policy, terms of service
+- **Contact Information**: Email or contact form link
+- **Social Media**: Repeat social links for accessibility
+
+## Optional Sections
+
+These sections can enhance your home page but aren't strictly necessary:
+
+##### Newsletter Signup
+
+- **Email Capture**: Build your subscriber list
+- **Incentive**: Offer a freebie or exclusive content
+- **Social Proof**: Mention subscriber count if significant
+
+##### Categories/Topics Overview
+
+- **Visual Category Grid**: Show main blog topics with icons
+- **Popular Tags**: Most-used tags as clickable elements
+- **Content Organization**: Help users find their interests
+
+##### Testimonials/Reviews
+
+- **Social Proof**: Build credibility with positive feedback
+- **Reader Comments**: Showcase engagement
+- **Media Mentions**: If featured elsewhere
+
+##### Popular/Trending Posts
+
+- **Most Read Articles**: Based on analytics data
+- **Trending Topics**: What's currently popular
+- **Editor's Picks**: Your personally recommended posts
+
+##### Author Spotlight
+
+- **Multiple Authors**: If you have guest writers
+- **Author Bios**: Brief introductions with photos
+- **Recent Posts by Author**: Showcase different perspectives
+
+## What Not to Include
+
+Avoid these common mistakes that can hurt your home page:
+
+##### Too Much Information
+
+- **Overwhelming Content**: Don't try to show everything at once
+- **Long Text Blocks**: Keep descriptions concise and scannable
+- **Too Many CTAs**: Limit call-to-actions to 2-3 maximum
+
+##### Slow Loading Elements
+
+- **Large Images**: Optimize all images for web
+- **Heavy Animations**: Use sparingly and ensure they're performant
+- **Too Many Widgets**: Each element adds loading time
+
+##### Poor Navigation
+
+- **Broken Links**: Test all links regularly
+- **Unclear Labels**: Use descriptive, intuitive menu items
+- **Missing Search**: Users expect to be able to search
+
+##### Generic Content
+
+- **Stock Photos**: Use original or high-quality, relevant images
+- **Placeholder Text**: All content should be purposeful
+- **Cookie-Cutter Design**: Make your blog unique
+
+##### Technical Issues
+
+- **Mobile Unfriendly**: Ensure responsive design
+- **Accessibility Problems**: Use proper contrast, alt text, etc.
+- **No Loading States**: Provide feedback for dynamic content
+
+## Featured Posts
+
+Grid layouts are perfect for showcasing multiple blog posts in an organized, visually appealing way. Here are examples for different design styles:
+
+### Basic Grid Layout Implementation
+
+```tsx
+// components/FeaturedPostsGrid.tsx
+interface BlogPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  image: string;
+  publishDate: string;
+  category: string;
+  slug: string;
+}
+
+interface FeaturedPostsGridProps {
+  posts: BlogPost[];
+  style?:
+    | "minimalistic"
+    | "bold"
+    | "whitespace"
+    | "neumorphism"
+    | "bauhaus"
+    | "aurora";
+}
+
+export default function FeaturedPostsGrid({
+  posts,
+  style = "minimalistic",
+}: FeaturedPostsGridProps) {
+  const getGridClasses = () => {
+    const baseClasses = "grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
+
+    switch (style) {
+      case "minimalistic":
+        return `${baseClasses} max-w-6xl mx-auto px-4`;
+      case "bold":
+        return `${baseClasses} max-w-7xl mx-auto px-8`;
+      case "whitespace":
+        return `${baseClasses} max-w-5xl mx-auto px-12 py-16`;
+      case "neumorphism":
+        return `${baseClasses} max-w-6xl mx-auto px-6 py-8`;
+      case "bauhaus":
+        return `${baseClasses} max-w-6xl mx-auto px-4 transform -rotate-1`;
+      case "aurora":
+        return `${baseClasses} max-w-6xl mx-auto px-4 relative z-10`;
+      default:
+        return baseClasses;
+    }
+  };
+
+  return (
+    <section className="py-12">
+      <div className={getGridClasses()}>
+        {posts.map((post) => (
+          <PostCard key={post.id} post={post} style={style} />
+        ))}
+      </div>
+    </section>
+  );
+}
+```
+
+<BackToTop />
+
+### Basic React Slick Carousel
+
+**NOTE**
+
+<blockquote>
+The following example use the `react-slick` library for the carousel functionality. Make sure to install it and its dependencies before using the code snippets below.
+
+First, install the required packages:
+
+```bash
+npm install react-slick slick-carousel
+npm install --save-dev @types/react-slick
+```
+
+</blockquote>
+
+```tsx
+// components/FeaturedPostsSlick.tsx
+import React from "react";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+interface BlogPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  image: string;
+  publishDate: string;
+  category: string;
+  slug: string;
+}
+
+interface FeaturedPostsSlickProps {
+  posts: BlogPost[];
+  style?:
+    | "minimalistic"
+    | "bold"
+    | "whitespace"
+    | "neumorphism"
+    | "bauhaus"
+    | "aurora";
+}
+
+export default function FeaturedPostsSlick({
+  posts,
+  style = "minimalistic",
+}: FeaturedPostsSlickProps) {
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 4000,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 640,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  };
+
+  const getContainerClasses = () => {
+    switch (style) {
+      case "minimalistic":
+        return "max-w-6xl mx-auto px-4";
+      case "bold":
+        return "max-w-7xl mx-auto px-8 bg-black py-12 rounded-2xl";
+      case "whitespace":
+        return "max-w-5xl mx-auto px-12 py-20";
+      case "neumorphism":
+        return "max-w-6xl mx-auto px-6 py-8 bg-gray-100 rounded-3xl shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff]";
+      case "bauhaus":
+        return "max-w-6xl mx-auto px-4 transform -rotate-1 bg-yellow-400 py-8";
+      case "aurora":
+        return "max-w-6xl mx-auto px-4 relative bg-gradient-to-r from-purple-900 via-blue-900 to-indigo-900 py-12 rounded-3xl";
+      default:
+        return "max-w-6xl mx-auto px-4";
+    }
+  };
+
+  return (
+    <section className="py-12">
+      <div className={getContainerClasses()}>
+        <Slider {...settings}>
+          {posts.map((post) => (
+            <div key={post.id} className="px-3">
+              <SlickPostCard post={post} style={style} />
+            </div>
+          ))}
+        </Slider>
+      </div>
+    </section>
+  );
+}
+```
+
+<BackToTop />
+
+### React Multi Carousel Implementation
+
+**NOTE**
+
+<blockquote>
+The following example use the `react-multi-carousel` library for the carousel functionality. Make sure to install them before using the code snippets below.
+
+```bash
+npm install react-multi-carousel
+```
+
+</blockquote>
+
+```tsx
+// components/FeaturedPostsMultiCarousel.tsx
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
+
+const responsive = {
+  desktop: {
+    breakpoint: { max: 3000, min: 1024 },
+    items: 3,
+    slidesToSlide: 1,
+  },
+  tablet: {
+    breakpoint: { max: 1024, min: 464 },
+    items: 2,
+    slidesToSlide: 1,
+  },
+  mobile: {
+    breakpoint: { max: 464, min: 0 },
+    items: 1,
+    slidesToSlide: 1,
+  },
+};
+
+export default function FeaturedPostsMultiCarousel({
+  posts,
+  style = "minimalistic",
+}: FeaturedPostsMultiCarouselProps) {
+  return (
+    <section className="py-12">
+      <div className={getContainerClasses(style)}>
+        <Carousel
+          responsive={responsive}
+          infinite={true}
+          autoPlay={true}
+          autoPlaySpeed={4000}
+          keyBoardControl={true}
+          customTransition="transform 300ms ease-in-out"
+          transitionDuration={300}
+          containerClass="carousel-container"
+          removeArrowOnDeviceType={["tablet", "mobile"]}
+          dotListClass="custom-dot-list-style"
+          itemClass="carousel-item-padding-40-px"
+        >
+          {posts.map((post) => (
+            <MultiCarouselPostCard key={post.id} post={post} style={style} />
+          ))}
+        </Carousel>
+      </div>
+    </section>
+  );
+}
+```
+
+<BackToTop />
+
+### React Responsive Carousel Implementation
+
+**NOTE**
+
+<blockquote>
+The following example use the `react-responsive-carousel` library for the carousel functionality. Make sure to install them before using the code snippets below.
+
+```bash
+npm install react-responsive-carousel
+```
+
+</blockquote>
+
+```tsx
+// components/FeaturedPostsResponsiveCarousel.tsx
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+
+export default function FeaturedPostsResponsiveCarousel({
+  posts,
+  style = "minimalistic",
+}: FeaturedPostsResponsiveCarouselProps) {
+  return (
+    <section className="py-12">
+      <div className={getContainerClasses(style)}>
+        <Carousel
+          showArrows={true}
+          showStatus={false}
+          showThumbs={false}
+          infiniteLoop={true}
+          autoPlay={true}
+          interval={4000}
+          transitionTime={500}
+          swipeable={true}
+          emulateTouch={true}
+          centerMode={true}
+          centerSlidePercentage={33.33}
+          showIndicators={true}
+        >
+          {posts.map((post) => (
+            <ResponsiveCarouselPostCard
+              key={post.id}
+              post={post}
+              style={style}
+            />
+          ))}
+        </Carousel>
+      </div>
+    </section>
+  );
+}
+```
+
+<BackToTop />
+
+## Custom Carousel Controls
+
+### Custom Arrow Components
+
+```tsx
+// components/CustomArrows.tsx
+interface CustomArrowProps {
+  onClick?: () => void;
+  style?:
+    | "minimalistic"
+    | "bold"
+    | "whitespace"
+    | "neumorphism"
+    | "bauhaus"
+    | "aurora";
+}
+
+export function CustomPrevArrow({ onClick, style }: CustomArrowProps) {
+  const getArrowClasses = () => {
+    const baseClasses =
+      "absolute left-4 top-1/2 transform -translate-y-1/2 z-10 p-3 rounded-full cursor-pointer transition-all";
+
+    switch (style) {
+      case "minimalistic":
+        return `${baseClasses} bg-white/80 hover:bg-white shadow-lg text-gray-700 hover:text-gray-900`;
+      case "bold":
+        return `${baseClasses} bg-yellow-400 hover:bg-yellow-300 text-black font-bold border-4 border-black`;
+      case "neumorphism":
+        return `${baseClasses} bg-gray-100 shadow-[5px_5px_15px_#bebebe,-5px_-5px_15px_#ffffff] hover:shadow-[inset_5px_5px_15px_#bebebe,inset_-5px_-5px_15px_#ffffff]`;
+      case "aurora":
+        return `${baseClasses} backdrop-blur-sm bg-white/20 border border-white/30 text-white hover:bg-white/30`;
+      default:
+        return `${baseClasses} bg-white/80 hover:bg-white shadow-lg`;
+    }
+  };
+
+  return (
+    <button onClick={onClick} className={getArrowClasses()}>
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M15 19l-7-7 7-7"
+        />
+      </svg>
+    </button>
+  );
+}
+
+export function CustomNextArrow({ onClick, style }: CustomArrowProps) {
+  const getArrowClasses = () => {
+    const baseClasses =
+      "absolute right-4 top-1/2 transform -translate-y-1/2 z-10 p-3 rounded-full cursor-pointer transition-all";
+
+    switch (style) {
+      case "minimalistic":
+        return `${baseClasses} bg-white/80 hover:bg-white shadow-lg text-gray-700 hover:text-gray-900`;
+      case "bold":
+        return `${baseClasses} bg-yellow-400 hover:bg-yellow-300 text-black font-bold border-4 border-black`;
+      case "neumorphism":
+        return `${baseClasses} bg-gray-100 shadow-[5px_5px_15px_#bebebe,-5px_-5px_15px_#ffffff] hover:shadow-[inset_5px_5px_15px_#bebebe,inset_-5px_-5px_15px_#ffffff]`;
+      case "aurora":
+        return `${baseClasses} backdrop-blur-sm bg-white/20 border border-white/30 text-white hover:bg-white/30`;
+      default:
+        return `${baseClasses} bg-white/80 hover:bg-white shadow-lg`;
+    }
+  };
+
+  return (
+    <button onClick={onClick} className={getArrowClasses()}>
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 5l7 7-7 7"
+        />
+      </svg>
+    </button>
+  );
+}
+```
+
+<BackToTop />
+
+### Custom Dots
+
+```tsx
+// components/CustomDots.tsx
+interface CustomDotsProps {
+  dots: React.ReactNode;
+  style?:
+    | "minimalistic"
+    | "bold"
+    | "whitespace"
+    | "neumorphism"
+    | "bauhaus"
+    | "aurora";
+}
+
+export function CustomDots({ dots, style }: CustomDotsProps) {
+  const getDotClasses = () => {
+    switch (style) {
+      case "bold":
+        return "flex justify-center space-x-3 mt-8 [&_.slick-dots_li]:mx-1 [&_.slick-dots_li_button]:bg-yellow-400 [&_.slick-dots_li_button]:w-4 [&_.slick-dots_li_button]:h-4 [&_.slick-dots_li_button]:rounded-none [&_.slick-dots_li_button]:border-2 [&_.slick-dots_li_button]:border-black";
+      case "neumorphism":
+        return "flex justify-center space-x-4 mt-8 [&_.slick-dots_li_button]:bg-gray-100 [&_.slick-dots_li_button]:shadow-[5px_5px_15px_#bebebe,-5px_-5px_15px_#ffffff] [&_.slick-dots_li_button]:w-4 [&_.slick-dots_li_button]:h-4 [&_.slick-dots_li_button]:rounded-full";
+      case "aurora":
+        return "flex justify-center space-x-3 mt-8 [&_.slick-dots_li_button]:backdrop-blur-sm [&_.slick-dots_li_button]:bg-white/20 [&_.slick-dots_li_button]:border [&_.slick-dots_li_button]:border-white/30 [&_.slick-dots_li_button]:w-3 [&_.slick-dots_li_button]:h-3 [&_.slick-dots_li_button]:rounded-full";
+      default:
+        return "flex justify-center space-x-2 mt-6";
+    }
+  };
+
+  return <div className={getDotClasses()}>{dots}</div>;
+}
+```
+
+<BackToTop />
+
+## Featured Posts with Category Icons
+
+Enhance your blog posts with category icons and interactive tooltips to improve user experience and visual appeal.
+
+**NOTE**
+
+<blockquote>
+The following examples use `react-icons` and the `Tooltip` component from `shadcn/ui`. Make sure to install them before using the code snippets below.
+
+```bash
+npm install react-icons
+npx shadcn@latest add tooltip
+```
+
+</blockquote>
+
+### Basic Implementation with Icons and Tooltips
+
+```tsx
+// components/FeaturedPostsWithIcons.tsx
+import {
+  FiCode,
+  FiSmartphone,
+  FiTrendingUp,
+  FiUsers,
+  FiBook,
+  FiCamera,
+  FiMusic,
+  FiGlobe,
+  FiHeart,
+  FiStar,
+} from "react-icons/fi";
+import {
+  SiReact,
+  SiJavascript,
+  SiPython,
+  SiNodedotjs,
+  SiTailwindcss,
+  SiNextdotjs,
+  SiTypescript,
+  SiGraphql,
+  SiMongodb,
+  SiPostgresql,
+} from "react-icons/si";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+interface BlogPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  image: string;
+  publishDate: string;
+  category: string;
+  tags: string[];
+  slug: string;
+}
+
+interface CategoryIcon {
+  name: string;
+  icon: React.ComponentType<any>;
+  color: string;
+  description: string;
+}
+
+const categoryIcons: CategoryIcon[] = [
+  {
+    name: "React",
+    icon: SiReact,
+    color: "text-blue-500",
+    description: "React tutorials and guides",
+  },
+  {
+    name: "JavaScript",
+    icon: SiJavascript,
+    color: "text-yellow-500",
+    description: "JavaScript programming",
+  },
+  {
+    name: "Python",
+    icon: SiPython,
+    color: "text-green-500",
+    description: "Python development",
+  },
+  {
+    name: "Node.js",
+    icon: SiNodedotjs,
+    color: "text-green-600",
+    description: "Node.js backend development",
+  },
+  {
+    name: "TypeScript",
+    icon: SiTypescript,
+    color: "text-blue-600",
+    description: "TypeScript programming",
+  },
+  {
+    name: "Next.js",
+    icon: SiNextdotjs,
+    color: "text-black",
+    description: "Next.js framework",
+  },
+  {
+    name: "Web Development",
+    icon: FiCode,
+    color: "text-purple-500",
+    description: "General web development",
+  },
+  {
+    name: "Mobile",
+    icon: FiSmartphone,
+    color: "text-indigo-500",
+    description: "Mobile app development",
+  },
+  {
+    name: "Tutorial",
+    icon: FiBook,
+    color: "text-orange-500",
+    description: "Step-by-step tutorials",
+  },
+  {
+    name: "Tips",
+    icon: FiStar,
+    color: "text-yellow-600",
+    description: "Tips and tricks",
+  },
+];
+
+const tagIcons: CategoryIcon[] = [
+  {
+    name: "beginner",
+    icon: FiBook,
+    color: "text-green-500",
+    description: "Beginner-friendly content",
+  },
+  {
+    name: "advanced",
+    icon: FiTrendingUp,
+    color: "text-red-500",
+    description: "Advanced topics",
+  },
+  {
+    name: "tutorial",
+    icon: FiUsers,
+    color: "text-blue-500",
+    description: "Tutorial content",
+  },
+  {
+    name: "best-practices",
+    icon: FiStar,
+    color: "text-yellow-500",
+    description: "Best practices and tips",
+  },
+  {
+    name: "performance",
+    icon: FiTrendingUp,
+    color: "text-purple-500",
+    description: "Performance optimization",
+  },
+];
+
+export default function FeaturedPostsWithIcons({
+  posts,
+  style = "minimalistic",
+}: FeaturedPostsWithIconsProps) {
+  const getCategoryIcon = (category: string) => {
+    return (
+      categoryIcons.find(
+        (cat) => cat.name.toLowerCase() === category.toLowerCase()
+      ) || {
+        name: category,
+        icon: FiCode,
+        color: "text-gray-500",
+        description: `${category} content`,
+      }
+    );
+  };
+
+  const getTagIcon = (tag: string) => {
+    return (
+      tagIcons.find(
+        (tagIcon) => tagIcon.name.toLowerCase() === tag.toLowerCase()
+      ) || {
+        name: tag,
+        icon: FiGlobe,
+        color: "text-gray-400",
+        description: `${tag} related content`,
+      }
+    );
+  };
+
+  return (
+    <TooltipProvider>
+      <section className="py-12">
+        <div className={getContainerClasses(style)}>
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {posts.map((post) => (
+              <PostCardWithIcons
+                key={post.id}
+                post={post}
+                style={style}
+                categoryIcon={getCategoryIcon(post.category)}
+                tagIcons={post.tags.map(getTagIcon)}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    </TooltipProvider>
+  );
+}
+```
+
+<BackToTop />
+
+### Minimalistic Style with Icons
+
+```tsx
+function MinimalisticPostCardWithIcons({
+  post,
+  categoryIcon,
+  tagIcons,
+}: {
+  post: BlogPost;
+  categoryIcon: CategoryIcon;
+  tagIcons: CategoryIcon[];
+}) {
+  const CategoryIconComponent = categoryIcon.icon;
+
+  return (
+    <article className="group cursor-pointer bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all">
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <img
+          src={post.image}
+          alt={post.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+        />
+        <div className="absolute top-4 left-4">
+          <Tooltip>
+            <TooltipTrigger>
+              <div className="bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg">
+                <CategoryIconComponent
+                  className={`w-5 h-5 ${categoryIcon.color}`}
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{categoryIcon.description}</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </div>
+      <div className="p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <span className={`text-sm font-medium ${categoryIcon.color}`}>
+            {post.category}
+          </span>
+          <time className="text-sm text-gray-500">
+            {new Date(post.publishDate).toLocaleDateString()}
+          </time>
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+          {post.title}
+        </h3>
+        <p className="text-sm text-gray-600 line-clamp-2">{post.excerpt}</p>
+        <div className="flex items-center gap-2 pt-2">
+          {tagIcons.slice(0, 3).map((tagIcon, index) => {
+            const TagIconComponent = tagIcon.icon;
+            return (
+              <Tooltip key={index}>
+                <TooltipTrigger>
+                  <div className="p-1.5 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
+                    <TagIconComponent className={`w-3 h-3 ${tagIcon.color}`} />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{tagIcon.description}</p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
+          {post.tags.length > 3 && (
+            <span className="text-xs text-gray-500 ml-1">
+              +{post.tags.length - 3} more
+            </span>
+          )}
+        </div>
+      </div>
+    </article>
+  );
+}
+```
+
+<BackToTop />
+
+### Bold Typography Style with Icons
+
+```tsx
+function BoldPostCardWithIcons({
+  post,
+  categoryIcon,
+  tagIcons,
+}: {
+  post: BlogPost;
+  categoryIcon: CategoryIcon;
+  tagIcons: CategoryIcon[];
+}) {
+  const CategoryIconComponent = categoryIcon.icon;
+
+  return (
+    <article className="group cursor-pointer bg-black text-white rounded-2xl overflow-hidden hover:scale-105 transition-transform">
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <img
+          src={post.image}
+          alt={post.title}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute top-4 left-4 flex items-center gap-3">
+          <Tooltip>
+            <TooltipTrigger>
+              <div className="bg-yellow-400 p-3 rounded-lg shadow-lg">
+                <CategoryIconComponent className="w-6 h-6 text-black" />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="font-bold">{categoryIcon.description}</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </div>
+      <div className="p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="bg-yellow-400 text-black px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+            {post.category}
+          </span>
+          <time className="text-yellow-400 text-sm font-bold">
+            {new Date(post.publishDate).toLocaleDateString()}
+          </time>
+        </div>
+        <h3 className="text-2xl font-black leading-tight group-hover:text-yellow-400 transition-colors">
+          {post.title}
+        </h3>
+        <p className="text-gray-300 font-medium">{post.excerpt}</p>
+        <div className="flex items-center gap-3 pt-2">
+          {tagIcons.slice(0, 4).map((tagIcon, index) => {
+            const TagIconComponent = tagIcon.icon;
+            return (
+              <Tooltip key={index}>
+                <TooltipTrigger>
+                  <div className="p-2 bg-white/10 rounded-lg hover:bg-yellow-400 hover:text-black transition-all">
+                    <TagIconComponent className="w-4 h-4" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="font-bold">{tagIcon.description}</p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
+        </div>
+      </div>
+    </article>
+  );
+}
+```
+
+<BackToTop />
+
+### Neumorphism Style with Icons
+
+```tsx
+function NeumorphismPostCardWithIcons({
+  post,
+  categoryIcon,
+  tagIcons,
+}: {
+  post: BlogPost;
+  categoryIcon: CategoryIcon;
+  tagIcons: CategoryIcon[];
+}) {
+  const CategoryIconComponent = categoryIcon.icon;
+
+  return (
+    <article className="group cursor-pointer">
+      <div className="bg-gray-100 rounded-3xl p-6 shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff] hover:shadow-[inset_20px_20px_60px_#bebebe,inset_-20px_-20px_60px_#ffffff] transition-all duration-300">
+        <div className="relative aspect-[4/3] mb-6 overflow-hidden rounded-2xl shadow-[inset_5px_5px_15px_#bebebe,inset_-5px_-5px_15px_#ffffff]">
+          <img
+            src={post.image}
+            alt={post.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute top-4 left-4">
+            <Tooltip>
+              <TooltipTrigger>
+                <div className="bg-gray-100 p-3 rounded-full shadow-[5px_5px_15px_#bebebe,-5px_-5px_15px_#ffffff]">
+                  <CategoryIconComponent
+                    className={`w-5 h-5 ${categoryIcon.color}`}
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{categoryIcon.description}</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </div>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="inline-flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full shadow-[5px_5px_15px_#bebebe,-5px_-5px_15px_#ffffff]">
+              <CategoryIconComponent
+                className={`w-4 h-4 ${categoryIcon.color}`}
+              />
+              <span className="text-gray-700 text-sm font-medium">
+                {post.category}
+              </span>
+            </div>
+            <time className="text-gray-500 text-xs">
+              {new Date(post.publishDate).toLocaleDateString()}
+            </time>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
+            {post.title}
+          </h3>
+          <p className="text-gray-600 text-sm line-clamp-3">{post.excerpt}</p>
+          <div className="flex items-center gap-2 pt-2">
+            {tagIcons.slice(0, 3).map((tagIcon, index) => {
+              const TagIconComponent = tagIcon.icon;
+              return (
+                <Tooltip key={index}>
+                  <TooltipTrigger>
+                    <div className="p-2 bg-gray-100 rounded-full shadow-[3px_3px_10px_#bebebe,-3px_-3px_10px_#ffffff] hover:shadow-[inset_3px_3px_10px_#bebebe,inset_-3px_-3px_10px_#ffffff] transition-all">
+                      <TagIconComponent
+                        className={`w-3 h-3 ${tagIcon.color}`}
+                      />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{tagIcon.description}</p>
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+```
+
+<BackToTop />
+
+### Aurora Background Style with Icons
+
+```tsx
+function AuroraPostCardWithIcons({
+  post,
+  categoryIcon,
+  tagIcons,
+}: {
+  post: BlogPost;
+  categoryIcon: CategoryIcon;
+  tagIcons: CategoryIcon[];
+}) {
+  const CategoryIconComponent = categoryIcon.icon;
+
+  return (
+    <article className="group cursor-pointer relative">
+      <div className="relative bg-gray-900 rounded-3xl overflow-hidden">
+        {/* Aurora Background Animation */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-blue-500 to-green-400 animate-pulse"></div>
+          <div className="absolute inset-0 bg-gradient-to-tl from-pink-500 via-red-500 to-yellow-400 animate-ping"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-500 animate-bounce"></div>
+        </div>
+
+        <div className="relative z-10 p-8">
+          <div className="relative aspect-[4/3] mb-6 overflow-hidden rounded-2xl backdrop-blur-sm bg-white/10 border border-white/20">
+            <img
+              src={post.image}
+              alt={post.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+            />
+            <div className="absolute top-4 left-4">
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="backdrop-blur-sm bg-white/20 p-3 rounded-full border border-white/30 shadow-lg">
+                    <CategoryIconComponent className="w-5 h-5 text-white" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-white bg-gray-900 border border-white/20">
+                    {categoryIcon.description}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="inline-flex items-center gap-2 backdrop-blur-sm bg-white/20 text-white px-4 py-2 rounded-full border border-white/30">
+                <CategoryIconComponent className="w-4 h-4" />
+                <span className="text-sm font-medium">{post.category}</span>
+              </div>
+              <time className="text-purple-300 text-sm font-medium">
+                {new Date(post.publishDate).toLocaleDateString()}
+              </time>
+            </div>
+            <h3 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">
+              {post.title}
+            </h3>
+            <p className="text-gray-200 text-sm line-clamp-3">{post.excerpt}</p>
+            <div className="flex items-center gap-2 pt-2">
+              {tagIcons.slice(0, 4).map((tagIcon, index) => {
+                const TagIconComponent = tagIcon.icon;
+                return (
+                  <Tooltip key={index}>
+                    <TooltipTrigger>
+                      <div className="p-2 backdrop-blur-sm bg-white/10 rounded-full border border-white/20 hover:bg-white/20 transition-all">
+                        <TagIconComponent className="w-3 h-3 text-white" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-white bg-gray-900 border border-white/20">
+                        {tagIcon.description}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+```
+
+<BackToTop />
+
+## Best Practices and Tips
+
+Creating an effective blog home page requires attention to both technical and user experience details. Here are proven strategies to make your home page successful:
+
+### Image Optimization
+
+```tsx
+// components/OptimizedImage.tsx
+import Image from "next/image";
+
+interface OptimizedImageProps {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  priority?: boolean;
+  className?: string;
+}
+
+export default function OptimizedImage({
+  src,
+  alt,
+  width,
+  height,
+  priority = false,
+  className,
+}: OptimizedImageProps) {
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      priority={priority}
+      placeholder="blur"
+      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+i2HzOTlAzWGPLIq"
+      className={className}
+      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+    />
+  );
+}
+```
+
+### Lazy Loading Implementation
+
+```tsx
+// hooks/useLazyLoad.ts
+import { useEffect, useRef, useState } from "react";
+
+export function useLazyLoad(threshold = 0.1) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return { ref, isVisible };
+}
+
+// Usage in component
+function LazyLoadedPostCard({ post }: { post: BlogPost }) {
+  const { ref, isVisible } = useLazyLoad();
+
+  return (
+    <div ref={ref} className="min-h-[400px]">
+      {isVisible ? (
+        <PostCard post={post} />
+      ) : (
+        <div className="bg-gray-200 animate-pulse rounded-xl h-96" />
+      )}
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+### SEO and Accessibility
+
+#### Semantic HTML Structure
+
+```tsx
+// components/SEOFriendlyHomePage.tsx
+export default function SEOFriendlyHomePage({ posts }: { posts: BlogPost[] }) {
+  return (
+    <>
+      <Head>
+        <title>Your Blog Name - Latest Posts and Insights</title>
+        <meta
+          name="description"
+          content="Discover the latest posts about web development, design, and technology. Stay updated with our expert insights and tutorials."
+        />
+        <meta
+          name="keywords"
+          content="blog, web development, design, technology, tutorials"
+        />
+        <meta
+          property="og:title"
+          content="Your Blog Name - Latest Posts and Insights"
+        />
+        <meta
+          property="og:description"
+          content="Discover the latest posts about web development, design, and technology."
+        />
+        <meta property="og:image" content="/images/og-image.jpg" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://yourblog.com" />
+      </Head>
+
+      <main role="main">
+        <header role="banner">
+          <h1 className="sr-only">Your Blog Name - Home Page</h1>
+          {/* Hero section */}
+        </header>
+
+        <section aria-labelledby="featured-posts" className="py-12">
+          <h2 id="featured-posts" className="text-3xl font-bold mb-8">
+            Featured Posts
+          </h2>
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {posts.map((post) => (
+              <article key={post.id} aria-labelledby={`post-title-${post.id}`}>
+                <h3
+                  id={`post-title-${post.id}`}
+                  className="text-xl font-semibold"
+                >
+                  {post.title}
+                </h3>
+                {/* Post content */}
+              </article>
+            ))}
+          </div>
+        </section>
+      </main>
+    </>
+  );
+}
+```
+
+#### Accessibility Features
+
+```tsx
+// components/AccessiblePostCard.tsx
+export default function AccessiblePostCard({ post }: { post: BlogPost }) {
+  return (
+    <article
+      className="group focus-within:ring-2 focus-within:ring-blue-500 rounded-xl"
+      role="article"
+      aria-labelledby={`post-title-${post.id}`}
+    >
+      <a
+        href={`/posts/${post.slug}`}
+        className="block focus:outline-none"
+        aria-describedby={`post-excerpt-${post.id}`}
+      >
+        <div className="aspect-[4/3] mb-4 overflow-hidden rounded-lg">
+          <img
+            src={post.image}
+            alt={`Featured image for ${post.title}`}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+            loading="lazy"
+          />
+        </div>
+        <div className="space-y-2">
+          <div
+            className="flex items-center text-sm text-gray-500"
+            aria-label="Post metadata"
+          >
+            <time
+              dateTime={post.publishDate}
+              aria-label={`Published on ${new Date(post.publishDate).toLocaleDateString()}`}
+            >
+              {new Date(post.publishDate).toLocaleDateString()}
+            </time>
+            <span className="mx-2" aria-hidden="true">
+              •
+            </span>
+            <span
+              className="text-blue-600"
+              aria-label={`Category: ${post.category}`}
+            >
+              {post.category}
+            </span>
+          </div>
+          <h3
+            id={`post-title-${post.id}`}
+            className="text-lg font-medium text-gray-900 group-hover:text-blue-600 transition-colors"
+          >
+            {post.title}
+          </h3>
+          <p
+            id={`post-excerpt-${post.id}`}
+            className="text-sm text-gray-600 line-clamp-2"
+          >
+            {post.excerpt}
+          </p>
+        </div>
+      </a>
+    </article>
+  );
+}
+```
+
+### Featured Post Selection Algorithm
+
+```tsx
+// utils/featuredPostsSelector.ts
+interface PostMetrics {
+  views: number;
+  shares: number;
+  comments: number;
+  publishDate: string;
+  category: string;
+}
+
+export function selectFeaturedPosts(
+  posts: (BlogPost & PostMetrics)[],
+  count: number = 6
+): BlogPost[] {
+  const scoredPosts = posts.map((post) => {
+    const recencyScore = getRecencyScore(post.publishDate);
+    const engagementScore = getEngagementScore(post);
+    const diversityScore = getDiversityScore(post, posts);
+
+    const totalScore =
+      recencyScore * 0.3 + engagementScore * 0.5 + diversityScore * 0.2;
+
+    return { ...post, score: totalScore };
+  });
+
+  return scoredPosts.sort((a, b) => b.score - a.score).slice(0, count);
+}
+
+function getRecencyScore(publishDate: string): number {
+  const daysSincePublished =
+    (Date.now() - new Date(publishDate).getTime()) / (1000 * 60 * 60 * 24);
+  return Math.max(0, 100 - daysSincePublished * 2); // Newer posts get higher scores
+}
+
+function getEngagementScore(post: PostMetrics): number {
+  return post.views * 0.1 + post.shares * 2 + post.comments * 3;
+}
+
+function getDiversityScore(
+  post: PostMetrics,
+  allPosts: (BlogPost & PostMetrics)[]
+): number {
+  const categoryCount = allPosts.filter(
+    (p) => p.category === post.category
+  ).length;
+  const totalPosts = allPosts.length;
+  return ((totalPosts - categoryCount) / totalPosts) * 100; // Less common categories get higher scores
+}
+```
+
+### Dynamic Content Loading
+
+```tsx
+// hooks/useContentLoader.ts
+import { useState, useEffect } from "react";
+
+interface ContentLoaderOptions {
+  initialCount: number;
+  loadMoreCount: number;
+  category?: string;
+}
+
+export function useContentLoader(options: ContentLoaderOptions) {
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(0);
+
+  const loadPosts = async (pageNum: number, reset = false) => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `/api/posts?page=${pageNum}&limit=${options.loadMoreCount}&category=${options.category || ""}`
+      );
+      const newPosts = await response.json();
+
+      if (reset) {
+        setPosts(newPosts);
+      } else {
+        setPosts((prev) => [...prev, ...newPosts]);
+      }
+
+      setHasMore(newPosts.length === options.loadMoreCount);
+    } catch (error) {
+      console.error("Error loading posts:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPosts(0, true);
+  }, [options.category]);
+
+  const loadMore = () => {
+    if (!loading && hasMore) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      loadPosts(nextPage);
+    }
+  };
+
+  return { posts, loading, hasMore, loadMore };
+}
+```
+
+<BackToTop />
+
+### User Experience Enhancements
+
+#### Loading States and Skeletons
+
+```tsx
+// components/PostSkeleton.tsx
+export function PostSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="aspect-[4/3] bg-gray-200 rounded-lg mb-4"></div>
+      <div className="space-y-2">
+        <div className="flex items-center space-x-2">
+          <div className="h-4 bg-gray-200 rounded w-20"></div>
+          <div className="h-4 bg-gray-200 rounded w-16"></div>
+        </div>
+        <div className="h-6 bg-gray-200 rounded w-full"></div>
+        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+      </div>
+    </div>
+  );
+}
+
+// Usage
+function PostGrid({ posts, loading }: { posts: BlogPost[]; loading: boolean }) {
+  return (
+    <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      {loading
+        ? Array.from({ length: 6 }).map((_, i) => <PostSkeleton key={i} />)
+        : posts.map((post) => <PostCard key={post.id} post={post} />)}
+    </div>
+  );
+}
+```
+
+#### Error Handling and Fallbacks
+
+```tsx
+// components/ErrorBoundary.tsx
+import { Component, ReactNode } from "react";
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error?: Error;
+}
+
+export class ErrorBoundary extends Component<
+  { children: ReactNode; fallback?: ReactNode },
+  ErrorBoundaryState
+> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: any) {
+    console.error("Error caught by boundary:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        this.props.fallback || (
+          <div className="text-center py-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Something went wrong
+            </h2>
+            <p className="text-gray-600 mb-6">
+              We're sorry, but there was an error loading the content.
+            </p>
+            <button
+              onClick={() => this.setState({ hasError: false })}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        )
+      );
+    }
+
+    return this.props.children;
+  }
+}
+```
+
+<BackToTop />
+
+### Analytics and Monitoring
+
+#### Performance Monitoring
+
+```tsx
+// utils/performance.ts
+export function measurePageLoad() {
+  if (typeof window !== "undefined" && "performance" in window) {
+    window.addEventListener("load", () => {
+      const navigation = performance.getEntriesByType(
+        "navigation"
+      )[0] as PerformanceNavigationTiming;
+      const paintEntries = performance.getEntriesByType("paint");
+
+      const metrics = {
+        domContentLoaded:
+          navigation.domContentLoadedEventEnd -
+          navigation.domContentLoadedEventStart,
+        firstPaint: paintEntries.find((entry) => entry.name === "first-paint")
+          ?.startTime,
+        firstContentfulPaint: paintEntries.find(
+          (entry) => entry.name === "first-contentful-paint"
+        )?.startTime,
+        loadComplete: navigation.loadEventEnd - navigation.loadEventStart,
+      };
+
+      // Send to analytics service
+      console.log("Performance metrics:", metrics);
+    });
+  }
+}
+
+// Track user interactions
+export function trackInteraction(
+  action: string,
+  element: string,
+  value?: string
+) {
+  if (typeof window !== "undefined" && window.gtag) {
+    window.gtag("event", action, {
+      event_category: "engagement",
+      event_label: element,
+      value: value,
+    });
+  }
+}
+```
+
+#### A/B Testing Framework
+
+```tsx
+// hooks/useABTest.ts
+import { useState, useEffect } from "react";
+
+interface ABTestConfig {
+  testName: string;
+  variants: string[];
+  weights?: number[];
+}
+
+export function useABTest(config: ABTestConfig) {
+  const [variant, setVariant] = useState<string>("");
+
+  useEffect(() => {
+    // Check if user is already assigned to a variant
+    const storedVariant = localStorage.getItem(`ab_test_${config.testName}`);
+
+    if (storedVariant && config.variants.includes(storedVariant)) {
+      setVariant(storedVariant);
+    } else {
+      // Assign new variant based on weights
+      const weights = config.weights || config.variants.map(() => 1);
+      const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+      const random = Math.random() * totalWeight;
+
+      let currentWeight = 0;
+      for (let i = 0; i < config.variants.length; i++) {
+        currentWeight += weights[i];
+        if (random <= currentWeight) {
+          const selectedVariant = config.variants[i];
+          setVariant(selectedVariant);
+          localStorage.setItem(`ab_test_${config.testName}`, selectedVariant);
+          break;
+        }
+      }
+    }
+  }, [config]);
+
+  return variant;
+}
+
+// Usage example
+function HomePage() {
+  const layoutVariant = useABTest({
+    testName: "homepage_layout",
+    variants: ["grid", "carousel", "masonry"],
+    weights: [0.5, 0.3, 0.2], // 50% grid, 30% carousel, 20% masonry
+  });
+
+  const renderLayout = () => {
+    switch (layoutVariant) {
+      case "carousel":
+        return <FeaturedPostsCarousel posts={posts} />;
+      case "masonry":
+        return <FeaturedPostsMasonry posts={posts} />;
+      default:
+        return <FeaturedPostsGrid posts={posts} />;
+    }
+  };
+
+  return <main>{renderLayout()}</main>;
+}
+```
+
+<BackToTop />

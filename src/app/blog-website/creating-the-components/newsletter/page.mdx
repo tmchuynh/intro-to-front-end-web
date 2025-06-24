@@ -389,6 +389,245 @@ const [currentHeadline] = useState(() =>
 );
 ```
 
+**Dynamic Background Animations:**
+```tsx
+// Animated particle system
+const useParticleSystem = (count = 50) => {
+  const [particles, setParticles] = useState([]);
+  
+  useEffect(() => {
+    setParticles(Array.from({ length: count }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 3 + 1,
+      speed: Math.random() * 2 + 0.5,
+      color: `hsl(${240 + Math.random() * 60}, 70%, ${60 + Math.random() * 20}%)`
+    })));
+  }, [count]);
+  
+  return particles;
+};
+
+// Floating geometric shapes
+const FloatingShapes = () => {
+  const shapes = [
+    { type: 'circle', size: 120, color: 'bg-purple-400/10' },
+    { type: 'square', size: 80, color: 'bg-blue-400/10' },
+    { type: 'triangle', size: 100, color: 'bg-pink-400/10' }
+  ];
+  
+  return (
+    <>
+      {shapes.map((shape, index) => (
+        <motion.div
+          key={index}
+          className={`absolute ${shape.color} blur-xl`}
+          style={{
+            width: shape.size,
+            height: shape.size,
+            left: `${20 + index * 30}%`,
+            top: `${30 + index * 20}%`,
+          }}
+          animate={{
+            x: [0, 50, 0],
+            y: [0, -30, 0],
+            rotate: [0, 180, 360]
+          }}
+          transition={{
+            duration: 15 + index * 5,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+      ))}
+    </>
+  );
+};
+```
+
+**Interactive Theme Switcher:**
+```tsx
+const themes = {
+  purple: {
+    gradient: 'from-purple-900 via-blue-900 to-indigo-900',
+    accent: 'from-purple-500 to-pink-500',
+    text: 'from-purple-400 to-pink-400'
+  },
+  green: {
+    gradient: 'from-emerald-900 via-teal-900 to-cyan-900',
+    accent: 'from-emerald-500 to-teal-500',
+    text: 'from-emerald-400 to-teal-400'
+  },
+  orange: {
+    gradient: 'from-orange-900 via-red-900 to-pink-900',
+    accent: 'from-orange-500 to-red-500',
+    text: 'from-orange-400 to-red-400'
+  }
+};
+
+const [currentTheme, setCurrentTheme] = useState('purple');
+
+// Theme toggle button
+<Button
+  onClick={() => {
+    const themeKeys = Object.keys(themes);
+    const currentIndex = themeKeys.indexOf(currentTheme);
+    const nextTheme = themeKeys[(currentIndex + 1) % themeKeys.length];
+    setCurrentTheme(nextTheme);
+  }}
+  className="fixed top-4 right-4 z-10"
+>
+  Switch Theme
+</Button>
+```
+
+**Personalization Based on User Behavior:**
+```tsx
+// Track user interactions
+const useUserBehavior = () => {
+  const [behavior, setBehavior] = useState({
+    timeOnPage: 0,
+    scrollDepth: 0,
+    interactions: 0,
+    preferredContent: null
+  });
+  
+  useEffect(() => {
+    const startTime = Date.now();
+    
+    const trackScroll = () => {
+      const scrolled = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+      setBehavior(prev => ({ ...prev, scrollDepth: Math.max(prev.scrollDepth, scrolled) }));
+    };
+    
+    const trackTime = setInterval(() => {
+      setBehavior(prev => ({ ...prev, timeOnPage: Date.now() - startTime }));
+    }, 1000);
+    
+    window.addEventListener('scroll', trackScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', trackScroll);
+      clearInterval(trackTime);
+    };
+  }, []);
+  
+  return behavior;
+};
+
+// Personalized messaging
+const getPersonalizedMessage = (behavior) => {
+  if (behavior.timeOnPage > 30000) return "You seem really interested! Join our community.";
+  if (behavior.scrollDepth > 50) return "Enjoying the content? Get more delivered weekly.";
+  if (behavior.interactions > 3) return "Ready to take the next step? Subscribe below.";
+  return "Join thousands of tech enthusiasts";
+};
+```
+
+**Advanced Form Validation:**
+```tsx
+const useAdvancedValidation = () => {
+  const [validation, setValidation] = useState({
+    isValid: false,
+    errors: {},
+    suggestions: []
+  });
+  
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const commonDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com'];
+    
+    if (!email) {
+      return { isValid: false, error: 'Email is required' };
+    }
+    
+    if (!emailRegex.test(email)) {
+      return { isValid: false, error: 'Please enter a valid email address' };
+    }
+    
+    const domain = email.split('@')[1];
+    const suggestions = commonDomains
+      .filter(d => d.includes(domain.slice(0, 3)))
+      .slice(0, 3);
+    
+    return { 
+      isValid: true, 
+      error: null,
+      suggestions: suggestions.length > 0 ? suggestions : []
+    };
+  };
+  
+  return { validation, validateEmail };
+};
+
+// Usage in component
+const { validation, validateEmail } = useAdvancedValidation();
+
+const handleEmailChange = (e) => {
+  const email = e.target.value;
+  setEmail(email);
+  const result = validateEmail(email);
+  setValidation(result);
+};
+```
+
+**Multi-language Support:**
+```tsx
+const translations = {
+  en: {
+    title: "Stay Ahead of the Tech Curve",
+    subtitle: "Join thousands of developers, designers, and tech enthusiasts",
+    emailPlaceholder: "your@email.com",
+    subscribeButton: "Get Weekly Insights",
+    benefits: [
+      "📚 Weekly curated content",
+      "🚀 Exclusive tutorials", 
+      "💡 Industry insights",
+      "🎁 Free resources"
+    ]
+  },
+  es: {
+    title: "Mantente a la Vanguardia Tecnológica",
+    subtitle: "Únete a miles de desarrolladores, diseñadores y entusiastas de la tecnología",
+    emailPlaceholder: "tu@email.com",
+    subscribeButton: "Recibir Insights Semanales",
+    benefits: [
+      "📚 Contenido curado semanal",
+      "🚀 Tutoriales exclusivos",
+      "💡 Insights de la industria", 
+      "🎁 Recursos gratuitos"
+    ]
+  },
+  fr: {
+    title: "Restez en Avance sur la Courbe Tech",
+    subtitle: "Rejoignez des milliers de développeurs, designers et passionnés de technologie",
+    emailPlaceholder: "votre@email.com",
+    subscribeButton: "Recevoir les Insights Hebdomadaires",
+    benefits: [
+      "📚 Contenu curé hebdomadaire",
+      "🚀 Tutoriels exclusifs",
+      "💡 Insights de l'industrie",
+      "🎁 Ressources gratuites"
+    ]
+  }
+};
+
+const [language, setLanguage] = useState('en');
+const t = translations[language];
+
+// Language selector
+<select 
+  value={language} 
+  onChange={(e) => setLanguage(e.target.value)}
+  className="absolute top-4 right-4 bg-white/20 text-white rounded"
+>
+  <option value="en">🇺🇸 EN</option>
+  <option value="es">🇪🇸 ES</option>
+  <option value="fr">🇫🇷 FR</option>
+</select>
+```
+
 <BackToTop />
 
 ##### Example 2: Minimalist Center-Focused with Floating Elements
@@ -690,6 +929,291 @@ const MeshBackground = () => (
       <rect width="100%" height="100%" fill="url(#mesh1)" />
     </svg>
   </div>
+);
+```
+
+**Advanced Mouse Interaction:**
+```tsx
+// Enhanced parallax with depth layers
+const useMouseParallax = (intensity = 1) => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isMoving, setIsMoving] = useState(false);
+  
+  useEffect(() => {
+    let timeout;
+    
+    const handleMouseMove = (e) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth) * 2 - 1,
+        y: (e.clientY / window.innerHeight) * 2 - 1
+      });
+      
+      setIsMoving(true);
+      clearTimeout(timeout);
+      timeout = setTimeout(() => setIsMoving(false), 100);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      clearTimeout(timeout);
+    };
+  }, []);
+  
+  return { mousePosition, isMoving, intensity };
+};
+
+// 3D tilt effect
+const use3DTilt = (tiltIntensity = 10) => {
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  
+  const handleMouseMove = useCallback((e, element) => {
+    if (!element) return;
+    
+    const rect = element.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const tiltX = (y - centerY) / centerY * tiltIntensity;
+    const tiltY = (centerX - x) / centerX * tiltIntensity;
+    
+    setTilt({ x: tiltX, y: tiltY });
+  }, [tiltIntensity]);
+  
+  return { tilt, handleMouseMove };
+};
+```
+
+**Dynamic Content Animations:**
+```tsx
+// Staggered text reveal
+const useTextReveal = (text, delay = 50) => {
+  const [revealedChars, setRevealedChars] = useState(0);
+  
+  useEffect(() => {
+    if (revealedChars < text.length) {
+      const timer = setTimeout(() => {
+        setRevealedChars(prev => prev + 1);
+      }, delay);
+      return () => clearTimeout(timer);
+    }
+  }, [revealedChars, text.length, delay]);
+  
+  return text.slice(0, revealedChars);
+};
+
+// Morphing shapes
+const MorphingShape = ({ shapes, duration = 3000 }) => {
+  const [currentShape, setCurrentShape] = useState(0);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentShape(prev => (prev + 1) % shapes.length);
+    }, duration);
+    
+    return () => clearInterval(interval);
+  }, [shapes.length, duration]);
+  
+  return (
+    <motion.div
+      key={currentShape}
+      initial={{ scale: 0, rotate: -180 }}
+      animate={{ scale: 1, rotate: 0 }}
+      exit={{ scale: 0, rotate: 180 }}
+      transition={{ duration: 0.8, ease: "easeInOut" }}
+      className={`w-20 h-20 ${shapes[currentShape].className}`}
+    />
+  );
+};
+```
+
+**Responsive Typography System:**
+```tsx
+// Dynamic font sizing based on viewport
+const useResponsiveFontSize = () => {
+  const [fontSize, setFontSize] = useState({
+    title: 'text-4xl lg:text-5xl',
+    subtitle: 'text-xl',
+    body: 'text-base'
+  });
+  
+  useEffect(() => {
+    const updateFontSize = () => {
+      const width = window.innerWidth;
+      
+      if (width < 640) {
+        setFontSize({
+          title: 'text-3xl',
+          subtitle: 'text-lg', 
+          body: 'text-sm'
+        });
+      } else if (width < 1024) {
+        setFontSize({
+          title: 'text-4xl',
+          subtitle: 'text-xl',
+          body: 'text-base'
+        });
+      } else {
+        setFontSize({
+          title: 'text-5xl xl:text-6xl',
+          subtitle: 'text-xl xl:text-2xl',
+          body: 'text-lg'
+        });
+      }
+    };
+    
+    updateFontSize();
+    window.addEventListener('resize', updateFontSize);
+    return () => window.removeEventListener('resize', updateFontSize);
+  }, []);
+  
+  return fontSize;
+};
+
+// Fluid typography with CSS clamp
+const fluidTypography = {
+  title: 'clamp(2rem, 5vw, 4rem)',
+  subtitle: 'clamp(1.125rem, 2.5vw, 1.5rem)',
+  body: 'clamp(1rem, 1.5vw, 1.125rem)'
+};
+```
+
+**Performance Optimization:**
+```tsx
+// Lazy loading for animations
+const useLazyAnimation = (threshold = 0.1) => {
+  const [isInView, setIsInView] = useState(false);
+  const ref = useRef();
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold }
+    );
+    
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+    
+    return () => observer.disconnect();
+  }, [threshold]);
+  
+  return { ref, isInView };
+};
+
+// Debounced animations
+const useDebouncedAnimation = (value, delay = 300) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+    
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+  
+  return debouncedValue;
+};
+
+// Reduced motion support
+const useReducedMotion = () => {
+  const [shouldReduceMotion, setShouldReduceMotion] = useState(false);
+  
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setShouldReduceMotion(mediaQuery.matches);
+    
+    const listener = (e) => setShouldReduceMotion(e.matches);
+    mediaQuery.addEventListener('change', listener);
+    
+    return () => mediaQuery.removeEventListener('change', listener);
+  }, []);
+  
+  return shouldReduceMotion;
+};
+```
+
+**Dark Mode Integration:**
+```tsx
+// Theme-aware animations
+const useThemeAwareColors = () => {
+  const [isDark, setIsDark] = useState(false);
+  
+  useEffect(() => {
+    const checkTheme = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+    
+    checkTheme();
+    
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['class'] 
+    });
+    
+    return () => observer.disconnect();
+  }, []);
+  
+  return {
+    isDark,
+    colors: {
+      background: isDark ? 'bg-gray-900' : 'bg-white',
+      text: isDark ? 'text-white' : 'text-gray-900',
+      accent: isDark ? 'from-purple-400 to-pink-400' : 'from-purple-600 to-pink-600',
+      muted: isDark ? 'text-gray-400' : 'text-gray-600'
+    }
+  };
+};
+```
+
+**Accessibility Enhancements:**
+```tsx
+// Focus management for animations
+const useFocusManagement = () => {
+  const [focusedElement, setFocusedElement] = useState(null);
+  
+  useEffect(() => {
+    const handleFocus = (e) => setFocusedElement(e.target);
+    const handleBlur = () => setFocusedElement(null);
+    
+    document.addEventListener('focusin', handleFocus);
+    document.addEventListener('focusout', handleBlur);
+    
+    return () => {
+      document.removeEventListener('focusin', handleFocus);
+      document.removeEventListener('focusout', handleBlur);
+    };
+  }, []);
+  
+  return focusedElement;
+};
+
+// Screen reader friendly animations
+const accessibleMotion = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+  transition: { duration: 0.3 }
+};
+
+// Skip link for screen readers
+const SkipToContent = () => (
+  <a
+    href="#main-content"
+    className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded z-50"
+  >
+    Skip to main content
+  </a>
 );
 ```
 
@@ -1192,6 +1716,171 @@ const getRecommendedTopics = (selectedTopics) => {
   }, []).filter((topic, index, arr) => 
     arr.indexOf(topic) === index && !selectedTopics.includes(topic)
   );
+};
+```
+
+**User Analytics Integration:**
+```tsx
+// Track user preferences for analytics
+const trackUserSelection = (action, data) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', action, {
+      event_category: 'Newsletter Signup',
+      event_label: JSON.stringify(data),
+      custom_parameter_1: data.topics?.length || 0,
+      custom_parameter_2: data.frequency || 'weekly'
+    });
+  }
+};
+
+// Usage in component
+const handleSubscribe = async (formData) => {
+  trackUserSelection('newsletter_preferences_selected', {
+    topics: selectedTopics,
+    frequency: selectedFrequency,
+    step_completed: step
+  });
+  
+  // Continue with subscription logic...
+};
+```
+
+**Progressive Enhancement with Local Storage:**
+```tsx
+// Save progress automatically
+useEffect(() => {
+  const saveProgress = () => {
+    localStorage.setItem('newsletter_signup_progress', JSON.stringify({
+      step,
+      selectedTopics,
+      selectedFrequency,
+      email,
+      timestamp: Date.now()
+    }));
+  };
+
+  saveProgress();
+}, [step, selectedTopics, selectedFrequency, email]);
+
+// Restore progress on component mount
+useEffect(() => {
+  const restored = localStorage.getItem('newsletter_signup_progress');
+  if (restored) {
+    const data = JSON.parse(restored);
+    // Only restore if less than 1 hour old
+    if (Date.now() - data.timestamp < 3600000) {
+      setStep(data.step);
+      setSelectedTopics(data.selectedTopics || []);
+      setSelectedFrequency(data.selectedFrequency || 'weekly');
+      setEmail(data.email || '');
+    }
+  }
+}, []);
+```
+
+**A/B Testing Framework:**
+```tsx
+// A/B test different flows
+const useABTest = (testName, variants) => {
+  const [variant, setVariant] = useState(null);
+
+  useEffect(() => {
+    const getVariant = () => {
+      const stored = localStorage.getItem(`ab_test_${testName}`);
+      if (stored) return stored;
+
+      const variantKeys = Object.keys(variants);
+      const randomVariant = variantKeys[Math.floor(Math.random() * variantKeys.length)];
+      localStorage.setItem(`ab_test_${testName}`, randomVariant);
+      return randomVariant;
+    };
+
+    setVariant(getVariant());
+  }, [testName, variants]);
+
+  return variant;
+};
+
+// Usage
+const variant = useABTest('newsletter_flow', {
+  'three_step': { steps: 3, showProgress: true },
+  'single_step': { steps: 1, showProgress: false },
+  'two_step': { steps: 2, showProgress: true }
+});
+```
+
+**Advanced Form Validation:**
+```tsx
+// Custom validation with real-time feedback
+const useFormValidation = () => {
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) return 'Email is required';
+    if (!emailRegex.test(email)) return 'Please enter a valid email';
+    return null;
+  };
+
+  const validateTopics = (topics) => {
+    if (topics.length === 0) return 'Please select at least one topic';
+    if (topics.length > 5) return 'Please select no more than 5 topics';
+    return null;
+  };
+
+  const validate = (field, value) => {
+    let error = null;
+    switch (field) {
+      case 'email':
+        error = validateEmail(value);
+        break;
+      case 'topics':
+        error = validateTopics(value);
+        break;
+    }
+    
+    setErrors(prev => ({ ...prev, [field]: error }));
+    return error === null;
+  };
+
+  return { errors, touched, setTouched, validate };
+};
+```
+
+**Accessibility Enhancements:**
+```tsx
+// Screen reader announcements
+const announceToScreenReader = (message) => {
+  const announcement = document.createElement('div');
+  announcement.setAttribute('aria-live', 'polite');
+  announcement.setAttribute('aria-atomic', 'true');
+  announcement.setAttribute('class', 'sr-only');
+  announcement.textContent = message;
+  
+  document.body.appendChild(announcement);
+  setTimeout(() => document.body.removeChild(announcement), 1000);
+};
+
+// Enhanced keyboard navigation
+const handleKeyDown = (e, action) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    action();
+  }
+};
+
+// Focus management
+const focusManagement = {
+  focusFirstError: () => {
+    const firstError = document.querySelector('[data-error="true"]');
+    if (firstError) firstError.focus();
+  },
+  
+  focusNextStep: () => {
+    const nextStepElement = document.querySelector('[data-step-focus="true"]');
+    if (nextStepElement) nextStepElement.focus();
+  }
 };
 ```
 
@@ -1827,6 +2516,150 @@ const trackEngagement = () => {
   
   // Send to analytics
   analytics.track('newsletter_shown', engagement);
+};
+```
+
+**Dynamic Content Personalization:**
+```tsx
+// Personalize based on user behavior
+const usePersonalization = () => {
+  const [userProfile, setUserProfile] = useState({});
+  
+  useEffect(() => {
+    const profile = {
+      visitCount: parseInt(localStorage.getItem('visit_count') || '1'),
+      lastVisit: localStorage.getItem('last_visit'),
+      interests: JSON.parse(localStorage.getItem('user_interests') || '[]'),
+      preferredTime: getBrowserTimeZone()
+    };
+    
+    setUserProfile(profile);
+    localStorage.setItem('visit_count', (profile.visitCount + 1).toString());
+    localStorage.setItem('last_visit', new Date().toISOString());
+  }, []);
+  
+  return userProfile;
+};
+
+// Returning user detection
+const getReturningUserMessage = (visitCount) => {
+  if (visitCount === 1) return "Welcome! Join our community";
+  if (visitCount < 5) return "Welcome back! Ready to subscribe?";
+  return "You're a frequent visitor! Join our VIP newsletter";
+};
+```
+
+**Advanced Scroll Behavior:**
+```tsx
+// Smart scroll behavior with momentum detection
+const useScrollMomentum = () => {
+  const [scrollDirection, setScrollDirection] = useState('down');
+  const [scrollSpeed, setScrollSpeed] = useState(0);
+  const lastScrollY = useRef(0);
+  const lastScrollTime = useRef(Date.now());
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const currentTime = Date.now();
+      const deltaY = currentScrollY - lastScrollY.current;
+      const deltaTime = currentTime - lastScrollTime.current;
+      
+      setScrollDirection(deltaY > 0 ? 'down' : 'up');
+      setScrollSpeed(Math.abs(deltaY) / deltaTime);
+      
+      lastScrollY.current = currentScrollY;
+      lastScrollTime.current = currentTime;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return { scrollDirection, scrollSpeed };
+};
+```
+
+**Performance Optimization:**
+```tsx
+// Debounced scroll handler
+const useDebouncedScroll = (delay = 16) => {
+  const [scrollY, setScrollY] = useState(0);
+  const timeoutRef = useRef();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
+        setScrollY(window.scrollY);
+      }, delay);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(timeoutRef.current);
+    };
+  }, [delay]);
+
+  return scrollY;
+};
+
+// Intersection Observer for performance
+const useIntersectionObserver = (options) => {
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  const elementRef = useRef();
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsIntersecting(entry.isIntersecting);
+    }, options);
+
+    if (elementRef.current) observer.observe(elementRef.current);
+    return () => observer.disconnect();
+  }, [options]);
+
+  return [elementRef, isIntersecting];
+};
+```
+
+**Multi-Device Synchronization:**
+```tsx
+// Sync subscription status across devices
+const useCrossDeviceSync = () => {
+  const [syncStatus, setSyncStatus] = useState('pending');
+
+  const syncUserData = async (userData) => {
+    try {
+      const response = await fetch('/api/user-sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: userData.email,
+          deviceId: getDeviceId(),
+          timestamp: Date.now(),
+          preferences: userData.preferences
+        })
+      });
+      
+      setSyncStatus(response.ok ? 'synced' : 'error');
+    } catch (error) {
+      setSyncStatus('error');
+    }
+  };
+
+  return { syncStatus, syncUserData };
+};
+
+// Device fingerprinting for consistency
+const getDeviceId = () => {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.textBaseline = 'top';
+  ctx.font = '14px Arial';
+  ctx.fillText('Device fingerprint', 2, 2);
+  
+  return btoa(canvas.toDataURL()).slice(0, 16);
 };
 ```
 

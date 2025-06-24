@@ -74,7 +74,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       </CustomHeading>
     ),
     h5: ({ children, ...props }) => (
-      <CustomHeading level={5} id={props.id} className="font-bold uppercase">
+      <CustomHeading
+        level={5}
+        id={props.id}
+        className="mt-6 font-bold uppercase"
+      >
         {children}
       </CustomHeading>
     ),

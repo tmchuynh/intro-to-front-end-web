@@ -27,30 +27,663 @@ npm install react-hook-form zod @hookform/resolvers
 - `FormControl`: The component that wraps the input element.
 - `FormMessage`: The component that displays validation messages for a form field.
 
-## Creating a Form Schema with Zod
+## Understanding Zod: TypeScript-First Schema Validation
 
-We will use `zod` to create a schema for our contact form. This schema will define the structure of the form data and include validation rules.
+Zod is a powerful TypeScript-first schema validation library that provides runtime type safety, data validation, and type inference. It's particularly valuable in form handling because it ensures data integrity both at compile time and runtime.
 
-`zod` is a TypeScript-first schema declaration and validation library that allows us to define the shape of our data and validate it easily.
+### Why Choose Zod?
+
+#### ✅ **Advantages of Zod**
+
+1. **TypeScript Integration**: Automatically infers TypeScript types from schemas
+2. **Runtime Safety**: Validates data at runtime, catching errors that TypeScript can't
+3. **Developer Experience**: Excellent error messages and IDE autocomplete
+4. **Zero Dependencies**: Lightweight with no external dependencies
+5. **Composable**: Build complex schemas from simple primitives
+6. **Framework Agnostic**: Works with any JavaScript/TypeScript project
+
+#### 🔄 **How Zod Works**
 
 ```typescript
 import { z } from "zod";
-export const contactFormSchema = z.object({
+
+// 1. Define a schema
+const userSchema = z.object({
+  name: z.string(),
+  age: z.number()
+});
+
+// 2. TypeScript type is automatically inferred
+type User = z.infer<typeof userSchema>; // { name: string; age: number }
+
+// 3. Validate data at runtime
+const result = userSchema.parse({ name: "John", age: 30 }); // ✅ Valid
+const invalid = userSchema.parse({ name: "John", age: "30" }); // ❌ Throws ZodError
+```
+
+### Basic Zod Schema Creation
+
+Let's start with a simple contact form schema and gradually build complexity:
+
+#### **Level 1: Basic Schema**
+
+```typescript
+import { z } from "zod";
+
+export const basicContactSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
   message: z.string().min(10, "Message must be at least 10 characters long"),
 });
+
+// Automatically inferred TypeScript type
+type BasicContact = z.infer<typeof basicContactSchema>;
+/*
+{
+  name: string;
+  email: string;
+  message: string;
+}
+*/
+```
+
+#### **Level 2: Enhanced Schema with Advanced Validation**
+
+```typescript
+export const enhancedContactSchema = z.object({
+  // String validations
+  name: z.string()
+    .min(2, "Name must be at least 2 characters")
+    .max(50, "Name must be less than 50 characters")
+    .regex(/^[a-zA-Z\s]+$/, "Name can only contain letters and spaces"),
+  
+  // Email with custom validation
+  email: z.string()
+    .email("Please enter a valid email address")
+    .toLowerCase() // Transform to lowercase
+    .refine(
+      (email) => !email.includes('+'), 
+      "Email addresses with '+' are not allowed"
+    ),
+  
+  // Optional fields with default values
+  phone: z.string()
+    .optional()
+    .or(z.literal("")) // Allow empty string
+    .transform((val) => val === "" ? undefined : val),
+  
+  // Enum for predefined values
+  subject: z.enum([
+    "general", 
+    "support", 
+    "billing", 
+    "partnership", 
+    "other"
+  ], {
+    errorMap: () => ({ message: "Please select a valid subject" })
+  }),
+  
+  // Number validation
+  urgency: z.number()
+    .min(1, "Urgency must be at least 1")
+    .max(5, "Urgency cannot exceed 5")
+    .int("Urgency must be a whole number"),
+  
+  // Boolean with default
+  newsletter: z.boolean().default(false),
+  
+  // Array validation
+  interests: z.array(z.string())
+    .min(1, "Please select at least one interest")
+    .max(5, "Please select no more than 5 interests"),
+  
+  // Complex string validation
+  message: z.string()
+    .min(10, "Message must be at least 10 characters")
+    .max(1000, "Message must be less than 1000 characters")
+    .refine(
+      (msg) => msg.trim().split(/\s+/).length >= 3,
+      "Message must contain at least 3 words"
+    ),
+});
+
+type EnhancedContact = z.infer<typeof enhancedContactSchema>;
+```
+
+#### **Level 3: Professional Schema with Complex Validations**
+
+```typescript
+export const professionalContactSchema = z.object({
+  // Personal Information
+  firstName: z.string()
+    .min(1, "First name is required")
+    .max(30, "First name too long")
+    .transform(val => val.trim())
+    .refine(val => val.length > 0, "First name cannot be empty"),
+  
+  lastName: z.string()
+    .min(1, "Last name is required")
+    .max(30, "Last name too long")
+    .transform(val => val.trim()),
+  
+  // Contact Information with complex validation
+  email: z.string()
+    .email("Invalid email format")
+    .toLowerCase()
+    .refine(async (email) => {
+      // Simulate checking if email is already registered
+      const existingUser = await checkEmailExists(email);
+      return !existingUser;
+    }, "This email is already registered"),
+  
+  phone: z.string()
+    .regex(
+      /^[\+]?[1-9][\d]{0,15}$/,
+      "Please enter a valid phone number"
+    )
+    .transform(phone => phone.replace(/\D/g, '')) // Remove non-digits
+    .optional(),
+  
+  // Business Information
+  company: z.string()
+    .max(100, "Company name too long")
+    .optional(),
+  
+  position: z.string()
+    .max(50, "Position title too long")
+    .optional(),
+  
+  // Message with rich validation
+  subject: z.string()
+    .min(5, "Subject must be at least 5 characters")
+    .max(100, "Subject must be less than 100 characters"),
+  
+  message: z.string()
+    .min(20, "Please provide a detailed message (at least 20 characters)")
+    .max(2000, "Message is too long (maximum 2000 characters)")
+    .refine(
+      (msg) => {
+        const wordCount = msg.trim().split(/\s+/).length;
+        return wordCount >= 5;
+      },
+      "Message must contain at least 5 words"
+    )
+    .refine(
+      (msg) => {
+        // Check for spam patterns
+        const spamWords = ['viagra', 'casino', 'lottery', 'winner'];
+        const lowerMsg = msg.toLowerCase();
+        return !spamWords.some(word => lowerMsg.includes(word));
+      },
+      "Message contains prohibited content"
+    ),
+  
+  // File attachments
+  attachments: z.array(
+    z.object({
+      name: z.string(),
+      size: z.number().max(5 * 1024 * 1024, "File size must be less than 5MB"),
+      type: z.string().refine(
+        (type) => ['image/jpeg', 'image/png', 'application/pdf', 'text/plain'].includes(type),
+        "Only JPEG, PNG, PDF, and TXT files are allowed"
+      )
+    })
+  ).max(3, "Maximum 3 files allowed").optional(),
+  
+  // Privacy and consent
+  consent: z.object({
+    privacyPolicy: z.boolean().refine(val => val === true, "You must accept the privacy policy"),
+    newsletter: z.boolean().default(false),
+    dataProcessing: z.boolean().refine(val => val === true, "You must consent to data processing"),
+  }),
+  
+  // Metadata
+  source: z.enum(['website', 'referral', 'social_media', 'advertisement']).optional(),
+  
+  // Anti-spam measures
+  honeypot: z.string().max(0, "Bot detected").optional(), // Should always be empty
+  
+  // Timestamp
+  submittedAt: z.date().default(() => new Date()),
+})
+// Schema-level validation
+.refine(
+  (data) => {
+    // Cross-field validation: if company is provided, position should be too
+    if (data.company && !data.position) {
+      return false;
+    }
+    return true;
+  },
+  {
+    message: "Position is required when company is provided",
+    path: ["position"] // Specify which field should show the error
+  }
+)
+.refine(
+  (data) => {
+    // Business hours submission check
+    const hour = data.submittedAt.getHours();
+    if (data.subject.toLowerCase().includes('urgent') && (hour < 9 || hour > 17)) {
+      return false;
+    }
+    return true;
+  },
+  {
+    message: "Urgent requests can only be submitted during business hours (9 AM - 5 PM)",
+    path: ["subject"]
+  }
+);
+
+type ProfessionalContact = z.infer<typeof professionalContactSchema>;
+```
+
+### Advanced Zod Techniques
+
+#### **Conditional Validation**
+
+```typescript
+const conditionalSchema = z.object({
+  userType: z.enum(['individual', 'business']),
+  name: z.string().min(1),
+  email: z.string().email(),
+  
+  // Conditional fields based on userType
+  businessInfo: z.object({
+    companyName: z.string().min(1),
+    taxId: z.string().min(1),
+    employees: z.number().min(1),
+  }).optional(),
+  
+  personalInfo: z.object({
+    dateOfBirth: z.date(),
+    nationality: z.string(),
+  }).optional(),
+})
+.refine(
+  (data) => {
+    if (data.userType === 'business') {
+      return data.businessInfo !== undefined;
+    }
+    if (data.userType === 'individual') {
+      return data.personalInfo !== undefined;
+    }
+    return true;
+  },
+  {
+    message: "Required information is missing for the selected user type",
+    path: ["userType"]
+  }
+);
+```
+
+#### **Custom Validation Functions**
+
+```typescript
+// Reusable custom validators
+const createPasswordValidator = (minLength: number = 8) => {
+  return z.string()
+    .min(minLength, `Password must be at least ${minLength} characters`)
+    .refine(
+      (password) => /[A-Z]/.test(password),
+      "Password must contain at least one uppercase letter"
+    )
+    .refine(
+      (password) => /[a-z]/.test(password),
+      "Password must contain at least one lowercase letter"
+    )
+    .refine(
+      (password) => /\d/.test(password),
+      "Password must contain at least one number"
+    )
+    .refine(
+      (password) => /[!@#$%^&*(),.?":{}|<>]/.test(password),
+      "Password must contain at least one special character"
+    );
+};
+
+const createDateRangeValidator = (startDate: Date, endDate: Date) => {
+  return z.date()
+    .min(startDate, `Date must be after ${startDate.toLocaleDateString()}`)
+    .max(endDate, `Date must be before ${endDate.toLocaleDateString()}`);
+};
+
+// Usage
+const userRegistrationSchema = z.object({
+  email: z.string().email(),
+  password: createPasswordValidator(12), // Minimum 12 characters
+  confirmPassword: z.string(),
+  birthDate: createDateRangeValidator(
+    new Date('1900-01-01'),
+    new Date(Date.now() - 18 * 365 * 24 * 60 * 60 * 1000) // Must be 18+ years old
+  ),
+})
+.refine(
+  (data) => data.password === data.confirmPassword,
+  {
+    message: "Passwords don't match",
+    path: ["confirmPassword"]
+  }
+);
+```
+
+#### **Schema Composition and Reusability**
+
+```typescript
+// Base schemas for reusability
+const basePersonSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Invalid email address"),
+});
+
+const addressSchema = z.object({
+  street: z.string().min(1, "Street address is required"),
+  city: z.string().min(1, "City is required"),
+  state: z.string().min(2, "State is required").max(2, "State code must be 2 characters"),
+  zipCode: z.string().regex(/^\d{5}(-\d{4})?$/, "Invalid ZIP code format"),
+  country: z.string().default("US"),
+});
+
+const contactPreferencesSchema = z.object({
+  preferredContact: z.enum(['email', 'phone', 'mail']),
+  newsletter: z.boolean().default(false),
+  promotions: z.boolean().default(false),
+  frequency: z.enum(['daily', 'weekly', 'monthly']).default('weekly'),
+});
+
+// Compose complex schemas from base schemas
+const customerSchema = basePersonSchema.extend({
+  phone: z.string().optional(),
+  dateOfBirth: z.date().optional(),
+  address: addressSchema,
+  preferences: contactPreferencesSchema,
+  
+  // Customer-specific fields
+  customerId: z.string().uuid(),
+  membershipLevel: z.enum(['bronze', 'silver', 'gold', 'platinum']).default('bronze'),
+  totalPurchases: z.number().min(0).default(0),
+});
+
+const employeeSchema = basePersonSchema.extend({
+  employeeId: z.string(),
+  department: z.string(),
+  position: z.string(),
+  salary: z.number().positive(),
+  startDate: z.date(),
+  address: addressSchema.optional(), // Optional for employees
+});
+
+// Merge multiple schemas
+const fullContactSchema = basePersonSchema
+  .merge(addressSchema.partial()) // Make address fields optional
+  .merge(contactPreferencesSchema.partial())
+  .extend({
+    message: z.string().min(10, "Message must be at least 10 characters"),
+    urgency: z.enum(['low', 'medium', 'high']).default('medium'),
+  });
+```
+
+### Error Handling and User Experience
+
+#### **Custom Error Messages**
+
+```typescript
+const userFriendlySchema = z.object({
+  username: z.string()
+    .min(3, "Username is too short - needs at least 3 characters")
+    .max(20, "Username is too long - maximum 20 characters allowed")
+    .regex(
+      /^[a-zA-Z0-9_]+$/, 
+      "Username can only contain letters, numbers, and underscores"
+    ),
+  
+  age: z.number({
+    required_error: "Please tell us your age",
+    invalid_type_error: "Age must be a number",
+  })
+    .min(13, "You must be at least 13 years old to register")
+    .max(120, "Please enter a valid age"),
+  
+  email: z.string({
+    required_error: "Email address is required",
+  })
+    .email("Please enter a valid email address")
+    .refine(
+      (email) => !email.endsWith('.temp'), 
+      "Temporary email addresses are not allowed"
+    ),
+});
+```
+
+#### **Parsing vs Validation**
+
+```typescript
+// Different ways to validate data with Zod
+
+// 1. parse() - Throws on validation failure
+try {
+  const validData = schema.parse(formData);
+  console.log("Data is valid:", validData);
+} catch (error) {
+  if (error instanceof z.ZodError) {
+    console.log("Validation errors:", error.errors);
+  }
+}
+
+// 2. safeParse() - Returns result object (recommended for forms)
+const result = schema.safeParse(formData);
+if (result.success) {
+  console.log("Valid data:", result.data);
+} else {
+  console.log("Validation errors:", result.error.errors);
+  
+  // Format errors for display
+  const fieldErrors = result.error.errors.reduce((acc, error) => {
+    const field = error.path.join('.');
+    acc[field] = error.message;
+    return acc;
+  }, {});
+}
+
+// 3. parseAsync() - For async validation
+const asyncResult = await schema.parseAsync(formData);
+
+// 4. safeParseAsync() - Safe async validation
+const safeAsyncResult = await schema.safeParseAsync(formData);
+```
+
+### Integration with React Hook Form
+
+#### **Complete Integration Example**
+
+```typescript
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const advancedFormSchema = z.object({
+  profile: z.object({
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    avatar: z.string().url("Please provide a valid image URL").optional(),
+  }),
+  
+  contact: z.object({
+    email: z.string().email("Invalid email address"),
+    phone: z.string().regex(/^\+?[\d\s-()]+$/, "Invalid phone number").optional(),
+    preferredContactTime: z.enum(['morning', 'afternoon', 'evening']),
+  }),
+  
+  preferences: z.object({
+    theme: z.enum(['light', 'dark', 'system']).default('system'),
+    notifications: z.object({
+      email: z.boolean().default(true),
+      push: z.boolean().default(false),
+      sms: z.boolean().default(false),
+    }),
+    privacy: z.object({
+      profileVisible: z.boolean().default(true),
+      dataSharing: z.boolean().default(false),
+    }),
+  }),
+  
+  // Nested array validation
+  interests: z.array(
+    z.object({
+      category: z.string(),
+      level: z.enum(['beginner', 'intermediate', 'advanced']),
+      yearsExperience: z.number().min(0).max(50),
+    })
+  ).min(1, "Please select at least one interest"),
+});
+
+type AdvancedFormData = z.infer<typeof advancedFormSchema>;
+
+export function AdvancedForm() {
+  const form = useForm<AdvancedFormData>({
+    resolver: zodResolver(advancedFormSchema),
+    defaultValues: {
+      profile: {
+        firstName: "",
+        lastName: "",
+      },
+      contact: {
+        email: "",
+        preferredContactTime: "morning",
+      },
+      preferences: {
+        theme: "system",
+        notifications: {
+          email: true,
+          push: false,
+          sms: false,
+        },
+        privacy: {
+          profileVisible: true,
+          dataSharing: false,
+        },
+      },
+      interests: [],
+    },
+  });
+
+  const onSubmit = (data: AdvancedFormData) => {
+    console.log("Form submitted with valid data:", data);
+  };
+
+  return (
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      {/* Form fields here */}
+    </form>
+  );
+}
+```
+
+### Performance Optimization
+
+#### **Schema Caching and Reuse**
+
+```typescript
+// Cache schemas to avoid recreation
+const schemaCache = new Map();
+
+const getContactSchema = (memoKey: string) => {
+  if (!schemaCache.has(memoKey)) {
+    const schema = z.object({
+      name: z.string().min(1),
+      email: z.string().email(),
+      message: z.string().min(10),
+    });
+    schemaCache.set(memoKey, schema);
+  }
+  return schemaCache.get(memoKey);
+};
+
+// Use useMemo in React components
+const ContactForm = () => {
+  const schema = useMemo(() => getContactSchema('basic-contact'), []);
+  
+  const form = useForm({
+    resolver: zodResolver(schema),
+  });
+  
+  // ... rest of component
+};
+```
+
+#### **Partial Validation for Step Forms**
+
+```typescript
+const fullSchema = z.object({
+  step1: z.object({
+    name: z.string().min(1),
+    email: z.string().email(),
+  }),
+  step2: z.object({
+    phone: z.string().optional(),
+    company: z.string().optional(),
+  }),
+  step3: z.object({
+    message: z.string().min(10),
+    urgency: z.enum(['low', 'medium', 'high']),
+  }),
+});
+
+// Validate individual steps
+const validateStep = (step: number, data: any) => {
+  switch (step) {
+    case 1:
+      return fullSchema.shape.step1.safeParse(data);
+    case 2:
+      return fullSchema.shape.step2.safeParse(data);
+    case 3:
+      return fullSchema.shape.step3.safeParse(data);
+    default:
+      return { success: false, error: new Error('Invalid step') };
+  }
+};
+```
+
+<BackToTop />
+
+## Creating a Form Schema with Zod
+
+Now let's implement a practical contact form schema using the concepts we've learned:
+
+```typescript
+import { z } from "zod";
+
+export const contactFormSchema = z.object({
+  name: z.string()
+    .min(1, "Name is required")
+    .max(50, "Name must be less than 50 characters")
+    .transform(val => val.trim()),
+  
+  email: z.string()
+    .min(1, "Email is required")
+    .email("Invalid email address")
+    .toLowerCase(),
+  
+  message: z.string()
+    .min(10, "Message must be at least 10 characters long")
+    .max(1000, "Message must be less than 1000 characters")
+    .transform(val => val.trim()),
+});
+
+// Export the inferred type for TypeScript
+export type ContactFormData = z.infer<typeof contactFormSchema>;
 ```
 
 ### How This Works
 
-`zod` provides a powerful and flexible way to define and validate data structures, making it an excellent choice for form validation in React applications.
+This schema demonstrates key Zod concepts:
 
-- We import `z` from the `zod` library.
-- We define a schema using `z.object()`, which takes an object with the fields we want to validate.
-- Each field is defined with a type and validation rules. For example, the `name` field must be a string with a minimum length of 1, the `email` field must be a valid email address, and the `message` field must be a string with a minimum length of 10 characters.
-
-Here, the `contactFormSchema` will be used to validate the form data when the user submits the contact form. If the validation fails, appropriate error messages will be displayed to the user.
+1. **Type Safety**: Automatic TypeScript type inference
+2. **Validation Chain**: Multiple validation rules per field
+3. **Transform**: Data cleaning (trim whitespace, lowercase email)
+4. **Custom Messages**: User-friendly error messages
+5. **Runtime Validation**: Ensures data integrity at submission
 
 ## Creating the Contact Form Component
 
@@ -301,14 +934,10 @@ export default function ContactFormWithSpinner() {
             )}
           />
           
-          <Button 
-            type="submit" 
-            disabled={isSubmitting}
-            className="w-full"
-          >
+          <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
                 Sending Message...
               </>
             ) : (
@@ -509,10 +1138,7 @@ export default function EnhancedContactForm() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    Full Name
-                  </FormLabel>
+                  <FormLabel>Full Name</FormLabel>
                   <FormControl>
                     <Input 
                       {...field} 
@@ -530,10 +1156,7 @@ export default function EnhancedContactForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <Mail className="h-4 w-4" />
-                    Email Address
-                  </FormLabel>
+                  <FormLabel>Email Address</FormLabel>
                   <FormControl>
                     <Input 
                       {...field} 
@@ -554,10 +1177,7 @@ export default function EnhancedContactForm() {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2">
-                    <Phone className="h-4 w-4" />
-                    Phone Number (Optional)
-                  </FormLabel>
+                  <FormLabel>Phone Number (Optional)</FormLabel>
                   <FormControl>
                     <Input 
                       {...field} 
@@ -625,10 +1245,7 @@ export default function EnhancedContactForm() {
             name="message"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="flex items-center gap-2">
-                  <MessageSquare className="h-4 w-4" />
-                  Your Message
-                </FormLabel>
+                <FormLabel>Your Message</FormLabel>
                 <FormControl>
                   <Textarea 
                     {...field} 
@@ -1089,7 +1706,7 @@ export default function RichTextContactForm() {
                   <FormControl>
                     <Input 
                       {...field} 
-                      placeholder="John Doe"
+                      placeholder="Enter your full name"
                       disabled={isSubmitting}
                     />
                   </FormControl>
@@ -1107,8 +1724,8 @@ export default function RichTextContactForm() {
                   <FormControl>
                     <Input 
                       {...field} 
-                      type="email"
-                      placeholder="john@example.com"
+                      type="email" 
+                      placeholder="Enter your email"
                       disabled={isSubmitting}
                     />
                   </FormControl>
@@ -1127,7 +1744,7 @@ export default function RichTextContactForm() {
                 <FormControl>
                   <Input 
                     {...field} 
-                    placeholder="How can we help you?"
+                    placeholder="Brief subject line"
                     disabled={isSubmitting}
                   />
                 </FormControl>
@@ -1141,7 +1758,7 @@ export default function RichTextContactForm() {
             name="message"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Message</FormLabel>
+                <FormLabel>Your Message</FormLabel>
                 <FormControl>
                   <div className="border border-gray-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
                     <MenuBar editor={editor} />
@@ -1244,132 +1861,6 @@ export default function RichTextContactForm() {
 }
 ```
 
-##### How It Works
-
-This rich text editor implementation using Tiptap provides several key features:
-
-1. **Modern Editor Framework**: Tiptap is a headless editor built on ProseMirror, offering excellent performance and flexibility.
-
-2. **Formatting Tools**: 
-   - **Bold/Italic**: Basic text formatting with keyboard shortcuts
-   - **Lists**: Bullet and numbered lists for structured content
-   - **Blockquotes**: For highlighting important text
-   - **Links**: Add clickable links to external resources
-
-3. **User Experience Features**:
-   - Visual toolbar with active state indicators
-   - Character count display
-   - Placeholder text for guidance
-   - Keyboard shortcuts (Ctrl+B, Ctrl+I, Ctrl+Enter)
-   - Undo/Redo functionality
-
-4. **Data Handling**: 
-   - Exports both HTML and plain text versions
-   - Validates content length
-   - Preserves formatting in submissions
-
-5. **Accessibility**: Proper ARIA labels, keyboard navigation, and screen reader support.
-
-##### Customization Options
-
-Extend the rich text editor with additional features:
-
-**Advanced Formatting:**
-```tsx
-// Add more extensions for enhanced formatting
-import Underline from '@tiptap/extension-underline';
-import TextStyle from '@tiptap/extension-text-style';
-import Color from '@tiptap/extension-color';
-import Highlight from '@tiptap/extension-highlight';
-
-const editor = useEditor({
-  extensions: [
-    StarterKit,
-    Underline,
-    TextStyle,
-    Color,
-    Highlight.configure({
-      multicolor: true,
-    }),
-  ],
-});
-
-// Additional toolbar buttons
-const advancedMenuItems = [
-  {
-    icon: Underline,
-    action: () => editor.chain().focus().toggleUnderline().run(),
-    isActive: editor.isActive('underline'),
-    tooltip: 'Underline (Ctrl+U)'
-  },
-  {
-    icon: Palette,
-    action: () => {
-      const color = prompt('Enter color (hex):');
-      if (color) {
-        editor.chain().focus().setColor(color).run();
-      }
-    },
-    isActive: false,
-    tooltip: 'Text Color'
-  }
-];
-```
-
-**File Upload Integration:**
-```tsx
-// Add image upload capability
-import Image from '@tiptap/extension-image';
-
-const handleImageUpload = async (file) => {
-  const formData = new FormData();
-  formData.append('image', file);
-  
-  const response = await fetch('/api/upload-image', {
-    method: 'POST',
-    body: formData,
-  });
-  
-  const { url } = await response.json();
-  return url;
-};
-
-// Image button in toolbar
-{
-  icon: ImageIcon,
-  action: () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = async (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const url = await handleImageUpload(file);
-        editor.chain().focus().setImage({ src: url }).run();
-      }
-    };
-    input.click();
-  },
-  isActive: false,
-  tooltip: 'Insert Image'
-}
-```
-
-**Content Templates:**
-```tsx
-// Pre-defined message templates
-const messageTemplates = [
-  {
-    name: "General Inquiry",
-    content: `<p>Hello,</p><p>I would like to inquire about <strong>[topic]</strong>.</p><p>Please provide more information about:</p><ul><li>Feature details</li><li>Pricing options</li><li>Timeline</li></ul><p>Thank you for your time.</p><p>Best regards,<br/>[Your Name]</p>`
-  },
-  {
-    name: "Support Request", 
-    content: `<p>Hi Support Team,</p><p>I'm experiencing an issue with <strong>[product/service]</strong>.</p><blockquote><p><em>Please describe the issue in detail here...</em></p></blockquote><p>Steps I've already tried:</p><ol><li>Step 1</li><li>Step 2</li><li>Step 3</li></ol><p>I would appreciate your assistance.</p><p>Thanks!</p>`
-  }
-];
-```
-
 #### Example with Quill.js (Alternative)
 
 For a more traditional rich text editor experience, you can use Quill.js:
@@ -1437,5 +1928,950 @@ Both implementations provide rich text editing capabilities with different appro
 - **Quill.js**: Traditional, feature-rich out of the box, mature ecosystem
 
 Choose based on your specific needs for customization, bundle size, and desired features.
+
+<BackToTop />
+
+### Multi-Step Contact Form with Advanced Validation
+
+This example demonstrates a comprehensive multi-step contact form using advanced Zod schemas:
+
+```tsx
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ChevronLeft, ChevronRight, CheckCircle, User, Mail, MessageSquare, Settings } from "lucide-react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+
+// Step 1: Personal Information Schema
+const personalInfoSchema = z.object({
+  firstName: z.string()
+    .min(2, "First name must be at least 2 characters")
+    .max(30, "First name must be less than 30 characters")
+    .regex(/^[a-zA-Z\s']+$/, "Only letters, spaces, and apostrophes allowed"),
+  
+  lastName: z.string()
+    .min(2, "Last name must be at least 2 characters")
+    .max(30, "Last name must be less than 30 characters")
+    .regex(/^[a-zA-Z\s']+$/, "Only letters, spaces, and apostrophes allowed"),
+  
+  email: z.string()
+    .email("Please enter a valid email address")
+    .toLowerCase()
+    .refine(
+      (email) => !email.includes('+'), 
+      "Email addresses with '+' symbols are not supported"
+    ),
+  
+  phone: z.string()
+    .regex(/^[\+]?[1-9][\d]{0,15}$/, "Please enter a valid phone number")
+    .optional()
+    .or(z.literal("")),
+  
+  company: z.string()
+    .max(100, "Company name must be less than 100 characters")
+    .optional()
+    .or(z.literal("")),
+  
+  position: z.string()
+    .max(50, "Position must be less than 50 characters")
+    .optional()
+    .or(z.literal("")),
+});
+
+// Step 2: Contact Details Schema
+const contactDetailsSchema = z.object({
+  inquiryType: z.enum([
+    "general",
+    "technical-support", 
+    "sales",
+    "partnership",
+    "media",
+    "careers",
+    "feedback"
+  ], {
+    errorMap: () => ({ message: "Please select an inquiry type" })
+  }),
+  
+  urgency: z.enum(["low", "medium", "high", "critical"], {
+    errorMap: () => ({ message: "Please select urgency level" })
+  }),
+  
+  preferredContact: z.enum(["email", "phone", "either"], {
+    errorMap: () => ({ message: "Please select preferred contact method" })
+  }),
+  
+  bestTimeToContact: z.array(z.enum([
+    "morning", "afternoon", "evening", "weekends"
+  ]))
+    .min(1, "Please select at least one time preference")
+    .max(4, "Please select no more than 4 time preferences"),
+  
+  budget: z.enum([
+    "under-1k",
+    "1k-5k", 
+    "5k-10k",
+    "10k-25k",
+    "25k-plus",
+    "not-applicable"
+  ]).optional(),
+});
+
+// Step 3: Message Schema  
+const messageSchema = z.object({
+  subject: z.string()
+    .min(5, "Subject must be at least 5 characters")
+    .max(100, "Subject must be less than 100 characters"),
+  
+  message: z.string()
+    .min(20, "Please provide a detailed message (at least 20 characters)")
+    .max(2000, "Message must be less than 2000 characters")
+    .refine(
+      (msg) => msg.trim().split(/\s+/).length >= 5,
+      "Message must contain at least 5 words"
+    ),
+  
+  attachments: z.array(z.object({
+    name: z.string(),
+    size: z.number().max(10 * 1024 * 1024, "Files must be smaller than 10MB"),
+    type: z.string().refine(
+      (type) => [
+        'image/jpeg', 'image/png', 'image/gif',
+        'application/pdf', 'text/plain', 'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ].includes(type),
+      "Only images, PDFs, and Word documents are allowed"
+    )
+  })).max(5, "Maximum 5 files allowed").optional(),
+  
+  followUpExpected: z.boolean().default(true),
+  
+  newsletter: z.boolean().default(false),
+  
+  privacyConsent: z.boolean().refine(
+    val => val === true, 
+    "You must agree to our privacy policy to continue"
+  ),
+});
+
+// Combined schema for final validation
+const completeFormSchema = personalInfoSchema
+  .merge(contactDetailsSchema)
+  .merge(messageSchema)
+  .refine(
+    (data) => {
+      // If urgency is critical, phone number is required
+      if (data.urgency === "critical" && !data.phone) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Phone number is required for critical inquiries",
+      path: ["phone"]
+    }
+  )
+  .refine(
+    (data) => {
+      // If preferred contact is phone, phone number is required
+      if (data.preferredContact === "phone" && !data.phone) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Phone number is required when phone is preferred contact method",
+      path: ["phone"]
+    }
+  );
+
+type CompleteFormData = z.infer<typeof completeFormSchema>;
+
+export default function MultiStepContactForm() {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+  
+  const totalSteps = 3;
+  const progress = (currentStep / totalSteps) * 100;
+
+  const form = useForm<CompleteFormData>({
+    resolver: zodResolver(completeFormSchema),
+    mode: "onChange",
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      company: "",
+      position: "",
+      inquiryType: "general",
+      urgency: "medium",
+      preferredContact: "email",
+      bestTimeToContact: [],
+      subject: "",
+      message: "",
+      followUpExpected: true,
+      newsletter: false,
+      privacyConsent: false,
+    },
+  });
+
+  const validateCurrentStep = async () => {
+    const values = form.getValues();
+    
+    try {
+      switch (currentStep) {
+        case 1:
+          personalInfoSchema.parse({
+            firstName: values.firstName,
+            lastName: values.lastName,
+            email: values.email,
+            phone: values.phone,
+            company: values.company,
+            position: values.position,
+          });
+          break;
+        case 2:
+          contactDetailsSchema.parse({
+            inquiryType: values.inquiryType,
+            urgency: values.urgency,
+            preferredContact: values.preferredContact,
+            bestTimeToContact: values.bestTimeToContact,
+            budget: values.budget,
+          });
+          break;
+        case 3:
+          messageSchema.parse({
+            subject: values.subject,
+            message: values.message,
+            attachments: values.attachments,
+            followUpExpected: values.followUpExpected,
+            newsletter: values.newsletter,
+            privacyConsent: values.privacyConsent,
+          });
+          break;
+      }
+      return true;
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        // Set form errors
+        error.errors.forEach((err) => {
+          form.setError(err.path.join('.') as any, {
+            message: err.message,
+          });
+        });
+      }
+      return false;
+    }
+  };
+
+  const nextStep = async () => {
+    const isValid = await validateCurrentStep();
+    if (isValid && currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const onSubmit = async (data: CompleteFormData) => {
+    setIsSubmitting(true);
+    
+    try {
+      // Final validation
+      const validatedData = completeFormSchema.parse(data);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      console.log("Form submitted successfully:", validatedData);
+      setIsComplete(true);
+      
+    } catch (error) {
+      console.error("Submission error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const inquiryTypeOptions = [
+    { value: "general", label: "General Inquiry", icon: "💬" },
+    { value: "technical-support", label: "Technical Support", icon: "🔧" },
+    { value: "sales", label: "Sales Question", icon: "💰" },
+    { value: "partnership", label: "Partnership", icon: "🤝" },
+    { value: "media", label: "Media & Press", icon: "📰" },
+    { value: "careers", label: "Career Opportunities", icon: "💼" },
+    { value: "feedback", label: "Feedback", icon: "💭" },
+  ];
+
+  const urgencyOptions = [
+    { value: "low", label: "Low Priority", color: "bg-green-100 text-green-800" },
+    { value: "medium", label: "Medium Priority", color: "bg-yellow-100 text-yellow-800" },
+    { value: "high", label: "High Priority", color: "bg-orange-100 text-orange-800" },
+    { value: "critical", label: "Critical", color: "bg-red-100 text-red-800" },
+  ];
+
+  if (isComplete) {
+    return (
+      <Card className="max-w-2xl mx-auto">
+        <CardContent className="p-8 text-center">
+          <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Thank You!</h2>
+          <p className="text-gray-600 mb-6">
+            Your message has been sent successfully. We'll get back to you within 24 hours.
+          </p>
+          <Button onClick={() => window.location.reload()} variant="outline">
+            Send Another Message
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="max-w-3xl mx-auto p-6 space-y-6">
+      {/* Progress Header */}
+      <Card>
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between mb-4">
+            <CardTitle className="text-2xl">Contact Us</CardTitle>
+            <Badge variant="outline">Step {currentStep} of {totalSteps}</Badge>
+          </div>
+          <Progress value={progress} className="h-2" />
+          
+          <div className="flex justify-between mt-4 text-sm">
+            <div className={`flex items-center gap-2 ${currentStep >= 1 ? 'text-blue-600' : 'text-gray-400'}`}>
+              <User className="h-4 w-4" />
+              Personal Info
+            </div>
+            <div className={`flex items-center gap-2 ${currentStep >= 2 ? 'text-blue-600' : 'text-gray-400'}`}>
+              <Mail className="h-4 w-4" />
+              Contact Details
+            </div>
+            <div className={`flex items-center gap-2 ${currentStep >= 3 ? 'text-blue-600' : 'text-gray-400'}`}>
+              <MessageSquare className="h-4 w-4" />
+              Your Message
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Form Content */}
+      <Card>
+        <CardContent className="p-6">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              
+              {/* Step 1: Personal Information */}
+              {currentStep === 1 && (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>First Name *</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="John" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Last Name *</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Doe" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email Address *</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="email" placeholder="john@example.com" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="tel" placeholder="+1 (555) 123-4567" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="company"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Company</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Acme Corp" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="position"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Position</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Software Engineer" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Contact Details */}
+              {currentStep === 2 && (
+                <div className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="inquiryType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>What is your inquiry about? *</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2"
+                          >
+                            {inquiryTypeOptions.map((option) => (
+                              <div key={option.value} className="flex items-center space-x-2 border rounded-lg p-4 hover:bg-gray-50">
+                                <RadioGroupItem value={option.value} id={option.value} />
+                                <label htmlFor={option.value} className="flex items-center gap-2 cursor-pointer flex-1">
+                                  <span className="text-lg">{option.icon}</span>
+                                  <span>{option.label}</span>
+                                </label>
+                              </div>
+                            ))}
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="urgency"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Urgency Level *</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex gap-4 mt-2"
+                          >
+                            {urgencyOptions.map((option) => (
+                              <div key={option.value} className="flex items-center space-x-2">
+                                <RadioGroupItem value={option.value} id={`urgency-${option.value}`} />
+                                <label htmlFor={`urgency-${option.value}`} className="cursor-pointer">
+                                  <Badge className={option.color}>{option.label}</Badge>
+                                </label>
+                              </div>
+                            ))}
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="preferredContact"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Preferred Contact Method *</FormLabel>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            className="flex gap-6 mt-2"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="email" id="contact-email" />
+                              <label htmlFor="contact-email" className="cursor-pointer">Email</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="phone" id="contact-phone" />
+                              <label htmlFor="contact-phone" className="cursor-pointer">Phone</label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="either" id="contact-either" />
+                              <label htmlFor="contact-either" className="cursor-pointer">Either</label>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="bestTimeToContact"
+                    render={() => (
+                      <FormItem>
+                        <FormLabel>Best Time to Contact (select all that apply) *</FormLabel>
+                        <div className="grid grid-cols-2 gap-4 mt-2">
+                          {["morning", "afternoon", "evening", "weekends"].map((time) => (
+                            <FormField
+                              key={time}
+                              control={form.control}
+                              name="bestTimeToContact"
+                              render={({ field }) => {
+                                return (
+                                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value?.includes(time)}
+                                        onCheckedChange={(checked) => {
+                                          const updatedValue = checked
+                                            ? [...(field.value || []), time]
+                                            : (field.value || []).filter((value) => value !== time);
+                                          field.onChange(updatedValue);
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <FormLabel className="capitalize cursor-pointer">
+                                      {time}
+                                    </FormLabel>
+                                  </FormItem>
+                                );
+                              }}
+                            />
+                          ))}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+
+              {/* Step 3: Message */}
+              {currentStep === 3 && (
+                <div className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="subject"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Subject *</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Brief subject line" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="message"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Your Message *</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            {...field}
+                            placeholder="Please provide details about your inquiry..."
+                            rows={6}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                        <div className="text-sm text-gray-500">
+                          {field.value?.length || 0}/2000 characters
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="followUpExpected"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="cursor-pointer">
+                              I expect a follow-up response
+                            </FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="newsletter"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="cursor-pointer">
+                              Subscribe to our newsletter for updates
+                            </FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="privacyConsent"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel className="cursor-pointer">
+                              I agree to the <a href="/privacy" className="text-blue-600 underline">privacy policy</a> *
+                            </FormLabel>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Navigation Buttons */}
+              <div className="flex justify-between pt-6 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={prevStep}
+                  disabled={currentStep === 1}
+                  className="flex items-center gap-2"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+
+                {currentStep < totalSteps ? (
+                  <Button
+                    type="button"
+                    onClick={nextStep}
+                    className="flex items-center gap-2"
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="h-4 w-4" />
+                        Send Message
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+```
+
+##### How This Advanced Example Works
+
+This multi-step contact form demonstrates several advanced Zod and form handling concepts:
+
+1. **Schema Composition**: Three separate schemas (`personalInfoSchema`, `contactDetailsSchema`, `messageSchema`) are combined into a complete schema with cross-field validation.
+
+2. **Step-by-Step Validation**: Each step is validated independently before allowing progression, providing immediate feedback.
+
+3. **Complex Field Types**: Demonstrates various input types including radio groups, checkboxes, arrays, and conditional validation.
+
+4. **Cross-Field Dependencies**: Phone number becomes required when urgency is "critical" or when phone is the preferred contact method.
+
+5. **User Experience**: Progressive disclosure, visual progress indicators, and contextual validation messages.
+
+6. **Data Transformation**: Email addresses are automatically converted to lowercase, and empty strings are converted to undefined for optional fields.
+
+##### Customization Options
+
+- **Dynamic Steps**: Add or remove steps based on user selections
+- **Conditional Fields**: Show/hide fields based on previous answers
+- **Save Progress**: Store form data in localStorage for session persistence
+- **File Upload**: Add file attachment capabilities with proper validation
+- **Real-time Validation**: Validate fields as users type rather than on step completion
+
+<BackToTop />
+
+### International Contact Form with Localization
+
+This example shows how to handle international users with proper validation for different regions:
+
+```tsx
+import { z } from "zod";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
+
+// Country-specific validation schemas
+const createInternationalSchema = (country: string = "US") => {
+  const baseSchema = z.object({
+    firstName: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    email: z.string().email("Invalid email address"),
+    country: z.string().min(1, "Please select your country"),
+    
+    // Phone validation based on country
+    phone: z.string()
+      .optional()
+      .refine((phone) => {
+        if (!phone) return true; // Optional field
+        const phoneNumber = parsePhoneNumberFromString(phone, country as any);
+        return phoneNumber?.isValid();
+      }, `Please enter a valid ${country} phone number`),
+    
+    // Postal code validation varies by country
+    postalCode: z.string()
+      .optional()
+      .refine((code) => {
+        if (!code) return true;
+        
+        const patterns = {
+          US: /^\d{5}(-\d{4})?$/,
+          CA: /^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$/,
+          UK: /^[A-Z]{1,2}\d[A-Z\d]? \d[A-Z]{2}$/,
+          DE: /^\d{5}$/,
+          FR: /^\d{5}$/,
+          JP: /^\d{3}-\d{4}$/,
+        };
+        
+        const pattern = patterns[country as keyof typeof patterns];
+        return pattern ? pattern.test(code) : true;
+      }, "Please enter a valid postal code for your country"),
+    
+    message: z.string().min(10, "Message must be at least 10 characters"),
+    
+    // GDPR compliance for EU countries
+    gdprConsent: country === "EU" ? 
+      z.boolean().refine(val => val === true, "GDPR consent is required") :
+      z.boolean().optional(),
+  });
+
+  return baseSchema;
+};
+
+export default function InternationalContactForm() {
+  const [selectedCountry, setSelectedCountry] = useState("US");
+  const schema = useMemo(() => createInternationalSchema(selectedCountry), [selectedCountry]);
+  
+  const form = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      country: "US",
+      gdprConsent: false,
+    },
+  });
+
+  // Rest of component implementation...
+}
+```
+
+### File Upload Contact Form with Advanced Validation
+
+```tsx
+import { z } from "zod";
+
+const fileUploadSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  subject: z.string().min(1, "Subject is required"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+  
+  // File upload with comprehensive validation
+  attachments: z.array(
+    z.object({
+      name: z.string(),
+      size: z.number()
+        .max(10 * 1024 * 1024, "File must be smaller than 10MB")
+        .min(1, "File cannot be empty"),
+      type: z.string()
+        .refine(
+          (type) => [
+            // Images
+            'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
+            // Documents
+            'application/pdf', 'text/plain', 
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/vnd.ms-excel',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            // Compressed files
+            'application/zip', 'application/x-rar-compressed'
+          ].includes(type),
+          "File type not supported. Please upload images, documents, or compressed files."
+        ),
+      lastModified: z.number().optional(),
+      // File content validation (for security)
+      content: z.string().optional().refine(
+        (content) => {
+          if (!content) return true;
+          // Basic security check - no script tags
+          return !/<script[\s\S]*?>[\s\S]*?<\/script>/gi.test(content);
+        },
+        "File contains potentially dangerous content"
+      ),
+    })
+  )
+    .max(5, "Maximum 5 files allowed")
+    .optional()
+    .refine(
+      (files) => {
+        if (!files) return true;
+        const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+        return totalSize <= 25 * 1024 * 1024; // 25MB total
+      },
+      "Total file size cannot exceed 25MB"
+    ),
+  
+  // File categories for better organization
+  attachmentCategories: z.array(z.enum([
+    "documentation",
+    "screenshots", 
+    "designs",
+    "contracts",
+    "other"
+  ])).optional(),
+});
+
+export default function FileUploadContactForm() {
+  const [files, setFiles] = useState<File[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
+  
+  const form = useForm({
+    resolver: zodResolver(fileUploadSchema),
+  });
+
+  const handleFileUpload = useCallback(async (acceptedFiles: File[]) => {
+    const validatedFiles = [];
+    
+    for (const file of acceptedFiles) {
+      try {
+        // Validate individual file
+        const fileData = {
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          lastModified: file.lastModified,
+        };
+        
+        // Additional security checks
+        if (file.type.startsWith('text/')) {
+          const content = await file.text();
+          fileData.content = content;
+        }
+        
+        // Validate with Zod
+        const validation = fileUploadSchema.shape.attachments.element.safeParse(fileData);
+        
+        if (validation.success) {
+          validatedFiles.push(file);
+        } else {
+          // Show specific error for this file
+          toast.error(`${file.name}: ${validation.error.errors[0].message}`);
+        }
+      } catch (error) {
+        toast.error(`Error processing ${file.name}: ${error.message}`);
+      }
+    }
+    
+    setFiles(prev => [...prev, ...validatedFiles]);
+  }, []);
+
+  // Rest of component implementation with drag-and-drop, progress bars, etc...
+}
+```
+
+These examples demonstrate the full power and flexibility of Zod for handling complex form validation scenarios. Each example builds upon the previous concepts while introducing new validation patterns and real-world use cases.
 
 <BackToTop />

@@ -33,7 +33,7 @@ In the context of React and Next.js, server APIs encompass both React's SSR stre
 
 ### Advantages and Disadvantages
 
-**Advantages:**
+##### Advantages
 
 - **Improved Performance**: Server-rendered pages load faster as users receive pre-rendered HTML instead of waiting for JavaScript to execute and render content
 - **Enhanced SEO**: Search engines can crawl and index server-rendered content more effectively, improving search rankings and social media previews
@@ -42,7 +42,7 @@ In the context of React and Next.js, server APIs encompass both React's SSR stre
 - **Reduced Client-Side Bundle Size**: Some rendering work is moved to the server, potentially reducing the JavaScript that needs to be downloaded
 - **Security Benefits**: Sensitive operations, API keys, and business logic remain on the server, reducing exposure to client-side vulnerabilities
 
-**Disadvantages:**
+##### Disadvantages
 
 - **Server Complexity**: Requires managing server infrastructure, scaling, and potential single points of failure
 - **Higher Server Costs**: Server-side rendering consumes more server resources compared to serving static files
@@ -52,7 +52,7 @@ In the context of React and Next.js, server APIs encompass both React's SSR stre
 
 ### When to Use Server APIs
 
-**Ideal Use Cases:**
+##### Ideal Use Cases
 
 - **E-commerce Applications**: Product catalogs, shopping carts, and checkout processes that require SEO and fast initial loads
 - **Content Management Systems**: Blogs, news sites, and documentation where content needs to be indexable and load quickly
@@ -60,7 +60,7 @@ In the context of React and Next.js, server APIs encompass both React's SSR stre
 - **Social Media Platforms**: User profiles, feeds, and content that benefit from SEO and social sharing previews
 - **Marketing Landing Pages**: Campaign pages that need optimal Core Web Vitals for conversion optimization
 
-**Technical Scenarios:**
+##### Technical Scenarios
 
 - When your application requires dynamic data that changes frequently (user-specific content, real-time updates)
 - When SEO is critical for organic traffic and search engine visibility
@@ -69,7 +69,7 @@ In the context of React and Next.js, server APIs encompass both React's SSR stre
 - When you're building progressive web apps (PWAs) that need to work offline and with poor connectivity
 - When you need to integrate with databases, external APIs, or microservices that require server-side processing
 
-**Performance Considerations:**
+##### Performance Considerations
 
 - Applications with heavy client-side JavaScript bundles that would benefit from server-side computation
 - When targeting users with slower devices or limited bandwidth who benefit from pre-rendered content
@@ -455,7 +455,7 @@ The `renderToReadableStream` function implements streaming SSR using the Web Str
 3. **Edge Computing**: Optimized for deployment to edge locations like Cloudflare Workers, Vercel Edge Functions, and Deno Deploy
 4. **Concurrent Features**: Supports all React 18 concurrent features including Suspense, selective hydration, and progressive enhancement
 
-**Key Differences from `renderToPipeableStream`:**
+##### Key Differences from `renderToPipeableStream`
 
 - Returns a Promise instead of providing callback-based APIs
 - Uses Web Streams instead of Node.js streams
@@ -662,7 +662,7 @@ This example showcases:
 
 The `renderToStaticMarkup` function renders React components to static HTML strings without any React-specific attributes, event handlers, or client-side features. This function is ideal for generating static content, email templates, or content that will never require client-side interactivity.
 
-**Important Considerations:**
+##### Important Considerations
 
 > `renderToStaticMarkup` strips away all React functionality from the output. The resulting HTML contains no `data-reactroot` attributes, no event handlers, and cannot be hydrated by React on the client. This makes it perfect for truly static content but unsuitable for interactive applications.
 
@@ -810,14 +810,14 @@ The `renderToStaticMarkup` function performs a complete React render cycle but r
 4. **Event Handler Removal**: Strips all event handlers and interactive functionality
 5. **Clean Output**: Produces minimal, semantic HTML suitable for static consumption
 
-**Performance Characteristics:**
+##### Performance Characteristics
 
 - **Synchronous**: Renders the entire component tree before returning
 - **Memory Efficient**: No need to maintain React state or event listeners
 - **Fast Execution**: No overhead from React's runtime features
 - **Small Output**: Cleaner HTML with smaller file sizes
 
-**Common Use Cases:**
+##### Common Use Cases
 
 - Email templates and newsletters
 - PDF generation from React components
@@ -1002,7 +1002,7 @@ This comprehensive example demonstrates:
 
 The `renderToString` function is React's traditional server-side rendering API that converts React components into HTML strings with full React functionality preserved. Unlike `renderToStaticMarkup`, this function includes React-specific attributes that enable client-side hydration, making the server-rendered content interactive once React loads on the client.
 
-**Important Considerations:**
+##### Important Considerations
 
 > `renderToString` is a legacy synchronous API that blocks until the entire component tree is rendered. For modern applications, prefer `renderToPipeableStream` or `renderToReadableStream` which provide better performance through streaming and don't block the server thread.
 
@@ -1200,7 +1200,7 @@ The `renderToString` function performs synchronous server-side rendering with hy
 4. **HTML Generation**: Produces HTML that matches what React would render on the client
 5. **Hydration Preparation**: Creates markup that React can "hydrate" on the client side
 
-**Hydration Process:**
+##### Hydration Process
 When the HTML reaches the client, React can attach event listeners and restore interactivity through hydration:
 
 ```javascript
@@ -1215,14 +1215,14 @@ const container = document.getElementById("root");
 hydrateRoot(container, <BlogPost {...initialData} />);
 ```
 
-**Performance Considerations:**
+##### Performance Considerations
 
 - **Blocking Nature**: Server thread is blocked until entire render completes
 - **Memory Usage**: Holds entire component tree in memory during rendering
 - **Large Applications**: Can cause timeouts for complex component hierarchies
 - **Modern Alternative**: Consider `renderToPipeableStream` for better performance
 
-**Migration Path:**
+##### Migration Path
 For applications using `renderToString`, consider upgrading to streaming APIs:
 
 - Replace `renderToString` with `renderToPipeableStream` for Node.js

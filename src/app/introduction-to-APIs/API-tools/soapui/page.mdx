@@ -77,7 +77,8 @@ SoapUI's open-source version is suitable for individual developers and small tea
 4. **Select the HTTP method** (GET, POST, PUT, DELETE, etc.)
 5. **Configure request details** as needed
 
-**Example: Creating a GET Request**
+##### Example: Creating a GET Request
+
 ```
 Method: GET
 URL: https://jsonplaceholder.typicode.com/posts/1
@@ -86,7 +87,8 @@ Headers:
   Accept: application/json
 ```
 
-**Example: Creating a POST Request**
+##### Example: Creating a POST Request
+
 ```
 Method: POST
 URL: https://jsonplaceholder.typicode.com/posts
@@ -108,6 +110,7 @@ Body:
 4. **Fill in the required parameters** in the generated XML structure
 
 **Example SOAP Request Structure**:
+
 ```xml
 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:web="http://www.oorsprong.org/websamples.countryinfo">
    <soap:Header/>
@@ -126,6 +129,7 @@ Body:
 - **Drag and drop** requests into appropriate folders for better organization
 
 **Example Project Structure**:
+
 ```
 📁 E-commerce API Project
   📁 Authentication
@@ -149,6 +153,7 @@ Body:
 - Use the "Raw" tab to view the raw request and response data
 
 **Example Response Analysis**:
+
 ```
 Status Code: 200 OK
 Response Time: 245ms
@@ -164,6 +169,7 @@ Response Body:
 ```
 
 **Response Tabs Explained**:
+
 - **JSON**: Formatted JSON response with syntax highlighting
 - **XML**: Formatted XML response with collapsible nodes
 - **HTML**: Rendered HTML content (for web pages)
@@ -173,10 +179,12 @@ Response Body:
 ### Adding Parameters and Headers
 
 #### Adding Headers
+
 - Use the "Headers" tab to add custom headers to your request
 - Common headers include `Authorization`, `Content-Type`, `Accept`, etc.
 
 **Example Headers**:
+
 ```
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 Content-Type: application/json
@@ -186,10 +194,12 @@ X-API-Key: your-api-key-here
 ```
 
 #### Adding Query Parameters
+
 - Use the "Parameters" tab to add query parameters for GET requests
 - Parameters are automatically appended to the URL
 
 **Example Query Parameters**:
+
 ```
 URL: https://api.example.com/users
 Parameters:
@@ -202,9 +212,11 @@ Resulting URL: https://api.example.com/users?page=1&limit=10&sort=name&filter=ac
 ```
 
 #### Adding Request Body
+
 - Use the "Body" tab to add request body content in various formats
 
 **JSON Body Example**:
+
 ```json
 {
   "user": {
@@ -220,6 +232,7 @@ Resulting URL: https://api.example.com/users?page=1&limit=10&sort=name&filter=ac
 ```
 
 **XML Body Example**:
+
 ```xml
 <user>
   <name>John Doe</name>
@@ -233,6 +246,7 @@ Resulting URL: https://api.example.com/users?page=1&limit=10&sort=name&filter=ac
 ```
 
 **Form Data Example**:
+
 ```
 username: johndoe
 password: secretPassword123
@@ -246,12 +260,14 @@ remember_me: true
 - Monitor test execution progress in the test log
 
 **Example Test Execution Flow**:
+
 1. **Pre-request setup**: Initialize variables, set authentication tokens
 2. **Request execution**: Send HTTP request to the target endpoint
 3. **Response validation**: Check status codes, response time, content
 4. **Post-request cleanup**: Log results, update test data
 
 **Test Results Dashboard**:
+
 ```
 ✅ Test Case: User Registration
      ✅ Request sent successfully (200ms)
@@ -270,11 +286,13 @@ remember_me: true
 Data-driven testing allows you to run the same test with multiple sets of input data, making your tests more comprehensive and efficient.
 
 **Setting Up Data Sources**:
+
 1. **Right-click** on the project and select "New DataSource"
 2. **Choose data source type**: File (CSV, Excel), Database, or Grid
 3. **Configure data mapping** to connect data fields to request parameters
 
 **CSV Data Source Example**:
+
 ```csv
 username,email,expectedStatus
 john_doe,john@example.com,201
@@ -284,6 +302,7 @@ duplicate@email.com,duplicate@email.com,409
 ```
 
 **Using Data in Requests**:
+
 ```json
 {
   "username": "${DataSource#username}",
@@ -301,13 +320,14 @@ duplicate@email.com,duplicate@email.com,409
 | SQL Injection | admin'; DROP TABLE users; -- | admin123 | 400 |
 
 **Database Data Source Example**:
+
 ```sql
-SELECT 
+SELECT
     user_id,
     username,
     email,
     account_status
-FROM test_users 
+FROM test_users
 WHERE is_test_data = true
 ```
 
@@ -317,7 +337,8 @@ Security testing helps identify vulnerabilities in your APIs before they reach p
 
 #### Security Test Types
 
-**1. SQL Injection Testing**
+##### 1. SQL Injection Testing
+
 ```
 Description: Tests for SQL injection vulnerabilities
 Example Payloads:
@@ -327,7 +348,8 @@ Example Payloads:
 Target Parameters: All input fields and query parameters
 ```
 
-**2. XSS (Cross-Site Scripting) Testing**
+##### 2. XSS (Cross-Site Scripting) Testing
+
 ```
 Description: Tests for XSS vulnerabilities in web APIs
 Example Payloads:
@@ -337,7 +359,8 @@ Example Payloads:
 Target: String input fields, especially those displayed in UI
 ```
 
-**3. XML Bomb Testing**
+##### 3. XML Bomb Testing
+
 ```
 Description: Tests for XML parsing vulnerabilities
 Example Payload:
@@ -350,7 +373,8 @@ Example Payload:
 <lolz>&lol3;</lolz>
 ```
 
-**4. Malformed XML Testing**
+##### 4. Malformed XML Testing
+
 ```
 Description: Tests API resilience to malformed XML
 Example Payloads:
@@ -362,12 +386,14 @@ Example Payloads:
 #### Security Test Configuration
 
 **Setting Up Security Tests**:
+
 1. **Right-click** on the project and select "Security Tests"
 2. **Choose test types** based on your API's input methods
 3. **Configure scan parameters** including payload lists and target fields
 4. **Run the security scan** and analyze results
 
 **Security Test Report Example**:
+
 ```
 🔴 HIGH RISK: SQL Injection vulnerability found
    Endpoint: POST /api/users/login
@@ -395,6 +421,7 @@ Load testing simulates real-world traffic patterns to evaluate API performance u
 #### Creating Load Tests
 
 **Setting Up Load Tests**:
+
 1. **Create a load test** by right-clicking on the project and selecting "New Load Test"
 2. **Configure test parameters** including virtual users, test duration, and ramp-up strategy
 3. **Define test scenarios** with different user behavior patterns
@@ -403,6 +430,7 @@ Load testing simulates real-world traffic patterns to evaluate API performance u
 #### Load Test Configuration Examples
 
 **Basic Load Test Setup**:
+
 ```
 Test Name: User Registration Load Test
 Target Endpoint: POST /api/users/register
@@ -414,7 +442,8 @@ Think Time: 1-3 seconds between requests
 
 **Advanced Load Test Scenarios**:
 
-**Scenario 1: Steady Load**
+##### Scenario 1: Steady Load
+
 ```
 Description: Constant user load over time
 Configuration:
@@ -424,7 +453,8 @@ Configuration:
   - Use case: Normal business hours traffic
 ```
 
-**Scenario 2: Spike Testing**
+##### Scenario 2: Spike Testing
+
 ```
 Description: Sudden increase in user load
 Configuration:
@@ -434,7 +464,8 @@ Configuration:
   - Use case: Flash sale or viral content
 ```
 
-**Scenario 3: Soak Testing**
+##### Scenario 3: Soak Testing
+
 ```
 Description: Extended duration testing
 Configuration:
@@ -446,21 +477,23 @@ Configuration:
 #### Load Test Results Analysis
 
 **Performance Metrics Dashboard**:
+
 ```
 📊 Load Test Results Summary
 ┌────────────────────────────────────────┐
     Test Duration: 5:00 minutes
-    Total Requests: 15,247 
-    Successful Requests: 15,089 (98.96%) 
-    Failed Requests: 158 (1.04%)  
-    Average Response Time: 245ms  
-    95th Percentile: 890ms  
-    Throughput: 50.8 req/sec  
+    Total Requests: 15,247
+    Successful Requests: 15,089 (98.96%)
+    Failed Requests: 158 (1.04%)
+    Average Response Time: 245ms
+    95th Percentile: 890ms
+    Throughput: 50.8 req/sec
    ──────────────────────────────────────┘
 
 ```
 
 **Response Time Distribution**:
+
 ```
 Response Time Ranges:
   0-100ms:     ████████████░░ 60% (9,148 requests)
@@ -470,6 +503,7 @@ Response Time Ranges:
 ```
 
 **Error Analysis**:
+
 ```
 Error Types:
   Timeout (>2000ms): 89 requests (0.58%)
@@ -490,6 +524,7 @@ Error Types:
 | Peak Memory | 512MB | 678MB | +32% 🟡 |
 
 **Load Testing Best Practices**:
+
 ```
 ✅ Start with baseline performance tests
 ✅ Test with realistic data volumes
@@ -505,20 +540,23 @@ Error Types:
 Assertions are validation rules that automatically verify if your API responses meet expected criteria. They're essential for automated testing and continuous integration.
 
 #### Adding Assertions
+
 - Use the "Assertions" tab to add assertions to your requests
 - Right-click on the request and select "Add Assertion"
 - Choose the appropriate assertion type based on what you want to validate
 
 #### Common Assertion Types
 
-**1. Response SLA (Response Time)**
+##### 1. Response SLA (Response Time)
+
 ```
 Description: Validates that the response time is within acceptable limits
 Configuration: Maximum response time: 500ms
 Result: ✅ Response time: 245ms (PASS)
 ```
 
-**2. Contains Assertion**
+##### 2. Contains Assertion
+
 ```
 Description: Checks if response contains specific text
 Configuration: Response must contain: "success"
@@ -526,7 +564,8 @@ Sample Response: {"status": "success", "data": {...}}
 Result: ✅ Contains "success" (PASS)
 ```
 
-**3. JSONPath Match**
+##### 3. JSONPath Match
+
 ```
 Description: Validates JSON response structure and values
 JSONPath: $.user.id
@@ -535,7 +574,8 @@ Sample Response: {"user": {"id": 12345, "name": "John"}}
 Result: ✅ JSONPath match (PASS)
 ```
 
-**4. XPath Match (for XML responses)**
+##### 4. XPath Match (for XML responses)
+
 ```
 Description: Validates XML response structure and values
 XPath: //user/@id
@@ -544,7 +584,8 @@ Sample Response: <user id="12345"><name>John</name></user>
 Result: ✅ XPath match (PASS)
 ```
 
-**5. HTTP Status Code**
+##### 5. HTTP Status Code
+
 ```
 Description: Validates the HTTP response status code
 Expected Codes: 200, 201, 204
@@ -552,7 +593,8 @@ Actual Code: 200
 Result: ✅ Status code valid (PASS)
 ```
 
-**6. Response Header**
+##### 6. Response Header
+
 ```
 Description: Validates response headers
 Header Name: Content-Type
@@ -564,20 +606,22 @@ Result: ✅ Header contains expected value (PASS)
 #### Advanced Assertion Examples
 
 **Schema Compliance Assertion**:
+
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
-    "id": {"type": "integer"},
-    "name": {"type": "string"},
-    "email": {"type": "string", "format": "email"}
+    "id": { "type": "integer" },
+    "name": { "type": "string" },
+    "email": { "type": "string", "format": "email" }
   },
   "required": ["id", "name", "email"]
 }
 ```
 
 **Script Assertion Example**:
+
 ```groovy
 // Custom Groovy script for complex validation
 def response = messageExchange.response.responseContent
@@ -609,6 +653,7 @@ Mock services simulate API behavior without requiring the actual backend impleme
 #### Creating Mock Services
 
 **Step-by-Step Process**:
+
 1. **Right-click** on the project and select "New Mock Service"
 2. **Configure the mock service** settings including port and path
 3. **Define response templates** for different request scenarios
@@ -617,6 +662,7 @@ Mock services simulate API behavior without requiring the actual backend impleme
 #### Mock Service Examples
 
 **REST Mock Service Configuration**:
+
 ```
 Service Name: User Management Mock
 Port: 8088
@@ -627,6 +673,7 @@ Base URL: http://localhost:8088/api/v1
 **Mock Response Examples**:
 
 **`GET /users/{id}` - Success Response**:
+
 ```json
 {
   "id": "${id}",
@@ -638,6 +685,7 @@ Base URL: http://localhost:8088/api/v1
 ```
 
 **`GET /users/{id}` - Not Found Response**:
+
 ```json
 {
   "error": {
@@ -649,6 +697,7 @@ Base URL: http://localhost:8088/api/v1
 ```
 
 **`POST /users` - Create User Response**:
+
 ```json
 {
   "id": 12345,
@@ -662,6 +711,7 @@ Base URL: http://localhost:8088/api/v1
 #### Dynamic Mock Responses
 
 **Using Groovy Scripts for Dynamic Responses**:
+
 ```groovy
 // Dynamic response based on request parameters
 def request = mockRequest.getHttpRequest()
@@ -691,21 +741,24 @@ if (userId.isNumber() && userId.toInteger() > 0) {
 
 #### Mock Service Use Cases
 
-**1. Frontend Development**
+##### 1. Frontend Development
+
 ```
 Scenario: Frontend team needs to develop user interface before backend is ready
 Mock Setup: Create mock endpoints for all required API calls
 Benefits: Parallel development, faster iterations, early testing
 ```
 
-**2. Third-Party API Simulation**
+##### 2. Third-Party API Simulation
+
 ```
 Scenario: Testing integration with external payment processor
 Mock Setup: Simulate various payment scenarios (success, failure, timeout)
 Benefits: Controlled testing environment, no real transactions
 ```
 
-**3. Error Scenario Testing**
+##### 3. Error Scenario Testing
+
 ```
 Scenario: Testing application behavior during API failures
 Mock Setup: Configure mocks to return various error responses
@@ -726,6 +779,7 @@ SoapUI integrates seamlessly with CI/CD pipelines, enabling automated API testin
 #### Command Line Interface (CLI)
 
 **Basic Command Structure**:
+
 ```bash
 # Run all tests in a project
 testrunner.sh -f /path/to/reports /path/to/project.xml
@@ -740,6 +794,7 @@ testrunner.sh -e "https://staging-api.example.com" /path/to/project.xml
 #### CI/CD Integration Examples
 
 **Jenkins Pipeline Example**:
+
 ```groovy
 pipeline {
     agent any
@@ -775,40 +830,42 @@ pipeline {
 ```
 
 **GitHub Actions Workflow**:
+
 ```yaml
 name: API Tests
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   api-tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup SoapUI
-      run: |
-        wget https://dl.eviware.com/soapuios/5.7.0/SoapUI-5.7.0-linux-bin.tar.gz
-        tar -xzf SoapUI-5.7.0-linux-bin.tar.gz
-        
-    - name: Run API Tests
-      run: |
-        ./SoapUI-5.7.0/bin/testrunner.sh \
-        -f test-reports \
-        -e ${{ secrets.API_ENDPOINT }} \
-        ./tests/api-project.xml
-        
-    - name: Upload Test Results
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-reports
-        path: test-reports/
+      - uses: actions/checkout@v3
+
+      - name: Setup SoapUI
+        run: |
+          wget https://dl.eviware.com/soapuios/5.7.0/SoapUI-5.7.0-linux-bin.tar.gz
+          tar -xzf SoapUI-5.7.0-linux-bin.tar.gz
+
+      - name: Run API Tests
+        run: |
+          ./SoapUI-5.7.0/bin/testrunner.sh \
+          -f test-reports \
+          -e ${{ secrets.API_ENDPOINT }} \
+          ./tests/api-project.xml
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-reports
+          path: test-reports/
 ```
 
 **GitLab CI Example**:
+
 ```yaml
 stages:
   - test
@@ -821,9 +878,9 @@ api_tests:
     - wget https://dl.eviware.com/soapuios/5.7.0/SoapUI-5.7.0-linux-bin.tar.gz
     - tar -xzf SoapUI-5.7.0-linux-bin.tar.gz
   script:
-    - ./SoapUI-5.7.0/bin/testrunner.sh 
-      -f test-reports 
-      -e $API_ENDPOINT 
+    - ./SoapUI-5.7.0/bin/testrunner.sh
+      -f test-reports
+      -e $API_ENDPOINT
       ./tests/api-project.xml
   artifacts:
     reports:
@@ -836,47 +893,49 @@ api_tests:
 ```
 
 **Azure DevOps Pipeline**:
+
 ```yaml
 trigger:
-- main
-- develop
+  - main
+  - develop
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: "ubuntu-latest"
 
 variables:
-  API_ENDPOINT: 'https://api.staging.example.com'
+  API_ENDPOINT: "https://api.staging.example.com"
 
 steps:
-- task: Bash@3
-  displayName: 'Install SoapUI'
-  inputs:
-    targetType: 'inline'
-    script: |
-      wget https://dl.eviware.com/soapuios/5.7.0/SoapUI-5.7.0-linux-bin.tar.gz
-      tar -xzf SoapUI-5.7.0-linux-bin.tar.gz
+  - task: Bash@3
+    displayName: "Install SoapUI"
+    inputs:
+      targetType: "inline"
+      script: |
+        wget https://dl.eviware.com/soapuios/5.7.0/SoapUI-5.7.0-linux-bin.tar.gz
+        tar -xzf SoapUI-5.7.0-linux-bin.tar.gz
 
-- task: Bash@3
-  displayName: 'Run API Tests'
-  inputs:
-    targetType: 'inline'
-    script: |
-      ./SoapUI-5.7.0/bin/testrunner.sh \
-      -f $(Agent.TempDirectory)/test-reports \
-      -e $(API_ENDPOINT) \
-      ./tests/api-project.xml
+  - task: Bash@3
+    displayName: "Run API Tests"
+    inputs:
+      targetType: "inline"
+      script: |
+        ./SoapUI-5.7.0/bin/testrunner.sh \
+        -f $(Agent.TempDirectory)/test-reports \
+        -e $(API_ENDPOINT) \
+        ./tests/api-project.xml
 
-- task: PublishTestResults@2
-  displayName: 'Publish Test Results'
-  inputs:
-    testResultsFormat: 'JUnit'
-    testResultsFiles: '$(Agent.TempDirectory)/test-reports/*.xml'
-    mergeTestResults: true
+  - task: PublishTestResults@2
+    displayName: "Publish Test Results"
+    inputs:
+      testResultsFormat: "JUnit"
+      testResultsFiles: "$(Agent.TempDirectory)/test-reports/*.xml"
+      mergeTestResults: true
 ```
 
 #### Advanced CLI Options
 
 **Comprehensive Command Examples**:
+
 ```bash
 # Run tests with custom properties
 testrunner.sh \
@@ -919,6 +978,7 @@ testrunner.sh \
 ### E-commerce API Testing Project
 
 **Project Structure**:
+
 ```
 📁 E-commerce API Tests
   📁 Authentication
@@ -949,6 +1009,7 @@ testrunner.sh \
 ```
 
 **Complete Test Scenario Example**:
+
 ```
 Test Case: Complete Purchase Flow
    Step 1: User Authentication
@@ -956,26 +1017,26 @@ Test Case: Complete Purchase Flow
          Assert: Status code 200
          Assert: Response contains auth_token
          Store: auth_token for subsequent requests
-    
+
 ├─ Step 2: Browse Products
          GET /api/products?category=electronics
          Assert: Status code 200
          Assert: Products array not empty
          Store: product_id from first item
-    
+
 ├─ Step 3: Add to Cart
          POST /api/cart/items
          Headers: Authorization: Bearer ${auth_token}
          Body: {"product_id": ${product_id}, "quantity": 2}
          Assert: Status code 201
          Assert: Cart total updated
-    
+
 ├─ Step 4: Checkout Process
          POST /api/orders
          Assert: Status code 201
          Assert: Order ID generated
          Store: order_id
-    
+
 └─ Step 5: Payment Processing
          POST /api/payments
          Body: {"order_id": ${order_id}, "payment_method": "card"}
@@ -986,6 +1047,7 @@ Test Case: Complete Purchase Flow
 ### Banking API Security Testing
 
 **Security Test Suite**:
+
 ```
 🔒 Banking API Security Tests
   Authentication Bypass Tests
@@ -1007,6 +1069,7 @@ Test Case: Complete Purchase Flow
 ```
 
 **Sample Security Test Configuration**:
+
 ```xml
 <securityTest>
   <name>Account Transfer Security Test</name>
@@ -1028,7 +1091,8 @@ Test Case: Complete Purchase Flow
 
 ### Test Organization
 
-**1. Project Structure Best Practices**
+##### 1. Project Structure Best Practices
+
 ```
 ✅ Use descriptive folder names
 ✅ Group related endpoints together
@@ -1037,7 +1101,8 @@ Test Case: Complete Purchase Flow
 ✅ Document test purpose and expected outcomes
 ```
 
-**2. Request Design Patterns**
+##### 2. Request Design Patterns
+
 ```
 ✅ Use environment variables for URLs
 ✅ Implement proper authentication handling
@@ -1049,6 +1114,7 @@ Test Case: Complete Purchase Flow
 ### Data Management
 
 **Test Data Strategy**:
+
 ```
 📊 Test Data Types
   Static Data: Unchanging reference data (currencies, countries)
@@ -1058,6 +1124,7 @@ Test Case: Complete Purchase Flow
 ```
 
 **Data Source Examples**:
+
 ```csv
 # users_testdata.csv
 user_type,username,email,expected_status,test_scenario
@@ -1071,6 +1138,7 @@ long_username,very_long_username_that_exceeds_limit,long@test.com,400,Field leng
 ### Error Handling
 
 **Comprehensive Error Testing**:
+
 ```
 🚨 Error Scenarios to Test
   Network Errors
@@ -1106,6 +1174,7 @@ long_username,very_long_username_that_exceeds_limit,long@test.com,400,Field leng
 ### Maintenance and Documentation
 
 **Documentation Standards**:
+
 ```
 📝 Test Documentation Checklist
 ✅ Test purpose and scope clearly defined
@@ -1119,6 +1188,7 @@ long_username,very_long_username_that_exceeds_limit,long@test.com,400,Field leng
 ```
 
 **Version Control Best Practices**:
+
 ```
 🔄 SoapUI Project Management
   Store projects in version control (Git)

@@ -1,0 +1,345 @@
+import BackToTop from "@/components/BackToTop";
+
+# Products API Integration
+
+##### WARNING
+
+> This part of the project is rather complex. Therefore, the API sections will be split into multiple parts and go into depth on each part. Remember to read the entire section before starting to implement it in your project. Each part will build upon the previous one, so it's important to understand the concepts before moving on.
+
+## Table of Contents
+
+## API Layer Structure
+
+```
+src/api/
+├── index.ts          # Main API configuration and base client
+├── products.ts       # Product-related API calls
+├── users.ts          # User authentication and profile API calls
+└── carts.ts          # Shopping cart API calls
+```
+
+### Products API Functionality
+
+**Base URL**: `https://dummyjson.com`
+
+The primary data source for products, users, and other e-commerce data.
+
+- **GET /products** - Fetch all products
+- **GET /products/{`id`}** - Fetch single product
+- **GET /products/categories** - Fetch product categories
+- **GET /products/category/{`category`}** - Fetch products by category
+- **GET /products/search?q={`query`}** - Search products
+
+Handles all product-related API calls:
+
+- **fetchProducts()** - Get all products with pagination
+- **fetchProductById(id)** - Get single product details
+- **fetchProductsByCategory(category)** - Get products by category
+- **searchProducts(query)** - Search products by name/description
+- **fetchCategories()** - Get all available categories
+
+### Data Flow
+
+```
+DummyJSON API → Products API → React Components → UI Display
+```
+
+## Implementing Utility Functions
+
+Before we get started, let's create a formatting function to handle the URL path segments. These functions will help us convert kebab-case strings to Title Case and capitalize the first letter of each segment and will be located in `src/lib/utils/format.ts`.
+
+```typescript
+// src/lib/utils/format.ts
+
+/**
+ * Converts a string from kebab-case or camelCase to Title Case.
+ * @param str - The string to convert to title case
+ * @returns The title case string
+ */
+export function toTitleCase(str: string): string {
+  if (!str) return str;
+
+  return str
+    .replace(/[-_]/g, " ") // Replace hyphens and underscores with spaces
+    .replace(/([a-z])([A-Z])/g, "$1 $2") // Add space before capital letters in camelCase
+    .split(" ")
+    .map((word) => capitalize(word))
+    .join(" ");
+}
+```
+
+##### Explanation of the Code
+
+- The `toTitleCase` function takes a string as input and converts it to Title Case.
+- It replaces hyphens and underscores with spaces, adds spaces before capital letters in camelCase, splits the string into words, capitalizes each word using the `capitalize` function, and then joins the words back together with spaces.
+- The `capitalize` function is a utility function that capitalizes the first letter of a given string and returns it.
+
+## `fetchProducts` Function
+
+```typescript
+// src/api/products.ts
+
+/**
+ * Fetches a list of products from the API.
+ *
+ * This asynchronous function retrieves product data, which can be used to display
+ * product listings or details within the ecommerce platform.
+ *
+ * @returns {Promise<Array>} A promise that resolves to an array of product objects.
+ * @throws {Error} If the request fails or the response is invalid.
+ */
+export async function fetchProducts(
+  categorySlug: string,
+  searchQuery?: string
+): Promise<ProductItem[]> {
+  try {
+    let url: string;
+
+    if (searchQuery) {
+      // If a search query is provided, use the search endpoint with limit=0 to get all results
+      url = `${API_BASE_URL}/products/search?q=${encodeURIComponent(
+        searchQuery
+      )}&limit=0`;
+    } else {
+      // Otherwise, fetch by category with limit=0 to get all products in the category
+      url = `${API_BASE_URL}/products/category/${encodeURIComponent(
+        categorySlug
+      )}?limit=0`;
+    }
+
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      if (res.status === 404) {
+        throw new Error(
+          `Category '${categorySlug}' not found or has no products.`
+        );
+      }
+      throw new Error(
+        `Failed to fetch products for category '${categorySlug}': ${res.status}`
+      );
+    }
+
+    const data: DummyJSONProductsResponse = await res.json();
+    return data.products || [];
+  } catch (error) {
+    console.error("Error in fetchProducts:", error);
+    throw error;
+  }
+}
+```
+
+##### Explanation of the Code
+
+- The `fetchProducts` function retrieves products from the DummyJSON API based on the provided category slug and optional search query.
+- It constructs the API URL based on whether a search query is provided or not.
+- If a search query is provided, it uses the search endpoint with `limit=0` to get all matching products.
+- If no search query is provided, it fetches products by category with `limit=0` to get all products in that category.
+- The function handles errors gracefully, throwing specific errors for 404 responses or other fetch failures.
+- It returns an array of `ProductItem` objects, which represent the products fetched from the API.
+
+<BackToTop />
+
+## `getProductBySlug` Function
+
+```typescript
+// src/api/products.ts
+
+export async function getProductBySlug(
+  productTitle: string
+): Promise<ProductItem | null> {
+  if (!productTitle) {
+    console.warn("Product title is missing.");
+    return null;
+  }
+
+  try {
+    const url = `${API_BASE_URL}/products/search?q=${toTitleCase(
+      productTitle
+    )}&limit=0`;
+
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error(
+        `Failed to fetch product '${productTitle}': ${res.status}`
+      );
+    }
+
+    const data: { products: ProductItem[] } = await res.json();
+
+    // Convert productTitle (slug format) to title format for comparison
+    const normalizedProductTitle = productTitle
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+
+    // Search returns an array, so we need to find the exact match
+    const product = data.products.find((p) => {
+      // Convert product title to slug format for comparison
+      const productSlug = p.title
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
+
+      const titleMatch =
+        p.title.toLowerCase() === normalizedProductTitle.toLowerCase();
+      const slugMatch = productSlug === productTitle.toLowerCase();
+
+      return titleMatch || slugMatch;
+    });
+
+    return product || null;
+  } catch (error) {
+    console.error("Error in getProductBySlug:", error);
+    return null;
+  }
+}
+```
+
+##### Explanation of the Code
+
+- The `getProductBySlug` function retrieves a product by its title, which is expected to be in slug format (e.g., "product-title").
+- It constructs the API URL using the `toTitleCase` function to convert the slug to a title format for the search query.
+- The function fetches the product data from the DummyJSON API using the search endpoint with `limit=0` to get all matching products.
+- It handles errors gracefully, throwing specific errors for fetch failures.
+- The function searches the returned products for an exact match based on both the title and slug format.
+- It returns the matching `ProductItem` or `null` if no match is found.
+
+<BackToTop />
+## `getProductById` Function
+
+```typescript
+// src/api/products.ts
+
+export async function getProductById(
+  productId: number
+): Promise<ProductItem | null> {
+  try {
+    const url = `${API_BASE_URL}/products/${productId}`;
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      if (res.status === 404) {
+        return null;
+      }
+      throw new Error(
+        `Failed to fetch product with ID ${productId}: ${res.status}`
+      );
+    }
+
+    const product: ProductItem = await res.json();
+    return product;
+  } catch (error) {
+    console.error("Error in getProductById:", error);
+    return null;
+  }
+}
+```
+
+##### Explanation of the Code
+
+- The `getProductById` function retrieves a product by its ID from the DummyJSON API.
+- It constructs the API URL using the provided product ID.
+- The function fetches the product data from the API and handles errors gracefully, returning `null` if the product is not found (404) or throwing an error for other fetch failures.
+- It returns the `ProductItem` object representing the product or `null` if the product is not found.
+
+<BackToTop />
+
+## `getAllProducts` Function
+
+```typescript
+// src/api/products.ts
+
+export async function getAllProducts(): Promise<ProductItem[]> {
+  try {
+    const url = `${API_BASE_URL}/products?limit=0`;
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch all products: ${res.status}`);
+    }
+
+    const data: DummyJSONProductsResponse = await res.json();
+    return data.products || [];
+  } catch (error) {
+    console.error("Error in getAllProducts:", error);
+    throw error;
+  }
+}
+```
+
+##### Explanation of the Code
+
+- The `getAllProducts` function retrieves all products from the DummyJSON API.
+- It constructs the API URL with `limit=0` to get all products.
+- The function fetches the product data from the API and handles errors gracefully, throwing an error for fetch failures.
+- It returns an array of `ProductItem` objects representing all products fetched from the API.
+
+<BackToTop />
+
+## `getProductCategories` Function
+
+```typescript
+// src/api/products.ts
+
+export async function getProductCategories(): Promise<
+  Array<{ slug: string; name: string; url: string }>
+> {
+  try {
+    const url = `${API_BASE_URL}/products/categories`;
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch categories: ${res.status}`);
+    }
+
+    const categories = await res.json();
+    return categories;
+  } catch (error) {
+    console.error("Error in getProductCategories:", error);
+    throw error;
+  }
+}
+```
+
+##### Explanation of the Code
+
+- The `getProductCategories` function retrieves all product categories from the DummyJSON API.
+- It constructs the API URL for the categories endpoint.
+- The function fetches the category data from the API and handles errors gracefully, throwing an error for fetch failures.
+- It returns an array of category objects, each containing a `slug`, `name`, and `url` property.
+
+<BackToTop />
+
+## `getProductCategoryList` Function
+
+```typescript
+// src/api/products.ts
+
+export async function getProductCategoryList(): Promise<string[]> {
+  try {
+    const url = `${API_BASE_URL}/products/category-list`;
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch category list: ${res.status}`);
+    }
+
+    const categoryList = await res.json();
+    return categoryList;
+  } catch (error) {
+    console.error("Error in getProductCategoryList:", error);
+    throw error;
+  }
+}
+```
+
+##### Explanation of the Code
+
+- The `getProductCategoryList` function retrieves a list of product categories from the DummyJSON API.
+- It constructs the API URL for the category list endpoint.
+- The function fetches the category list data from the API and handles errors gracefully, throwing an error for fetch failures.
+- It returns an array of category names.
+
+<BackToTop />

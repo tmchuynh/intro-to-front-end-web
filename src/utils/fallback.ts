@@ -168,6 +168,10 @@ export const fallbackNav = [
         title: "jQuery",
         href: "/jQuery",
       },
+      {
+        title: "Documentation and Learning Platforms",
+        href: "/documentation-and-learning-platforms",
+      },
     ],
   },
   {

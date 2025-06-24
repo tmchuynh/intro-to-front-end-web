@@ -237,6 +237,7 @@ function categorizeNavigationItems(
       path.includes("document-object-model") ||
       path.includes("forms") ||
       path.includes("jquery") ||
+      path.includes("documentation-and-learning-platforms") ||
       title.includes("html") ||
       title.includes("css") ||
       title.includes("javascript") ||
@@ -244,7 +245,9 @@ function categorizeNavigationItems(
       title.includes("accessibility") ||
       title.includes("dom") ||
       title.includes("forms") ||
-      title.includes("jquery")
+      title.includes("jquery") ||
+      title.includes("documentation") ||
+      title.includes("learning platforms")
     ) {
       return "core_technologies";
     } else if (
@@ -264,7 +267,8 @@ function categorizeNavigationItems(
       title.includes("utilities") ||
       title.includes("utility") ||
       title.includes("helper") ||
-      title.includes("tools")
+      title.includes("tools") ||
+      title.includes("platforms")
     ) {
       return "utilities";
     } else {

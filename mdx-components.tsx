@@ -135,13 +135,15 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     table: ({ children }) => (
       <>
         <br />
-        <table className="shadow-sm rounded-lg min-w-full">{children}</table>
+        <table className="shadow-md rounded-lg min-w-full overflow-clip">
+          {children}
+        </table>
         <br />
       </>
     ),
     thead: ({ children }) => <thead className="">{children}</thead>,
     tbody: ({ children }) => (
-      <tbody className="bg-table-body divide-gray-200 dark:divide-gray-600 divide-y text-table-body-foreground">
+      <tbody className="bg-table-body text-table-body-foreground">
         {children}
       </tbody>
     ),
@@ -151,12 +153,12 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       </tr>
     ),
     th: ({ children }) => (
-      <th className="bg-table-head px-6 py-3 border-b font-medium text-center text-table-head-foreground tracking-wider uppercase">
+      <th className="bg-table-head px-6 py-3 font-medium text-table-head-foreground tracking-wider uppercase">
         {children}
       </th>
     ),
     td: ({ children }) => (
-      <td className="px-6 py-4 border-gray-200 dark:border-gray-600 border-b text-sm dark:text-gray-100">
+      <td className="px-6 py-4 border-b-1 border-table-hover text-sm">
         {children}
       </td>
     ),

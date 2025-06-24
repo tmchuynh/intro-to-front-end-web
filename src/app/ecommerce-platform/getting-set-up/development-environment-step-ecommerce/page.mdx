@@ -1,0 +1,139 @@
+import BackToTop from "@/components/BackToTop";
+
+# Development Environment Setup
+
+## Table of Contents
+
+## Development Environment Setup
+
+### Prerequisites
+
+##### Required Software
+
+- **Node.js**: Version 18.0 or higher
+- **npm**: Version 9.0 or higher (or yarn/pnpm/bun)
+- **Git**: Latest version
+- **VS Code**: Recommended IDE with extensions
+
+##### Recommended VS Code Extensions
+
+```json
+{
+  "recommendations": [
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "ms-vscode.vscode-json",
+    "github.copilot",
+    "ms-playwright.playwright"
+  ]
+}
+```
+
+## Project Structure Deep Dive
+
+### Source Code Organization
+
+```
+src/
+├── app/                    # Next.js App Router
+│   ├── (auth)/            # Route groups for auth pages
+│   ├── (dashboard)/       # Protected dashboard routes
+│   ├── (public)/          # Public routes
+│   ├── api/               # API routes
+│   ├── context/           # React Context providers
+│   ├── globals.css        # Global styles
+│   ├── layout.tsx         # Root layout
+│   ├── loading.tsx        # Loading UI
+│   ├── not-found.tsx      # 404 page
+│   └── page.tsx           # Home page
+├── components/            # Reusable components
+│   ├── ui/               # Base UI components
+│   ├── forms/            # Form components
+│   ├── layout/           # Layout components
+│   └── features/         # Feature-specific components
+├── hooks/                # Custom React hooks
+├── lib/                  # Utility libraries
+│   ├── utils.ts          # General utilities
+│   ├── constants/        # Application constants
+│   ├── types/            # TypeScript type definitions
+│   ├── interfaces/       # TypeScript interfaces
+│   └── api/              # API client functions
+└── styles/               # Additional styling
+```
+
+## Development Tools
+
+### Useful Scripts
+
+##### Development Scripts
+
+```json
+{
+  "scripts": {
+    "dev": "next dev",
+    "dev:turbo": "next dev --turbo",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "analyze": "ANALYZE=true npm run build",
+    "dev:inspect": "NODE_OPTIONS='--inspect' npm run dev",
+    "clean": "rm -rf .next node_modules/.cache",
+    "reset": "rm -rf .next node_modules package-lock.json && npm install"
+  }
+}
+```
+
+### Debugging
+
+**VS Code Debug Configuration** (`.vscode/launch.json`)
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Next.js: debug server-side",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Next.js: debug client-side",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/next",
+      "args": ["dev"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Next.js: debug full stack",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/.bin/next",
+      "args": ["dev"],
+      "console": "integratedTerminal",
+      "serverReadyAction": {
+        "pattern": "started server on .+, url: (https?://.+)",
+        "uriFormat": "%s",
+        "action": "debugWithChrome"
+      }
+    }
+  ]
+}
+```
+
+<BackToTop />

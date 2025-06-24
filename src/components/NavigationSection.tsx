@@ -32,7 +32,7 @@ export default function NavigationSection({
     <div>
       <button
         onClick={onToggle}
-        className={`flex justify-between items-center mb-3 w-full font-semibold text-left text-xs uppercase tracking-wider transition-colors ${
+        className={`flex justify-between items-center mb-3 w-full font-extrabold text-left text-md uppercase tracking-wider transition-colors ${
           isOpen
             ? "text-sidebar-active-text"
             : "text-sidebar-text hover:text-sidebar-text-secondary "
@@ -111,7 +111,7 @@ function NavigationItem({
       <li className="">
         <button
           onClick={onToggle}
-          className={`flex justify-between items-center px-3 py-2 ml-1 max-w-full w-13/14  font-medium text-left text-sm transition-colors rounded-md ${
+          className={`flex justify-between items-center px-3 py-2 ml-1 max-w-full w-[95%] font-medium text-left text-sm transition-colors rounded-md ${
             isExpanded ? "bg-primary/50 " : "hover:bg-sidebar-border "
           } `}
         >
@@ -133,7 +133,7 @@ function NavigationItem({
           </svg>
         </button>
         <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out max-w-full w-11/12 scrollbar-hide ${
+          className={`overflow-hidden transition-all duration-300 ease-in-out max-w-full w-[94%] scrollbar-hide ${
             isExpanded ? "max-h-screen opacity-100 ml-5" : "max-h-0 opacity-0 "
           }`}
         >
@@ -167,7 +167,7 @@ function NavigationItem({
     <li>
       <Link
         href={item.href}
-        className="block ml-1 px-3 py-2 hover:bg-sidebar-border rounded-md max-w-full w-13/14 text-sm transition-colors"
+        className="block ml-1 px-3 py-2 hover:bg-sidebar-border rounded-md max-w-full w-[95%] text-sm transition-colors"
       >
         {item.title}
       </Link>

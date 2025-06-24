@@ -1,0 +1,300 @@
+import BackToTop from "@/components/BackToTop";
+
+# Contact Page
+
+## Table of Contents
+
+## About the Contact Page
+
+The contact form is a crucial component of any website, allowing users to get in touch with the site owners or support team. In this section, we will create a simple contact form using the `shadcn/ui` library.
+
+### Prerequisites
+
+For this example, we will create a simple contact form with fields for the user's name, email, and message. We will also handle form submission and validation using `react-hook-form` and `zod`.
+
+We will also need to install the necessary dependencies if they are not already installed:
+
+```bash
+npm install react-hook-form zod @hookform/resolvers
+```
+
+## Contact Form Components
+
+- `Form`: The main component that wraps the form.
+- `FormField`: The component that represents a single field in the form.
+- `FormItem`: The component that contains the label and input for a form field.
+- `FormLabel`: The label for a form field.
+- `FormControl`: The component that wraps the input element.
+- `FormMessage`: The component that displays validation messages for a form field.
+
+## Creating a Form Schema with Zod
+
+We will use `zod` to create a schema for our contact form. This schema will define the structure of the form data and include validation rules.
+
+`zod` is a TypeScript-first schema declaration and validation library that allows us to define the shape of our data and validate it easily.
+
+```typescript
+import { z } from "zod";
+export const contactFormSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  message: z.string().min(10, "Message must be at least 10 characters long"),
+});
+```
+
+### How This Works
+
+`zod` provides a powerful and flexible way to define and validate data structures, making it an excellent choice for form validation in React applications.
+
+- We import `z` from the `zod` library.
+- We define a schema using `z.object()`, which takes an object with the fields we want to validate.
+- Each field is defined with a type and validation rules. For example, the `name` field must be a string with a minimum length of 1, the `email` field must be a valid email address, and the `message` field must be a string with a minimum length of 10 characters.
+
+Here, the `contactFormSchema` will be used to validate the form data when the user submits the contact form. If the validation fails, appropriate error messages will be displayed to the user.
+
+## Creating the Contact Form Component
+
+First, we will create a new file for our contact form component. This component will use the `shadcn/ui` components to build the form UI.
+
+```tsx
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { contactFormSchema } from "@/lib/validation/contactFormSchema";
+import { useState } from "react";
+import { toast } from "@/components/ui/use-toast";
+
+export default function ContactForm() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const form = useForm({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      message: "",
+    },
+  });
+
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
+    try {
+      // Simulate form submission
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      toast({ title: "Form submitted successfully!" });
+      form.reset();
+    } catch (error) {
+      toast({ title: "Failed to submit form", variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <input {...field} className="input" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <input {...field} type="email" className="input" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="message"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Message</FormLabel>
+              <FormControl>
+                <textarea {...field} className="textarea" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Submitting..." : "Submit"}
+        </Button>
+      </form>
+    </Form>
+  );
+}
+```
+
+<BackToTop />
+
+## Customizing the Contact Form (and Examples)
+
+You can customize the contact form by adding additional fields, changing the layout, or modifying the styles. Here are some examples of how you can extend the contact form:
+
+- Adding a Loading Spinner During Submission
+- Implementing Accessibility Features (e.g., ARIA attributes)
+- Adding a Subject Field and/or a Phone Number Field and/or a File Upload Field
+- Adding a Rich Text Editor for the Message Field
+- Customizing the Submit Button
+- Implementing Client-Side Validation with `react-hook-form`
+- Using a Third-Party Library (e.g., Formik) or Custom Hook for Form Handling and State Management (e.g., Redux, Zustand)
+- Integrating with a Third-Party Form Service (e.g., Formspree, Google Forms)
+- Adding a Captcha for Spam Protection
+- Implementing Error Handling for Form Submission
+- Adding a redirect to a Thank You Page After Successful Submission
+- Adding a Confirmation Email to the User
+- Adding a Reset Button
+
+Let's go over a few of these examples:
+
+### Adding a Loading Spinner During Submission
+
+You can add a loading spinner to indicate that the form is being submitted. This can be done by using a state variable to track the submission status and conditionally rendering a spinner component.
+
+```tsx
+
+```
+
+<BackToTop />
+
+### Adding a Subject Field, Phone Number Field, and Customizing the Submit Button
+
+You can add additional fields to the contact form, such as a subject field and a phone number field. You can also customize the submit button to change its appearance or behavior.
+
+```tsx
+
+```
+
+<BackToTop />
+
+### Implementing Client-Side Validation with `react-hook-form`
+
+You can implement client-side validation using `react-hook-form` and `zod`. This allows you to validate the form data before submission and provide immediate feedback to the user.
+
+```tsx
+
+```
+
+<BackToTop />
+
+### Integrating with a Third-Party Form Service
+
+You can integrate the contact form with a third-party form service like Formspree or Google Forms. This allows you to handle form submissions without needing to set up your own backend.
+
+```tsx
+
+```
+
+<BackToTop />
+
+### Adding a Captcha for Spam Protection
+
+You can add a captcha to the contact form to prevent spam submissions. This can be done using a service like Google reCAPTCHA or hCaptcha. You will need to include the captcha widget in the form and validate the captcha response on submission.
+
+```tsx
+
+```
+
+<BackToTop />
+
+### Implementing Error Handling for Form Submission
+
+You can implement error handling for form submission to handle cases where the submission fails. This can be done by catching errors during the submission process and displaying appropriate error messages to the user.
+
+```tsx
+
+```
+
+<BackToTop />
+
+### Adding a Redirect to a Thank You Page After Successful Submission and Confirmation Email to the User using Resend
+
+[Resend](https://resend.com/docs/send-with-nextjs) is a service that allows you to send emails easily. You can use it to send a confirmation email to the user after they submit the contact form.
+You can use the `resend` package to send emails from your Next.js application. First, install the package:
+
+```bash
+npm install resend
+```
+
+Then, you can create a function to send the email after the form submission. Here’s an example of how to do this:
+
+```tsx
+import Resend from "resend";
+const resend = new Resend(process.env.RESEND_API_KEY);
+const sendConfirmationEmail = async (email: string, name: string) => {
+  try {
+    await resend.emails.send({
+      from: "Your Name <insert your email here>",
+      to: email,
+      subject: "Thank You for Contacting Us",
+      html: `<p>Hi ${name},</p><p>Thank you for reaching out to us! We have received your message and will get back to you shortly.</p><p>Best regards,<br>Your Team</p>`,
+    });
+  } catch (error) {
+    console.error("Error sending confirmation email:", error);
+    throw new Error("Failed to send confirmation email");
+  }
+};
+```
+
+You can call this function in the `onSubmit` handler after the form submission is successful:
+
+```tsx
+const onSubmit = async (data) => {
+  setIsSubmitting(true);
+  try {
+    // Simulate form submission
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await sendConfirmationEmail(data.email, data.name);
+    toast({ title: "Form submitted successfully!" });
+    form.reset();
+  } catch (error) {
+    toast({ title: "Failed to submit form", variant: "destructive" });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+```
+
+This will send a confirmation email to the user after they submit the contact form. You can customize the email content as needed.
+
+You can redirect the user to a thank you page after successful form submission. You can also send a confirmation email to the user to acknowledge their submission. This can be done by using a backend service or a third-party form service that supports email notifications.
+
+```tsx
+
+```
+
+<BackToTop />
+
+### Adding a Rich Text Editor for the Message Field
+
+You can enhance the message field by using a rich text editor like [Draft.js](https://draftjs.org/) or [Slate](https://docs.slatejs.org/). This allows users to format their messages with bold, italics, lists, and other rich text features. You will need to integrate the rich text editor into the form and handle the data accordingly.
+
+```tsx
+
+```
+
+<BackToTop />

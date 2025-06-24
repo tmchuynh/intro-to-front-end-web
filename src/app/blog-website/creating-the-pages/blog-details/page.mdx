@@ -6,8 +6,1053 @@ import BackToTop from "@/components/BackToTop";
 
 ## Introduction
 
-This page is dedicated to displaying individual blog posts. Each post will have its own unique content from the MDX filed located in the `content/posts` directory of your project.
+Individual blog post pages are essential for displaying the full content of each blog post. These pages are dynamically generated based on the slug in the URL, allowing users to read the complete article with proper formatting, metadata, and additional features like related posts, comments, and social sharing.
 
-## The `src/app/blog/[...slug]/page.tsx` File
+This page will guide you through creating dynamic blog post pages using Next.js App Router, building upon the blog listing page concepts covered in the [Blog Page](/blog-website/creating-the-pages/blog) section.
 
-The `page.tsx` file is responsible for rendering individual blog posts based on the slug provided in the URL. This file will use Next.js dynamic routing to fetch and display the content of each post.
+## Dynamic Routing with App Router
+
+In Next.js App Router, dynamic routes are created using square brackets in folder names. For individual blog posts, we'll use the `[...slug]` pattern to handle multi-segment slugs (e.g., `category/subcategory/post-title`).
+
+### File Structure
+
+```plaintext
+src/app/blog/
+├── page.tsx                    # Blog listing page
+└── [...slug]/
+    └── page.tsx               # Individual blog post page
+```
+
+The `[...slug]` folder captures all segments after `/blog/` in the URL, making it flexible for different URL structures.
+
+## Fetching Individual Blog Posts
+
+### Reading MDX Files
+
+Similar to the blog listing page, we need to read and parse individual MDX files. However, instead of fetching all posts, we'll target a specific post based on the slug.
+
+```tsx
+// src/app/blog/[...slug]/page.tsx
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
+import { notFound } from "next/navigation";
+import { BlogPost } from "@/types/blog";
+
+export async function generateStaticParams() {
+  const postsDirectory = path.join(process.cwd(), "content/posts");
+  const filenames = fs.readdirSync(postsDirectory);
+  
+  return filenames.map((name) => ({
+    slug: [name.replace(/\.mdx$/, "")],
+  }));
+}
+
+async function getPost(slug: string[]): Promise<BlogPost | null> {
+  try {
+    const postsDirectory = path.join(process.cwd(), "content/posts");
+    const fullPath = path.join(postsDirectory, `${slug.join("/")}.mdx`);
+    const fileContents = fs.readFileSync(fullPath, "utf8");
+    const { data, content } = matter(fileContents);
+
+    return {
+      slug: slug.join("/"),
+      title: data.title,
+      description: data.description,
+      date: data.date,
+      author: data.author,
+      tags: data.tags || [],
+      category: data.category,
+      featured: data.featured || false,
+      content,
+      ...data,
+    } as BlogPost;
+  } catch (error) {
+    return null;
+  }
+}
+```
+
+### Handling MDX Content
+
+To render MDX content properly, you'll need to process it using libraries like `next-mdx-remote` or `@mdx-js/loader`.
+
+```tsx
+import { MDXRemote } from "next-mdx-remote/rsc";
+import { compileMDX } from "next-mdx-remote/rsc";
+
+async function getCompiledPost(slug: string[]) {
+  const post = await getPost(slug);
+  
+  if (!post) {
+    return null;
+  }
+
+  const { content, frontmatter } = await compileMDX({
+    source: post.content,
+    options: {
+      parseFrontmatter: true,
+      mdxOptions: {
+        remarkPlugins: [
+          require("remark-gfm"),
+          require("remark-frontmatter"),
+          require("remark-toc"),
+        ],
+        rehypePlugins: [
+          require("rehype-slug"),
+          require("rehype-autolink-headings"),
+        ],
+      },
+    },
+  });
+
+  return {
+    ...post,
+    content,
+    frontmatter,
+  };
+}
+```
+
+## The Blog Post Page Component
+
+### Basic Page Structure
+
+```tsx
+// src/app/blog/[...slug]/page.tsx
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { BlogPost } from "@/types/blog";
+import PostHeader from "@/components/blog/PostHeader";
+import PostContent from "@/components/blog/PostContent";
+import PostFooter from "@/components/blog/PostFooter";
+import BackToTop from "@/components/BackToTop";
+
+interface BlogPostPageProps {
+  params: {
+    slug: string[];
+  };
+}
+
+export async function generateMetadata({ 
+  params 
+}: BlogPostPageProps): Promise<Metadata> {
+  const post = await getPost(params.slug);
+  
+  if (!post) {
+    return {
+      title: "Post Not Found",
+    };
+  }
+
+  return {
+    title: post.title,
+    description: post.description,
+    authors: [{ name: post.author }],
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      type: "article",
+      publishedTime: post.date,
+      authors: [post.author],
+      tags: post.tags,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+    },
+  };
+}
+
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const post = await getCompiledPost(params.slug);
+
+  if (!post) {
+    notFound();
+  }
+
+  return (
+    <article className="max-w-4xl mx-auto px-4 py-8">
+      <PostHeader post={post} />
+      <PostContent content={post.content} />
+      <PostFooter post={post} />
+      <BackToTop />
+    </article>
+  );
+}
+```
+
+## Component Breakdown
+
+### Post Header Component
+
+The header displays the post title, metadata, and author information.
+
+```tsx
+// src/components/blog/PostHeader.tsx
+import Image from "next/image";
+import { CalendarIcon, ClockIcon, UserIcon } from "@heroicons/react/24/outline";
+import { BlogPost } from "@/types/blog";
+import { Badge } from "@/components/ui/badge";
+
+interface PostHeaderProps {
+  post: BlogPost;
+}
+
+export default function PostHeader({ post }: PostHeaderProps) {
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const calculateReadingTime = (content: string) => {
+    const wordsPerMinute = 200;
+    const words = content.split(/\s+/).length;
+    return Math.ceil(words / wordsPerMinute);
+  };
+
+  return (
+    <header className="mb-8 border-b border-gray-200 dark:border-gray-700 pb-8">
+      {/* Category Badge */}
+      {post.category && (
+        <div className="mb-4">
+          <Badge variant="secondary" className="text-sm">
+            {post.category}
+          </Badge>
+        </div>
+      )}
+
+      {/* Title */}
+      <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
+        {post.title}
+      </h1>
+
+      {/* Description */}
+      {post.description && (
+        <p className="text-xl text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+          {post.description}
+        </p>
+      )}
+
+      {/* Meta Information */}
+      <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
+        {/* Author */}
+        <div className="flex items-center gap-2">
+          <UserIcon className="h-4 w-4" />
+          <span>{post.author}</span>
+        </div>
+
+        {/* Date */}
+        <div className="flex items-center gap-2">
+          <CalendarIcon className="h-4 w-4" />
+          <time dateTime={post.date}>{formatDate(post.date)}</time>
+        </div>
+
+        {/* Reading Time */}
+        <div className="flex items-center gap-2">
+          <ClockIcon className="h-4 w-4" />
+          <span>{calculateReadingTime(post.content)} min read</span>
+        </div>
+      </div>
+
+      {/* Tags */}
+      {post.tags && post.tags.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-4">
+          {post.tags.map((tag) => (
+            <Badge key={tag} variant="outline" className="text-xs">
+              #{tag}
+            </Badge>
+          ))}
+        </div>
+      )}
+    </header>
+  );
+}
+```
+
+### Post Content Component
+
+This component renders the MDX content with proper styling.
+
+```tsx
+// src/components/blog/PostContent.tsx
+import { ReactElement } from "react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+
+interface PostContentProps {
+  content: ReactElement;
+}
+
+const mdxComponents = {
+  // Custom heading components with anchor links
+  h1: ({ children, id }: { children: React.ReactNode; id?: string }) => (
+    <h1 id={id} className="text-3xl font-bold mt-8 mb-4 text-gray-900 dark:text-white">
+      {children}
+    </h1>
+  ),
+  h2: ({ children, id }: { children: React.ReactNode; id?: string }) => (
+    <h2 id={id} className="text-2xl font-semibold mt-6 mb-3 text-gray-900 dark:text-white">
+      {children}
+    </h2>
+  ),
+  h3: ({ children, id }: { children: React.ReactNode; id?: string }) => (
+    <h3 id={id} className="text-xl font-medium mt-4 mb-2 text-gray-900 dark:text-white">
+      {children}
+    </h3>
+  ),
+  
+  // Custom paragraph styling
+  p: ({ children }: { children: React.ReactNode }) => (
+    <p className="mb-4 leading-7 text-gray-700 dark:text-gray-300">
+      {children}
+    </p>
+  ),
+  
+  // Custom code block styling
+  pre: ({ children }: { children: React.ReactNode }) => (
+    <div className="my-6 overflow-x-auto rounded-lg">
+      {children}
+    </div>
+  ),
+  
+  code: ({ children, className }: { children: React.ReactNode; className?: string }) => {
+    const language = className?.replace("language-", "") || "";
+    
+    if (language) {
+      return (
+        <SyntaxHighlighter
+          language={language}
+          style={oneDark}
+          customStyle={{
+            borderRadius: "0.5rem",
+            padding: "1rem",
+          }}
+        >
+          {String(children).replace(/\n$/, "")}
+        </SyntaxHighlighter>
+      );
+    }
+    
+    return (
+      <code className="bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono text-gray-800 dark:text-gray-200">
+        {children}
+      </code>
+    );
+  },
+  
+  // Custom list styling
+  ul: ({ children }: { children: React.ReactNode }) => (
+    <ul className="mb-4 ml-6 list-disc space-y-1 text-gray-700 dark:text-gray-300">
+      {children}
+    </ul>
+  ),
+  ol: ({ children }: { children: React.ReactNode }) => (
+    <ol className="mb-4 ml-6 list-decimal space-y-1 text-gray-700 dark:text-gray-300">
+      {children}
+    </ol>
+  ),
+  
+  // Custom blockquote styling
+  blockquote: ({ children }: { children: React.ReactNode }) => (
+    <blockquote className="border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 my-6 italic text-gray-700 dark:text-gray-300">
+      {children}
+    </blockquote>
+  ),
+  
+  // Custom link styling
+  a: ({ href, children }: { href?: string; children: React.ReactNode }) => (
+    <a
+      href={href}
+      className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline"
+      target={href?.startsWith("http") ? "_blank" : undefined}
+      rel={href?.startsWith("http") ? "noopener noreferrer" : undefined}
+    >
+      {children}
+    </a>
+  ),
+};
+
+export default function PostContent({ content }: PostContentProps) {
+  return (
+    <div className="prose prose-lg dark:prose-invert max-w-none">
+      <div className="mdx-content">
+        {/* Render MDX content with custom components */}
+        {content}
+      </div>
+    </div>
+  );
+}
+```
+
+### Post Footer Component
+
+The footer can include navigation to previous/next posts, social sharing, and related posts.
+
+```tsx
+// src/components/blog/PostFooter.tsx
+import Link from "next/link";
+import { ArrowLeftIcon, ArrowRightIcon, ShareIcon } from "@heroicons/react/24/outline";
+import { BlogPost } from "@/types/blog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+interface PostFooterProps {
+  post: BlogPost;
+  previousPost?: BlogPost;
+  nextPost?: BlogPost;
+  relatedPosts?: BlogPost[];
+}
+
+export default function PostFooter({ 
+  post, 
+  previousPost, 
+  nextPost, 
+  relatedPosts 
+}: PostFooterProps) {
+  const sharePost = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: post.title,
+          text: post.description,
+          url: window.location.href,
+        });
+      } catch (error) {
+        console.log("Error sharing:", error);
+      }
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(window.location.href);
+      // You could show a toast notification here
+    }
+  };
+
+  return (
+    <footer className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+      {/* Share Button */}
+      <div className="mb-8">
+        <Button
+          onClick={sharePost}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
+          <ShareIcon className="h-4 w-4" />
+          Share this post
+        </Button>
+      </div>
+
+      {/* Navigation */}
+      {(previousPost || nextPost) && (
+        <nav className="mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Previous Post */}
+            {previousPost && (
+              <Link
+                href={`/blog/${previousPost.slug}`}
+                className="group p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
+              >
+                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-1">
+                  <ArrowLeftIcon className="h-4 w-4" />
+                  Previous
+                </div>
+                <div className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                  {previousPost.title}
+                </div>
+              </Link>
+            )}
+
+            {/* Next Post */}
+            {nextPost && (
+              <Link
+                href={`/blog/${nextPost.slug}`}
+                className="group p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 transition-colors md:text-right"
+              >
+                <div className="flex items-center justify-end gap-2 text-sm text-gray-500 dark:text-gray-400 mb-1">
+                  Next
+                  <ArrowRightIcon className="h-4 w-4" />
+                </div>
+                <div className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                  {nextPost.title}
+                </div>
+              </Link>
+            )}
+          </div>
+        </nav>
+      )}
+
+      {/* Related Posts */}
+      {relatedPosts && relatedPosts.length > 0 && (
+        <section>
+          <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+            Related Posts
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {relatedPosts.map((relatedPost) => (
+              <Link
+                key={relatedPost.slug}
+                href={`/blog/${relatedPost.slug}`}
+                className="group p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
+              >
+                <h4 className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 mb-2">
+                  {relatedPost.title}
+                </h4>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  {relatedPost.description}
+                </p>
+                {relatedPost.category && (
+                  <Badge variant="secondary" className="text-xs">
+                    {relatedPost.category}
+                  </Badge>
+                )}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Back to Blog */}
+      <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <Link
+          href="/blog"
+          className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+        >
+          <ArrowLeftIcon className="h-4 w-4" />
+          Back to all posts
+        </Link>
+      </div>
+    </footer>
+  );
+}
+```
+
+<BackToTop />
+
+## Advanced Features
+
+### Table of Contents Generation
+
+Automatically generate a table of contents from the blog post headings using the `remark-toc` plugin.
+
+```tsx
+// In your MDX processing
+import remarkToc from "remark-toc";
+
+const { content } = await compileMDX({
+  source: post.content,
+  options: {
+    mdxOptions: {
+      remarkPlugins: [
+        [remarkToc, { heading: "Table of Contents", maxDepth: 3 }],
+      ],
+    },
+  },
+});
+```
+
+You can also create a custom table of contents component:
+
+```tsx
+// src/components/blog/TableOfContents.tsx
+import { useEffect, useState } from "react";
+
+interface TocItem {
+  id: string;
+  text: string;
+  level: number;
+}
+
+export default function TableOfContents() {
+  const [tocItems, setTocItems] = useState<TocItem[]>([]);
+  const [activeId, setActiveId] = useState<string>("");
+
+  useEffect(() => {
+    // Extract headings from the page
+    const headings = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+    const items = Array.from(headings).map((heading) => ({
+      id: heading.id,
+      text: heading.textContent || "",
+      level: parseInt(heading.tagName.charAt(1)),
+    }));
+    setTocItems(items);
+
+    // Set up intersection observer for active heading
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveId(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: "-80px 0px -80px 0px" }
+    );
+
+    headings.forEach((heading) => observer.observe(heading));
+
+    return () => observer.disconnect();
+  }, []);
+
+  if (tocItems.length === 0) return null;
+
+  return (
+    <nav className="sticky top-8 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+      <h4 className="font-semibold text-gray-900 dark:text-white mb-3">
+        Table of Contents
+      </h4>
+      <ul className="space-y-1">
+        {tocItems.map((item) => (
+          <li key={item.id}>
+            <a
+              href={`#${item.id}`}
+              className={`block text-sm transition-colors ${
+                activeId === item.id
+                  ? "text-blue-600 dark:text-blue-400 font-medium"
+                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300"
+              }`}
+              style={{ paddingLeft: `${(item.level - 1) * 0.75}rem` }}
+            >
+              {item.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+```
+
+### Reading Progress Indicator
+
+Add a reading progress bar to show how much of the article has been read:
+
+```tsx
+// src/components/blog/ReadingProgress.tsx
+import { useEffect, useState } from "react";
+
+export default function ReadingProgress() {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const updateProgress = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scrollTop / docHeight) * 100;
+      setProgress(progress);
+    };
+
+    window.addEventListener("scroll", updateProgress);
+    return () => window.removeEventListener("scroll", updateProgress);
+  }, []);
+
+  return (
+    <div className="fixed top-0 left-0 w-full h-1 bg-gray-200 dark:bg-gray-700 z-50">
+      <div
+        className="h-full bg-blue-600 dark:bg-blue-400 transition-all duration-150"
+        style={{ width: `${progress}%` }}
+      />
+    </div>
+  );
+}
+```
+
+### Comments System
+
+Integrate a comments system using a service like Disqus, Utterances, or Giscus:
+
+```tsx
+// src/components/blog/Comments.tsx
+import { useEffect, useRef } from "react";
+
+interface CommentsProps {
+  slug: string;
+}
+
+export default function Comments({ slug }: CommentsProps) {
+  const commentsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Example using Utterances (GitHub Issues)
+    const script = document.createElement("script");
+    script.src = "https://utteranc.es/client.js";
+    script.setAttribute("repo", "your-username/your-repo");
+    script.setAttribute("issue-term", "pathname");
+    script.setAttribute("theme", "github-light");
+    script.setAttribute("crossorigin", "anonymous");
+    script.async = true;
+
+    if (commentsRef.current) {
+      commentsRef.current.appendChild(script);
+    }
+
+    return () => {
+      if (commentsRef.current) {
+        commentsRef.current.innerHTML = "";
+      }
+    };
+  }, [slug]);
+
+  return (
+    <section className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+      <h3 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">
+        Comments
+      </h3>
+      <div ref={commentsRef} />
+    </section>
+  );
+}
+```
+
+<BackToTop />
+
+## SEO and Performance Optimization
+
+### Meta Tags and Open Graph
+
+Proper meta tags are crucial for SEO and social sharing. The `generateMetadata` function handles this:
+
+```tsx
+export async function generateMetadata({ 
+  params 
+}: BlogPostPageProps): Promise<Metadata> {
+  const post = await getPost(params.slug);
+  
+  if (!post) {
+    return {
+      title: "Post Not Found",
+    };
+  }
+
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yoursite.com";
+  const postUrl = `${baseUrl}/blog/${post.slug}`;
+  const imageUrl = post.image || `${baseUrl}/default-og-image.jpg`;
+
+  return {
+    title: `${post.title} | Your Blog Name`,
+    description: post.description,
+    authors: [{ name: post.author }],
+    keywords: post.tags?.join(", "),
+    canonical: postUrl,
+    
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      type: "article",
+      publishedTime: post.date,
+      modifiedTime: post.updatedAt || post.date,
+      authors: [post.author],
+      tags: post.tags,
+      url: postUrl,
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+    },
+    
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+      images: [imageUrl],
+      creator: "@yourtwitterhandle",
+    },
+    
+    alternates: {
+      canonical: postUrl,
+    },
+  };
+}
+```
+
+### Structured Data (JSON-LD)
+
+Add structured data for better SEO:
+
+```tsx
+// src/components/blog/StructuredData.tsx
+import { BlogPost } from "@/types/blog";
+
+interface StructuredDataProps {
+  post: BlogPost;
+}
+
+export default function StructuredData({ post }: StructuredDataProps) {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://yoursite.com";
+  const postUrl = `${baseUrl}/blog/${post.slug}`;
+  
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.description,
+    image: post.image || `${baseUrl}/default-image.jpg`,
+    author: {
+      "@type": "Person",
+      name: post.author,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Your Blog Name",
+      logo: {
+        "@type": "ImageObject",
+        url: `${baseUrl}/logo.png`,
+      },
+    },
+    datePublished: post.date,
+    dateModified: post.updatedAt || post.date,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": postUrl,
+    },
+    url: postUrl,
+    keywords: post.tags?.join(", "),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+    />
+  );
+}
+```
+
+### Static Generation
+
+Use `generateStaticParams` to pre-generate all blog post pages at build time:
+
+```tsx
+export async function generateStaticParams() {
+  const postsDirectory = path.join(process.cwd(), "content/posts");
+  
+  function getAllPosts(dir: string, baseSlug: string = ""): string[][] {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    let allSlugs: string[][] = [];
+    
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      
+      if (entry.isDirectory()) {
+        // Recursively get posts from subdirectories
+        const subSlugs = getAllPosts(fullPath, `${baseSlug}${entry.name}/`);
+        allSlugs.push(...subSlugs);
+      } else if (entry.name.endsWith(".mdx")) {
+        const slug = entry.name.replace(/\.mdx$/, "");
+        const fullSlug = baseSlug + slug;
+        allSlugs.push(fullSlug.split("/").filter(Boolean));
+      }
+    }
+    
+    return allSlugs;
+  }
+  
+  const slugs = getAllPosts(postsDirectory);
+  
+  return slugs.map((slug) => ({
+    slug,
+  }));
+}
+```
+
+<BackToTop />
+
+## Error Handling and User Experience
+
+### Custom Not Found Page
+
+Create a custom 404 page specifically for blog posts:
+
+```tsx
+// src/app/blog/[...slug]/not-found.tsx
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
+export default function BlogPostNotFound() {
+  return (
+    <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+      <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+        Post Not Found
+      </h1>
+      <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+        The blog post you're looking for doesn't exist or has been moved.
+      </p>
+      <div className="space-y-4">
+        <Button asChild>
+          <Link href="/blog">
+            Browse All Posts
+          </Link>
+        </Button>
+        <div>
+          <Link
+            href="/"
+            className="text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            Go to Homepage
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+### Loading States
+
+For dynamic content or slow networks, add loading states:
+
+```tsx
+// src/app/blog/[...slug]/loading.tsx
+export default function BlogPostLoading() {
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      {/* Header Skeleton */}
+      <div className="mb-8 border-b border-gray-200 dark:border-gray-700 pb-8">
+        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-4"></div>
+        <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-full mb-6"></div>
+        <div className="flex gap-4">
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+        </div>
+      </div>
+      
+      {/* Content Skeleton */}
+      <div className="space-y-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-4 bg-gray-200 dark:bg-gray-700 rounded"
+            style={{ width: `${Math.random() * 40 + 60}%` }}
+          ></div>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+### Error Boundaries
+
+Implement error boundaries for graceful error handling:
+
+```tsx
+// src/components/blog/BlogPostErrorBoundary.tsx
+"use client";
+
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+
+export default function BlogPostError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    console.error("Blog post error:", error);
+  }, [error]);
+
+  return (
+    <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+      <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+        Something went wrong
+      </h1>
+      <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+        We encountered an error while loading this blog post.
+      </p>
+      <div className="space-x-4">
+        <Button onClick={reset}>Try Again</Button>
+        <Button variant="outline" asChild>
+          <a href="/blog">Browse Other Posts</a>
+        </Button>
+      </div>
+    </div>
+  );
+}
+```
+
+## Testing Individual Blog Posts
+
+### Unit Testing
+
+Test your blog post components:
+
+```tsx
+// __tests__/blog/PostHeader.test.tsx
+import { render, screen } from "@testing-library/react";
+import PostHeader from "@/components/blog/PostHeader";
+import { BlogPost } from "@/types/blog";
+
+const mockPost: BlogPost = {
+  slug: "test-post",
+  title: "Test Post",
+  description: "A test blog post",
+  date: "2024-01-01",
+  author: "Test Author",
+  category: "Test",
+  tags: ["test", "example"],
+  content: "Test content",
+  featured: false,
+};
+
+describe("PostHeader", () => {
+  it("renders post title", () => {
+    render(<PostHeader post={mockPost} />);
+    expect(screen.getByText("Test Post")).toBeInTheDocument();
+  });
+
+  it("displays author information", () => {
+    render(<PostHeader post={mockPost} />);
+    expect(screen.getByText("Test Author")).toBeInTheDocument();
+  });
+
+  it("shows tags", () => {
+    render(<PostHeader post={mockPost} />);
+    expect(screen.getByText("#test")).toBeInTheDocument();
+    expect(screen.getByText("#example")).toBeInTheDocument();
+  });
+});
+```
+
+## Best Practices
+
+### Performance Tips
+
+1. **Optimize Images**: Use Next.js `Image` component with proper sizing
+2. **Code Splitting**: Lazy load non-critical components
+3. **Static Generation**: Pre-generate all blog posts at build time
+4. **Bundle Analysis**: Monitor JavaScript bundle sizes
+
+### Accessibility
+
+1. **Semantic HTML**: Use proper heading hierarchy
+2. **Alt Text**: Provide descriptive alt text for images
+3. **Keyboard Navigation**: Ensure all interactive elements are keyboard accessible
+4. **Screen Readers**: Test with screen reader software
+
+### Content Management
+
+1. **Consistent Frontmatter**: Standardize metadata across all posts
+2. **Image Organization**: Store images in a consistent structure
+3. **URL Structure**: Maintain clean, SEO-friendly URLs
+4. **Content Validation**: Validate MDX files before deployment
+
+<BackToTop />
+
+## Conclusion
+
+Individual blog post pages are the heart of your blog website. By implementing proper dynamic routing, MDX processing, and thoughtful component design, you create an engaging reading experience for your visitors.
+
+The combination of Next.js App Router, TypeScript, and modern React patterns provides a solid foundation for building scalable and maintainable blog post pages. Remember to focus on performance, accessibility, and SEO to ensure your content reaches and engages your target audience effectively.
+
+Next, you might want to explore [Creating Blog Components](/blog-website/creating-the-components) to build reusable UI elements for your blog.

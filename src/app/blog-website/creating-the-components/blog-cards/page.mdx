@@ -260,7 +260,7 @@ function NeumorphismPostCard({ post }: { post: BlogPost }) {
   return (
     <article className="group cursor-pointer">
       <div className="bg-gray-100 rounded-3xl p-6 shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff] hover:shadow-[inset_20px_20px_60px_#bebebe,inset_-20px_-20px_60px_#ffffff] transition-all duration-300">
-        <div className="aspect-[4/3] mb-6 overflow-hidden rounded-2xl shadow-[inset_5px_5px_15px_#bebebe,inset_-5px_-5px_15px_#ffffff]">
+        <div className="relative aspect-[4/3] mb-6 overflow-hidden rounded-2xl shadow-[inset_5px_5px_15px_#bebebe,inset_-5px_-5px_15px_#ffffff]">
           <img
             src={post.image}
             alt={post.title}
@@ -802,8 +802,8 @@ const NeonGlowCard = ({ title, description, imageUrl, link, category }) => {
       </CardHeader>
 
       <CardContent className="pt-6">
-        <CardTitle className="text-xl mb-3 text-white">{title}</CardTitle>
-        <CardDescription className="text-gray-300 leading-relaxed mb-6">
+        <CardTitle className="mb-3 text-white">{title}</CardTitle>
+        <CardDescription className="text-white/90 mb-4">
           {description}
         </CardDescription>
       </CardContent>
@@ -1053,36 +1053,26 @@ const AudioCard = ({
   return (
     <Card className="max-w-sm overflow-hidden">
       <CardHeader className="p-0 relative">
-        <Image 
-          className="w-full h-48 object-cover" 
-          src={imageUrl} 
-          alt={title}
-          width={400}
-          height={192}
-        />
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-          <Button
-            onClick={togglePlay}
-            variant="ghost"
-            size="lg"
-            className="bg-white/90 hover:bg-white text-black rounded-full p-4 transition-all hover:scale-110"
-          >
-            {isPlaying ? (
-              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-              </svg>
-            ) : (
-              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            )}
-          </Button>
+        <div className="h-48 overflow-hidden">
+          <Image
+            className="w-full h-full object-cover transition-transform duration-300"
+            style={{ transform: `translateY(${offset * 0.1}px)` }}
+            src={imageUrl}
+            alt={title}
+            width={400}
+            height={192}
+          />
+          <div className="absolute top-4 right-4 bg-black/70 text-white px-2 py-1 rounded-full text-xs">
+            {readTime} min read
+          </div>
         </div>
       </CardHeader>
 
       <CardContent className="pt-6">
-        <CardTitle className="mb-2">{title}</CardTitle>
-        <CardDescription className="mb-4">{description}</CardDescription>
+        <CardTitle className="mb-3">{title}</CardTitle>
+        <CardDescription className="leading-relaxed mb-6">
+          {description}
+        </CardDescription>
 
         <div className="bg-gray-100 rounded-lg p-4 mb-4">
           <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
@@ -1146,3 +1136,879 @@ const blogPosts = [
 ```
 
 These creative examples showcase different design patterns and interactions that can make your blog more engaging and visually appealing. Each card type serves different purposes and can be customized further based on your specific needs.
+
+## Featured Posts Grid and Carousel Layouts
+
+Grid layouts and carousels are perfect for showcasing multiple blog posts in an organized, visually appealing way. Here are examples for different design styles and layout implementations.
+
+### Basic Grid Layout Implementation
+
+```tsx
+// components/FeaturedPostsGrid.tsx
+interface BlogPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  image: string;
+  publishDate: string;
+  category: string;
+  slug: string;
+}
+
+interface FeaturedPostsGridProps {
+  posts: BlogPost[];
+  style?:
+    | "minimalistic"
+    | "bold"
+    | "whitespace"
+    | "neumorphism"
+    | "bauhaus"
+    | "aurora";
+}
+
+export default function FeaturedPostsGrid({
+  posts,
+  style = "minimalistic",
+}: FeaturedPostsGridProps) {
+  const getGridClasses = () => {
+    const baseClasses = "grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
+
+    switch (style) {
+      case "minimalistic":
+        return `${baseClasses} max-w-6xl mx-auto px-4`;
+      case "bold":
+        return `${baseClasses} max-w-7xl mx-auto px-8`;
+      case "whitespace":
+        return `${baseClasses} max-w-5xl mx-auto px-12 py-16`;
+      case "neumorphism":
+        return `${baseClasses} max-w-6xl mx-auto px-6 py-8`;
+      case "bauhaus":
+        return `${baseClasses} max-w-6xl mx-auto px-4 transform -rotate-1`;
+      case "aurora":
+        return `${baseClasses} max-w-6xl mx-auto px-4 relative z-10`;
+      default:
+        return baseClasses;
+    }
+  };
+
+  return (
+    <section className="py-12">
+      <div className={getGridClasses()}>
+        {posts.map((post) => (
+          <PostCard key={post.id} post={post} style={style} />
+        ))}
+      </div>
+    </section>
+  );
+}
+```
+
+<BackToTop />
+
+### Basic React Slick Carousel
+
+**NOTE**
+
+<blockquote>
+The following example use the `react-slick` library for the carousel functionality. Make sure to install it and its dependencies before using the code snippets below.
+
+First, install the required packages:
+
+```bash
+npm install react-slick slick-carousel
+npm install --save-dev @types/react-slick
+```
+
+</blockquote>
+
+```tsx
+// components/FeaturedPostsSlick.tsx
+import React from "react";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
+interface BlogPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  image: string;
+  publishDate: string;
+  category: string;
+  slug: string;
+}
+
+interface FeaturedPostsSlickProps {
+  posts: BlogPost[];
+  style?:
+    | "minimalistic"
+    | "bold"
+    | "whitespace"
+    | "neumorphism"
+    | "bauhaus"
+    | "aurora";
+}
+
+export default function FeaturedPostsSlick({
+  posts,
+  style = "minimalistic",
+}: FeaturedPostsSlickProps) {
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 4000,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 640,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  };
+
+  const getContainerClasses = () => {
+    switch (style) {
+      case "minimalistic":
+        return "max-w-6xl mx-auto px-4";
+      case "bold":
+        return "max-w-7xl mx-auto px-8 bg-black py-12 rounded-2xl";
+      case "whitespace":
+        return "max-w-5xl mx-auto px-12 py-20";
+      case "neumorphism":
+        return "max-w-6xl mx-auto px-6 py-8 bg-gray-100 rounded-3xl shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff]";
+      case "bauhaus":
+        return "max-w-6xl mx-auto px-4 transform -rotate-1 bg-yellow-400 py-8";
+      case "aurora":
+        return "max-w-6xl mx-auto px-4 relative bg-gradient-to-r from-purple-900 via-blue-900 to-indigo-900 py-12 rounded-3xl";
+      default:
+        return "max-w-6xl mx-auto px-4";
+    }
+  };
+
+  return (
+    <section className="py-12">
+      <div className={getContainerClasses()}>
+        <Slider {...settings}>
+          {posts.map((post) => (
+            <div key={post.id} className="px-3">
+              <PostCard post={post} style={style} />
+            </div>
+          ))}
+        </Slider>
+      </div>
+    </section>
+  );
+}
+```
+
+<BackToTop />
+
+### React Multi Carousel Implementation
+
+**NOTE**
+
+<blockquote>
+The following example use the `react-multi-carousel` library for the carousel functionality. Make sure to install them before using the code snippets below.
+
+```bash
+npm install react-multi-carousel
+```
+
+</blockquote>
+
+```tsx
+// components/FeaturedPostsMultiCarousel.tsx
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
+
+const responsive = {
+  desktop: {
+    breakpoint: { max: 3000, min: 1024 },
+    items: 3,
+    slidesToSlide: 1,
+  },
+  tablet: {
+    breakpoint: { max: 1024, min: 464 },
+    items: 2,
+    slidesToSlide: 1,
+  },
+  mobile: {
+    breakpoint: { max: 464, min: 0 },
+    items: 1,
+    slidesToSlide: 1,
+  },
+};
+
+export default function FeaturedPostsMultiCarousel({
+  posts,
+  style = "minimalistic",
+}: FeaturedPostsMultiCarouselProps) {
+  return (
+    <section className="py-12">
+      <div className={getContainerClasses(style)}>
+        <Carousel
+          responsive={responsive}
+          infinite={true}
+          autoPlay={true}
+          autoPlaySpeed={3000}
+          keyBoardControl={true}
+          customTransition="all .5"
+          transitionDuration={500}
+          containerClass="carousel-container"
+          removeArrowOnDeviceType={["tablet", "mobile"]}
+          itemClass="carousel-item-padding-40-px"
+        >
+          {posts.map((post) => (
+            <PostCard key={post.id} post={post} style={style} />
+          ))}
+        </Carousel>
+      </div>
+    </section>
+  );
+}
+```
+
+<BackToTop />
+
+### React Responsive Carousel Implementation
+
+**NOTE**
+
+<blockquote>
+The following example use the `react-responsive-carousel` library for the carousel functionality. Make sure to install them before using the code snippets below.
+
+```bash
+npm install react-responsive-carousel
+```
+
+</blockquote>
+
+```tsx
+// components/FeaturedPostsResponsiveCarousel.tsx
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+
+export default function FeaturedPostsResponsiveCarousel({
+  posts,
+  style = "minimalistic",
+}: FeaturedPostsResponsiveCarouselProps) {
+  return (
+    <section className="py-12">
+      <div className={getContainerClasses(style)}>
+        <Carousel
+          showArrows={true}
+          showStatus={false}
+          showIndicators={true}
+          infiniteLoop={true}
+          autoPlay={true}
+          interval={5000}
+          transitionTime={300}
+          swipeable={true}
+          emulateTouch={true}
+        >
+          {posts.map((post) => (
+            <div key={post.id}>
+              <PostCard post={post} style={style} />
+            </div>
+          ))}
+        </Carousel>
+      </div>
+    </section>
+  );
+}
+```
+
+<BackToTop />
+
+## Custom Carousel Controls
+
+### Custom Arrow Components
+
+```tsx
+// components/CustomArrows.tsx
+interface CustomArrowProps {
+  onClick?: () => void;
+  style?:
+    | "minimalistic"
+    | "bold"
+    | "whitespace"
+    | "neumorphism"
+    | "bauhaus"
+    | "aurora";
+}
+
+export function CustomPrevArrow({ onClick, style }: CustomArrowProps) {
+  const getArrowClasses = () => {
+    const baseClasses =
+      "absolute left-4 top-1/2 transform -translate-y-1/2 z-10 p-3 rounded-full cursor-pointer transition-all";
+
+    switch (style) {
+      case "minimalistic":
+        return `${baseClasses} bg-white/80 hover:bg-white shadow-lg text-gray-700 hover:text-gray-900`;
+      case "bold":
+        return `${baseClasses} bg-yellow-400 hover:bg-yellow-300 text-black font-bold border-4 border-black`;
+      case "neumorphism":
+        return `${baseClasses} bg-gray-100 shadow-[5px_5px_15px_#bebebe,-5px_-5px_15px_#ffffff] hover:shadow-[inset_5px_5px_15px_#bebebe,inset_-5px_-5px_15px_#ffffff]`;
+      case "aurora":
+        return `${baseClasses} backdrop-blur-sm bg-white/20 border border-white/30 text-white hover:bg-white/30`;
+      default:
+        return `${baseClasses} bg-white/80 hover:bg-white shadow-lg`;
+    }
+  };
+
+  return (
+    <button onClick={onClick} className={getArrowClasses()}>
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M15 19l-7-7 7-7"
+        />
+      </svg>
+    </button>
+  );
+}
+
+export function CustomNextArrow({ onClick, style }: CustomArrowProps) {
+  const getArrowClasses = () => {
+    const baseClasses =
+      "absolute right-4 top-1/2 transform -translate-y-1/2 z-10 p-3 rounded-full cursor-pointer transition-all";
+
+    switch (style) {
+      case "minimalistic":
+        return `${baseClasses} bg-white/80 hover:bg-white shadow-lg text-gray-700 hover:text-gray-900`;
+      case "bold":
+        return `${baseClasses} bg-yellow-400 hover:bg-yellow-300 text-black font-bold border-4 border-black`;
+      case "neumorphism":
+        return `${baseClasses} bg-gray-100 shadow-[5px_5px_15px_#bebebe,-5px_-5px_15px_#ffffff] hover:shadow-[inset_5px_5px_15px_#bebebe,inset_-5px_-5px_15px_#ffffff]`;
+      case "aurora":
+        return `${baseClasses} backdrop-blur-sm bg-white/20 border border-white/30 text-white hover:bg-white/30`;
+      default:
+        return `${baseClasses} bg-white/80 hover:bg-white shadow-lg`;
+    }
+  };
+
+  return (
+    <button onClick={onClick} className={getArrowClasses()}>
+      <svg
+        className="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 5l7 7-7 7"
+        />
+      </svg>
+    </button>
+  );
+}
+```
+
+<BackToTop />
+
+### Custom Dots
+
+```tsx
+// components/CustomDots.tsx
+interface CustomDotsProps {
+  dots: React.ReactNode;
+  style?:
+    | "minimalistic"
+    | "bold"
+    | "whitespace"
+    | "neumorphism"
+    | "bauhaus"
+    | "aurora";
+}
+
+export function CustomDots({ dots, style }: CustomDotsProps) {
+  const getDotClasses = () => {
+    switch (style) {
+      case "bold":
+        return "flex justify-center space-x-3 mt-8 [&_.slick-dots_li]:mx-1 [&_.slick-dots_li_button]:bg-yellow-400 [&_.slick-dots_li_button]:w-4 [&_.slick-dots_li_button]:h-4 [&_.slick-dots_li_button]:rounded-none [&_.slick-dots_li_button]:border-2 [&_.slick-dots_li_button]:border-black";
+      case "neumorphism":
+        return "flex justify-center space-x-4 mt-8 [&_.slick-dots_li_button]:bg-gray-100 [&_.slick-dots_li_button]:shadow-[5px_5px_15px_#bebebe,-5px_-5px_15px_#ffffff] [&_.slick-dots_li_button]:w-4 [&_.slick-dots_li_button]:h-4 [&_.slick-dots_li_button]:rounded-full";
+      case "aurora":
+        return "flex justify-center space-x-3 mt-8 [&_.slick-dots_li_button]:backdrop-blur-sm [&_.slick-dots_li_button]:bg-white/20 [&_.slick-dots_li_button]:border [&_.slick-dots_li_button]:border-white/30 [&_.slick-dots_li_button]:w-3 [&_.slick-dots_li_button]:h-3 [&_.slick-dots_li_button]:rounded-full";
+      default:
+        return "flex justify-center space-x-2 mt-6 [&_.slick-dots_li_button]:bg-gray-300 [&_.slick-dots_li_button]:w-3 [&_.slick-dots_li_button]:h-3 [&_.slick-dots_li_button]:rounded-full [&_.slick-dots_li.slick-active_button]:bg-blue-500";
+    }
+  };
+
+  return <div className={getDotClasses()}>{dots}</div>;
+}
+```
+
+<BackToTop />
+
+## Blog Card Styles with Category Icons
+
+The following examples show how to enhance your blog cards with category icons and interactive tooltips to improve user experience and visual appeal.
+
+**NOTE**
+
+<blockquote>
+The following examples use `react-icons` and the `Tooltip` component from `shadcn/ui`. Make sure to install them before using the code snippets below.
+
+```bash
+npm install react-icons
+npx shadcn@latest add tooltip
+```
+
+</blockquote>
+
+### Minimalistic Style with Icons
+
+```tsx
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+function MinimalisticPostCardWithIcons({
+  post,
+  categoryIcon,
+  tagIcons,
+}: {
+  post: BlogPost;
+  categoryIcon: CategoryIcon;
+  tagIcons: CategoryIcon[];
+}) {
+  const CategoryIconComponent = categoryIcon.icon;
+
+  return (
+    <article className="group cursor-pointer bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all">
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <img
+          src={post.image}
+          alt={post.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+        />
+        <div className="absolute top-4 left-4">
+          <Tooltip>
+            <TooltipTrigger>
+              <div className="bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg">
+                <CategoryIconComponent
+                  className={`w-5 h-5 ${categoryIcon.color}`}
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{categoryIcon.description}</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </div>
+      <div className="p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <span className={`text-sm font-medium ${categoryIcon.color}`}>
+            {post.category}
+          </span>
+          <time className="text-sm text-gray-500">
+            {new Date(post.publishDate).toLocaleDateString()}
+          </time>
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+          {post.title}
+        </h3>
+        <p className="text-sm text-gray-600 line-clamp-2">{post.excerpt}</p>
+        <div className="flex items-center gap-2 pt-2">
+          {tagIcons.slice(0, 3).map((tagIcon, index) => {
+            const TagIconComponent = tagIcon.icon;
+            return (
+              <Tooltip key={index}>
+                <TooltipTrigger>
+                  <div className="p-1.5 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors">
+                    <TagIconComponent className={`w-3 h-3 ${tagIcon.color}`} />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{tagIcon.description}</p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
+          {post.tags.length > 3 && (
+            <span className="text-xs text-gray-500 ml-1">
+              +{post.tags.length - 3} more
+            </span>
+          )}
+        </div>
+      </div>
+    </article>
+  );
+}
+```
+
+### Bold Typography Style with Icons
+
+```tsx
+function BoldPostCardWithIcons({
+  post,
+  categoryIcon,
+  tagIcons,
+}: {
+  post: BlogPost;
+  categoryIcon: CategoryIcon;
+  tagIcons: CategoryIcon[];
+}) {
+  const CategoryIconComponent = categoryIcon.icon;
+
+  return (
+    <article className="group cursor-pointer bg-black text-white rounded-2xl overflow-hidden hover:scale-105 transition-transform">
+      <div className="relative aspect-[4/3] overflow-hidden">
+        <img
+          src={post.image}
+          alt={post.title}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute top-4 left-4 flex items-center gap-3">
+          <Tooltip>
+            <TooltipTrigger>
+              <div className="bg-yellow-400 p-3 rounded-lg shadow-lg">
+                <CategoryIconComponent className="w-6 h-6 text-black" />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="font-bold">{categoryIcon.description}</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </div>
+      <div className="p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="bg-yellow-400 text-black px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+            {post.category}
+          </span>
+          <time className="text-yellow-400 text-sm font-bold">
+            {new Date(post.publishDate).toLocaleDateString()}
+          </time>
+        </div>
+        <h3 className="text-2xl font-black leading-tight group-hover:text-yellow-400 transition-colors">
+          {post.title}
+        </h3>
+        <p className="text-gray-300 font-medium">{post.excerpt}</p>
+        <div className="flex items-center gap-3 pt-2">
+          {tagIcons.slice(0, 4).map((tagIcon, index) => {
+            const TagIconComponent = tagIcon.icon;
+            return (
+              <Tooltip key={index}>
+                <TooltipTrigger>
+                  <div className="p-2 bg-white/10 rounded-lg hover:bg-yellow-400 hover:text-black transition-all">
+                    <TagIconComponent className="w-4 h-4" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="font-bold">{tagIcon.description}</p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          })}
+        </div>
+      </div>
+    </article>
+  );
+}
+```
+
+### Neumorphism Style with Icons
+
+```tsx
+function NeumorphismPostCardWithIcons({
+  post,
+  categoryIcon,
+  tagIcons,
+}: {
+  post: BlogPost;
+  categoryIcon: CategoryIcon;
+  tagIcons: CategoryIcon[];
+}) {
+  const CategoryIconComponent = categoryIcon.icon;
+
+  return (
+    <article className="group cursor-pointer">
+      <div className="bg-gray-100 rounded-3xl p-6 shadow-[20px_20px_60px_#bebebe,-20px_-20px_60px_#ffffff] hover:shadow-[inset_20px_20px_60px_#bebebe,inset_-20px_-20px_60px_#ffffff] transition-all duration-300">
+        <div className="relative aspect-[4/3] mb-6 overflow-hidden rounded-2xl shadow-[inset_5px_5px_15px_#bebebe,inset_-5px_-5px_15px_#ffffff]">
+          <img
+            src={post.image}
+            alt={post.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute top-4 left-4">
+            <Tooltip>
+              <TooltipTrigger>
+                <div className="bg-gray-100 p-3 rounded-full shadow-[5px_5px_15px_#bebebe,-5px_-5px_15px_#ffffff]">
+                  <CategoryIconComponent
+                    className={`w-5 h-5 ${categoryIcon.color}`}
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{categoryIcon.description}</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </div>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="inline-flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full shadow-[5px_5px_15px_#bebebe,-5px_-5px_15px_#ffffff]">
+              <CategoryIconComponent
+                className={`w-4 h-4 ${categoryIcon.color}`}
+              />
+              <span className="text-gray-700 text-sm font-medium">
+                {post.category}
+              </span>
+            </div>
+            <time className="text-gray-500 text-xs">
+              {new Date(post.publishDate).toLocaleDateString()}
+            </time>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
+            {post.title}
+          </h3>
+          <p className="text-gray-600 text-sm line-clamp-3">{post.excerpt}</p>
+          <div className="flex items-center gap-2 pt-2">
+            {tagIcons.slice(0, 3).map((tagIcon, index) => {
+              const TagIconComponent = tagIcon.icon;
+              return (
+                <Tooltip key={index}>
+                  <TooltipTrigger>
+                    <div className="p-2 bg-gray-100 rounded-full shadow-[3px_3px_10px_#bebebe,-3px_-3px_10px_#ffffff] hover:shadow-[inset_3px_3px_10px_#bebebe,inset_-3px_-3px_10px_#ffffff] transition-all">
+                      <TagIconComponent
+                        className={`w-3 h-3 ${tagIcon.color}`}
+                      />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{tagIcon.description}</p>
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+```
+
+### Aurora Background Style with Icons
+
+```tsx
+function AuroraPostCardWithIcons({
+  post,
+  categoryIcon,
+  tagIcons,
+}: {
+  post: BlogPost;
+  categoryIcon: CategoryIcon;
+  tagIcons: CategoryIcon[];
+}) {
+  const CategoryIconComponent = categoryIcon.icon;
+
+  return (
+    <article className="group cursor-pointer relative">
+      <div className="relative bg-gray-900 rounded-3xl overflow-hidden">
+        {/* Aurora Background Animation */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-blue-500 to-green-400 animate-pulse"></div>
+          <div className="absolute inset-0 bg-gradient-to-tl from-pink-500 via-red-500 to-yellow-400 animate-ping"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-500 animate-bounce"></div>
+        </div>
+
+        <div className="relative z-10 p-8">
+          <div className="relative aspect-[4/3] mb-6 overflow-hidden rounded-2xl backdrop-blur-sm bg-white/10 border border-white/20">
+            <img
+              src={post.image}
+              alt={post.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+            />
+            <div className="absolute top-4 left-4">
+              <Tooltip>
+                <TooltipTrigger>
+                  <div className="backdrop-blur-sm bg-white/20 p-3 rounded-full border border-white/30 shadow-lg">
+                    <CategoryIconComponent className="w-5 h-5 text-white" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-white bg-gray-900 border border-white/20">
+                    {categoryIcon.description}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="inline-flex items-center gap-2 backdrop-blur-sm bg-white/20 text-white px-4 py-2 rounded-full border border-white/30">
+                <CategoryIconComponent className="w-4 h-4" />
+                <span className="text-sm font-medium">{post.category}</span>
+              </div>
+              <time className="text-purple-300 text-sm font-medium">
+                {new Date(post.publishDate).toLocaleDateString()}
+              </time>
+            </div>
+            <h3 className="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">
+              {post.title}
+            </h3>
+            <p className="text-gray-200 text-sm line-clamp-3">{post.excerpt}</p>
+            <div className="flex items-center gap-2 pt-2">
+              {tagIcons.slice(0, 4).map((tagIcon, index) => {
+                const TagIconComponent = tagIcon.icon;
+                return (
+                  <Tooltip key={index}>
+                    <TooltipTrigger>
+                      <div className="p-2 backdrop-blur-sm bg-white/10 rounded-full border border-white/20 hover:bg-white/20 transition-all">
+                        <TagIconComponent className="w-3 h-3 text-white" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-white bg-gray-900 border border-white/20">
+                        {tagIcon.description}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+```
+
+### Category and Tag Icon Definitions
+
+```tsx
+interface CategoryIcon {
+  name: string;
+  icon: React.ComponentType<any>;
+  color: string;
+  description: string;
+}
+
+const categoryIcons: CategoryIcon[] = [
+  {
+    name: "react",
+    icon: SiReact,
+    color: "text-blue-500",
+    description: "React tutorials and guides",
+  },
+  {
+    name: "javascript",
+    icon: SiJavascript,
+    color: "text-yellow-500",
+    description: "JavaScript programming",
+  },
+  {
+    name: "python",
+    icon: SiPython,
+    color: "text-green-500",
+    description: "Python development",
+  },
+  {
+    name: "node",
+    icon: SiNodedotjs,
+    color: "text-green-600",
+    description: "Node.js backend development",
+  },
+  {
+    name: "typescript",
+    icon: SiTypescript,
+    color: "text-blue-600",
+    description: "TypeScript programming",
+  },
+  {
+    name: "nextjs",
+    icon: SiNextdotjs,
+    color: "text-gray-900",
+    description: "Next.js framework",
+  },
+  {
+    name: "web-development",
+    icon: FiCode,
+    color: "text-purple-500",
+    description: "General web development",
+  },
+  {
+    name: "mobile",
+    icon: FiSmartphone,
+    color: "text-pink-500",
+    description: "Mobile app development",
+  },
+  {
+    name: "tutorial",
+    icon: FiBook,
+    color: "text-indigo-500",
+    description: "Step-by-step tutorials",
+  },
+  {
+    name: "tips",
+    icon: FiTrendingUp,
+    color: "text-orange-500",
+    description: "Tips and tricks",
+  },
+];
+
+const tagIcons: CategoryIcon[] = [
+  {
+    name: "beginner",
+    icon: FiBook,
+    color: "text-green-500",
+    description: "Beginner-friendly content",
+  },
+  {
+    name: "advanced",
+    icon: FiTrendingUp,
+    color: "text-red-500",
+    description: "Advanced topics",
+  },
+  {
+    name: "tutorial",
+    icon: FiUsers,
+    color: "text-blue-500",
+    description: "Tutorial content",
+  },
+  {
+    name: "best-practices",
+    icon: FiStar,
+    color: "text-yellow-500",
+    description: "Best practices and tips",
+  },
+  {
+    name: "performance",
+    icon: FiTrendingUp,
+    color: "text-purple-500",
+    description: "Performance optimization",
+  },
+];
+```

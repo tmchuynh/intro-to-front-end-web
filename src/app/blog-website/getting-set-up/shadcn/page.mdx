@@ -1,0 +1,428 @@
+import BackToTop from "@/components/BackToTop";
+
+# shadcn/ui Components
+
+## Table of Contents
+
+## Initializing `shadcn/ui`
+
+To install the `shadcn/ui` library, which provides a set of accessible and customizable UI components for React, run the following command in your terminal:
+
+```bash
+npx shadcn@latest init
+```
+
+This command will set up the `shadcn/ui` library in your Next.js project, allowing you to use its components in your portfolio website.
+
+It will prompt you to choose a base color for your Tailwind CSS configuration. You can select from the following options:
+
+```bash
+tmchuynh@tmch:~/Documents/my-portfolio$ npx shadcn@latest init
+✔ Preflight checks.
+✔ Verifying framework. Found Next.js.
+✔ Validating Tailwind CSS config. Found v4.
+✔ Validating import alias.
+? Which color would you like to use as the base color? › - Use arrow-keys. Return to submit.
+❯   Neutral
+    Gray
+    Zinc
+    Stone
+    Slate
+```
+
+After selecting a base color, the command will proceed to set up the necessary files and configurations for the `shadcn/ui` components in your project.
+
+```bash
+tmchuynh@tmch:~/Documents/my-portfolio$ npx shadcn@latest init
+✔ Preflight checks.
+✔ Verifying framework. Found Next.js.
+✔ Validating Tailwind CSS config. Found v4.
+✔ Validating import alias.
+✔ Which color would you like to use as the base color? › Neutral
+✔ Writing components.json.
+✔ Checking registry.
+✔ Updating CSS variables in src/app/globals.css
+✔ Installing dependencies.
+✔ Created 1 file:
+  - src/lib/utils.ts
+
+Success! Project initialization completed.
+You may now add components.
+```
+
+### `components.json` file
+
+It will create a `components.json` file in your project directory, which contains the configuration for the `shadcn/ui` components.
+
+```json
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "aliases": {
+    "components": "@/components",
+    "hooks": "@/hooks",
+    "lib": "@/lib",
+    "ui": "@/components/ui",
+    "utils": "@/lib/utils"
+  },
+  "iconLibrary": "lucide",
+  "rsc": true,
+  "style": "new-york",
+  "tailwind": {
+    "baseColor": "neutral",
+    "config": "",
+    "css": "src/app/globals.css",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "tsx": true
+}
+```
+
+### `src/lib/utils.ts` file
+
+It will also create your `lib/` directory, which contains utility functions and hooks for your project. For right now, it will contain a `utils.ts` file with some utility functions that you can use in your project.
+
+The file will look like this:
+
+```typescript
+// src/lib/utils.ts
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+```
+
+This utility function `cn` is used to merge class names together, which is useful for styling components with Tailwind CSS.
+
+For example, you can use it to conditionally apply classes to your components based on certain conditions.
+
+```typescript
+import { cn } from "@/lib/utils";
+const Button = ({ primary, className }) => {
+  return (
+    <button className={cn("btn", primary && "btn-primary", className)}>
+      Click Me
+    </button>
+  );
+};
+```
+
+### Updating `globals.css`
+
+The last thing this command does is update your `globals.css` file to include the necessary styles for the `shadcn/ui` components.
+
+Your `globals.css` file will now include the following styles:
+
+```css
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.13 0.028 261.692);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.13 0.028 261.692);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.13 0.028 261.692);
+  --primary: oklch(0.21 0.034 264.665);
+  --primary-foreground: oklch(0.985 0.002 247.839);
+  --secondary: oklch(0.967 0.003 264.542);
+  --secondary-foreground: oklch(0.21 0.034 264.665);
+  --muted: oklch(0.967 0.003 264.542);
+  --muted-foreground: oklch(0.551 0.027 264.364);
+  --accent: oklch(0.967 0.003 264.542);
+  --accent-foreground: oklch(0.21 0.034 264.665);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.928 0.006 264.531);
+  --input: oklch(0.928 0.006 264.531);
+  --ring: oklch(0.707 0.022 261.325);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0.002 247.839);
+  --sidebar-foreground: oklch(0.13 0.028 261.692);
+  --sidebar-primary: oklch(0.21 0.034 264.665);
+  --sidebar-primary-foreground: oklch(0.985 0.002 247.839);
+  --sidebar-accent: oklch(0.967 0.003 264.542);
+  --sidebar-accent-foreground: oklch(0.21 0.034 264.665);
+  --sidebar-border: oklch(0.928 0.006 264.531);
+  --sidebar-ring: oklch(0.707 0.022 261.325);
+}
+
+.dark {
+  --background: oklch(0.13 0.028 261.692);
+  --foreground: oklch(0.985 0.002 247.839);
+  --card: oklch(0.21 0.034 264.665);
+  --card-foreground: oklch(0.985 0.002 247.839);
+  --popover: oklch(0.21 0.034 264.665);
+  --popover-foreground: oklch(0.985 0.002 247.839);
+  --primary: oklch(0.928 0.006 264.531);
+  --primary-foreground: oklch(0.21 0.034 264.665);
+  --secondary: oklch(0.278 0.033 256.848);
+  --secondary-foreground: oklch(0.985 0.002 247.839);
+  --muted: oklch(0.278 0.033 256.848);
+  --muted-foreground: oklch(0.707 0.022 261.325);
+  --accent: oklch(0.278 0.033 256.848);
+  --accent-foreground: oklch(0.985 0.002 247.839);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.551 0.027 264.364);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.21 0.034 264.665);
+  --sidebar-foreground: oklch(0.985 0.002 247.839);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0.002 247.839);
+  --sidebar-accent: oklch(0.278 0.033 256.848);
+  --sidebar-accent-foreground: oklch(0.985 0.002 247.839);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+```
+
+<BackToTop />
+### About oklch colors
+
+The `shadcn/ui` library uses the `oklch` color space for its color variables. The `oklch` color space is a perceptually uniform color space that provides a more consistent and intuitive way to work with colors compared to traditional RGB or HSL color spaces.
+
+If you're more comfortable with hex or RGB colors, you can easily convert `oklch` colors to those formats using online tools or libraries. However, it's recommended to use `oklch` colors when working with the `shadcn/ui` library to take advantage of its design system and ensure consistency across your project.
+The `oklch` color space is based on the CIELAB color space, which is designed to be more perceptually uniform. This means that colors in the `oklch` space are more consistent in terms of how they appear to the human eye, regardless of the device or lighting conditions.
+
+The `oklch` color space is defined by three components: lightness (L), chroma (C), and hue (H). The lightness component represents how light or dark a color is, the chroma component represents the intensity or saturation of the color, and the hue component represents the color itself (e.g., red, green, blue).
+
+The `oklch` color space is designed to be more intuitive and easier to work with than traditional RGB or HSL color spaces. It allows designers and developers to create colors that are more visually consistent and accessible, making it easier to create designs that look good across different devices and lighting conditions
+
+You can learn more about the `oklch` color space and how to use it in your designs by visiting the [oklch documentation](https://www.w3.org/TR/css-color-4/#oklch).
+
+Maybe you're wondering why the `shadcn/ui` library uses `oklch` colors instead of the more traditional RGB or HSL colors. The reason is that `oklch` colors are designed to be more perceptually uniform, meaning that they look more consistent across different devices and lighting conditions.
+
+### VSCode Extensions for Working with `oklch` Colors
+
+When working with `oklch` colors in your code, you might find it helpful to have a color picker or preview tool.
+
+A few helpful VSCode extensions can help you work with `oklch` colors:
+
+[OKLCH Color Preview](https://marketplace.visualstudio.com/items?itemName=nize.oklch-preview): A VSCode extension that provides a color preview for `oklch` colors, allowing you to see the colors in your code.
+
+![OKLCH Color Preview](https://github.com/user-attachments/assets/d619d658-ddb1-4116-8bf1-c00876cbe873)
+
+[Color Highlight](https://marketplace.visualstudio.com/items?itemName=naumovs.color-highlight): Highlights colors in your code, including `oklch` colors.
+
+![Color Picker](https://github.com/Enivia/oklch-decorator-extension/raw/HEAD/images/oklch-decorator.gif)
+
+[Shadcn Color Tool](https://marketplace.visualstudio.com/items?itemName=origin-space.shadcn-color-tool): A VSCode extension that provides a color picker for `shadcn/ui` colors, including `oklch` colors.
+
+![Shadcn Color Tool](https://github.com/origin-space/shadcn-color-tool/raw/HEAD/images/3.gif)
+
+<BackToTop />
+
+## Downloading the shadcn/ui components
+
+To download the `shadcn/ui` components, you can use the `npx shadcn@latest add` command followed by the component name. For example, to add the `Button` component, you would run:
+
+```bash
+npx shadcn@latest add button
+```
+
+This command will download the `Button` component and its dependencies, and add it to your project.
+
+You can also add multiple components at once by separating their names with a space. For example, to add the `Button`, `Card`, and `Input` components, you would run:
+
+```bash
+npx shadcn@latest add button card input
+```
+
+For this portfolio website, we will be adding the following components:
+
+- `Accordion`
+- `Badge`
+- `Breadcrumb`
+- `Button`
+- `Card`
+- `Carousel`
+- `Checkbox`
+- `Checkbox`
+- `Dialog`
+- `DropdownMenu`
+- `Input`
+- `Label`
+- `NavigationMenu`
+- `Select`
+- `Separator`
+- `Sidebar`
+- `Sonner`
+- `Switch`
+- `Tabs`
+- `Textarea`
+- `Toggle`
+- `Tooltip`
+
+You can add all of these components at once by running the following command:
+
+```bash
+npx shadcn@latest add accordion badge breadcrumb button card carousel checkbox dialog dropdown-menu input label navigation-menu select separator sidebar sonner switch tabs textarea toggle tooltip
+```
+
+After you run this command, you'll find the component files in the `src/components/ui/` directory, and you can start using them in your project.
+
+Your `src/components/ui/` directory will look like this:
+
+```src
+└── components
+    └── ui
+        ├── accordion
+        ├── badge
+        ├── breadcrumb
+        ├── button
+        ├── card
+        ├── carousel
+        ├── checkbox
+        ├── dialog
+        ├── dropdown-menu
+        ├── input
+        ├── label
+        ├── navigation-menu
+        ├── select
+        ├── separator
+        ├── sidebar
+        ├── sonner
+        ├── switch
+        ├── tabs
+        ├── textarea
+        ├── toggle
+        └── tooltip
+```
+
+<BackToTop />
+
+### Using the Components
+
+Once you've added the components, you can start using them in your project. Each component will have its own directory with a `ComponentName.tsx` file and a `ComponentName.css` file.
+
+You can then use these components in your JSX like this:
+
+```jsx
+import { Button } from "@/components/ui/button";
+
+export function ButtonSecondary() {
+  return <Button>Button</Button>;
+}
+```
+
+```jsx
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardAction,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+
+export function CardDemo() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Card Title</CardTitle>
+        <CardDescription>Card Description</CardDescription>
+        <CardAction>Card Action</CardAction>
+      </CardHeader>
+      <CardContent>
+        <p>Card Content</p>
+      </CardContent>
+      <CardFooter>
+        <p>Card Footer</p>
+      </CardFooter>
+    </Card>
+  );
+}
+```
+
+```jsx
+import { Input } from "@/components/ui/input";
+export function InputDemo() {
+  return <Input type="email" placeholder="Email" />;
+}
+```
+
+```jsx
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+export function InputFile() {
+  return (
+    <div className="grid w-full max-w-sm items-center gap-3">
+      <Label htmlFor="picture">Picture</Label>
+      <Input id="picture" type="file" />
+    </div>
+  );
+}
+```
+
+This will render the `Button`, `Card`, and `Input` components with the styles and functionality provided by the `shadcn/ui` library.
+
+<BackToTop />
+
+### Customizing the Components
+
+You can customize the components by passing props to them. Each component will have its own set of props that you can use to modify its behavior and appearance.
+For example, the `Button` component might have a `variant` prop that allows you to change its style:
+
+```jsx
+import { Button } from "@/components/ui/button";
+export function ButtonSecondary() {
+  return <Button variant="secondary">Secondary</Button>;
+}
+```
+
+You can also use the `className` prop to apply additional styles to the components:
+
+```jsx
+import { Button } from "@/components/ui/button";
+export function ButtonSecondary() {
+  return <Button className="bg-blue-500 text-white">Secondary</Button>;
+}
+```
+
+You can also include the components in your pages or other components by importing them and using them in your JSX. For example, you can create a `Button` component like this:
+
+```jsx
+import { IconGitBranch } from "@tabler/icons-react";
+
+import { Button } from "@/components/ui/button";
+
+export function ButtonWithIcon() {
+  return (
+    <Button variant="outline" size="sm">
+      <IconGitBranch /> New Branch
+    </Button>
+  );
+}
+```
+
+This will render a button with an icon and some text. You can use any of the icons from the `@tabler/icons-react` library, or any other icon library you prefer.
+
+You can also pass additional props to the components to customize their behavior. For example, you can pass an `onClick` prop to the `Button` component to handle click events:
+
+```jsx
+import { Button } from "@/components/ui/button";
+export function ButtonWithClick() {
+  const handleClick = () => {
+    console.log("Button clicked!");
+  };
+  return <Button onClick={handleClick}>Click Me</Button>;
+}
+```
+
+### Documentation
+
+For more information on how to use the `shadcn/ui` components, you can refer to the official documentation at [shadcn/ui documentation](https://ui.shadcn.com/docs/overview).
+
+<BackToTop />

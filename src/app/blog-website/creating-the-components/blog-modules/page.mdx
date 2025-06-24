@@ -549,7 +549,6 @@ export default function BlogNavigationDialog({
 
 <BackToTop />
 
-
 ### Step-by-Step Tutorial Preview Dialog
 
 ```tsx
@@ -1235,3 +1234,578 @@ export default function SocialSharingBlogDialog({
 ```
 
 <BackToTop />
+
+## Alert Dialogs vs Regular Dialogs
+
+Understanding the difference between Alert Dialogs and Regular Dialogs is crucial for creating effective user interfaces. Each serves different purposes and provides distinct user experiences.
+
+### What are Alert Dialogs?
+
+Alert Dialogs are modal components specifically designed for critical interactions that require immediate user attention. They typically interrupt the user's workflow to present important information, confirmations, or warnings.
+
+#### Key Characteristics of Alert Dialogs:
+
+- **Modal and Blocking**: They prevent interaction with the rest of the application
+- **Focus Management**: Automatically trap focus within the dialog
+- **Accessibility**: Built-in ARIA attributes for screen readers
+- **Simplified Actions**: Usually limited to 1-3 action buttons
+- **No Dismiss on Outside Click**: Generally can't be closed by clicking outside
+
+### What are Regular Dialogs?
+
+Regular Dialogs are more flexible modal components that can display various types of content, from simple messages to complex forms and interactive elements.
+
+#### Key Characteristics of Regular Dialogs:
+
+- **Flexible Content**: Can contain any type of content or components
+- **Customizable Behavior**: More control over dismiss actions and interactions
+- **Rich Interactions**: Support for forms, media, navigation, etc.
+- **Variable Sizing**: Can be resized or have custom dimensions
+- **Multiple Dismiss Options**: Can be closed via buttons, outside clicks, or escape key
+
+<BackToTop />
+
+## Comparison: Alert Dialogs vs Regular Dialogs
+
+### Alert Dialogs
+
+#### ✅ Advantages
+
+- **Clear Intent**: Designed specifically for critical actions and confirmations
+- **Accessibility First**: Built-in ARIA roles and keyboard navigation
+- **Consistent UX**: Standardized patterns users expect for confirmations
+- **Lightweight**: Minimal API surface and simple implementation
+- **Focus Management**: Automatic focus trapping and restoration
+- **Semantic HTML**: Proper dialog role attributes for assistive technologies
+
+#### ❌ Disadvantages
+
+- **Limited Flexibility**: Restricted content types and layouts
+- **Basic Styling**: Less customization options for visual design
+- **Simple Actions**: Usually limited to confirmation/cancellation patterns
+- **No Rich Content**: Cannot easily embed complex components or media
+- **Fixed Behavior**: Less control over interaction patterns
+
+#### 🎯 Best Use Cases for Alert Dialogs
+
+- **Destructive Actions**: Confirming deletions, permanent changes
+- **Error Messages**: Critical system errors requiring acknowledgment
+- **Data Loss Prevention**: Warning before losing unsaved work
+- **Permission Requests**: Asking for user consent or authorization
+- **System Notifications**: Important system-wide announcements
+- **Confirmation Actions**: Validating high-impact user decisions
+
+```tsx
+// Example: Destructive Action Confirmation
+<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <Button variant="destructive">Delete Account</Button>
+  </AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+      <AlertDialogDescription>
+        This action cannot be undone. This will permanently delete your
+        account and remove your data from our servers.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction>Yes, delete account</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
+### Regular Dialogs
+
+#### ✅ Advantages
+
+- **Maximum Flexibility**: Can contain any content, from simple text to complex UIs
+- **Rich Interactions**: Support for forms, media players, step-by-step wizards
+- **Custom Styling**: Full control over appearance and animations
+- **Advanced Behavior**: Configurable dismiss options and interaction patterns
+- **Responsive Design**: Can adapt to different screen sizes and orientations
+- **Component Composition**: Easy integration with other UI components
+
+#### ❌ Disadvantages
+
+- **More Complex**: Requires more setup and configuration
+- **Accessibility Responsibility**: Need to manually implement proper ARIA attributes
+- **Inconsistent UX**: Can create non-standard interaction patterns
+- **Performance Impact**: Potentially heavier with complex content
+- **Focus Management**: Manual implementation of focus trapping
+- **Testing Complexity**: More scenarios to test due to flexibility
+
+#### 🎯 Best Use Cases for Regular Dialogs
+
+- **Content Preview**: Showing blog post previews, image galleries
+- **Forms and Data Entry**: User profiles, settings, content creation
+- **Multi-step Processes**: Onboarding flows, setup wizards
+- **Rich Media**: Video players, audio content, interactive demos
+- **Content Management**: Editing interfaces, content organization
+- **Information Display**: Detailed views, help documentation
+
+```tsx
+// Example: Rich Content Dialog
+<Dialog open={open} onOpenChange={setOpen}>
+  <DialogTrigger asChild>
+    <Button>View Blog Details</Button>
+  </DialogTrigger>
+  <DialogContent className="max-w-4xl">
+    <DialogHeader>
+      <DialogTitle>{post.title}</DialogTitle>
+      <DialogDescription>{post.excerpt}</DialogDescription>
+    </DialogHeader>
+    
+    <div className="space-y-4">
+      <Image src={post.image} alt={post.title} width={800} height={400} />
+      <div className="prose prose-lg">{post.content}</div>
+      
+      <div className="flex gap-2">
+        {post.tags.map(tag => (
+          <Badge key={tag} variant="secondary">{tag}</Badge>
+        ))}
+      </div>
+    </div>
+    
+    <DialogFooter>
+      <Button variant="outline" onClick={() => setOpen(false)}>Close</Button>
+      <Button>Read Full Article</Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+<BackToTop />
+
+## Implementation Examples
+
+### Alert Dialog Implementation
+
+```tsx
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Trash2, AlertTriangle } from "lucide-react";
+
+export function DeletePostDialog({ postId, postTitle, onDelete }) {
+  const handleDelete = async () => {
+    try {
+      await onDelete(postId);
+      // Handle success (e.g., show toast, redirect)
+    } catch (error) {
+      // Handle error
+      console.error('Failed to delete post:', error);
+    }
+  };
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="destructive" size="sm">
+          <Trash2 className="h-4 w-4 mr-2" />
+          Delete Post
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-orange-500" />
+            Delete Blog Post
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to delete "{postTitle}"? This action cannot be undone 
+            and will permanently remove the post and all its associated data.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction 
+            onClick={handleDelete}
+            className="bg-red-600 hover:bg-red-700"
+          >
+            Yes, Delete Post
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+```
+
+### Regular Dialog with Complex Content
+
+```tsx
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
+import { useState } from "react";
+
+export function EditPostDialog({ post, onSave }) {
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    title: post.title,
+    excerpt: post.excerpt,
+    content: post.content,
+    tags: post.tags,
+  });
+  const [newTag, setNewTag] = useState("");
+
+  const handleSave = async () => {
+    try {
+      await onSave(formData);
+      setOpen(false);
+    } catch (error) {
+      console.error('Failed to save post:', error);
+    }
+  };
+
+  const addTag = () => {
+    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
+      setFormData(prev => ({
+        ...prev,
+        tags: [...prev.tags, newTag.trim()]
+      }));
+      setNewTag("");
+    }
+  };
+
+  const removeTag = (tagToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      tags: prev.tags.filter(tag => tag !== tagToRemove)
+    }));
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline">Edit Post</Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Edit Blog Post</DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-6 mt-6">
+          <div className="space-y-2">
+            <Label htmlFor="title">Title</Label>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              placeholder="Enter post title..."
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="excerpt">Excerpt</Label>
+            <Textarea
+              id="excerpt"
+              value={formData.excerpt}
+              onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
+              placeholder="Brief description of the post..."
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="content">Content</Label>
+            <Textarea
+              id="content"
+              value={formData.content}
+              onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+              placeholder="Write your post content..."
+              rows={10}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Tags</Label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {formData.tags.map((tag) => (
+                <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                  {tag}
+                  <X 
+                    className="h-3 w-3 cursor-pointer hover:text-red-500" 
+                    onClick={() => removeTag(tag)}
+                  />
+                </Badge>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                placeholder="Add a tag..."
+                onKeyPress={(e) => e.key === 'Enter' && addTag()}
+              />
+              <Button type="button" onClick={addTag} variant="outline">
+                Add Tag
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2 mt-6 pt-6 border-t">
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleSave}>
+            Save Changes
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+<BackToTop />
+
+## Decision Matrix: When to Use Which
+
+### Use Alert Dialog When:
+
+| Scenario | Why Alert Dialog |
+|----------|-----------------|
+| **Confirming Deletions** | Users need clear warning about irreversible actions |
+| **System Errors** | Critical errors require immediate acknowledgment |
+| **Data Loss Warnings** | Preventing accidental loss of user work |
+| **Permission Requests** | Clear consent flows for sensitive operations |
+| **Account Actions** | Confirming account-level changes (deletion, suspension) |
+| **Logout Confirmations** | Ensuring users don't accidentally lose their session |
+
+### Use Regular Dialog When:
+
+| Scenario | Why Regular Dialog |
+|----------|-------------------|
+| **Content Previews** | Rich content display with images, formatting, interactions |
+| **Form Interfaces** | Complex forms with multiple fields and validation |
+| **Media Players** | Video/audio content requiring custom controls |
+| **Step-by-Step Flows** | Multi-step processes with navigation |
+| **Settings Panels** | Configuration interfaces with multiple options |
+| **Help Documentation** | Detailed information with formatting and links |
+
+## Accessibility Considerations
+
+### Alert Dialog Accessibility
+
+```tsx
+// Alert dialogs automatically include proper ARIA attributes
+<AlertDialog>
+  {/* Automatically includes:
+      - role="alertdialog"
+      - aria-labelledby pointing to title
+      - aria-describedby pointing to description
+      - focus trapping
+      - escape key handling
+  */}
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>
+        {/* This becomes the accessible label */}
+        Confirm Action
+      </AlertDialogTitle>
+      <AlertDialogDescription>
+        {/* This becomes the accessible description */}
+        This action will permanently delete your data.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
+### Regular Dialog Accessibility
+
+```tsx
+// Regular dialogs require manual accessibility setup
+<Dialog>
+  <DialogContent 
+    role="dialog"
+    aria-labelledby="dialog-title"
+    aria-describedby="dialog-description"
+  >
+    <DialogHeader>
+      <DialogTitle id="dialog-title">
+        Edit Profile
+      </DialogTitle>
+    </DialogHeader>
+    
+    {/* Ensure focus management */}
+    <div id="dialog-description" className="sr-only">
+      Form to edit your user profile information
+    </div>
+    
+    {/* Provide clear navigation and actions */}
+    <form onSubmit={handleSubmit}>
+      {/* Form fields with proper labels */}
+    </form>
+  </DialogContent>
+</Dialog>
+```
+
+## Best Practices Summary
+
+### For Alert Dialogs:
+1. **Keep titles concise** but descriptive
+2. **Use clear, action-oriented language** in buttons
+3. **Provide sufficient context** in descriptions
+4. **Use appropriate visual indicators** (icons, colors)
+5. **Test with screen readers** to ensure accessibility
+
+### For Regular Dialogs:
+1. **Implement proper focus management** manually
+2. **Add appropriate ARIA attributes** for accessibility
+3. **Keep content scannable** with clear hierarchy
+4. **Provide multiple ways to close** the dialog
+5. **Optimize for mobile** responsive design
+6. **Consider performance** with complex content
+
+### Universal Guidelines:
+- **Always provide a way to cancel** or go back
+- **Use consistent language** across your application
+- **Test keyboard navigation** thoroughly
+- **Consider mobile users** with touch interfaces
+- **Provide feedback** for user actions (loading states, success messages)
+
+<BackToTop />
+
+## Advanced Pattern: Conditional Dialog Type
+
+Sometimes you might want to dynamically choose between alert and regular dialogs based on the context:
+
+```tsx
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+interface ConditionalDialogProps {
+  mode: 'alert' | 'regular';
+  trigger: React.ReactNode;
+  title: string;
+  description?: string;
+  children?: React.ReactNode;
+  onConfirm?: () => void;
+  onCancel?: () => void;
+}
+
+export function ConditionalDialog({
+  mode,
+  trigger,
+  title,
+  description,
+  children,
+  onConfirm,
+  onCancel
+}: ConditionalDialogProps) {
+  const [open, setOpen] = useState(false);
+
+  if (mode === 'alert') {
+    return (
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogTrigger asChild>
+          {trigger}
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{title}</AlertDialogTitle>
+            {description && (
+              <AlertDialogDescription>{description}</AlertDialogDescription>
+            )}
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onConfirm}>Confirm</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {trigger}
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+        </DialogHeader>
+        {children}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// Usage example
+function BlogPostActions({ post, hasUnsavedChanges }) {
+  return (
+    <div className="flex gap-2">
+      <ConditionalDialog
+        mode={hasUnsavedChanges ? "alert" : "regular"}
+        trigger={<Button>Delete Post</Button>}
+        title={hasUnsavedChanges ? "Unsaved Changes" : "Delete Post"}
+        description={
+          hasUnsavedChanges 
+            ? "You have unsaved changes. Are you sure you want to delete this post?"
+            : undefined
+        }
+        onConfirm={() => deletePost(post.id)}
+      >
+        {!hasUnsavedChanges && (
+          <div className="space-y-4">
+            <p>Are you sure you want to delete "{post.title}"?</p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={() => deletePost(post.id)}>
+                Delete
+              </Button>
+            </div>
+          </div>
+        )}
+      </ConditionalDialog>
+    </div>
+  );
+}
+```
+
+This pattern allows you to adapt the dialog type based on the current application state or user context, providing the most appropriate user experience for each situation.

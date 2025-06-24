@@ -6,32 +6,27 @@ import BackToTop from "@/components/BackToTop";
 
 ## Overview
 
+Now that you have your `providers.tsx` file set up, you can create a global layout for your Next.js application. This layout will be used to wrap all of your pages, providing a consistent structure and styling across your application.
+
 ## The `layout.tsx` File
 
-The `layout.tsx` file is a crucial part of your Next.js application, as it defines the global layout for your pages. This file is responsible for rendering the common structure of your website, such as headers, footers, and any other components that should be present on every page.
-
-It allows you to maintain a consistent look and feel across your application while also providing a place to include global styles and scripts.
+We will be adding onto the `layout.tsx` file later on in the course, but for now, we will be setting up the root layout. This will allow us to use the `shadcn/ui` components with our custom theme.
 
 ```tsx
-import LayoutWrapper from "@/components/LayoutWrapper";
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+// src/app/layout.tsx
+
 import "./globals.css";
+import { Providers } from "./providers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "Intro to Web Development",
-};
-
+/**
+ * RootLayout is the main layout component for the "Getting Set Up" section
+ * of the ecommerce platform application. It wraps all child components and
+ * provides a consistent structure and styling for the page.
+ *
+ * @param {Object} props - The properties passed to the layout component.
+ * @param {React.ReactNode} props.children - The content to be rendered within the layout.
+ * @returns {JSX.Element} The rendered layout component.
+ */
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -39,96 +34,30 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <LayoutWrapper>{children}</LayoutWrapper>
+      <body className="relative flex flex-col min-h-screen">
+        <Providers>
+          <main className="flex-grow mx-auto mt-24 md:pb-0 w-10/12 md:w-11/12 xl:w-full">
+            {children}
+          </main>
+        </Providers>
       </body>
     </html>
   );
 }
 ```
 
-This code sets up a global layout for your Next.js application, applying custom fonts and ensuring that the layout is consistent across all pages.
-
 ##### Explanation of the Code
 
-- **Imports**: The code imports necessary components and styles, including the `LayoutWrapper` component, which will be used to wrap the main content of the application.
-- **Fonts**: It uses the `Geist` and `Geist_Mono` fonts from Google Fonts, applying them as CSS variables for use throughout the application.
-- **Metadata**: The `metadata` object defines the title of the application, which will be used in the HTML `<head>` section.
-- **RootLayout Component**: This component serves as the root layout for the application. It wraps the `children` prop (the main content of the page) in a `<LayoutWrapper>` component, ensuring that the layout is applied consistently across all pages.
-- **HTML Structure**: The `<html>` and `<body>` elements are set up with the appropriate language and font settings, and the `suppressHydrationWarning` prop is used to prevent hydration warnings during server-side rendering.
-- **Antialiasing**: The `antialiased` class is applied to the body to improve text rendering quality across different browsers.
-
-<BackToTop />
-
-## The `LayoutWrapper.tsx` Component
-
-The `LayoutWrapper.tsx` component is responsible for defining the overall structure of your application's layout. It typically includes elements like the header, footer, and any other components that should be present on every page.
-
-```tsx
-"use client";
-
-import { useState } from "react";
-import Sidebar from "./Sidebar";
-import { ThemeProvider } from "./ThemeProvider";
-import TopNavbar from "./TopNavbar";
-
-interface LayoutWrapperProps {
-  children: React.ReactNode;
-}
-
-export default function LayoutWrapper({ children }: LayoutWrapperProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  const closeSidebar = () => {
-    setSidebarOpen(false);
-  };
-
-  return (
-    <ThemeProvider>
-      <div className="flex h-screen">
-        {/* Sidebar */}
-        <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
-
-        {/* Main content area */}
-        <div className="flex flex-1 flex-col min-w-0">
-          {/* Top navbar */}
-          <TopNavbar onToggleSidebar={toggleSidebar} />
-
-          {/* Main content */}
-          <main className="flex-1 overflow-auto">
-            <div className="mx-auto px-4 lg:px-8 py-8">{children}</div>
-          </main>
-        </div>
-      </div>
-    </ThemeProvider>
-  );
-}
-```
-
-This component sets up the main layout structure, including a sidebar for navigation and a top navbar for additional controls. It uses React state to manage the sidebar's open/closed state and provides functions to toggle and close the sidebar.
-
-##### Explanation of the Code
-
-- **Imports**: The component imports necessary hooks and components, including `useState` for managing state, `Sidebar` for the sidebar navigation, `ThemeProvider` for theming support, and `TopNavbar` for the top navigation bar.
-- **LayoutWrapperProps Interface**: This interface defines the props that the `LayoutWrapper` component expects, specifically the `children` prop, which represents the main content of the page.
-- **State Management**: The component uses the `useState` hook to manage the `sidebarOpen` state, which determines whether the sidebar is currently open or closed.
-- **Toggle and Close Functions**: The `toggleSidebar` function toggles the sidebar's open/closed state, while the `closeSidebar` function sets the sidebar to closed.
-- **JSX Structure**: The component returns a JSX structure that includes:
-  - A `ThemeProvider` to apply theming across the application.
-  - A `Sidebar` component that receives the `isOpen` state and `onClose` function as props.
-  - A main content area that includes a `TopNavbar` for navigation controls and a `main` section that renders the `children` prop, which contains the main content of the page.
-- **Styling**: The layout uses Tailwind CSS classes for styling, ensuring a responsive and visually appealing design. The `flex` classes create a flexible layout, while the `overflow-auto` class allows the main content area to scroll if it exceeds the available height.
+- **Imports**: The `globals.css` file is imported to apply global styles, and the `Providers` component is imported to wrap the application in necessary context providers.
+- **RootLayout Function**: This function defines the root layout of the application. It accepts a `children` prop, which represents the content of the page.
+- **JSX Structure**: The function returns a JSX structure that includes:
+  - An `html` element with a `lang` attribute set to "en" for English language support and `suppressHydrationWarning` to prevent hydration warnings.
+  - A `body` element with a class that sets up a flexible layout.
+  - The `Providers` component wraps the main content to provide context and state management.
+- **Main Content Area**: The `main` element is styled to be responsive, with margins and widths set to ensure proper layout across different screen sizes. The `children` prop is rendered inside the `main` element, allowing the content of each page to be displayed within this layout.
 
 <BackToTop />
 
 ## Next Steps
 
-Now that you have inputted the `<Sidebar />` and `<TopNavbar />` components, you can proceed to implement the individual components that make up the sidebar and top navbar. These components will handle navigation and user interactions, providing a seamless experience for your users.
-
-Let's continue to the next section on Navigation Components](/blog-website/getting-set-up/navigation/navigation-components)
+Head to [shadcn/ui Components](/ecommerce-platform/getting-set-up/shadcn) to continue setting up your application.

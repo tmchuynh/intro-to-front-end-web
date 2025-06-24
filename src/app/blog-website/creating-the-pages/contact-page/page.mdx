@@ -176,7 +176,234 @@ Let's go over a few of these examples:
 You can add a loading spinner to indicate that the form is being submitted. This can be done by using a state variable to track the submission status and conditionally rendering a spinner component.
 
 ```tsx
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2 } from "lucide-react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { toast } from "@/components/ui/use-toast";
 
+const contactFormSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  message: z.string().min(10, "Message must be at least 10 characters long"),
+});
+
+export default function ContactFormWithSpinner() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const form = useForm({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      message: "",
+    },
+  });
+
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      
+      // Simulate success/error randomly for demo
+      if (Math.random() > 0.3) {
+        toast({
+          title: "Success!",
+          description: "Your message has been sent successfully.",
+        });
+        form.reset();
+      } else {
+        throw new Error("Submission failed");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-6">Contact Us</h2>
+      
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Full Name</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    placeholder="Enter your full name"
+                    disabled={isSubmitting}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email Address</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    type="email" 
+                    placeholder="Enter your email"
+                    disabled={isSubmitting}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="message"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Message</FormLabel>
+                <FormControl>
+                  <Textarea 
+                    {...field} 
+                    placeholder="Enter your message"
+                    rows={4}
+                    disabled={isSubmitting}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <Button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="w-full"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Sending Message...
+              </>
+            ) : (
+              "Send Message"
+            )}
+          </Button>
+        </form>
+      </Form>
+      
+      {isSubmitting && (
+        <div className="mt-4 text-center">
+          <div className="inline-flex items-center px-4 py-2 bg-blue-50 rounded-lg">
+            <Loader2 className="mr-2 h-4 w-4 animate-spin text-blue-600" />
+            <span className="text-sm text-blue-600">Processing your request...</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+##### How It Works
+
+The loading spinner implementation uses several key concepts:
+
+1. **State Management**: The `isSubmitting` state variable tracks whether the form is currently being processed.
+
+2. **Conditional Rendering**: The button content changes based on the `isSubmitting` state:
+   - When `false`: Shows "Send Message"
+   - When `true`: Shows a spinning loader icon with "Sending Message..."
+
+3. **Form Disabling**: All form inputs are disabled during submission using the `disabled={isSubmitting}` prop, preventing user interaction while processing.
+
+4. **Visual Feedback**: Multiple loading indicators provide clear feedback:
+   - Button spinner with text change
+   - Additional loading message below the form
+   - Disabled form inputs with visual styling
+
+5. **Error Handling**: The form handles both success and error states, updating the UI accordingly and resetting the loading state in the `finally` block.
+
+##### Customization Options
+
+You can customize the loading experience in several ways:
+
+**Spinner Variations:**
+```tsx
+// Different spinner icons
+import { Loader, RotateCw, Circle } from "lucide-react";
+
+// Custom spinner with different animations
+<RotateCw className="mr-2 h-4 w-4 animate-spin" />
+<Circle className="mr-2 h-4 w-4 animate-pulse" />
+```
+
+**Loading Text Customization:**
+```tsx
+const loadingMessages = [
+  "Sending your message...",
+  "Processing request...",
+  "Almost done...",
+];
+
+// Cycle through messages during long operations
+const [messageIndex, setMessageIndex] = useState(0);
+```
+
+**Progress Indicators:**
+```tsx
+import { Progress } from "@/components/ui/progress";
+
+// Add progress bar for longer operations
+const [progress, setProgress] = useState(0);
+
+// Simulate progress during submission
+useEffect(() => {
+  if (isSubmitting) {
+    const timer = setInterval(() => {
+      setProgress((prev) => Math.min(prev + 10, 90));
+    }, 300);
+    return () => clearInterval(timer);
+  }
+}, [isSubmitting]);
+```
+
+**Custom Loading Overlay:**
+```tsx
+{isSubmitting && (
+  <div className="absolute inset-0 bg-white/80 flex items-center justify-center rounded-lg">
+    <div className="flex flex-col items-center">
+      <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      <p className="mt-2 text-sm text-blue-600">Sending your message...</p>
+    </div>
+  </div>
+)}
 ```
 
 <BackToTop />
@@ -186,115 +413,1029 @@ You can add a loading spinner to indicate that the form is being submitted. This
 You can add additional fields to the contact form, such as a subject field and a phone number field. You can also customize the submit button to change its appearance or behavior.
 
 ```tsx
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Send, Phone, Mail, User, MessageSquare } from "lucide-react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { toast } from "@/components/ui/use-toast";
 
+const enhancedContactFormSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(10, "Please enter a valid phone number").optional(),
+  subject: z.string().min(1, "Please select a subject"),
+  priority: z.enum(["low", "medium", "high"]),
+  message: z.string().min(10, "Message must be at least 10 characters long"),
+});
+
+export default function EnhancedContactForm() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const form = useForm({
+    resolver: zodResolver(enhancedContactFormSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      subject: "",
+      priority: "medium",
+      message: "",
+    },
+  });
+
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
+    try {
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      
+      toast({
+        title: "Message Sent Successfully!",
+        description: `We'll respond to your ${data.priority} priority message within 24 hours.`,
+      });
+      form.reset();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const subjectOptions = [
+    "General Inquiry",
+    "Technical Support",
+    "Billing Question",
+    "Partnership Opportunity",
+    "Bug Report",
+    "Feature Request",
+    "Other"
+  ];
+
+  return (
+    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-gray-800">Get In Touch</h2>
+        <p className="text-gray-600 mt-2">We'd love to hear from you. Send us a message!</p>
+      </div>
+      
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Full Name
+                  </FormLabel>
+                  <FormControl>
+                    <Input 
+                      {...field} 
+                      placeholder="Enter your full name"
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    Email Address
+                  </FormLabel>
+                  <FormControl>
+                    <Input 
+                      {...field} 
+                      type="email" 
+                      placeholder="Enter your email"
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2">
+                    <Phone className="h-4 w-4" />
+                    Phone Number (Optional)
+                  </FormLabel>
+                  <FormControl>
+                    <Input 
+                      {...field} 
+                      type="tel" 
+                      placeholder="+1 (555) 123-4567"
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="priority"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Priority Level</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-blue-500">
+                        <SelectValue placeholder="Select priority" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="low">🟢 Low Priority</SelectItem>
+                      <SelectItem value="medium">🟡 Medium Priority</SelectItem>
+                      <SelectItem value="high">🔴 High Priority</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          
+          <FormField
+            control={form.control}
+            name="subject"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Subject</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-blue-500">
+                      <SelectValue placeholder="What is this regarding?" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {subjectOptions.map((subject) => (
+                      <SelectItem key={subject} value={subject}>
+                        {subject}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="message"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Your Message
+                </FormLabel>
+                <FormControl>
+                  <Textarea 
+                    {...field} 
+                    placeholder="Enter your message"
+                    rows={4}
+                    disabled={isSubmitting}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <Button 
+              type="submit" 
+              disabled={isSubmitting}
+              className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                  Sending Message...
+                </>
+              ) : (
+                <>
+                  <Send className="mr-2 h-4 w-4" />
+                  Send Message
+                </>
+              )}
+            </Button>
+            
+            <Button 
+              type="button" 
+              variant="outline"
+              onClick={() => form.reset()}
+              disabled={isSubmitting}
+              className="px-6 py-3 border-2 border-gray-300 hover:border-gray-400 transition-all duration-200"
+            >
+              Clear Form
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+}
 ```
 
-<BackToTop />
+##### How It Works
 
-### Implementing Client-Side Validation with `react-hook-form`
+This enhanced contact form demonstrates several advanced concepts:
 
-You can implement client-side validation using `react-hook-form` and `zod`. This allows you to validate the form data before submission and provide immediate feedback to the user.
+1. **Extended Schema Validation**: The `enhancedContactFormSchema` includes additional fields with specific validation rules:
+   - Phone number with minimum length requirement
+   - Subject selection (required)
+   - Priority enumeration with predefined values
+   - Optional fields using `.optional()`
 
+2. **Grid Layout**: Uses CSS Grid for responsive form layout:
+   - Single column on mobile devices
+   - Two columns on medium and larger screens
+   - Automatic responsive behavior with `grid-cols-1 md:grid-cols-2`
+
+3. **Select Components**: Implements dropdown selections for:
+   - Subject categories with predefined options
+   - Priority levels with visual indicators (emoji icons)
+   - Dynamic option rendering from arrays
+
+4. **Icon Integration**: Each form field includes relevant Lucide React icons for better UX:
+   - Visual cues help users understand field purposes
+   - Consistent icon sizing and positioning
+
+5. **Enhanced Button Styling**: Custom gradient button with hover effects:
+   - Gradient background colors
+   - Scale transform on hover
+   - Shadow effects for depth
+   - Loading state with custom spinner
+
+6. **Form Reset Functionality**: Separate clear button that resets all form fields to default values.
+
+##### Customization Options
+
+You can customize this enhanced form in multiple ways:
+
+**Dynamic Subject Options:**
 ```tsx
+// Load subjects from API or CMS
+const [subjects, setSubjects] = useState([]);
 
-```
+useEffect(() => {
+  fetchSubjects().then(setSubjects);
+}, []);
 
-<BackToTop />
-
-### Integrating with a Third-Party Form Service
-
-You can integrate the contact form with a third-party form service like Formspree or Google Forms. This allows you to handle form submissions without needing to set up your own backend.
-
-```tsx
-
-```
-
-<BackToTop />
-
-### Adding a Captcha for Spam Protection
-
-You can add a captcha to the contact form to prevent spam submissions. This can be done using a service like Google reCAPTCHA or hCaptcha. You will need to include the captcha widget in the form and validate the captcha response on submission.
-
-```tsx
-
-```
-
-<BackToTop />
-
-### Implementing Error Handling for Form Submission
-
-You can implement error handling for form submission to handle cases where the submission fails. This can be done by catching errors during the submission process and displaying appropriate error messages to the user.
-
-```tsx
-
-```
-
-<BackToTop />
-
-### Adding a Redirect to a Thank You Page After Successful Submission and Confirmation Email to the User using Resend
-
-[Resend](https://resend.com/docs/send-with-nextjs) is a service that allows you to send emails easily. You can use it to send a confirmation email to the user after they submit the contact form.
-You can use the `resend` package to send emails from your Next.js application. First, install the package:
-
-```bash
-npm install resend
-```
-
-Then, you can create a function to send the email after the form submission. Here’s an example of how to do this:
-
-```tsx
-import Resend from "resend";
-const resend = new Resend(process.env.RESEND_API_KEY);
-const sendConfirmationEmail = async (email: string, name: string) => {
-  try {
-    await resend.emails.send({
-      from: "Your Name <insert your email here>",
-      to: email,
-      subject: "Thank You for Contacting Us",
-      html: `<p>Hi ${name},</p><p>Thank you for reaching out to us! We have received your message and will get back to you shortly.</p><p>Best regards,<br>Your Team</p>`,
-    });
-  } catch (error) {
-    console.error("Error sending confirmation email:", error);
-    throw new Error("Failed to send confirmation email");
-  }
+// Conditional subjects based on user type
+const getSubjectOptions = (userType) => {
+  const baseSubjects = ["General Inquiry", "Technical Support"];
+  const premiumSubjects = ["Priority Support", "Account Manager"];
+  
+  return userType === "premium" 
+    ? [...baseSubjects, ...premiumSubjects]
+    : baseSubjects;
 };
 ```
 
-You can call this function in the `onSubmit` handler after the form submission is successful:
-
+**Phone Number Validation:**
 ```tsx
-const onSubmit = async (data) => {
-  setIsSubmitting(true);
-  try {
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    await sendConfirmationEmail(data.email, data.name);
-    toast({ title: "Form submitted successfully!" });
-    form.reset();
-  } catch (error) {
-    toast({ title: "Failed to submit form", variant: "destructive" });
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+// Advanced phone validation with formatting
+import { parsePhoneNumberFromString } from "libphonenumber-js";
+
+const phoneValidation = z.string().refine((phone) => {
+  if (!phone) return true; // Optional field
+  const phoneNumber = parsePhoneNumberFromString(phone, 'US');
+  return phoneNumber?.isValid();
+}, "Please enter a valid phone number");
 ```
 
-This will send a confirmation email to the user after they submit the contact form. You can customize the email content as needed.
-
-You can redirect the user to a thank you page after successful form submission. You can also send a confirmation email to the user to acknowledge their submission. This can be done by using a backend service or a third-party form service that supports email notifications.
-
+**Conditional Field Display:**
 ```tsx
+// Show/hide fields based on other selections
+const watchSubject = form.watch("subject");
+const showUrgentFields = watchSubject === "Technical Support";
 
+{showUrgentFields && (
+  <FormField
+    name="urgency"
+    render={({ field }) => (
+      <FormItem>
+        <FormLabel>How urgent is this issue?</FormLabel>
+        {/* Additional field content */}
+      </FormItem>
+    )}
+  />
+)}
+```
+
+**Custom Button Variants:**
+```tsx
+// Multiple button styles based on priority
+const getButtonStyle = (priority) => {
+  const styles = {
+    low: "bg-green-600 hover:bg-green-700",
+    medium: "bg-yellow-600 hover:bg-yellow-700", 
+    high: "bg-red-600 hover:bg-red-700"
+  };
+  return styles[priority] || styles.medium;
+};
+
+<Button className={`${getButtonStyle(watchPriority)} transition-all duration-300`}>
+  Send {priority} Priority Message
+</Button>
+```
+
+**Auto-save Draft:**
+```tsx
+// Save form data to localStorage
+useEffect(() => {
+  const formData = form.getValues();
+  localStorage.setItem('contactFormDraft', JSON.stringify(formData));
+}, [form.watch()]);
+
+// Load draft on component mount
+useEffect(() => {
+  const draft = localStorage.getItem('contactFormDraft');
+  if (draft) {
+    form.reset(JSON.parse(draft));
+  }
+}, []);
 ```
 
 <BackToTop />
 
 ### Adding a Rich Text Editor for the Message Field
 
-You can enhance the message field by using a rich text editor like [Draft.js](https://draftjs.org/) or [Slate](https://docs.slatejs.org/). This allows users to format their messages with bold, italics, lists, and other rich text features. You will need to integrate the rich text editor into the form and handle the data accordingly.
+Enhance the message field with rich text editing capabilities, allowing users to format their messages with bold, italics, lists, and other formatting options.
+
+#### Example with Tiptap (Recommended)
+
+Tiptap is a modern, headless rich text editor that's highly customizable and works well with React.
 
 ```tsx
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { 
+  Send, 
+  CheckCircle, 
+  Bold, 
+  Italic, 
+  List, 
+  ListOrdered,
+  Quote,
+  Undo,
+  Redo,
+  Type,
+  Link
+} from "lucide-react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Link from '@tiptap/extension-link';
+import Placeholder from '@tiptap/extension-placeholder';
 
+const richTextFormSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  subject: z.string().min(1, "Subject is required"),
+  message: z.string()
+    .min(10, "Message must be at least 10 characters")
+    .max(2000, "Message must be less than 2000 characters"),
+});
+
+// Custom menu bar component
+const MenuBar = ({ editor }) => {
+  if (!editor) return null;
+
+  const menuItems = [
+    {
+      icon: Bold,
+      action: () => editor.chain().focus().toggleBold().run(),
+      isActive: editor.isActive('bold'),
+      tooltip: 'Bold (Ctrl+B)'
+    },
+    {
+      icon: Italic,
+      action: () => editor.chain().focus().toggleItalic().run(),
+      isActive: editor.isActive('italic'),
+      tooltip: 'Italic (Ctrl+I)'
+    },
+    {
+      icon: List,
+      action: () => editor.chain().focus().toggleBulletList().run(),
+      isActive: editor.isActive('bulletList'),
+      tooltip: 'Bullet List'
+    },
+    {
+      icon: ListOrdered,
+      action: () => editor.chain().focus().toggleOrderedList().run(),
+      isActive: editor.isActive('orderedList'),
+      tooltip: 'Numbered List'
+    },
+    {
+      icon: Quote,
+      action: () => editor.chain().focus().toggleBlockquote().run(),
+      isActive: editor.isActive('blockquote'),
+      tooltip: 'Quote'
+    },
+    {
+      icon: Link,
+      action: () => {
+        const url = window.prompt('Enter URL:');
+        if (url) {
+          editor.chain().focus().setLink({ href: url }).run();
+        }
+      },
+      isActive: editor.isActive('link'),
+      tooltip: 'Add Link'
+    }
+  ];
+
+  return (
+    <div className="border-b border-gray-200 p-2 flex items-center gap-1 bg-gray-50 rounded-t-lg">
+      {menuItems.map((item, index) => (
+        <Button
+          key={index}
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={item.action}
+          className={`h-8 w-8 p-0 ${
+            item.isActive 
+              ? 'bg-blue-100 text-blue-600' 
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+          title={item.tooltip}
+        >
+          <item.icon className="h-4 w-4" />
+        </Button>
+      ))}
+      
+      <div className="w-px h-6 bg-gray-300 mx-2" />
+      
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().undo().run()}
+        disabled={!editor.can().undo()}
+        className="h-8 w-8 p-0"
+        title="Undo (Ctrl+Z)"
+      >
+        <Undo className="h-4 w-4" />
+      </Button>
+      
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={() => editor.chain().focus().redo().run()}
+        disabled={!editor.can().redo()}
+        className="h-8 w-8 p-0"
+        title="Redo (Ctrl+Y)"
+      >
+        <Redo className="h-4 w-4" />
+      </Button>
+      
+      <div className="ml-auto flex items-center gap-2 text-xs text-gray-500">
+        <Type className="h-3 w-3" />
+        <span>{editor.storage.characterCount?.characters() || 0}/2000</span>
+      </div>
+    </div>
+  );
+};
+
+export default function RichTextContactForm() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
+  
+  const form = useForm({
+    resolver: zodResolver(richTextFormSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      subject: "",
+      message: "",
+    },
+  });
+
+  // Initialize Tiptap editor
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: {
+          levels: [1, 2, 3],
+        },
+      }),
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-blue-600 underline hover:text-blue-800',
+        },
+      }),
+      Placeholder.configure({
+        placeholder: 'Write your message here... You can use formatting tools above.',
+      }),
+    ],
+    content: '',
+    editorProps: {
+      attributes: {
+        class: 'prose prose-sm max-w-none focus:outline-none min-h-[120px] p-4',
+      },
+    },
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      const text = editor.getText();
+      form.setValue('message', text, { shouldValidate: true });
+    },
+  });
+
+  const onSubmit = async (data) => {
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    try {
+      // Get both HTML and plain text versions
+      const htmlContent = editor?.getHTML();
+      const plainTextContent = editor?.getText();
+      
+      // Simulate API call
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...data,
+          messageHtml: htmlContent,
+          messagePlain: plainTextContent,
+          hasFormatting: htmlContent !== `<p>${plainTextContent}</p>`,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      setSubmitStatus({
+        type: "success",
+        message: "Your formatted message has been sent successfully!"
+      });
+      
+      form.reset();
+      editor?.commands.clearContent();
+
+    } catch (error) {
+      console.error("Form submission error:", error);
+      
+      setSubmitStatus({
+        type: "error",
+        message: "Failed to send your message. Please try again."
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Keyboard shortcuts
+  const handleKeyDown = (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      switch (e.key) {
+        case 'b':
+          e.preventDefault();
+          editor?.chain().focus().toggleBold().run();
+          break;
+        case 'i':
+          e.preventDefault();
+          editor?.chain().focus().toggleItalic().run();
+          break;
+        case 'Enter':
+          e.preventDefault();
+          if (form.formState.isValid) {
+            onSubmit(form.getValues());
+          }
+          break;
+      }
+    }
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-gray-800 mb-2">Rich Text Contact Form</h2>
+        <p className="text-gray-600">
+          Format your message with bold, italics, lists, and more using our rich text editor.
+        </p>
+      </div>
+      
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" onKeyDown={handleKeyDown}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input 
+                      {...field} 
+                      placeholder="John Doe"
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email Address</FormLabel>
+                  <FormControl>
+                    <Input 
+                      {...field} 
+                      type="email"
+                      placeholder="john@example.com"
+                      disabled={isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          
+          <FormField
+            control={form.control}
+            name="subject"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Subject</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    placeholder="How can we help you?"
+                    disabled={isSubmitting}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="message"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Message</FormLabel>
+                <FormControl>
+                  <div className="border border-gray-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
+                    <MenuBar editor={editor} />
+                    <EditorContent 
+                      editor={editor} 
+                      className="min-h-[120px] max-h-[300px] overflow-y-auto"
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage />
+                
+                {/* Formatting Tips */}
+                <div className="text-xs text-gray-500 mt-2 space-y-1">
+                  <p><strong>Tips:</strong> Use the toolbar above or keyboard shortcuts:</p>
+                  <ul className="list-disc list-inside space-y-0.5 ml-2">
+                    <li><kbd className="px-1 py-0.5 bg-gray-100 rounded text-xs">Ctrl+B</kbd> for bold</li>
+                    <li><kbd className="px-1 py-0.5 bg-gray-100 rounded text-xs">Ctrl+I</kbd> for italic</li>
+                    <li><kbd className="px-1 py-0.5 bg-gray-100 rounded text-xs">Ctrl+Enter</kbd> to submit</li>
+                  </ul>
+                </div>
+              </FormItem>
+            )}
+          />
+
+          {/* Preview Mode Toggle */}
+          <div className="flex items-center gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const html = editor?.getHTML();
+                if (html) {
+                  navigator.clipboard.writeText(html);
+                  alert('HTML content copied to clipboard!');
+                }
+              }}
+              disabled={!editor?.getText()?.trim()}
+            >
+              Copy HTML
+            </Button>
+            
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const text = editor?.getText();
+                if (text) {
+                  navigator.clipboard.writeText(text);
+                  alert('Plain text copied to clipboard!');
+                }
+              }}
+              disabled={!editor?.getText()?.trim()}
+            >
+              Copy Plain Text
+            </Button>
+          </div>
+
+          {/* Status Messages */}
+          {submitStatus && (
+            <Alert variant={submitStatus.type === "error" ? "destructive" : "default"}>
+              {submitStatus.type === "success" ? (
+                <CheckCircle className="h-4 w-4" />
+              ) : (
+                <XCircle className="h-4 w-4" />
+              )}
+              <AlertDescription>{submitStatus.message}</AlertDescription>
+            </Alert>
+          )}
+
+          <Button 
+            type="submit" 
+            disabled={isSubmitting || !form.watch("message")?.trim()}
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+          >
+            {isSubmitting ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                Sending Formatted Message...
+              </>
+            ) : (
+              <>
+                <Send className="mr-2 h-4 w-4" />
+                Send Formatted Message
+              </>
+            )}
+          </Button>
+
+          {/* Editor Info */}
+          <div className="text-center pt-4 border-t border-gray-200">
+            <p className="text-xs text-gray-500">
+              Rich text editor powered by Tiptap. HTML and plain text versions are sent.
+            </p>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+}
 ```
+
+##### How It Works
+
+This rich text editor implementation using Tiptap provides several key features:
+
+1. **Modern Editor Framework**: Tiptap is a headless editor built on ProseMirror, offering excellent performance and flexibility.
+
+2. **Formatting Tools**: 
+   - **Bold/Italic**: Basic text formatting with keyboard shortcuts
+   - **Lists**: Bullet and numbered lists for structured content
+   - **Blockquotes**: For highlighting important text
+   - **Links**: Add clickable links to external resources
+
+3. **User Experience Features**:
+   - Visual toolbar with active state indicators
+   - Character count display
+   - Placeholder text for guidance
+   - Keyboard shortcuts (Ctrl+B, Ctrl+I, Ctrl+Enter)
+   - Undo/Redo functionality
+
+4. **Data Handling**: 
+   - Exports both HTML and plain text versions
+   - Validates content length
+   - Preserves formatting in submissions
+
+5. **Accessibility**: Proper ARIA labels, keyboard navigation, and screen reader support.
+
+##### Customization Options
+
+Extend the rich text editor with additional features:
+
+**Advanced Formatting:**
+```tsx
+// Add more extensions for enhanced formatting
+import Underline from '@tiptap/extension-underline';
+import TextStyle from '@tiptap/extension-text-style';
+import Color from '@tiptap/extension-color';
+import Highlight from '@tiptap/extension-highlight';
+
+const editor = useEditor({
+  extensions: [
+    StarterKit,
+    Underline,
+    TextStyle,
+    Color,
+    Highlight.configure({
+      multicolor: true,
+    }),
+  ],
+});
+
+// Additional toolbar buttons
+const advancedMenuItems = [
+  {
+    icon: Underline,
+    action: () => editor.chain().focus().toggleUnderline().run(),
+    isActive: editor.isActive('underline'),
+    tooltip: 'Underline (Ctrl+U)'
+  },
+  {
+    icon: Palette,
+    action: () => {
+      const color = prompt('Enter color (hex):');
+      if (color) {
+        editor.chain().focus().setColor(color).run();
+      }
+    },
+    isActive: false,
+    tooltip: 'Text Color'
+  }
+];
+```
+
+**File Upload Integration:**
+```tsx
+// Add image upload capability
+import Image from '@tiptap/extension-image';
+
+const handleImageUpload = async (file) => {
+  const formData = new FormData();
+  formData.append('image', file);
+  
+  const response = await fetch('/api/upload-image', {
+    method: 'POST',
+    body: formData,
+  });
+  
+  const { url } = await response.json();
+  return url;
+};
+
+// Image button in toolbar
+{
+  icon: ImageIcon,
+  action: () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const url = await handleImageUpload(file);
+        editor.chain().focus().setImage({ src: url }).run();
+      }
+    };
+    input.click();
+  },
+  isActive: false,
+  tooltip: 'Insert Image'
+}
+```
+
+**Content Templates:**
+```tsx
+// Pre-defined message templates
+const messageTemplates = [
+  {
+    name: "General Inquiry",
+    content: `<p>Hello,</p><p>I would like to inquire about <strong>[topic]</strong>.</p><p>Please provide more information about:</p><ul><li>Feature details</li><li>Pricing options</li><li>Timeline</li></ul><p>Thank you for your time.</p><p>Best regards,<br/>[Your Name]</p>`
+  },
+  {
+    name: "Support Request", 
+    content: `<p>Hi Support Team,</p><p>I'm experiencing an issue with <strong>[product/service]</strong>.</p><blockquote><p><em>Please describe the issue in detail here...</em></p></blockquote><p>Steps I've already tried:</p><ol><li>Step 1</li><li>Step 2</li><li>Step 3</li></ol><p>I would appreciate your assistance.</p><p>Thanks!</p>`
+  }
+];
+```
+
+#### Example with Quill.js (Alternative)
+
+For a more traditional rich text editor experience, you can use Quill.js:
+
+```tsx
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+
+const QuillContactForm = () => {
+  const [messageContent, setMessageContent] = useState('');
+
+  const quillModules = {
+    toolbar: [
+      [{ 'header': [1, 2, 3, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      ['blockquote', 'code-block'],
+      ['link', 'image'],
+      ['clean']
+    ],
+  };
+
+  const quillFormats = [
+    'header', 'bold', 'italic', 'underline', 'strike',
+    'list', 'bullet', 'blockquote', 'code-block',
+    'link', 'image'
+  ];
+
+  return (
+    <FormField
+      control={form.control}
+      name="message"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Message</FormLabel>
+          <FormControl>
+            <ReactQuill
+              value={messageContent}
+              onChange={(content) => {
+                setMessageContent(content);
+                // Strip HTML tags for validation
+                const plainText = content.replace(/<[^>]*>/g, '');
+                field.onChange(plainText);
+              }}
+              modules={quillModules}
+              formats={quillFormats}
+              theme="snow"
+              placeholder="Write your formatted message here..."
+              style={{ height: '200px' }}
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+```
+
+##### How It Works
+
+Both implementations provide rich text editing capabilities with different approaches:
+
+- **Tiptap**: Modern, headless, highly customizable, better TypeScript support
+- **Quill.js**: Traditional, feature-rich out of the box, mature ecosystem
+
+Choose based on your specific needs for customization, bundle size, and desired features.
 
 <BackToTop />

@@ -44,15 +44,49 @@ export default myMdxPlugin;
 
 In this project, we will use the following plugins:
 
-- **remark-frontmatter**: To parse frontmatter from MDX files.
-- **remark-mdx-frontmatter**: To handle frontmatter in MDX files.
-- **rehype-slug**: To add slugs to headings for linking.
-- **rehype-autolink-headings**: To automatically add links to headings.
-- **remark-gfm**: To support GitHub Flavored Markdown features like tables and task lists.
-- **rehype-highlight**: To add syntax highlighting to code blocks.
-- **rehype-toc**: To generate a table of contents from headings in the MDX content.
+### remark-frontmatter
+This plugin allows you to parse frontmatter in your MDX files, enabling you to extract metadata and use it in your application.
 
-### Configurations
+```bash
+npm install remark-frontmatter
+```
+
+### remark-mdx-frontmatter
+This plugin extends the functionality of `remark-frontmatter` to work specifically with MDX files, allowing you to use frontmatter in your MDX content.
+
+```bash
+npm install remark-mdx-frontmatter
+```
+
+### rehype-slug
+This plugin adds slugs to headings in your MDX content, allowing you to create anchor links for each heading. This is useful for generating a table of contents or linking to specific sections within the page.
+
+```bash
+npm install rehype-slug
+```
+
+### rehype-autolink-headings
+This plugin automatically adds links to headings in your MDX content, making it easy for users to navigate to specific sections of the page. It can be configured to wrap the heading text with a link or add a separate link element.
+
+```bash
+npm install rehype-autolink-headings
+```
+
+### remark-gfm
+This plugin adds support for GitHub Flavored Markdown (GFM) in your MDX content, allowing you to use features like tables, strikethroughs, and task lists.
+
+```bash
+npm install remark-gfm
+```
+
+### rehype-toc
+This plugin generates a table of contents (TOC) from the headings in your MDX content, allowing you to easily navigate through long pages. It can be configured to control the depth of the TOC and the structure of the generated HTML.
+
+```bash
+npm install rehype-toc
+```
+
+## Configuring Plugins
 
 To configure these plugins, you will need to update your `next.config.mjs` file to include the necessary settings. Here’s an example configuration:
 
@@ -60,7 +94,6 @@ To configure these plugins, you will need to update your `next.config.mjs` file 
 import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import rehypeHighlight from "rehype-highlight";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import remarkToc from "remark-toc";
@@ -87,13 +120,6 @@ const withMDX = createMDX({
     ],
     rehypePlugins: [
       rehypeSlug,
-      [
-        rehypeHighlight,
-        {
-          // Ignore code blocks without language specified
-          ignoreMissing: true,
-        },
-      ],
       [
         rehypeAutolinkHeadings,
         {
@@ -125,5 +151,67 @@ You can customize the plugins and their options based on your specific needs.
 - **Table of Contents**: You can adjust the `maxDepth` option in the `remark-toc` plugin to control how deep the table of contents should go.
 - **Syntax Highlighting**: The `rehype-highlight` plugin can be configured to ignore code blocks without a specified language, preventing unnecessary warnings or errors.
 - **Autolinking Headings**: The `rehype-autolink-headings` plugin can be customized to change the behavior of how links are added to headings, such as wrapping the heading text with a link or adding specific classes to the link elements.
+
+### Honorable Mentions
+
+#### [wooorm/remark-api](https://github.com/wooorm/remark-api)
+
+Remark plugin to generate an API from markdown files, useful for creating documentation or reference guides.
+
+#### [remark-a11y-emoji](https://github.com/florianeckerstorfer/remark-a11y-emoji)
+
+Remark plugin to add accessibility features to emojis in markdown files, ensuring that they are properly described for screen readers. Wraps Emoji in a `<span>` Tag with role and aria-label attributes.
+
+#### [remark-capitalize-headings](https://github.com/Xunnamius/unified-utils/tree/main/packages/remark-capitalize-headings)
+
+Remark plugin to capitalize headings in markdown files, useful for maintaining consistent heading styles.
+
+#### [remark-collapse](https://github.com/Rokt33r/remark-collapse)
+
+Remark plugin to collapse sections of markdown files, allowing you to hide or show content based on user interaction.
+
+#### [remark-emoji](https://github.com/rhysd/remark-emoji)
+
+Remark plugin to add support for emojis in markdown files, allowing you to use shortcodes to insert emojis.
+
+#### [remark-footnotes-extra](https://github.com/miaobuao/remark-footnotes-extra)
+
+Remark plugin to add extra features to footnotes in markdown files, such as automatic numbering and custom styles.
+
+#### [remark-flexible-toc](https://github.com/ipikuka/remark-flexible-toc)
+
+Remark plugin to generate a flexible table of contents from markdown files, allowing you to customize the depth and structure of the TOC.
+
+#### [remark-github](https://github.com/remarkjs/remark-github)
+
+Remark plugin to add GitHub links to code blocks in markdown files, allowing you to link directly to the source code on GitHub.
+
+#### [remark-images](https://github.com/remarkjs/remark-images)
+
+Remark plugin to add support for images in markdown files, allowing you to embed images with custom attributes and styles.
+
+#### [remark-numbered-footnote-labels](https://github.com/jackfletch/remark-numbered-footnote-labels)
+
+Remark plugin to add numbered labels to footnotes in markdown files, useful for maintaining a consistent numbering scheme across footnotes.
+
+#### [remark-oembed](https://github.com/agentofuser/remark-oembed)
+
+Remark plugin to embed oEmbed content in markdown files, allowing you to easily include rich media from various sources like YouTube, Twitter, and more.
+
+#### [rehype-inline-svg](https://github.com/JS-DevTools/rehype-inline-svg)
+
+rehype plugin to inline SVGs in HTML, allowing you to embed SVG images directly in your markdown content without needing external files.
+
+#### [retext-simplify](https://github.com/retextjs/retext-simplify)
+
+retext plugin to simplify text, making it easier to read and understand by replacing complex words with simpler alternatives.
+
+#### [retext-spell](https://github.com/retextjs/retext-spell)
+
+retext plugin to check spelling in text, useful for ensuring that your markdown content is free of spelling errors.
+
+#### [retext-repeated-words](https://github.com/retextjs/retext-repeated-words)
+
+retext plugin to detect and highlight repeated words in text, helping you to avoid redundancy in your writing.
 
 <BackToTop />

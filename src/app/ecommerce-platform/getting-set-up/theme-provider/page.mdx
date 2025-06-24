@@ -32,6 +32,70 @@ export function Providers({ children }: { children: ReactNode }): JSX.Element {
 }
 ```
 
+## The `ThemeToggle` Component
+
+This component allows users to toggle between light and dark themes and will be located in `src/app/components/buttons`. It uses the `useTheme` hook from `next-themes` to manage the theme state.
+
+```tsx
+"use client";
+import { useTheme } from "next-themes";
+import { JSX, useEffect, useMemo, useState } from "react";
+import { FiMoon, FiSun } from "react-icons/fi";
+import { Toggle } from "../ui/toggle";
+
+/**
+ * A React functional component that toggles the application's theme.
+ * Returns a JSX element for the theme toggle UI, or null if not applicable.
+ *
+ * @returns {JSX.Element | null} The theme toggle component or null.
+ */
+export const ThemeToggle = (): JSX.Element | null => {
+  const { theme, setTheme, systemTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    if (!theme || theme === "system") {
+      setTheme(systemTheme || "light");
+    }
+  }, [systemTheme, theme, setTheme]);
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
+
+  const currentTheme = theme === "system" ? systemTheme : theme;
+
+  // Memoize the toggle button content based on the theme
+  const toggleButton = useMemo(
+    () => (
+      <Toggle
+        aria-label="Toggle theme"
+        onClick={toggleTheme}
+        className="flex justify-center items-center bg-transparent data-[state=on]:bg-transparent dark:hover:bg-muted shadow-none rounded-lg w-9 h-9 text-accent hover:text-accent dark:text-accent transition-all duration-200 focus-visible:outline-none"
+        pressed={currentTheme === "dark"}
+      >
+        {currentTheme === "dark" ? (
+          <>
+            <span className="sr-only">Toggle to light mode</span>
+            <FiMoon className="w-4 h-4" />
+          </>
+        ) : (
+          <>
+            <span className="sr-only">Toggle to dark mode</span>
+            <FiSun className="w-4 h-4" />
+          </>
+        )}
+      </Toggle>
+    ),
+    [currentTheme, toggleTheme]
+  );
+
+  return mounted ? toggleButton : null;
+};
+```
+
+Don't worry about the error from the `Toggle` component since we haven't downloaded the `shadcn/ui` components yet. This will be resolved in a the next step when we set up the `shadcn/ui` components.
 
 Now, the `providers.tsx` file is set up to provide a theme context for your application. This allows you to use the `shadcn/ui` components with your custom theme.
 

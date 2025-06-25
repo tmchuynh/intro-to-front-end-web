@@ -10,6 +10,7 @@ import rehypeAutolinkHeadings from "rehype-autolink-headings"; // Adds anchor li
 import rehypeExpressiveCode from "rehype-expressive-code"; // Enhanced code block styling and features
 import rehypeHighlight from "rehype-highlight"; // Syntax highlighting for code blocks
 import rehypeSlug from "rehype-slug"; // Generates URL-friendly slugs for headings
+import remarkFlexibleToc from "remark-flexible-toc";
 
 // Remark plugins for markdown processing (runs before HTML conversion)
 import remarkGfm from "remark-gfm"; // GitHub Flavored Markdown support
@@ -76,10 +77,12 @@ const withMDX = createMDX({
     remarkPlugins: [
       remarkGfm, // Enable GitHub Flavored Markdown (tables, strikethrough, etc.)
       remarkAutoCollapseFunctions, // Custom plugin to auto-collapse function code blocks
+      [remarkFlexibleToc, { skipLevels: [1, 5, 6] }], // Flexible table of contents with level skipping
       [
         remarkToc, // Generate table of contents
         {
-          maxDepth: 3, // Limit TOC depth to 3 levels (h1, h2, h3)
+          maxDepth: 4, // Allow up to h4
+          tight: true, // Compile list items tightly
         },
       ],
     ],

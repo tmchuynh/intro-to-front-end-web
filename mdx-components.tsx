@@ -1,7 +1,6 @@
 import type { MDXComponents } from "mdx/types";
 import { JSX } from "react";
 import Button from "./src/components/Button";
-import CopyButton from "./src/components/CopyToClipboard";
 import Guides from "./src/components/Guides";
 import Resources from "./src/components/Resources";
 
@@ -120,11 +119,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       </code>
     ),
     pre: ({ children }) => {
-      const textContent = extractTextContent(children);
       return (
         <>
-          <div className="bg-code-blocks relative shadow-md my-5 px-4 rounded-2xl overflow-y-auto">
-            <CopyButton textToCopy={textContent} />
+          <div className="relative shadow-md my-5 px-4 rounded-2xl overflow-y-auto">
             <pre className="my-4 p-4">{children}</pre>
           </div>
           <br />

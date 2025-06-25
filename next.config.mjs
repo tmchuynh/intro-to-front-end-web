@@ -11,6 +11,14 @@ import remarkToc from "remark-toc";
 /** @type {import('rehype-expressive-code').RehypeExpressiveCodeOptions} */
 const rehypeExpressiveCodeOptions = {
   plugins: [pluginLineNumbers(), pluginCollapsibleSections()],
+  themes: ["github-light-default", "github-dark-default"], // Light theme first, then dark theme
+  themeCssSelector: (theme) => {
+    // Map theme names to next-themes class names
+    if (theme.name === "github-light-default") return ".light";
+    if (theme.name === "github-dark-default") return ".dark";
+    return `[data-theme="${theme.name}"]`;
+  },
+  useDarkModeMediaQuery: false, // Disable system preference detection to use next-themes instead
   defaultProps: {
     // Enable word wrap by default
     wrap: true,

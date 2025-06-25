@@ -22,8 +22,6 @@ src/api/
 
 **Base URL**: `https://dummyjson.com`
 
-The primary data source for products, users, and other e-commerce data.
-
 - **GET /products** - Fetch all products
 - **GET /products/{`id`}** - Fetch single product
 - **GET /products/categories** - Fetch product categories
@@ -44,9 +42,89 @@ Handles all product-related API calls:
 DummyJSON API → Products API → React Components → UI Display
 ```
 
+## Defining Types and Interfaces
+
+Before we get started, let's define the types and interfaces we will use for our product data. This will help us ensure type safety and clarity in our API calls. We will create a file named `cart.ts` in the `src/lib/interfaces/` directory with the following content:
+
+```typescript
+// src/lib/interfaces/cart.ts
+
+export interface CartItem {
+  id: number;
+  productId: number;
+  title: string;
+  price: number;
+  quantity: number;
+  image?: string;
+  category: string;
+  thumbnail?: string;
+  discountPercentage?: number;
+  brand?: string;
+}
+
+export interface CartProduct {
+  id: number;
+  title: string;
+  price: number;
+  quantity: number;
+  total: number;
+  discountPercentage: number;
+  discountedTotal: number;
+  thumbnail: string;
+}
+
+export interface Cart {
+  id: number;
+  products: CartProduct[];
+  total: number;
+  discountedTotal: number;
+  userId: number;
+  totalProducts: number;
+  totalQuantity: number;
+}
+
+export interface UserCartsResponse {
+  carts: Cart[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+```
+
+##### Explanation of the Code
+
+- The `CartItem` interface represents an item in the cart, including properties like `id`, `productId`, `title`, `price`, `quantity`, and optional properties like `image`, `thumbnail`, `discountPercentage`, and `brand`.
+  - Each `CartItem` will have a unique `id` and a `productId` that links it to the corresponding product.
+  - The `title`, `price`, and `quantity` properties represent the product's title, price, and quantity in the cart.
+  - The `image` and `thumbnail` properties are optional and can be used to display product images in the cart.
+  - The `discountPercentage` and `brand` properties are also optional and can be used to show discounts and brand information in the cart.
+- The `CartProduct` interface represents a product in the cart, including properties like `id`, `title`, `price`, `quantity`, `total`, `discountPercentage`, `discountedTotal`, and `thumbnail`.
+  - The `total` property represents the total price of the product in the cart, calculated as `price * quantity`.
+  - The `discountedTotal` property represents the total price after applying any discounts.
+  - The `thumbnail` property is used to display the product's thumbnail image in the cart.
+- The `Cart` interface represents a shopping cart, including properties like `id`, `products`, `total`, `discountedTotal`, `userId`, `totalProducts`, and `totalQuantity`.
+  - The `id` property is a unique identifier for the cart.
+  - The `products` property is an array of `CartProduct` objects representing the products in the cart.
+  - The `total` property represents the total price of all products in the cart before discounts.
+  - The `discountedTotal` property represents the total price after applying any discounts to the products in the cart.
+  - The `userId` property represents the ID of the user who owns the cart.
+  - The `totalProducts` property represents the total number of products in the cart.
+  - The `totalQuantity` property represents the total quantity of all products in the cart.
+  - The `Cart` interface is used to represent the cart data fetched from the API.
+- The `UserCartsResponse` interface represents the response from the API when fetching user carts, including an array of `Cart` objects, `total`, `skip`, and `limit` properties.
+  - The `carts` property is an array of `Cart` objects representing the user's carts.
+  - The `total` property represents the total number of carts available for the user.
+  - The `skip` property represents the number of carts skipped in the response, useful for pagination.
+  - The `limit` property represents the maximum number of carts returned in the response.
+  - The `UserCartsResponse` interface is used to represent the response data when fetching user carts from the API.
+
+##### NOTE
+
+> Take note that the `CartProduct` interface is similar to `CartItem`, but it includes additional properties for calculating totals and discounts. We have both because `CartProduct` is used to represent the data fetched from the API, while `CartItem` is used to represent the items in the cart that the user interacts with.
+
 ## Implementing Utility Functions
 
-Before we get started, let's create a formatting function to handle the URL path segments. These functions will help us convert kebab-case strings to Title Case and capitalize the first letter of each segment and will be located in `src/lib/utils/format.ts`.
+Alright, let's create a formatting function to handle the URL path segments. These functions will help us convert kebab-case strings to Title Case and capitalize the first letter of each segment and will be located in `src/lib/utils/format.ts`.
 
 ```typescript
 // src/lib/utils/format.ts

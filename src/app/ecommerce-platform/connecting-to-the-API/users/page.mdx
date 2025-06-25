@@ -1,0 +1,214 @@
+import BackToTop from "@/components/BackToTop";
+
+# Users API Integration
+
+## Table of Contents
+
+## Users API Functionality
+
+- **GET /carts** - Fetch all carts
+- **GET /carts/{`id`}** - Fetch single cart
+- **POST /carts/add** - Add new cart
+- **PUT /carts/{`id`}** - Update cart
+- **DELETE /carts/{`id`}** - Delete cart
+
+Manages user authentication and profile data:
+
+- **authenticateUser(credentials)** - Login user
+- **fetchUserProfile(id)** - Get user profile
+- **updateUserProfile(id, data)** - Update user information
+
+### Data Flow
+
+> User Input → Users API → DummyJSON Auth → JWT Token → Local Storage
+
+### JWT Token Management
+
+The application uses JWT tokens for authentication:
+
+1. **Login Process**:
+
+   - Send credentials to DummyJSON auth endpoint
+   - Receive JWT token
+   - Store token in local storage
+   - Use token for subsequent API calls
+
+2. **Token Validation**:
+
+   - Check token expiration
+   - Refresh token when needed
+   - Clear token on logout
+
+3. **Protected Routes**:
+   - Verify token before accessing protected pages
+   - Redirect to login if unauthorized
+
+## The `import` Statements
+
+```typescript
+// src/api/users.ts
+
+import { DummyUser, DummyUsersResponse } from "@/lib/interfaces/user";
+import { API_BASE_URL } from ".";
+```
+
+## `fetchRandomUser` Function
+
+```typescript
+// src/api/users.ts
+
+/**
+ * Fetches a random user from the DummyUser API.
+ *
+ * @returns {Promise<DummyUser>} A promise that resolves to a randomly selected DummyUser object.
+ */
+export async function fetchRandomUser(): Promise<DummyUser> {
+  try {
+    // Get a random user ID between 1 and 100
+    const randomId = Math.floor(Math.random() * 100) + 1;
+    const response = await fetch(`${API_BASE_URL}/users/${randomId}`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user: ${response.statusText}`);
+    }
+
+    const user: DummyUser = await response.json();
+    return user;
+  } catch (error) {
+    console.error("Error fetching random user:", error);
+    throw error;
+  }
+}
+```
+
+##### Explanation of the Code
+
+- **Import Statements**: Import necessary types and constants.
+- **fetchRandomUser Function**:
+  - Generates a random user ID.
+  - Fetches user data from the DummyJSON API.
+  - Handles errors and returns the user data.
+
+<BackToTop />
+
+## `fetchUsers` Function
+
+```typescript
+// src/api/users.ts
+
+/**
+ * Asynchronously fetches a list of users from the API.
+ *
+ * @returns {Promise<Array>} A promise that resolves to an array of user objects.
+ * @throws {Error} Throws an error if the fetch operation fails.
+ */
+export async function fetchUsers(
+  limit: number = 10,
+  skip: number = 0
+): Promise<DummyUsersResponse> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/users?limit=${limit}&skip=${skip}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch users: ${response.statusText}`);
+    }
+
+    const data: DummyUsersResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    throw error;
+  }
+}
+```
+
+##### Explanation of the Code
+
+- **fetchUsers Function**:
+  - Accepts `limit` and `skip` parameters for pagination.
+  - Fetches a list of users from the DummyJSON API.
+  - Handles errors and returns the user data.
+
+<BackToTop />
+
+## `fetchDemoCredentials` Function
+
+```typescript
+// src/api/users.ts
+
+/**
+ * Asynchronously fetches demo credentials for users.
+ *
+ * @returns {Promise<{ ... }>} A promise that resolves to an object containing demo credentials.
+ */
+export async function fetchDemoCredentials(): Promise<{
+  username: string;
+  password: string;
+  fullName: string;
+}> {
+  try {
+    const user = await fetchRandomUser();
+    return {
+      username: user.username,
+      password: user.password,
+      fullName: `${user.firstName} ${user.lastName}`,
+    };
+  } catch (error) {
+    console.error("Error fetching demo credentials:", error);
+    throw error;
+  }
+}
+```
+
+##### Explanation of the Code
+
+- **fetchDemoCredentials Function**:
+  - Calls `fetchRandomUser` to get a random user.
+  - Returns an object with username, password, and full name.
+
+<BackToTop />
+
+## `fetchUserById` Function
+
+```typescript
+// src/api/users.ts
+
+/**
+ * Fetches a user by their unique ID from the API.
+ *
+ * @param userId - The unique identifier of the user to fetch.
+ * @returns A promise that resolves to a DummyUser object containing the user's data.
+ */
+export async function fetchUserById(userId: number): Promise<DummyUser> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/${userId}`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user: ${response.statusText}`);
+    }
+
+    const user: DummyUser = await response.json();
+    return user;
+  } catch (error) {
+    console.error("Error fetching user by ID:", error);
+    throw error;
+  }
+}
+```
+
+##### Explanation of the Code
+
+- **fetchUserById Function**:
+  - Accepts a user ID as a parameter.
+  - Fetches user data from the DummyJSON API.
+  - Handles errors and returns the user data.
+
+<BackToTop />
+
+## Next Steps
+
+How about that home page now? It's about time to see all your hard work pay off! In the next section, we will implement the home page of our e-commerce platform. This will include displaying featured products, categories, and other key information to give users a great first impression.
+
+Head over to [Home Page](/ecommerce-platform/creating-the-pages/home-page) to see your e-commerce platform in action!

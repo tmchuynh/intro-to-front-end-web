@@ -12,31 +12,45 @@ export function remarkAutoCollapse() {
       const lines = node.value.split("\n");
       const collapseRanges = [];
 
-      // Look for special collapse markers
+      // Look for special collapse markers and collect ranges while filtering lines
       let inCollapseSection = false;
       let sectionStart = null;
+      const filteredLines = [];
+      const originalToFilteredLineMap = new Map();
+      let filteredLineNum = 1;
 
       lines.forEach((line, index) => {
-        const lineNum = index + 1;
-
-        // Check for collapse markers
-        if (
+        const originalLineNum = index + 1;
+        const isCollapseStart =
           line.includes("// COLLAPSE_START") ||
-          line.includes("/* COLLAPSE_START */")
-        ) {
-          inCollapseSection = true;
-          sectionStart = lineNum;
-        } else if (
+          line.includes("/* COLLAPSE_START */");
+        const isCollapseEnd =
           line.includes("// COLLAPSE_END") ||
-          line.includes("/* COLLAPSE_END */")
-        ) {
+          line.includes("/* COLLAPSE_END */");
+
+        if (isCollapseStart) {
+          inCollapseSection = true;
+          sectionStart = filteredLineNum;
+          // Don't include this line in filtered output
+        } else if (isCollapseEnd) {
           if (inCollapseSection && sectionStart) {
-            collapseRanges.push(`${sectionStart}-${lineNum}`);
+            collapseRanges.push(`${sectionStart}-${filteredLineNum - 1}`);
             inCollapseSection = false;
             sectionStart = null;
           }
+          // Don't include this line in filtered output
+        } else {
+          // Include this line in filtered output
+          filteredLines.push(line);
+          originalToFilteredLineMap.set(originalLineNum, filteredLineNum);
+          filteredLineNum++;
         }
       });
+
+      // Update the node value with filtered lines (removing collapse markers)
+      if (filteredLines.length !== lines.length) {
+        node.value = filteredLines.join("\n");
+      }
 
       // Auto-detect import blocks (for JavaScript/TypeScript)
       if (
@@ -44,11 +58,13 @@ export function remarkAutoCollapse() {
           node.lang
         )
       ) {
+        // Use filtered lines for import detection
+        const linesToCheck = filteredLines.length > 0 ? filteredLines : lines;
         let importStart = null;
         let importEnd = null;
 
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i].trim();
+        for (let i = 0; i < linesToCheck.length; i++) {
+          const line = linesToCheck[i].trim();
 
           if (
             line.startsWith("import ") ||
@@ -96,7 +112,6 @@ export function remarkAutoCollapseFunctions() {
         )
       ) {
         let currentFunction = null;
-        let braceCount = 0;
 
         lines.forEach((line, index) => {
           const lineNum = index + 1;

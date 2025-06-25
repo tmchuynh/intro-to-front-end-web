@@ -1,3 +1,4 @@
+import { pluginCollapsibleSections } from "@expressive-code/plugin-collapsible-sections";
 import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
 import createMDX from "@next/mdx";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
@@ -9,7 +10,11 @@ import remarkToc from "remark-toc";
 
 /** @type {import('rehype-expressive-code').RehypeExpressiveCodeOptions} */
 const rehypeExpressiveCodeOptions = {
-  plugins: [pluginLineNumbers()],
+  plugins: [pluginLineNumbers(), pluginCollapsibleSections()],
+  defaultProps: {
+    // Enable word wrap by default
+    wrap: true,
+  },
 };
 
 /** @type {import('next').NextConfig} */

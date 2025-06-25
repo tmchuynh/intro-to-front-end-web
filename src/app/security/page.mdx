@@ -178,7 +178,7 @@ function decrypt(encryptedData, iv) {
   const decipher = crypto.createDecipheriv(
     algorithm,
     key,
-    Buffer.from(iv, "hex")
+    Buffer.from(iv, "hex"),
   );
   let decrypted = decipher.update(encryptedData, "hex", "utf8");
   decrypted += decipher.final("utf8");
@@ -203,7 +203,7 @@ function decrypt(encryptedData, iv) {
   const decipher = crypto.createDecipheriv(
     algorithm,
     key,
-    Buffer.from(iv, "hex")
+    Buffer.from(iv, "hex"),
   );
   let decrypted = decipher.update(encryptedData, "hex", "utf8");
   decrypted += decipher.final("utf8");
@@ -228,7 +228,7 @@ function decrypt(encryptedData, iv) {
   const decipher = crypto.createDecipheriv(
     algorithm,
     key,
-    Buffer.from(iv, "hex")
+    Buffer.from(iv, "hex"),
   );
   let decrypted = decipher.update(encryptedData, "hex", "utf8");
   decrypted += decipher.final("utf8");
@@ -259,7 +259,7 @@ function encrypt(text) {
 function decrypt(encryptedData) {
   const decrypted = crypto.privateDecrypt(
     privateKey,
-    Buffer.from(encryptedData, "base64")
+    Buffer.from(encryptedData, "base64"),
   );
   return decrypted.toString("utf8");
 }
@@ -279,7 +279,7 @@ function encrypt(text) {
 function decrypt(encryptedData) {
   const decrypted = crypto.privateDecrypt(
     privateKey,
-    Buffer.from(encryptedData, "base64")
+    Buffer.from(encryptedData, "base64"),
   );
   return decrypted.toString("utf8");
 }
@@ -343,7 +343,7 @@ function validateType(input, expectedType) {
   const actualType = typeof input;
   if (actualType !== expectedType) {
     throw new Error(
-      `Invalid type: expected ${expectedType}, got ${actualType}`
+      `Invalid type: expected ${expectedType}, got ${actualType}`,
     );
   }
   return true;
@@ -368,7 +368,7 @@ function validateLength(input, minLength, maxLength) {
   const length = input.length;
   if (length < minLength || length > maxLength) {
     throw new Error(
-      `Invalid length: expected between ${minLength} and ${maxLength}, got ${length}`
+      `Invalid length: expected between ${minLength} and ${maxLength}, got ${length}`,
     );
   }
   return true;
@@ -390,7 +390,7 @@ Format checking ensures that the input data matches a specific format or pattern
 function validateFormat(input, regex) {
   if (!regex.test(input)) {
     throw new Error(
-      `Invalid format: input does not match the expected pattern`
+      `Invalid format: input does not match the expected pattern`,
     );
   }
   return true;
@@ -413,7 +413,7 @@ Range checking involves validating that numeric input falls within a specified r
 function validateRange(input, min, max) {
   if (input < min || input > max) {
     throw new Error(
-      `Invalid range: expected between ${min} and ${max}, got ${input}`
+      `Invalid range: expected between ${min} and ${max}, got ${input}`,
     );
   }
   return true;
@@ -435,7 +435,7 @@ Whitelist validation involves allowing only specific, known-good values for inpu
 function validateWhitelist(input, validValues) {
   if (!validValues.includes(input)) {
     throw new Error(
-      `Invalid value: expected one of ${validValues.join(", ")}, got ${input}`
+      `Invalid value: expected one of ${validValues.join(", ")}, got ${input}`,
     );
   }
   return true;
@@ -559,7 +559,7 @@ app.use(
       sameSite: "strict", // CSRF protection
     },
     rolling: true, // Reset expiration on activity
-  })
+  }),
 );
 
 // Middleware to check session expiration
@@ -663,7 +663,7 @@ app.use(
       maxAge: 3600000, // 1 hour
       sameSite: "strict", // CSRF protection
     },
-  })
+  }),
 );
 // Middleware to check session security
 function checkSessionSecurity(req, res, next) {
@@ -708,7 +708,7 @@ app.use(
       maxAge: 3600000, // 1 hour
       sameSite: "strict", // CSRF protection
     },
-  })
+  }),
 );
 // Middleware to monitor session activity
 function monitorSessionActivity(req, res, next) {
@@ -721,7 +721,7 @@ function monitorSessionActivity(req, res, next) {
       req.get("User-Agent") !== sessionData.userAgent
     ) {
       console.warn(
-        `Suspicious activity detected for session ${sessionId}: IP ${req.ip}, User-Agent ${req.get("User-Agent")}`
+        `Suspicious activity detected for session ${sessionId}: IP ${req.ip}, User-Agent ${req.get("User-Agent")}`,
       );
       // Optionally, revoke the session
       activeSessions.delete(sessionId);
@@ -799,7 +799,7 @@ app.use(
       secure: true, // Ensure the cookie is only sent over HTTPS
       maxAge: 3600000, // Set the cookie expiration time (1 hour)
     },
-  })
+  }),
 );
 // Example of storing session data
 app.get("/login", (req, res) => {
@@ -831,7 +831,7 @@ app.use((req, res, next) => {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
       "font-src 'self' https://fonts.gstatic.com; " +
       "img-src 'self' data: https:; " +
-      "connect-src 'self' https://api.example.com"
+      "connect-src 'self' https://api.example.com",
   );
   next();
 });
@@ -867,7 +867,7 @@ HSTS forces browsers to use HTTPS connections, preventing downgrade attacks.
 app.use((req, res, next) => {
   res.setHeader(
     "Strict-Transport-Security",
-    "max-age=31536000; includeSubDomains; preload"
+    "max-age=31536000; includeSubDomains; preload",
   );
   next();
 });
@@ -920,7 +920,7 @@ app.use(
       includeSubDomains: true,
       preload: true,
     },
-  })
+  }),
 );
 ```
 
@@ -947,7 +947,7 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true, // Allow cookies to be sent
     maxAge: 86400, // Preflight cache duration (24 hours)
-  })
+  }),
 );
 ```
 
@@ -974,7 +974,7 @@ app.use(
     credentials: true, // Allow cookies to be sent
     optionsSuccessStatus: 200, // For legacy browser support
     maxAge: 86400, // Preflight cache duration (24 hours)
-  })
+  }),
 );
 ```
 
@@ -1023,7 +1023,7 @@ app.use(
     credentials: true, // Allow cookies to be sent
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  }),
 );
 ```
 
@@ -1040,7 +1040,7 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "X-Custom-Header"],
     credentials: true, // Allow cookies to be sent
     optionsSuccessStatus: 200, // For legacy browser support
-  })
+  }),
 );
 ```
 
@@ -1165,7 +1165,7 @@ app.engine(
     helpers: {
       escapeHtml: escapeHtml,
     },
-  })
+  }),
 );
 ```
 
@@ -1437,11 +1437,11 @@ function logSessionActivity(req, res, next) {
   if (sessionId && activeSessions.has(sessionId)) {
     const sessionData = activeSessions.get(sessionId);
     console.log(
-      `Session Activity: User ID ${sessionData.userId}, IP ${req.ip}, User-Agent ${req.get("User-Agent")}`
+      `Session Activity: User ID ${sessionData.userId}, IP ${req.ip}, User-Agent ${req.get("User-Agent")}`,
     );
   } else {
     console.warn(
-      `Unauthorized access attempt from IP ${req.ip}, User-Agent ${req.get("User-Agent")}`
+      `Unauthorized access attempt from IP ${req.ip}, User-Agent ${req.get("User-Agent")}`,
     );
   }
   next(); // Proceed to the next middleware or route handler
@@ -1480,9 +1480,9 @@ if (process.env.NODE_ENV !== "production") {
         winston.format.colorize(),
         printf(({ level, message, timestamp }) => {
           return `${timestamp} [${level}]: ${message}`;
-        })
+        }),
       ),
-    })
+    }),
   );
 }
 
@@ -1632,7 +1632,7 @@ class SecurityMonitor {
     if (threshold) {
       this.events.set(
         key,
-        events.filter((event) => now - event.timestamp < threshold.timeWindow)
+        events.filter((event) => now - event.timestamp < threshold.timeWindow),
       );
 
       // Check for suspicious activity
@@ -1734,7 +1734,7 @@ const schemas = {
     password: Joi.string()
       .min(8)
       .pattern(
-        new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])")
+        new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])"),
       )
       .required(),
     age: Joi.number().integer().min(13).max(120),
@@ -1905,7 +1905,7 @@ app.use(
     noSniff: true,
     frameguard: { action: "deny" },
     xssFilter: true,
-  })
+  }),
 );
 ```
 

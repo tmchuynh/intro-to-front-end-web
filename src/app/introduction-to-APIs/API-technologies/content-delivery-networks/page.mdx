@@ -297,7 +297,7 @@ const pageRules = [
 
 #### Fastly VCL Configuration
 
-```vcl
+```
 # Fastly VCL for custom caching logic
 sub vcl_recv {
   # Set cache key based on user type
@@ -454,7 +454,7 @@ app.use(
     maxAge: "1y", // 1 year for static assets
     etag: true,
     lastModified: true,
-  })
+  }),
 );
 
 app.get("/api/data", (req, res) => {
@@ -587,7 +587,7 @@ const userPreferences = {
 
 // Personalization at the edge
 const personalizedResponse = await generatePersonalizedContent(
-  await userPreferences.get(userId)
+  await userPreferences.get(userId),
 );
 ```
 
@@ -815,7 +815,7 @@ const testCDNPerformance = async () => {
     const latency = Date.now() - start;
 
     console.log(
-      `${test.url}: ${latency}ms, Cache: ${response.headers.get("cf-cache-status")}`
+      `${test.url}: ${latency}ms, Cache: ${response.headers.get("cf-cache-status")}`,
     );
   }
 };

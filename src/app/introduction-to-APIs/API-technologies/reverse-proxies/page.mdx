@@ -40,7 +40,6 @@ In modern distributed architectures, reverse proxies are essential infrastructur
 ## Key Features
 
 - **Load Balancing**: Distributes incoming requests across multiple backend servers using various algorithms:
-
   - **Round Robin**: Requests distributed sequentially across servers
   - **Least Connections**: Routes to server with fewest active connections
   - **IP Hash**: Routes based on client IP hash for session persistence
@@ -48,27 +47,23 @@ In modern distributed architectures, reverse proxies are essential infrastructur
   - **Health-based**: Routes only to healthy servers based on health checks
 
 - **SSL/TLS Termination**: Handles SSL encryption/decryption to offload cryptographic processing from backend servers:
-
   - **Certificate Management**: Centralized SSL certificate storage and renewal
   - **Protocol Support**: TLS 1.2/1.3, HTTP/2, HTTP/3 support
   - **Cipher Suite Management**: Control over encryption algorithms and security settings
 
 - **Caching**: Stores frequently requested content to improve response times:
-
   - **Static Content Caching**: Images, CSS, JavaScript files
   - **Dynamic Content Caching**: API responses, rendered pages
   - **Cache Invalidation**: TTL-based or manual cache clearing
   - **Cache Headers**: Proper cache control header management
 
 - **Request/Response Modification**:
-
   - **Header Manipulation**: Add, remove, or modify HTTP headers
   - **URL Rewriting**: Transform URLs before forwarding to backends
   - **Content Compression**: Gzip, Brotli compression for bandwidth optimization
   - **Request Routing**: Route based on URL patterns, headers, or query parameters
 
 - **Security Features**:
-
   - **DDoS Protection**: Rate limiting and traffic filtering
   - **Web Application Firewall (WAF)**: SQL injection, XSS protection
   - **IP Whitelisting/Blacklisting**: Access control based on client IP
@@ -181,7 +176,7 @@ server {
 
 ### HAProxy Configuration
 
-```haproxy
+```
 # /etc/haproxy/haproxy.cfg
 global
     daemon
@@ -398,7 +393,7 @@ networks:
 
 ### Caddy Configuration
 
-```caddyfile
+```
 # Caddyfile
 {
     # Global options
@@ -513,28 +508,24 @@ admin.example.com {
 #### Use Cases
 
 - **High-Traffic Web Applications**:
-
   - **Load Distribution**: Handle millions of requests across multiple servers
   - **Session Persistence**: Maintain user sessions across server restarts
   - **Auto-scaling**: Dynamic backend server provisioning based on traffic
   - **Global Load Balancing**: Route users to nearest data center
 
 - **Microservices Architecture**:
-
   - **Service Discovery**: Automatic routing to available service instances
   - **Circuit Breaking**: Prevent cascading failures between services
   - **Request Routing**: Route based on service version, user type, or A/B testing
   - **Protocol Translation**: Convert between HTTP/1.1, HTTP/2, and gRPC
 
 - **API Gateways**:
-
   - **Authentication/Authorization**: Centralized security policy enforcement
   - **Rate Limiting**: Prevent API abuse and ensure fair usage
   - **Request/Response Transformation**: Data format conversion and validation
   - **Analytics**: Request tracking, monitoring, and business intelligence
 
 - **Content Delivery and CDN**:
-
   - **Edge Caching**: Cache static content at edge locations
   - **Image Optimization**: Dynamic image resizing and format conversion
   - **Bandwidth Optimization**: Content compression and minification
@@ -549,21 +540,18 @@ admin.example.com {
 #### Benefits
 
 - **Performance Optimization**:
-
   - **Reduced Latency**: Caching frequently requested content locally
   - **Connection Pooling**: Reuse connections to backend servers
   - **Content Compression**: Reduce bandwidth usage with gzip/brotli
   - **HTTP/2 Multiplexing**: Handle multiple requests over single connection
 
 - **Scalability and Reliability**:
-
   - **Horizontal Scaling**: Add backend servers without client changes
   - **High Availability**: Automatic failover to healthy servers
   - **Load Distribution**: Prevent any single server from being overwhelmed
   - **Graceful Degradation**: Serve cached content when backends are down
 
 - **Security Enhancements**:
-
   - **DDoS Mitigation**: Rate limiting and traffic filtering
   - **SSL/TLS Termination**: Centralized certificate management
   - **Attack Surface Reduction**: Hide backend server details from clients
@@ -579,21 +567,18 @@ admin.example.com {
 #### Challenges
 
 - **Configuration Complexity**:
-
   - **Learning Curve**: Each proxy solution has different configuration syntax
   - **Rule Management**: Complex routing rules can become difficult to maintain
   - **Testing**: Validating proxy configurations in development environments
   - **Documentation**: Keeping configuration documentation up-to-date
 
 - **Performance Considerations**:
-
   - **Additional Latency**: Every hop adds network latency
   - **Resource Overhead**: Proxy servers consume CPU, memory, and bandwidth
   - **Bottleneck Risk**: Proxy can become performance bottleneck if not properly scaled
   - **Cache Invalidation**: Stale cached content can serve outdated information
 
 - **Operational Challenges**:
-
   - **Single Point of Failure**: Proxy failure affects all backend services
   - **Debugging Complexity**: Tracing requests through multiple proxy layers
   - **Health Check Configuration**: Properly configuring backend health monitoring
@@ -644,7 +629,7 @@ app.use(
       includeSubDomains: true,
       preload: true,
     },
-  })
+  }),
 );
 
 // Rate limiting
@@ -699,7 +684,7 @@ app.use(
       proxyReq.setHeader("X-Real-IP", req.ip);
 
       console.log(
-        `Proxying ${req.method} ${req.url} to ${proxyReq.getHeader("host")}`
+        `Proxying ${req.method} ${req.url} to ${proxyReq.getHeader("host")}`,
       );
     },
     onProxyRes: (proxyRes, req, res) => {
@@ -713,7 +698,7 @@ app.use(
       console.error("Proxy error:", err);
       res.status(500).json({ error: "Proxy error occurred" });
     },
-  })
+  }),
 );
 
 // Static file proxy
@@ -726,7 +711,7 @@ app.use(
       // Cache static files for 1 hour
       proxyRes.headers["Cache-Control"] = "public, max-age=3600";
     },
-  })
+  }),
 );
 
 // WebSocket proxy
@@ -736,7 +721,7 @@ app.use(
     target: "http://websocket-server:8080",
     ws: true,
     changeOrigin: true,
-  })
+  }),
 );
 
 // Default proxy for web application
@@ -748,7 +733,7 @@ app.use(
     onProxyReq: (proxyReq, req, res) => {
       proxyReq.setHeader("X-Forwarded-For", req.ip);
     },
-  })
+  }),
 );
 
 const PORT = process.env.PORT || 3000;

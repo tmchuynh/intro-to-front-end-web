@@ -206,7 +206,7 @@ const q = query(
   collection(db, "articles"),
   where("published", "==", true),
   orderBy("created_at", "desc"),
-  limit(10)
+  limit(10),
 );
 const querySnapshot = await getDocs(q);
 
@@ -215,7 +215,7 @@ const complexQ = query(
   collection(db, "articles"),
   where("published", "==", true),
   where("tags", "array-contains-any", ["tutorial", "guide"]),
-  orderBy("created_at", "desc")
+  orderBy("created_at", "desc"),
 );
 const complexSnapshot = await getDocs(complexQ);
 ```
@@ -236,7 +236,7 @@ await db.collection("articles").updateOne(
     $push: {
       tags: "updated",
     },
-  }
+  },
 );
 
 // Update multiple documents
@@ -247,7 +247,7 @@ await db.collection("articles").updateMany(
       status: "draft",
       "metadata.updated_at": new Date(),
     },
-  }
+  },
 );
 
 // Upsert operation (update or insert)
@@ -260,7 +260,7 @@ await db.collection("articles").updateOne(
       created_at: new Date(),
     },
   },
-  { upsert: true }
+  { upsert: true },
 );
 ```
 
@@ -600,7 +600,7 @@ function useArticles() {
     const q = query(
       collection(db, "articles"),
       where("published", "==", true),
-      orderBy("created_at", "desc")
+      orderBy("created_at", "desc"),
     );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -650,7 +650,7 @@ const client = new MongoClient(
   {
     tlsCAFile: "./rds-combined-ca-bundle.pem",
     useUnifiedTopology: true,
-  }
+  },
 );
 
 async function connectToDocumentDB() {
@@ -778,7 +778,7 @@ await fetch(`${couchUrl}/_design/articles`, {
 
 // Query the view
 const viewResponse = await fetch(
-  `${couchUrl}/_design/articles/_view/by_author?key="Bob Smith"`
+  `${couchUrl}/_design/articles/_view/by_author?key="Bob Smith"`,
 );
 const viewResults = await viewResponse.json();
 ```
@@ -868,7 +868,7 @@ await db.collection("articles").createIndex(
   },
   {
     weights: { title: 10, content: 1 }, // Title is more important
-  }
+  },
 );
 ```
 

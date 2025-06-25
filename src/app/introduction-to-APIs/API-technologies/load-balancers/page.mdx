@@ -45,30 +45,35 @@ Load balancers use various algorithms to distribute traffic across backend serve
 #### Use Cases
 
 #### Web Application Load Balancing
+
 - **High-Traffic Websites**: Distributing millions of concurrent requests across server farms
 - **E-commerce Platforms**: Handling peak shopping periods with dynamic scaling
 - **Content Management Systems**: Balancing read/write operations across database clusters
 - **Media Streaming**: Distributing video/audio content delivery across CDN nodes
 
 #### API Gateway Load Balancing
+
 - **RESTful APIs**: Distributing API calls across multiple service instances
 - **GraphQL Endpoints**: Load balancing complex query processing
 - **WebSocket Connections**: Managing persistent connection distribution
 - **Real-time Applications**: Balancing chat, gaming, and collaboration platforms
 
 #### Microservices Architecture
+
 - **Service-to-Service Communication**: Internal load balancing between microservices
 - **Container Orchestration**: Kubernetes ingress and service mesh load balancing
 - **Serverless Functions**: Distributing function invocations across compute resources
 - **Event-Driven Systems**: Balancing message processing across worker nodes
 
 #### Database Load Balancing
+
 - **Read Replicas**: Distributing read queries across multiple database replicas
 - **Connection Pooling**: Managing database connection distribution
 - **Sharded Databases**: Routing queries to appropriate database shards
 - **Multi-Master Setups**: Balancing writes across multiple master databases
 
 #### Global Load Balancing
+
 - **Multi-Region Deployments**: Routing traffic to the nearest geographical region
 - **Disaster Recovery**: Automatic failover between data centers
 - **Content Delivery**: Optimizing content delivery based on user location
@@ -89,7 +94,7 @@ Load balancers use various algorithms to distribute traffic across backend serve
 - **Performance Bottlenecks**: Load balancers themselves can become performance bottlenecks if not sized correctly or if they are overloaded with traffic. Proper capacity planning and monitoring are crucial to avoid this issue.
 - **Cost**: Depending on the implementation, load balancers can add additional costs to the infrastructure, especially if using commercial solutions or cloud-based services with usage-based pricing.
 - **Security Risks**: Load balancers can introduce security risks if not properly configured. Ensuring secure communication, implementing access controls, and regularly updating load balancer software are essential to mitigate these risks.
-<BackToTop />
+  <BackToTop />
 
 ## Load Balancer Types and Architectures
 
@@ -100,6 +105,7 @@ Load balancers use various algorithms to distribute traffic across backend serve
 Layer 4 load balancers operate at the transport layer, making routing decisions based on IP addresses and port numbers without inspecting packet contents.
 
 ##### Characteristics
+
 - Fast processing with minimal latency
 - Protocol-agnostic (TCP, UDP, etc.)
 - Lower resource consumption
@@ -107,6 +113,7 @@ Layer 4 load balancers operate at the transport layer, making routing decisions 
 - Limited application awareness
 
 ##### Use Cases
+
 - High-performance applications requiring minimal latency
 - Non-HTTP protocols (databases, game servers, etc.)
 - Simple traffic distribution without content inspection
@@ -117,6 +124,7 @@ Layer 4 load balancers operate at the transport layer, making routing decisions 
 Layer 7 load balancers operate at the application layer, making intelligent routing decisions based on application content such as HTTP headers, URLs, and cookies.
 
 ##### Characteristics
+
 - Content-aware routing capabilities
 - Advanced traffic management features
 - SSL termination and inspection
@@ -124,6 +132,7 @@ Layer 7 load balancers operate at the application layer, making intelligent rout
 - More resource-intensive
 
 ##### Use Cases
+
 - Modern web applications requiring intelligent routing
 - Microservices architectures with API-based communication
 - Applications requiring SSL termination
@@ -132,16 +141,19 @@ Layer 7 load balancers operate at the application layer, making intelligent rout
 ### Hardware vs Software vs Cloud Load Balancers
 
 #### Hardware Load Balancers
+
 - **Advantages**: High performance, dedicated resources, hardware-optimized
 - **Disadvantages**: High cost, limited flexibility, vendor lock-in
 - **Examples**: F5 BIG-IP, Citrix ADC, A10 Networks Thunder
 
 #### Software Load Balancers
+
 - **Advantages**: Cost-effective, flexible configuration, open-source options
 - **Disadvantages**: Resource sharing, potential performance limitations
 - **Examples**: NGINX, HAProxy, Apache Traffic Server
 
 #### Cloud Load Balancers
+
 - **Advantages**: Managed service, automatic scaling, global distribution
 - **Disadvantages**: Vendor dependence, potential latency, cost variability
 - **Examples**: AWS ELB, Google Cloud Load Balancing, Azure Load Balancer
@@ -163,96 +175,96 @@ http {
     upstream web_servers {
         # Load balancing method
         least_conn;
-        
+
         # Backend servers with health checks
         server 192.168.1.10:8080 weight=3 max_fails=3 fail_timeout=30s;
         server 192.168.1.11:8080 weight=3 max_fails=3 fail_timeout=30s;
         server 192.168.1.12:8080 weight=2 max_fails=3 fail_timeout=30s;
         server 192.168.1.13:8080 weight=1 backup; # Backup server
-        
+
         # Enable session persistence
         ip_hash;
-        
+
         # Keep-alive connections to upstream
         keepalive 32;
     }
-    
+
     # Rate limiting configuration
     limit_req_zone $binary_remote_addr zone=api_limit:10m rate=10r/s;
     limit_conn_zone $binary_remote_addr zone=conn_limit:10m;
-    
+
     # Logging configuration
     log_format main '$remote_addr - $remote_user [$time_local] "$request" '
                     '$status $body_bytes_sent "$http_referer" '
                     '"$http_user_agent" "$http_x_forwarded_for" '
                     'rt=$request_time uct="$upstream_connect_time" '
                     'uht="$upstream_header_time" urt="$upstream_response_time"';
-    
+
     access_log /var/log/nginx/access.log main;
     error_log /var/log/nginx/error.log warn;
-    
+
     # Main server block
     server {
         listen 80;
         listen 443 ssl http2;
         server_name example.com www.example.com;
-        
+
         # SSL configuration
         ssl_certificate /etc/ssl/certs/example.com.crt;
         ssl_certificate_key /etc/ssl/private/example.com.key;
         ssl_protocols TLSv1.2 TLSv1.3;
         ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384;
         ssl_prefer_server_ciphers off;
-        
+
         # Security headers
         add_header X-Frame-Options DENY always;
         add_header X-Content-Type-Options nosniff always;
         add_header X-XSS-Protection "1; mode=block" always;
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-        
+
         # Health check endpoint
         location /health {
             access_log off;
             return 200 "healthy\n";
             add_header Content-Type text/plain;
         }
-        
+
         # API endpoints with rate limiting
         location /api/ {
             limit_req zone=api_limit burst=20 nodelay;
             limit_conn conn_limit 10;
-            
+
             proxy_pass http://web_servers;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
-            
+
             # Timeouts
             proxy_connect_timeout 5s;
             proxy_send_timeout 10s;
             proxy_read_timeout 30s;
-            
+
             # Buffer settings
             proxy_buffering on;
             proxy_buffer_size 4k;
             proxy_buffers 8 4k;
-            
+
             # Enable keep-alive to upstream
             proxy_http_version 1.1;
             proxy_set_header Connection "";
         }
-        
+
         # Static content with caching
         location /static/ {
             expires 1y;
             add_header Cache-Control "public, immutable";
             add_header X-Cache-Status "HIT";
-            
+
             # Try local cache first, fallback to upstream
             try_files $uri @upstream;
         }
-        
+
         # Fallback to upstream servers
         location @upstream {
             proxy_pass http://web_servers;
@@ -261,7 +273,7 @@ http {
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
         }
-        
+
         # WebSocket support
         location /ws/ {
             proxy_pass http://web_servers;
@@ -272,16 +284,16 @@ http {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
-            
+
             # WebSocket timeout settings
             proxy_read_timeout 3600s;
             proxy_send_timeout 3600s;
         }
-        
+
         # Content-based routing
         location ~ ^/api/v([0-9]+)/ {
             set $api_version $1;
-            
+
             # Route to different upstream based on API version
             if ($api_version = "1") {
                 proxy_pass http://api_v1_servers;
@@ -289,7 +301,7 @@ http {
             if ($api_version = "2") {
                 proxy_pass http://api_v2_servers;
             }
-            
+
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -297,19 +309,20 @@ http {
             proxy_set_header X-API-Version $api_version;
         }
     }
-    
+
     # Additional upstream definitions
     upstream api_v1_servers {
         server 192.168.1.20:8080;
         server 192.168.1.21:8080;
     }
-    
+
     upstream api_v2_servers {
         server 192.168.1.30:8080;
         server 192.168.1.31:8080;
     }
 }
 ```
+
 <BackToTop />
 
 #### Advanced NGINX Configuration with Lua
@@ -321,12 +334,12 @@ http {
     lua_shared_dict sessions 10m;
     lua_shared_dict rate_limit 10m;
     lua_shared_dict health_check 1m;
-    
+
     # Initialize Lua modules
     init_by_lua_block {
         local http = require "resty.http"
         local json = require "cjson"
-        
+
         -- Global health check function
         function check_upstream_health()
             local httpc = http.new()
@@ -335,13 +348,13 @@ http {
                 "192.168.1.11:8080",
                 "192.168.1.12:8080"
             }
-            
+
             for i, server in ipairs(servers) do
                 local res, err = httpc:request_uri("http://" .. server .. "/health", {
                     method = "GET",
                     timeout = 5000
                 })
-                
+
                 local health_dict = ngx.shared.health_check
                 if res and res.status == 200 then
                     health_dict:set(server, "healthy")
@@ -352,30 +365,30 @@ http {
             end
         end
     }
-    
+
     # Periodic health checks
     init_worker_by_lua_block {
         local function health_check_timer()
             check_upstream_health()
         end
-        
+
         -- Run health check every 30 seconds
         local ok, err = ngx.timer.every(30, health_check_timer)
         if not ok then
             ngx.log(ngx.ERR, "Failed to create health check timer: ", err)
         end
     }
-    
+
     upstream dynamic_servers {
         server 192.168.1.10:8080;
         server 192.168.1.11:8080;
         server 192.168.1.12:8080;
-        
+
         # Enable dynamic upstream modification
         balancer_by_lua_block {
             local balancer = require "ngx.balancer"
             local health_dict = ngx.shared.health_check
-            
+
             -- Get list of healthy servers
             local healthy_servers = {}
             local servers = {
@@ -383,58 +396,58 @@ http {
                 "192.168.1.11:8080",
                 "192.168.1.12:8080"
             }
-            
+
             for i, server in ipairs(servers) do
                 local status = health_dict:get(server)
                 if status == "healthy" then
                     table.insert(healthy_servers, server)
                 end
             end
-            
+
             if #healthy_servers == 0 then
                 ngx.log(ngx.ERR, "No healthy servers available")
                 return
             end
-            
+
             -- Simple round-robin among healthy servers
             local index = (ngx.worker.id() + ngx.now()) % #healthy_servers + 1
             local chosen_server = healthy_servers[index]
-            
+
             local host, port = chosen_server:match("([^:]+):(%d+)")
             local ok, err = balancer.set_current_peer(host, tonumber(port))
-            
+
             if not ok then
                 ngx.log(ngx.ERR, "Failed to set current peer: ", err)
             end
         }
     }
-    
+
     server {
         listen 80;
-        
+
         # Custom load balancing with session affinity
         location /app/ {
             access_by_lua_block {
                 local sessions = ngx.shared.sessions
                 local rate_limit = ngx.shared.rate_limit
-                
+
                 -- Rate limiting
                 local client_ip = ngx.var.remote_addr
                 local current_time = ngx.now()
                 local window_size = 60  -- 1 minute window
                 local max_requests = 100
-                
+
                 local key = client_ip .. ":" .. math.floor(current_time / window_size)
                 local count = rate_limit:get(key) or 0
-                
+
                 if count >= max_requests then
                     ngx.status = 429
                     ngx.say("Rate limit exceeded")
                     ngx.exit(429)
                 end
-                
+
                 rate_limit:set(key, count + 1, window_size)
-                
+
                 -- Session affinity
                 local session_id = ngx.var.cookie_sessionid
                 if session_id then
@@ -444,20 +457,20 @@ http {
                     end
                 end
             }
-            
+
             proxy_pass http://dynamic_servers;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
-        
+
         # A/B testing endpoint
         location /experiment/ {
             access_by_lua_block {
                 -- Simple A/B testing logic
                 local user_id = ngx.var.arg_user_id or ngx.var.remote_addr
                 local hash = ngx.crc32_long(user_id)
-                
+
                 if hash % 2 == 0 then
                     ngx.var.experiment_group = "A"
                     ngx.var.target_upstream = "experiment_a_servers"
@@ -465,10 +478,10 @@ http {
                     ngx.var.experiment_group = "B"
                     ngx.var.target_upstream = "experiment_b_servers"
                 end
-                
+
                 ngx.header["X-Experiment-Group"] = ngx.var.experiment_group
             }
-            
+
             proxy_pass http://$target_upstream;
             proxy_set_header Host $host;
             proxy_set_header X-Real-IP $remote_addr;
@@ -476,26 +489,27 @@ http {
             proxy_set_header X-Experiment-Group $experiment_group;
         }
     }
-    
+
     # Experiment upstream groups
     upstream experiment_a_servers {
         server 192.168.1.40:8080;
         server 192.168.1.41:8080;
     }
-    
+
     upstream experiment_b_servers {
         server 192.168.1.50:8080;
         server 192.168.1.51:8080;
     }
 }
 ```
+
 <BackToTop />
 
 ### HAProxy Configuration
 
 #### Production-Ready HAProxy Setup
 
-```haproxy
+```
 # /etc/haproxy/haproxy.cfg
 global
     # Process settings
@@ -503,25 +517,25 @@ global
     user haproxy
     group haproxy
     pidfile /var/run/haproxy.pid
-    
+
     # Performance tuning
     maxconn 4096
     nbproc 1
     nbthread 4
     cpu-map auto:1/1-4 0-3
-    
+
     # SSL settings
     ssl-default-bind-ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384
     ssl-default-bind-options ssl-min-ver TLSv1.2 no-sslv3 no-tlsv10 no-tlsv11
-    
+
     # Certificate directory
     crt-base /etc/ssl/certs
     ca-base /etc/ssl/certs
-    
+
     # Statistics socket
     stats socket /var/run/haproxy.sock mode 600 level admin
     stats timeout 2m
-    
+
     # Logging
     log 127.0.0.1:514 local0
     log-tag haproxy
@@ -533,7 +547,7 @@ defaults
     option log-health-checks
     option forwardfor
     option http-server-close
-    
+
     # Timeouts
     timeout connect 5000ms
     timeout client 50000ms
@@ -541,7 +555,7 @@ defaults
     timeout http-request 10s
     timeout http-keep-alive 2s
     timeout check 3s
-    
+
     # Error handling
     errorfile 400 /etc/haproxy/errors/400.http
     errorfile 403 /etc/haproxy/errors/403.http
@@ -564,36 +578,36 @@ listen stats
 frontend web_frontend
     bind *:80
     bind *:443 ssl crt /etc/ssl/certs/example.com.pem
-    
+
     # Redirect HTTP to HTTPS
     redirect scheme https code 301 if !{ ssl_fc }
-    
+
     # Security headers
     http-response set-header X-Frame-Options DENY
     http-response set-header X-Content-Type-Options nosniff
     http-response set-header X-XSS-Protection "1; mode=block"
     http-response set-header Strict-Transport-Security "max-age=31536000; includeSubDomains"
-    
+
     # Rate limiting using stick tables
     stick-table type ip size 100k expire 30s store http_req_rate(10s)
     http-request track-sc0 src
     http-request deny if { sc_http_req_rate(0) gt 20 }
-    
+
     # Content-based routing
     acl is_api path_beg /api/
     acl is_static path_beg /static/ /images/ /css/ /js/
     acl is_websocket hdr(Upgrade) -i websocket
     acl is_admin path_beg /admin/
-    
+
     # Admin access control
     http-request deny if is_admin !{ src -f /etc/haproxy/admin_ips.txt }
-    
+
     # Route to appropriate backends
     use_backend api_servers if is_api
     use_backend static_servers if is_static
     use_backend websocket_servers if is_websocket
     use_backend web_servers
-    
+
     # Custom error pages
     default_backend web_servers
 
@@ -602,20 +616,20 @@ backend web_servers
     balance roundrobin
     option httpchk GET /health
     http-check expect status 200
-    
+
     # Server definitions with health checks
     server web1 192.168.1.10:8080 check inter 5s rise 3 fall 2 weight 100
     server web2 192.168.1.11:8080 check inter 5s rise 3 fall 2 weight 100
     server web3 192.168.1.12:8080 check inter 5s rise 3 fall 2 weight 80
     server web4 192.168.1.13:8080 check inter 5s rise 3 fall 2 weight 50 backup
-    
+
     # Session persistence using cookies
     cookie JSESSIONID prefix nocache
-    
+
     # Compression
     compression algo gzip
     compression type text/html text/plain text/css text/javascript application/javascript application/json
-    
+
     # HTTP headers
     http-request set-header X-Forwarded-Proto https if { ssl_fc }
     http-request set-header X-Forwarded-Proto http if !{ ssl_fc }
@@ -625,11 +639,11 @@ backend api_servers
     balance leastconn
     option httpchk GET /api/health
     http-check expect string "healthy"
-    
+
     server api1 192.168.1.20:8080 check inter 3s rise 2 fall 3 weight 100
     server api2 192.168.1.21:8080 check inter 3s rise 2 fall 3 weight 100
     server api3 192.168.1.22:8080 check inter 3s rise 2 fall 3 weight 100
-    
+
     # API-specific headers
     http-request set-header X-API-Gateway haproxy
     http-response set-header X-API-Response-Time %Tr
@@ -638,10 +652,10 @@ backend api_servers
 backend static_servers
     balance source
     option httpchk GET /health
-    
+
     server static1 192.168.1.30:80 check inter 10s
     server static2 192.168.1.31:80 check inter 10s
-    
+
     # Cache control headers
     http-response set-header Cache-Control "public, max-age=31536000"
 
@@ -649,10 +663,10 @@ backend static_servers
 backend websocket_servers
     balance source
     option httpchk GET /ws/health
-    
+
     server ws1 192.168.1.40:8080 check inter 5s
     server ws2 192.168.1.41:8080 check inter 5s
-    
+
     # WebSocket-specific timeouts
     timeout server 3600s
     timeout tunnel 3600s
@@ -663,7 +677,7 @@ listen mysql_cluster
     mode tcp
     balance leastconn
     option mysql-check user haproxy_check
-    
+
     server mysql1 192.168.1.60:3306 check inter 5s rise 3 fall 2
     server mysql2 192.168.1.61:3306 check inter 5s rise 3 fall 2 backup
 
@@ -675,11 +689,12 @@ listen redis_cluster
     option tcp-check
     tcp-check send PING\r\n
     tcp-check expect string +PONG
-    
+
     server redis1 192.168.1.70:6379 check inter 5s
     server redis2 192.168.1.71:6379 check inter 5s
     server redis3 192.168.1.72:6379 check inter 5s
 ```
+
 <BackToTop />
 
 ### AWS Application Load Balancer (ALB)
@@ -688,22 +703,22 @@ listen redis_cluster
 
 ```yaml
 # aws-alb-advanced.yaml
-AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Advanced Application Load Balancer with multiple target groups and routing rules'
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Advanced Application Load Balancer with multiple target groups and routing rules"
 
 Parameters:
   VpcId:
     Type: AWS::EC2::VPC::Id
     Description: VPC ID where the load balancer will be deployed
-  
+
   SubnetIds:
     Type: List<AWS::EC2::Subnet::Id>
     Description: List of subnet IDs for the load balancer
-  
+
   CertificateArn:
     Type: String
     Description: ACM certificate ARN for HTTPS
-  
+
   DomainName:
     Type: String
     Default: example.com
@@ -745,17 +760,17 @@ Resources:
         - !Ref ALBSecurityGroup
       LoadBalancerAttributes:
         - Key: idle_timeout.timeout_seconds
-          Value: '60'
+          Value: "60"
         - Key: routing.http2.enabled
-          Value: 'true'
+          Value: "true"
         - Key: access_logs.s3.enabled
-          Value: 'true'
+          Value: "true"
         - Key: access_logs.s3.bucket
           Value: !Ref AccessLogsBucket
         - Key: access_logs.s3.prefix
           Value: alb-logs
         - Key: deletion_protection.enabled
-          Value: 'false'
+          Value: "false"
       Tags:
         - Key: Name
           Value: Advanced-ALB
@@ -793,13 +808,13 @@ Resources:
       UnhealthyThresholdCount: 3
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
-          Value: '30'
+          Value: "30"
         - Key: stickiness.enabled
-          Value: 'true'
+          Value: "true"
         - Key: stickiness.type
           Value: lb_cookie
         - Key: stickiness.lb_cookie.duration_seconds
-          Value: '86400'
+          Value: "86400"
       Tags:
         - Key: Name
           Value: WebServers-TG
@@ -821,9 +836,9 @@ Resources:
       UnhealthyThresholdCount: 2
       TargetGroupAttributes:
         - Key: deregistration_delay.timeout_seconds
-          Value: '60'
+          Value: "60"
         - Key: slow_start.duration_seconds
-          Value: '30'
+          Value: "30"
       Tags:
         - Key: Name
           Value: APIServers-TG
@@ -872,7 +887,7 @@ Resources:
         - Type: redirect
           RedirectConfig:
             Protocol: HTTPS
-            Port: '443'
+            Port: "443"
             StatusCode: HTTP_301
 
   # API Routing Rule
@@ -884,7 +899,7 @@ Resources:
       Conditions:
         - Field: path-pattern
           Values:
-            - '/api/*'
+            - "/api/*"
       Actions:
         - Type: forward
           TargetGroupArn: !Ref APIServerTargetGroup
@@ -898,10 +913,10 @@ Resources:
       Conditions:
         - Field: path-pattern
           Values:
-            - '/admin/*'
+            - "/admin/*"
         - Field: source-ip
           Values:
-            - '203.0.113.0/24'  # Replace with your admin IP range
+            - "203.0.113.0/24" # Replace with your admin IP range
       Actions:
         - Type: forward
           TargetGroupArn: !Ref AdminPanelTargetGroup
@@ -915,10 +930,10 @@ Resources:
       Conditions:
         - Field: path-pattern
           Values:
-            - '/static/*'
-            - '/images/*'
-            - '/css/*'
-            - '/js/*'
+            - "/static/*"
+            - "/images/*"
+            - "/css/*"
+            - "/js/*"
       Actions:
         - Type: forward
           TargetGroupArn: !Ref WebServerTargetGroup
@@ -1022,6 +1037,7 @@ Outputs:
     Export:
       Name: !Sub "${AWS::StackName}-APITG-ARN"
 ```
+
 <BackToTop />
 
 ### Kubernetes Ingress Controllers
@@ -1046,42 +1062,42 @@ data:
   ssl-protocols: "TLSv1.2 TLSv1.3"
   ssl-ciphers: "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384"
   ssl-prefer-server-ciphers: "true"
-  
+
   # Performance settings
   worker-processes: "auto"
   worker-connections: "16384"
   max-worker-open-files: "65536"
-  
+
   # Keep-alive settings
   upstream-keepalive-connections: "32"
   upstream-keepalive-timeout: "60"
   upstream-keepalive-requests: "100"
-  
+
   # Buffer settings
   proxy-buffer-size: "16k"
   proxy-buffers-number: "8"
   proxy-busy-buffers-size: "32k"
-  
+
   # Timeout settings
   proxy-connect-timeout: "5"
   proxy-send-timeout: "60"
   proxy-read-timeout: "60"
-  
+
   # Rate limiting
   limit-req-status-code: "429"
   limit-conn-status-code: "429"
-  
+
   # Security headers
   add-headers: "true"
   custom-headers: "default/custom-headers"
-  
+
   # Logging
   log-format-upstream: '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" $request_length $request_time [$proxy_upstream_name] [$proxy_alternative_upstream_name] $upstream_addr $upstream_response_length $upstream_response_time $upstream_status $req_id'
-  
+
   # Enable real IP
   use-forwarded-headers: "true"
   compute-full-forwarded-for: "true"
-  
+
   # Enable gzip compression
   enable-brotli: "true"
   gzip-level: "6"
@@ -1120,69 +1136,69 @@ spec:
     spec:
       serviceAccountName: nginx-ingress-serviceaccount
       containers:
-      - name: nginx-ingress-controller
-        image: k8s.gcr.io/ingress-nginx/controller:v1.8.1
-        args:
-        - /nginx-ingress-controller
-        - --configmap=$(POD_NAMESPACE)/nginx-configuration
-        - --tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
-        - --udp-services-configmap=$(POD_NAMESPACE)/udp-services
-        - --publish-service=$(POD_NAMESPACE)/ingress-nginx
-        - --annotations-prefix=nginx.ingress.kubernetes.io
-        - --enable-ssl-passthrough
-        - --metrics-bind-address=0.0.0.0:10254
-        - --profiling
-        securityContext:
-          allowPrivilegeEscalation: true
-          capabilities:
-            drop:
-            - ALL
-            add:
-            - NET_BIND_SERVICE
-          runAsUser: 101
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: POD_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        ports:
-        - name: http
-          containerPort: 80
-        - name: https
-          containerPort: 443
-        - name: metrics
-          containerPort: 10254
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 10254
-            scheme: HTTP
-          initialDelaySeconds: 10
-          periodSeconds: 10
-          timeoutSeconds: 1
-          successThreshold: 1
-          failureThreshold: 5
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: 10254
-            scheme: HTTP
-          initialDelaySeconds: 10
-          periodSeconds: 10
-          timeoutSeconds: 1
-          successThreshold: 1
-          failureThreshold: 3
-        resources:
-          requests:
-            cpu: 100m
-            memory: 90Mi
-          limits:
-            cpu: 1000m
-            memory: 1Gi
+        - name: nginx-ingress-controller
+          image: k8s.gcr.io/ingress-nginx/controller:v1.8.1
+          args:
+            - /nginx-ingress-controller
+            - --configmap=$(POD_NAMESPACE)/nginx-configuration
+            - --tcp-services-configmap=$(POD_NAMESPACE)/tcp-services
+            - --udp-services-configmap=$(POD_NAMESPACE)/udp-services
+            - --publish-service=$(POD_NAMESPACE)/ingress-nginx
+            - --annotations-prefix=nginx.ingress.kubernetes.io
+            - --enable-ssl-passthrough
+            - --metrics-bind-address=0.0.0.0:10254
+            - --profiling
+          securityContext:
+            allowPrivilegeEscalation: true
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+            runAsUser: 101
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+            - name: metrics
+              containerPort: 10254
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 10254
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 90Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
 
 ---
 # Service for NGINX Ingress Controller
@@ -1197,14 +1213,14 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - port: 80
-    targetPort: 80
-    protocol: TCP
-    name: http
-  - port: 443
-    targetPort: 443
-    protocol: TCP
-    name: https
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+    - port: 443
+      targetPort: 443
+      protocol: TCP
+      name: https
   selector:
     app: nginx-ingress-controller
 
@@ -1219,21 +1235,21 @@ metadata:
     # Basic configuration
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/rewrite-target: /
-    
+
     # SSL configuration
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    
+
     # Rate limiting
     nginx.ingress.kubernetes.io/rate-limit: "100"
     nginx.ingress.kubernetes.io/rate-limit-window: "1m"
-    
+
     # CORS configuration
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "https://example.com"
     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
-    
+
     # Session affinity
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/affinity-mode: "persistent"
@@ -1241,68 +1257,68 @@ metadata:
     nginx.ingress.kubernetes.io/session-cookie-expires: "86400"
     nginx.ingress.kubernetes.io/session-cookie-max-age: "86400"
     nginx.ingress.kubernetes.io/session-cookie-path: "/"
-    
+
     # Custom error pages
     nginx.ingress.kubernetes.io/custom-http-errors: "404,503"
     nginx.ingress.kubernetes.io/default-backend: "default/custom-error-pages"
-    
+
     # Whitelist configuration
     nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
-    
+
     # Load balancing algorithm
     nginx.ingress.kubernetes.io/upstream-hash-by: "$request_uri"
-    
+
     # Monitoring and logging
     nginx.ingress.kubernetes.io/enable-access-log: "true"
     nginx.ingress.kubernetes.io/enable-rewrite-log: "true"
-    
+
 spec:
   tls:
-  - hosts:
-    - example.com
-    - api.example.com
-    secretName: example-tls-secret
+    - hosts:
+        - example.com
+        - api.example.com
+      secretName: example-tls-secret
   rules:
-  - host: example.com
-    http:
-      paths:
-      # Main web application
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: web-app-service
-            port:
-              number: 80
-      
-      # Static content with caching
-      - path: /static
-        pathType: Prefix
-        backend:
-          service:
-            name: static-content-service
-            port:
-              number: 80
-  
-  - host: api.example.com
-    http:
-      paths:
-      # API endpoints with different rate limiting
-      - path: /v1
-        pathType: Prefix
-        backend:
-          service:
-            name: api-v1-service
-            port:
-              number: 8080
-      
-      - path: /v2
-        pathType: Prefix
-        backend:
-          service:
-            name: api-v2-service
-            port:
-              number: 8080
+    - host: example.com
+      http:
+        paths:
+          # Main web application
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-app-service
+                port:
+                  number: 80
+
+          # Static content with caching
+          - path: /static
+            pathType: Prefix
+            backend:
+              service:
+                name: static-content-service
+                port:
+                  number: 80
+
+    - host: api.example.com
+      http:
+        paths:
+          # API endpoints with different rate limiting
+          - path: /v1
+            pathType: Prefix
+            backend:
+              service:
+                name: api-v1-service
+                port:
+                  number: 8080
+
+          - path: /v2
+            pathType: Prefix
+            backend:
+              service:
+                name: api-v2-service
+                port:
+                  number: 8080
 
 ---
 # Custom Error Pages Service
@@ -1315,8 +1331,8 @@ spec:
   selector:
     app: custom-error-pages
   ports:
-  - port: 80
-    targetPort: 8080
+    - port: 80
+      targetPort: 8080
 
 ---
 # Rate Limiting Ingress for API
@@ -1327,35 +1343,35 @@ metadata:
   namespace: default
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    
+
     # Aggressive rate limiting for public API
     nginx.ingress.kubernetes.io/rate-limit: "10"
     nginx.ingress.kubernetes.io/rate-limit-burst: "20"
     nginx.ingress.kubernetes.io/rate-limit-window: "1m"
-    
+
     # Connection limiting
     nginx.ingress.kubernetes.io/limit-connections: "5"
-    
+
     # Request size limiting
     nginx.ingress.kubernetes.io/proxy-body-size: "1m"
-    
+
     # Timeout configuration
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "5"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "10"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "30"
-    
+
 spec:
   rules:
-  - host: api.example.com
-    http:
-      paths:
-      - path: /public
-        pathType: Prefix
-        backend:
-          service:
-            name: public-api-service
-            port:
-              number: 8080
+    - host: api.example.com
+      http:
+        paths:
+          - path: /public
+            pathType: Prefix
+            backend:
+              service:
+                name: public-api-service
+                port:
+                  number: 8080
 
 ---
 # Blue-Green Deployment Ingress
@@ -1366,25 +1382,25 @@ metadata:
   namespace: default
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    
+
     # Canary deployment configuration
     nginx.ingress.kubernetes.io/canary: "true"
-    nginx.ingress.kubernetes.io/canary-weight: "10"  # 10% traffic to green
+    nginx.ingress.kubernetes.io/canary-weight: "10" # 10% traffic to green
     nginx.ingress.kubernetes.io/canary-by-header: "X-Canary"
     nginx.ingress.kubernetes.io/canary-by-header-value: "green"
-    
+
 spec:
   rules:
-  - host: app.example.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: green-app-service  # New version
-            port:
-              number: 80
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: green-app-service # New version
+                port:
+                  number: 80
 
 ---
 # Main Production Ingress (Blue)
@@ -1397,16 +1413,16 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
-  - host: app.example.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: blue-app-service  # Current version
-            port:
-              number: 80
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: blue-app-service # Current version
+                port:
+                  number: 80
 ```
 
 <BackToTop />

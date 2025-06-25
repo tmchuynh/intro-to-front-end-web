@@ -24,13 +24,17 @@ Unlike traditional approaches where these capabilities are built into each servi
 Service meshes typically follow a two-plane architecture:
 
 ### Data Plane
+
 The data plane consists of lightweight network proxies (often called sidecars) deployed alongside each service instance. These proxies:
+
 - Intercept all network communication between services
 - Implement traffic policies, security rules, and observability collection
 - Are typically based on high-performance proxies like Envoy
 
 ### Control Plane
+
 The control plane manages and configures the data plane proxies:
+
 - Provides service discovery and configuration distribution
 - Manages security certificates and policies
 - Collects telemetry data
@@ -49,7 +53,7 @@ data:
     - Citadel: Certificate management and security
     - Galley: Configuration validation and distribution
     - Telemetry: Metrics and tracing collection
-    
+
     Data Plane:
     - Envoy Proxy: Sidecar proxies for traffic interception
 ```
@@ -80,37 +84,40 @@ data:
 - **Debugging Complexity**: Network-level abstractions can make troubleshooting more challenging.
 - **Vendor Lock-in Risk**: Different service mesh implementations have varying APIs and configuration formats.
 - **Initial Setup Overhead**: Significant investment in learning, planning, and migration required.
-<BackToTop />
+  <BackToTop />
 
 ## Popular Service Mesh Solutions
 
-| Solution | Type | Key Strengths | Best For | Learning Curve |
-|----------|------|---------------|----------|----------------|
-| [**Istio**](https://istio.io/) | CNCF Graduated | Feature-rich, enterprise-grade, extensive ecosystem | Large-scale enterprises, complex requirements | High |
-| [**Linkerd**](https://linkerd.io/) | CNCF Graduated | Lightweight, simple, excellent performance | Small to medium deployments, simplicity focus | Low |
-| [**Consul Connect**](https://www.consul.io/docs/connect) | HashiCorp | Multi-platform, service discovery integration | Hybrid environments, HashiCorp stack users | Medium |
-| [**AWS App Mesh**](https://aws.amazon.com/app-mesh/) | Managed Service | AWS-native, fully managed, no control plane management | AWS-centric architectures | Low |
-| [**Cilium**](https://cilium.io/) | CNCF Graduated | eBPF-based, high performance, advanced networking | Performance-critical applications, Kubernetes-native | High |
-| [**Kuma**](https://kuma.io/) | CNCF Sandbox | Universal (K8s + VMs), Kong ecosystem | Multi-platform deployments | Medium |
+| Solution                                                 | Type            | Key Strengths                                          | Best For                                             | Learning Curve |
+| -------------------------------------------------------- | --------------- | ------------------------------------------------------ | ---------------------------------------------------- | -------------- |
+| [**Istio**](https://istio.io/)                           | CNCF Graduated  | Feature-rich, enterprise-grade, extensive ecosystem    | Large-scale enterprises, complex requirements        | High           |
+| [**Linkerd**](https://linkerd.io/)                       | CNCF Graduated  | Lightweight, simple, excellent performance             | Small to medium deployments, simplicity focus        | Low            |
+| [**Consul Connect**](https://www.consul.io/docs/connect) | HashiCorp       | Multi-platform, service discovery integration          | Hybrid environments, HashiCorp stack users           | Medium         |
+| [**AWS App Mesh**](https://aws.amazon.com/app-mesh/)     | Managed Service | AWS-native, fully managed, no control plane management | AWS-centric architectures                            | Low            |
+| [**Cilium**](https://cilium.io/)                         | CNCF Graduated  | eBPF-based, high performance, advanced networking      | Performance-critical applications, Kubernetes-native | High           |
+| [**Kuma**](https://kuma.io/)                             | CNCF Sandbox    | Universal (K8s + VMs), Kong ecosystem                  | Multi-platform deployments                           | Medium         |
 
 #### Istio
+
 - **Strengths**: Most comprehensive feature set, strong security, excellent observability
 - **Use Cases**: Enterprise environments requiring advanced traffic management and security
 - **Performance**: Moderate overhead due to feature richness
 - **Adoption**: Widely adopted in large enterprises
 
 #### Linkerd
+
 - **Strengths**: Exceptional performance, minimal resource usage, ease of use
 - **Use Cases**: Performance-sensitive applications, teams prioritizing simplicity
 - **Performance**: Lowest latency overhead among major service meshes
 - **Adoption**: Popular for its simplicity and Rust-based efficiency
 
 #### Consul Connect
+
 - **Strengths**: Works across VMs and containers, strong service discovery
 - **Use Cases**: Hybrid cloud environments, existing Consul users
 - **Performance**: Good performance with minimal overhead
 - **Adoption**: Strong in enterprises using HashiCorp tools
-<BackToTop />
+  <BackToTop />
 
 ## Implementation Examples
 
@@ -144,8 +151,8 @@ metadata:
     service: productpage
 spec:
   ports:
-  - port: 9080
-    name: http
+    - port: 9080
+      name: http
   selector:
     app: productpage
 ---
@@ -169,11 +176,11 @@ spec:
         version: v1
     spec:
       containers:
-      - name: productpage
-        image: docker.io/istio/examples-bookinfo-productpage-v1:1.16.2
-        imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: 9080
+        - name: productpage
+          image: docker.io/istio/examples-bookinfo-productpage-v1:1.16.2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9080
 ```
 
 #### 3. Traffic Management with VirtualService
@@ -186,23 +193,23 @@ metadata:
   name: productpage
 spec:
   http:
-  - match:
-    - headers:
-        end-user:
-          exact: jason
-    route:
-    - destination:
-        host: reviews
-        subset: v2
-  - route:
-    - destination:
-        host: reviews
-        subset: v1
-      weight: 90
-    - destination:
-        host: reviews
-        subset: v3
-      weight: 10
+    - match:
+        - headers:
+            end-user:
+              exact: jason
+      route:
+        - destination:
+            host: reviews
+            subset: v2
+    - route:
+        - destination:
+            host: reviews
+            subset: v1
+          weight: 90
+        - destination:
+            host: reviews
+            subset: v3
+          weight: 10
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
@@ -211,20 +218,20 @@ metadata:
 spec:
   host: reviews
   subsets:
-  - name: v1
-    labels:
-      version: v1
-  - name: v2
-    labels:
-      version: v2
-  - name: v3
-    labels:
-      version: v3
-    trafficPolicy:
-      circuitBreaker:
-        consecutiveErrors: 5
-        interval: 30s
-        baseEjectionTime: 30s
+    - name: v1
+      labels:
+        version: v1
+    - name: v2
+      labels:
+        version: v2
+    - name: v3
+      labels:
+        version: v3
+      trafficPolicy:
+        circuitBreaker:
+          consecutiveErrors: 5
+          interval: 30s
+          baseEjectionTime: 30s
 ```
 
 #### 4. Security Policies
@@ -250,16 +257,17 @@ spec:
     matchLabels:
       app: productpage
   rules:
-  - from:
-    - source:
-        principals: ["cluster.local/ns/production/sa/gateway"]
-  - to:
-    - operation:
-        methods: ["GET", "POST"]
-  - when:
-    - key: request.headers[version]
-      values: ["v1", "v2"]
+    - from:
+        - source:
+            principals: ["cluster.local/ns/production/sa/gateway"]
+    - to:
+        - operation:
+            methods: ["GET", "POST"]
+    - when:
+        - key: request.headers[version]
+          values: ["v1", "v2"]
 ```
+
 <BackToTop />
 
 ### Linkerd Implementation
@@ -306,10 +314,10 @@ spec:
         config.linkerd.io/proxy-memory-request: "64Mi"
     spec:
       containers:
-      - name: web-app
-        image: nginx:1.21
-        ports:
-        - containerPort: 80
+        - name: web-app
+          image: nginx:1.21
+          ports:
+            - containerPort: 80
 ```
 
 #### 3. Traffic Split for Canary Deployments
@@ -324,10 +332,10 @@ metadata:
 spec:
   service: web-app
   backends:
-  - service: web-app-stable
-    weight: 90
-  - service: web-app-canary
-    weight: 10
+    - service: web-app-stable
+      weight: 90
+    - service: web-app-canary
+      weight: 10
 ---
 apiVersion: specs.smi-spec.io/v1alpha4
 kind: HTTPRouteGroup
@@ -335,15 +343,16 @@ metadata:
   name: web-app-routes
 spec:
   matches:
-  - name: metrics
-    pathRegex: /metrics
-    methods:
-    - GET
-  - name: health
-    pathRegex: /health
-    methods:
-    - GET
+    - name: metrics
+      pathRegex: /metrics
+      methods:
+        - GET
+    - name: health
+      pathRegex: /health
+      methods:
+        - GET
 ```
+
 <BackToTop />
 
 ### Consul Connect Setup
@@ -421,6 +430,7 @@ consul intention create -deny "*" database
 # List all intentions
 consul intention list
 ```
+
 <BackToTop />
 
 ### AWS App Mesh Configuration
@@ -453,7 +463,7 @@ spec:
         protocol: http
       healthCheck:
         protocol: http
-        path: '/health'
+        path: "/health"
         healthyThreshold: 2
         unhealthyThreshold: 2
         timeoutMillis: 2000
@@ -504,6 +514,7 @@ spec:
                 name: reviews-v2
               weight: 30
 ```
+
 <BackToTop />
 
 ### Observability Configuration
@@ -560,6 +571,7 @@ spec:
     annotations:
       kubernetes.io/ingress.class: nginx
 ```
+
 <BackToTop />
 
 ## Best Practices
@@ -630,8 +642,7 @@ kind: AuthorizationPolicy
 metadata:
   name: deny-all-default
   namespace: production
-spec:
-  {} # Empty spec denies all requests
+spec: {} # Empty spec denies all requests
 ---
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
@@ -640,15 +651,15 @@ metadata:
   namespace: production
 spec:
   rules:
-  - from:
-    - source:
-        namespaces: ["production", "staging"]
-  - to:
-    - operation:
-        methods: ["GET", "POST", "PUT", "DELETE"]
-  - when:
-    - key: source.ip
-      notValues: ["10.0.0.0/8"]  # Block external IPs
+    - from:
+        - source:
+            namespaces: ["production", "staging"]
+    - to:
+        - operation:
+            methods: ["GET", "POST", "PUT", "DELETE"]
+    - when:
+        - key: source.ip
+          notValues: ["10.0.0.0/8"] # Block external IPs
 ```
 
 ### 4. Performance Optimization
@@ -677,21 +688,22 @@ data:
         service: opentelemetry-collector
         port: 4317
 ```
+
 <BackToTop />
 
 ## Comparison Matrix
 
-| Feature | Istio | Linkerd | Consul Connect | AWS App Mesh | Cilium |
-|---------|-------|---------|----------------|--------------|--------|
-| **Performance** | Medium | High | High | Medium | Very High |
-| **Feature Richness** | Very High | Medium | Medium | Medium | High |
-| **Learning Curve** | High | Low | Medium | Low | High |
-| **Multi-Cloud** | Yes | Yes | Yes | AWS Only | Yes |
-| **Non-K8s Support** | Limited | No | Yes | Limited | No |
-| **Enterprise Support** | Yes | Yes | Yes | Yes | Yes |
-| **Cost** | Free | Free | Free/Paid | AWS Pricing | Free |
-| **Maturity** | High | High | High | Medium | Medium |
-| **Community** | Large | Medium | Medium | AWS Ecosystem | Growing |
+| Feature                | Istio     | Linkerd | Consul Connect | AWS App Mesh  | Cilium    |
+| ---------------------- | --------- | ------- | -------------- | ------------- | --------- |
+| **Performance**        | Medium    | High    | High           | Medium        | Very High |
+| **Feature Richness**   | Very High | Medium  | Medium         | Medium        | High      |
+| **Learning Curve**     | High      | Low     | Medium         | Low           | High      |
+| **Multi-Cloud**        | Yes       | Yes     | Yes            | AWS Only      | Yes       |
+| **Non-K8s Support**    | Limited   | No      | Yes            | Limited       | No        |
+| **Enterprise Support** | Yes       | Yes     | Yes            | Yes           | Yes       |
+| **Cost**               | Free      | Free    | Free/Paid      | AWS Pricing   | Free      |
+| **Maturity**           | High      | High    | High           | Medium        | Medium    |
+| **Community**          | Large     | Medium  | Medium         | AWS Ecosystem | Growing   |
 
 #### Performance Benchmarks
 

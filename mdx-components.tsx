@@ -43,7 +43,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     // Allows customizing built-in components, e.g. to add styling.
     h1: ({ children, ...props }) => (
       <CustomHeading
-        className="my-6 font-bold text-4xl"
+        className="my-6 font-[IbarraRealNova] font-extrabold text-5xl"
         level={1}
         id={props.id}
       >
@@ -51,7 +51,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       </CustomHeading>
     ),
     h2: ({ children, ...props }) => (
-      <CustomHeading level={2} id={props.id} className="my-4 text-3xl">
+      <CustomHeading
+        level={2}
+        id={props.id}
+        className="my-4 font-[IbarraRealNova] font-black text-3xl tracking-tighter"
+      >
         {children}
       </CustomHeading>
     ),
@@ -59,8 +63,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <CustomHeading
         level={3}
         id={props.id}
-        className="my-3 font-medium text-2xl"
+        className="my-4 font-[IbarraRealNova] font-light text-2xl tracking-wide"
       >
+        <br />
         {children}
       </CustomHeading>
     ),
@@ -68,8 +73,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <CustomHeading
         level={4}
         id={props.id}
-        className="my-3 font-medium italic text-xl"
+        className="my-4 font-[BodoniModaSC] text-xl"
       >
+        <br />
+        <br />
         {children}
       </CustomHeading>
     ),
@@ -77,17 +84,13 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <CustomHeading
         level={5}
         id={props.id}
-        className="mt-6 font-bold uppercase"
+        className="mt-6 decoration-border font-[BodoniModaSC] text-lg"
       >
         {children}
       </CustomHeading>
     ),
     h6: ({ children, ...props }) => (
-      <CustomHeading
-        level={6}
-        id={props.id}
-        className="mb-1 font-thin underline underline-offset-4 decoration-dashed decoration-muted"
-      >
+      <CustomHeading level={6} id={props.id} className="mb-1 font-medium">
         {children}
       </CustomHeading>
     ),
@@ -112,13 +115,15 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     li: ({ children }) => <li className="mb-1 ml-9">{children}</li>,
     code: ({ children }) => (
-      <code className="my-5 py-1 font-mono text-sm">{children}</code>
+      <code className="my-5 py-1 font-[CascadiaCode] font-semibold text-sm">
+        {children}
+      </code>
     ),
     pre: ({ children }) => {
       const textContent = extractTextContent(children);
       return (
         <>
-          <div className="bg-code-blocks relative my-5 px-4 border-zinc-700 dark:border-zinc-800 rounded-2xl overflow-y-auto">
+          <div className="bg-code-blocks relative shadow-md my-5 px-4 rounded-2xl overflow-y-auto">
             <CopyButton textToCopy={textContent} />
             <pre className="my-4 p-4">{children}</pre>
           </div>

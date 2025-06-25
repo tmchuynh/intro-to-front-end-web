@@ -144,17 +144,18 @@ export function remarkAutoCollapseFunctions() {
 
             // Function/assignment ended - check for various end conditions
             const isEndOfBlock =
-              // Traditional function with braces
-              (currentFunction.braceCount === 0 && line.includes("}")) ||
-              // Variable assignment ending with semicolon and balanced parentheses
-              (currentFunction.parenthesesCount === 0 &&
-                line.trim().endsWith(";")) ||
-              // Variable assignment ending with }) as BlogPost;
-              (currentFunction.parenthesesCount === 0 &&
-                line.trim().match(/\}\s*as\s+\w+;?$/)) ||
-              // Array method chain ending
-              (currentFunction.parenthesesCount === 0 &&
-                line.trim().match(/\);?\s*$/));
+              // Traditional function with braces (only when both braces and parens are balanced)
+              (currentFunction.braceCount === 0 &&
+                currentFunction.parenthesesCount === 0 &&
+                line.includes("}")) ||
+              // Variable assignment ending with }) as Type; (typescript casting)
+              (currentFunction.braceCount === 0 &&
+                currentFunction.parenthesesCount === 0 &&
+                line.trim().match(/\}\s*as\s+\w+;?\s*$/)) ||
+              // Array method chain ending with }); (for .map, .filter, etc.)
+              (currentFunction.braceCount === 0 &&
+                currentFunction.parenthesesCount === 0 &&
+                line.trim().match(/\}\);?\s*$/));
 
             if (isEndOfBlock) {
               collapseRanges.push(`${currentFunction.start}-${lineNum}`);
@@ -171,6 +172,114 @@ export function remarkAutoCollapseFunctions() {
         node.meta = existingMeta
           ? `${existingMeta} ${collapseAnnotation}`
           : collapseAnnotation;
+      }
+    });
+  };
+}
+
+/**
+ * Debug version with console logs to test function detection
+ */
+export function remarkAutoCollapseFunctionsDebug() {
+  return (tree) => {
+    visit(tree, "code", (node) => {
+      if (!node.lang || !node.value) return;
+
+      console.log(`Processing code block with language: ${node.lang}`);
+
+      const lines = node.value.split("\n");
+      const collapseRanges = [];
+
+      if (
+        ["javascript", "typescript", "js", "ts", "jsx", "tsx"].includes(
+          node.lang
+        )
+      ) {
+        console.log(`Lines in code block:`, lines);
+        let currentFunction = null;
+
+        lines.forEach((line, index) => {
+          const lineNum = index + 1;
+          const trimmedLine = line.trim();
+
+          // Detect function declarations, React components, and variable assignments
+          const matches = trimmedLine.match(
+            /^(function\s+\w+|const\s+\w+\s*=\s*\([^)]*\)\s*=>|async\s+function\s+\w+|export\s+function\s+\w+|export\s+const\s+\w+\s*=|function\s+[A-Z]\w*|const\s+[A-Z]\w*\s*=|export\s+default\s+function|const\s+\w+\s*=\s*.*\.map\(|const\s+\w+\s*=\s*.*\.filter\(|const\s+\w+\s*=\s*.*\.reduce\(|const\s+\w+\s*=\s*files\.map\()/
+          );
+
+          if (matches) {
+            console.log(
+              `Found potential function/variable at line ${lineNum}: "${trimmedLine}"`
+            );
+
+            // Check if this function/component/variable should be collapsed (mark with @collapse)
+            const hasCollapseMarker =
+              index > 0 && lines[index - 1].includes("@collapse");
+            console.log(
+              `Previous line: "${
+                lines[index - 1] || "N/A"
+              }", has @collapse: ${hasCollapseMarker}`
+            );
+
+            if (hasCollapseMarker) {
+              console.log(`Starting collapse tracking for line ${lineNum}`);
+              currentFunction = {
+                start: lineNum,
+                braceCount: 0,
+                parenthesesCount: 0,
+              };
+            }
+          }
+
+          if (currentFunction) {
+            // Count braces and parentheses to find function/assignment end
+            for (const char of line) {
+              if (char === "{") currentFunction.braceCount++;
+              if (char === "}") currentFunction.braceCount--;
+              if (char === "(") currentFunction.parenthesesCount++;
+              if (char === ")") currentFunction.parenthesesCount--;
+            }
+
+            console.log(
+              `Line ${lineNum}: braces=${currentFunction.braceCount}, parens=${currentFunction.parenthesesCount}, line="${trimmedLine}"`
+            );
+
+            // Function/assignment ended - check for various end conditions
+            const isEndOfBlock =
+              // Traditional function with braces (only when both braces and parens are balanced)
+              (currentFunction.braceCount === 0 &&
+                currentFunction.parenthesesCount === 0 &&
+                line.includes("}")) ||
+              // Variable assignment ending with }) as Type; (typescript casting)
+              (currentFunction.braceCount === 0 &&
+                currentFunction.parenthesesCount === 0 &&
+                line.trim().match(/\}\s*as\s+\w+;?\s*$/)) ||
+              // Array method chain ending with }); (for .map, .filter, etc.)
+              (currentFunction.braceCount === 0 &&
+                currentFunction.parenthesesCount === 0 &&
+                line.trim().match(/\}\);?\s*$/));
+
+            if (isEndOfBlock) {
+              console.log(
+                `End of block detected at line ${lineNum}, adding range: ${currentFunction.start}-${lineNum}`
+              );
+              collapseRanges.push(`${currentFunction.start}-${lineNum}`);
+              currentFunction = null;
+            }
+          }
+        });
+      }
+
+      // Add collapse annotation
+      if (collapseRanges.length > 0) {
+        const existingMeta = node.meta || "";
+        const collapseAnnotation = `collapse={${collapseRanges.join(", ")}}`;
+        node.meta = existingMeta
+          ? `${existingMeta} ${collapseAnnotation}`
+          : collapseAnnotation;
+        console.log(`Added collapse annotation: ${collapseAnnotation}`);
+      } else {
+        console.log(`No collapse ranges found`);
       }
     });
   };
@@ -315,8 +424,8 @@ export function remarkAutoCollapseJSX() {
                 currentJSXElement = {
                   start: lineNum,
                   tagName: tagName,
-                  depth: 5, // Start with depth 5
-                  selfClosing: trimmedLine.includes("/>", ""),
+                  depth: 1,
+                  selfClosing: trimmedLine.includes("/>"),
                 };
               }
             }

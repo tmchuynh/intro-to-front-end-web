@@ -55,7 +55,7 @@ export function remarkAutoCollapse() {
       // Auto-detect import blocks (for JavaScript/TypeScript)
       if (
         ["javascript", "typescript", "js", "ts", "jsx", "tsx"].includes(
-          node.lang
+          node.lang,
         )
       ) {
         // Use filtered lines for import detection
@@ -108,31 +108,40 @@ export function remarkAutoCollapseFunctions() {
 
       if (
         ["javascript", "typescript", "js", "ts", "jsx", "tsx"].includes(
-          node.lang
+          node.lang,
         )
       ) {
         let currentFunction = null;
+        const filteredLines = [];
 
         lines.forEach((line, index) => {
           const lineNum = index + 1;
           const trimmedLine = line.trim();
 
-          // Detect function declarations, React components, variable assignments, and constants
+          // Skip @collapse marker comments but don't include them in output
+          if (trimmedLine.includes("@collapse")) {
+            return; // Skip this line entirely
+          }
+
+          // Detect function declarations, React components, variable assignments, constants, hooks, and interfaces
           if (
             trimmedLine.match(
-              /^(function\s+\w+|const\s+\w+\s*=\s*\([^)]*\)\s*=>|async\s+function\s+\w+|export\s+function\s+\w+|export\s+const\s+\w+\s*=|function\s+[A-Z]\w*|const\s+[A-Z]\w*\s*=|export\s+default\s+function|const\s+\w+\s*=\s*.*\.map\(|const\s+\w+\s*=\s*.*\.filter\(|const\s+\w+\s*=\s*.*\.reduce\(|const\s+\w+\s*=\s*files\.map\(|const\s+[A-Z_][A-Z0-9_]*\s*=|const\s+\w+\s*=\s*\{|const\s+\w+\s*=\s*\[)/
+              /^(function\s+\w+|const\s+\w+\s*=\s*\([^)]*\)\s*[=:].*=>|async\s+function\s+\w+|export\s+function\s+\w+|export\s+const\s+\w+\s*=|function\s+[A-Z]\w*|const\s+[A-Z]\w*\s*=|export\s+default\s+function|const\s+\w+\s*=\s*.*\.map\(|const\s+\w+\s*=\s*.*\.filter\(|const\s+\w+\s*=\s*.*\.reduce\(|const\s+\w+\s*=\s*files\.map\(|const\s+[A-Z_][A-Z0-9_]*\s*=|const\s+\w+\s*=\s*\{|const\s+\w+\s*=\s*\[|const\s+\w+\s*=\s*React\.|const\s+\w+\s*:\s*React\.FC|export\s+const\s+\w+\s*:\s*React\.FC|useEffect\(|useMemo\(|useCallback\(|export\s+interface\s+\w+|interface\s+\w+|type\s+\w+\s*=|export\s+type\s+\w+\s*=)/,
             )
           ) {
             // Check if this function/component/variable should be collapsed (mark with @collapse)
             if (index > 0 && lines[index - 1].includes("@collapse")) {
               currentFunction = {
-                start: lineNum,
+                start: filteredLines.length + 1, // Use filtered line number
                 braceCount: 0,
                 parenthesesCount: 0,
                 bracketCount: 0,
               };
             }
           }
+
+          // Always add the line to filtered output (except @collapse markers)
+          filteredLines.push(line);
 
           if (currentFunction) {
             // Count braces, parentheses, and brackets to find function/assignment end
@@ -173,14 +182,36 @@ export function remarkAutoCollapseFunctions() {
                 currentFunction.bracketCount === 0 &&
                 line.trim().endsWith(";") &&
                 !line.includes("{") &&
+                !line.includes("[")) ||
+              // Interface definitions ending with }
+              (currentFunction.braceCount === 0 &&
+                currentFunction.parenthesesCount === 0 &&
+                currentFunction.bracketCount === 0 &&
+                line.trim() === "}") ||
+              // Hook dependencies array ending
+              (currentFunction.braceCount === 0 &&
+                currentFunction.parenthesesCount === 0 &&
+                currentFunction.bracketCount === 0 &&
+                line.trim().match(/\],?\s*\);?\s*$/)) ||
+              // Type alias ending (for type definitions)
+              (currentFunction.braceCount === 0 &&
+                currentFunction.parenthesesCount === 0 &&
+                currentFunction.bracketCount === 0 &&
+                line.trim().match(/^type\s+\w+\s*=.*;\s*$/) &&
+                !line.includes("{") &&
                 !line.includes("["));
 
             if (isEndOfBlock) {
-              collapseRanges.push(`${currentFunction.start}-${lineNum}`);
+              collapseRanges.push(
+                `${currentFunction.start}-${filteredLines.length}`,
+              );
               currentFunction = null;
             }
           }
         });
+
+        // Update node value with filtered content (removing @collapse markers)
+        node.value = filteredLines.join("\n");
       }
 
       // Add collapse annotation
@@ -210,24 +241,33 @@ export function remarkAutoCollapseFunctionsDebug() {
 
       if (
         ["javascript", "typescript", "js", "ts", "jsx", "tsx"].includes(
-          node.lang
+          node.lang,
         )
       ) {
         console.log(`Lines in code block:`, lines);
         let currentFunction = null;
+        const filteredLines = [];
 
         lines.forEach((line, index) => {
           const lineNum = index + 1;
           const trimmedLine = line.trim();
 
-          // Detect function declarations, React components, variable assignments, and constants
+          // Skip @collapse marker comments but don't include them in output
+          if (trimmedLine.includes("@collapse")) {
+            console.log(
+              `Found @collapse marker on line ${lineNum}, skipping from output`,
+            );
+            return; // Skip this line entirely
+          }
+
+          // Detect function declarations, React components, variable assignments, constants, hooks, and interfaces
           const matches = trimmedLine.match(
-            /^(function\s+\w+|const\s+\w+\s*=\s*\([^)]*\)\s*=>|async\s+function\s+\w+|export\s+function\s+\w+|export\s+const\s+\w+\s*=|function\s+[A-Z]\w*|const\s+[A-Z]\w*\s*=|export\s+default\s+function|const\s+\w+\s*=\s*.*\.map\(|const\s+\w+\s*=\s*.*\.filter\(|const\s+\w+\s*=\s*.*\.reduce\(|const\s+\w+\s*=\s*files\.map\(|const\s+[A-Z_][A-Z0-9_]*\s*=|const\s+\w+\s*=\s*\{|const\s+\w+\s*=\s*\[)/
+            /^(function\s+\w+|const\s+\w+\s*=\s*\([^)]*\)\s*[=:].*=>|async\s+function\s+\w+|export\s+function\s+\w+|export\s+const\s+\w+\s*=|function\s+[A-Z]\w*|const\s+[A-Z]\w*\s*=|export\s+default\s+function|const\s+\w+\s*=\s*.*\.map\(|const\s+\w+\s*=\s*.*\.filter\(|const\s+\w+\s*=\s*.*\.reduce\(|const\s+\w+\s*=\s*files\.map\(|const\s+[A-Z_][A-Z0-9_]*\s*=|const\s+\w+\s*=\s*\{|const\s+\w+\s*=\s*\[|const\s+\w+\s*=\s*React\.|const\s+\w+\s*:\s*React\.FC|export\s+const\s+\w+\s*:\s*React\.FC|useEffect\(|useMemo\(|useCallback\(|export\s+interface\s+\w+|interface\s+\w+|type\s+\w+\s*=|export\s+type\s+\w+\s*=)/,
           );
 
           if (matches) {
             console.log(
-              `Found potential function/variable at line ${lineNum}: "${trimmedLine}"`
+              `Found potential function/variable at line ${lineNum}: "${trimmedLine}"`,
             );
 
             // Check if this function/component/variable should be collapsed (mark with @collapse)
@@ -236,19 +276,22 @@ export function remarkAutoCollapseFunctionsDebug() {
             console.log(
               `Previous line: "${
                 lines[index - 1] || "N/A"
-              }", has @collapse: ${hasCollapseMarker}`
+              }", has @collapse: ${hasCollapseMarker}`,
             );
 
             if (hasCollapseMarker) {
               console.log(`Starting collapse tracking for line ${lineNum}`);
               currentFunction = {
-                start: lineNum,
+                start: filteredLines.length + 1, // Use filtered line number
                 braceCount: 0,
                 parenthesesCount: 0,
                 bracketCount: 0,
               };
             }
           }
+
+          // Always add the line to filtered output (except @collapse markers)
+          filteredLines.push(line);
 
           if (currentFunction) {
             // Count braces, parentheses, and brackets to find function/assignment end
@@ -262,7 +305,7 @@ export function remarkAutoCollapseFunctionsDebug() {
             }
 
             console.log(
-              `Line ${lineNum}: braces=${currentFunction.braceCount}, parens=${currentFunction.parenthesesCount}, brackets=${currentFunction.bracketCount}, line="${trimmedLine}"`
+              `Line ${lineNum}: braces=${currentFunction.braceCount}, parens=${currentFunction.parenthesesCount}, brackets=${currentFunction.bracketCount}, line="${trimmedLine}"`,
             );
 
             // Function/assignment ended - check for various end conditions
@@ -293,17 +336,41 @@ export function remarkAutoCollapseFunctionsDebug() {
                 currentFunction.bracketCount === 0 &&
                 line.trim().endsWith(";") &&
                 !line.includes("{") &&
+                !line.includes("[")) ||
+              // Interface definitions ending with }
+              (currentFunction.braceCount === 0 &&
+                currentFunction.parenthesesCount === 0 &&
+                currentFunction.bracketCount === 0 &&
+                line.trim() === "}") ||
+              // Hook dependencies array ending
+              (currentFunction.braceCount === 0 &&
+                currentFunction.parenthesesCount === 0 &&
+                currentFunction.bracketCount === 0 &&
+                line.trim().match(/\],?\s*\);?\s*$/)) ||
+              // Type alias ending (for type definitions)
+              (currentFunction.braceCount === 0 &&
+                currentFunction.parenthesesCount === 0 &&
+                currentFunction.bracketCount === 0 &&
+                line.trim().match(/^type\s+\w+\s*=.*;\s*$/) &&
+                !line.includes("{") &&
                 !line.includes("["));
 
             if (isEndOfBlock) {
               console.log(
-                `End of block detected at line ${lineNum}, adding range: ${currentFunction.start}-${lineNum}`
+                `Function/block ended at line ${lineNum}. Adding collapse range: ${currentFunction.start}-${filteredLines.length}`,
               );
-              collapseRanges.push(`${currentFunction.start}-${lineNum}`);
+              collapseRanges.push(
+                `${currentFunction.start}-${filteredLines.length}`,
+              );
               currentFunction = null;
             }
           }
         });
+
+        // Update node value with filtered content (removing @collapse markers)
+        node.value = filteredLines.join("\n");
+        console.log(`Filtered content:`, node.value);
+        console.log(`Final collapse ranges:`, collapseRanges);
       }
 
       // Add collapse annotation
@@ -334,7 +401,7 @@ export function remarkAutoCollapseComponents() {
 
       if (
         ["javascript", "typescript", "js", "ts", "jsx", "tsx"].includes(
-          node.lang
+          node.lang,
         )
       ) {
         let currentFunction = null;
@@ -345,7 +412,7 @@ export function remarkAutoCollapseComponents() {
 
           // Detect function declarations and React components
           const functionMatch = trimmedLine.match(
-            /^(function\s+(\w+)|const\s+(\w+)\s*=\s*\([^)]*\)\s*=>|async\s+function\s+(\w+)|export\s+function\s+(\w+)|export\s+const\s+(\w+)\s*=|export\s+default\s+function\s+(\w+))/
+            /^(function\s+(\w+)|const\s+(\w+)\s*=\s*\([^)]*\)\s*=>|async\s+function\s+(\w+)|export\s+function\s+(\w+)|export\s+const\s+(\w+)\s*=|export\s+default\s+function\s+(\w+))/,
           );
 
           if (functionMatch) {
@@ -417,7 +484,7 @@ export function remarkAutoCollapseJSX() {
 
       if (
         ["javascript", "typescript", "js", "ts", "jsx", "tsx"].includes(
-          node.lang
+          node.lang,
         )
       ) {
         let inReturnStatement = false;
@@ -470,12 +537,12 @@ export function remarkAutoCollapseJSX() {
             if (currentJSXElement && !currentJSXElement.selfClosing) {
               const openTags = (
                 line.match(
-                  new RegExp(`<${currentJSXElement.tagName}[^>]*>`, "g")
+                  new RegExp(`<${currentJSXElement.tagName}[^>]*>`, "g"),
                 ) || []
               ).length;
               const closeTags = (
                 line.match(
-                  new RegExp(`</${currentJSXElement.tagName}>`, "g")
+                  new RegExp(`</${currentJSXElement.tagName}>`, "g"),
                 ) || []
               ).length;
 
@@ -533,7 +600,7 @@ export function remarkAutoCollapseJSXPatterns() {
 
       if (
         ["javascript", "typescript", "js", "ts", "jsx", "tsx"].includes(
-          node.lang
+          node.lang,
         )
       ) {
         let currentElement = null;
@@ -546,7 +613,7 @@ export function remarkAutoCollapseJSXPatterns() {
           const shouldAutoCollapse =
             // Elements with specific names
             trimmedLine.match(
-              /<(Header|Footer|Sidebar|Navigation|Nav|Modal|Dialog|Command|Image|Input|Select|DropdownMenu)\b/
+              /<(Header|Footer|Sidebar|Navigation|Nav|Modal|Dialog|Command|Image|Input|Select|DropdownMenu)\b/,
             ) ||
             // Elements with className containing certain words
             (trimmedLine.includes("svg") &&
@@ -582,7 +649,7 @@ export function remarkAutoCollapseJSXPatterns() {
           if (currentElement && !currentElement.selfClosing) {
             const openTags = (
               line.match(
-                new RegExp(`<${currentElement.tagName}[^/>]*>`, "g")
+                new RegExp(`<${currentElement.tagName}[^/>]*>`, "g"),
               ) || []
             ).length;
             const closeTags = (

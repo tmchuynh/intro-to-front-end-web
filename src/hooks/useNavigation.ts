@@ -14,7 +14,7 @@ export function useNavigation() {
       try {
         // In client-side, we'll fetch from an API route with current path
         const response = await fetch(
-          `/api/navigation?path=${encodeURIComponent(pathname)}`
+          `/api/navigation?path=${encodeURIComponent(pathname)}`,
         );
         if (response.ok) {
           const data = await response.json();

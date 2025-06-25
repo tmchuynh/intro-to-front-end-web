@@ -34,7 +34,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       }
       return false;
     },
-    []
+    [],
   );
 
   // Function to find which section contains the current path
@@ -47,7 +47,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       }
       return null;
     },
-    [navigation, checkItemContainsPath]
+    [navigation, checkItemContainsPath],
   );
 
   // Set the section containing the current page as open by default

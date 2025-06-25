@@ -54,7 +54,7 @@ export function Tag({
       className={clsx(
         "font-mono font-semibold text-[0.625rem]/6",
         variantStyles[variant],
-        colorStyles[color][variant]
+        colorStyles[color][variant],
       )}
     >
       {children}

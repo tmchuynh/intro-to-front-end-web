@@ -1,0 +1,299 @@
+import BackToTop from "@/components/BackToTop";
+
+# Cart API Integration
+
+## Table of Contents
+
+## Next Steps
+
+Next, we will finish the API integration by implementing user-related API functions. This will include creating functions to handle user authentication, and fetch user profiles. These functions will be essential for building the dashboard functionality and user management features in our e-commerce platform.
+
+Head over to [Users API Integration](/ecommerce-platform/connecting-to-the-API/users) to continue setting up your application.
+
+## API Layer Structure
+
+```plaintext
+src/api/
+├── index.ts          # Main API configuration and base client
+├── products.ts       # Product-related API calls
+├── users.ts          # User authentication and profile API calls
+└── carts.ts          # Shopping cart API calls
+```
+
+### Carts API Functionality
+
+- **GET /carts** - Fetch all carts
+- **GET /carts/{`id`}** - Fetch single cart
+- **POST /carts/add** - Add new cart
+- **PUT /carts/{`id`}** - Update cart
+- **DELETE /carts/{`id`}** - Delete cart
+
+Handles shopping cart operations:
+
+- **fetchUserCart(userId)** - Get user's cart
+- **addToCart(productId, quantity)** - Add product to cart
+- **updateCartItem(itemId, quantity)** - Update cart item
+- **removeFromCart(itemId)** - Remove item from cart
+
+### Data Flow
+
+> User Action → Cart Context → Local Storage ↔ Carts API → DummyJSON
+
+## The `import` Statements
+
+```typescript
+// src/api/carts.ts
+import { UserCartsResponse, Cart, CartProduct } from "@/lib/interfaces/cart";
+import { API_BASE_URL } from ".";
+```
+
+## `fetchUserCarts` Function
+
+```typescript
+// src/api/carts.ts
+
+/**
+ * Fetches all carts (order history) for a specific user
+ * @param userId - The user ID to fetch carts for
+ * @returns Promise<UserCartsResponse> - User's cart history
+ */
+export async function fetchUserCarts(
+  userId: number
+): Promise<UserCartsResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/${userId}/carts`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user carts: ${response.statusText}`);
+    }
+
+    const data: UserCartsResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching user carts:", error);
+    throw error;
+  }
+}
+```
+
+##### Explanation of the Code
+
+- This function fetches all carts for a specific user by making a GET request to the API endpoint. It handles errors and returns the user's cart history.
+- It uses the `UserCartsResponse` interface to type the response data.
+
+<BackToTop />
+
+## `fetchCartById` Function
+
+```typescript
+// src/api/carts.ts
+
+/**
+ * Fetches a single cart by ID
+ * @param cartId - The cart ID to fetch
+ * @returns Promise<Cart> - The cart data
+ */
+export async function fetchCartById(cartId: number): Promise<Cart> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/carts/${cartId}`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch cart: ${response.statusText}`);
+    }
+
+    const cart: Cart = await response.json();
+    return cart;
+  } catch (error) {
+    console.error("Error fetching cart:", error);
+    throw error;
+  }
+}
+```
+
+##### Explanation of the Code
+
+- This function fetches a single cart by its ID. It makes a GET request to the API and returns the cart data.
+- It uses the `Cart` interface to type the response data.
+
+<BackToTop />
+
+## `fetchAllCarts` Function
+
+```typescript
+// src/api/carts.ts
+
+/**
+ * Fetches all carts (useful for admin or general overview)
+ * @param limit - Number of carts to fetch (default: 20)
+ * @param skip - Number of carts to skip (default: 0)
+ * @returns Promise<{ carts: Cart[]; total: number; skip: number; limit: number }> - All carts data
+ */
+export async function fetchAllCarts(
+  limit: number = 20,
+  skip: number = 0
+): Promise<{
+  carts: Cart[];
+  total: number;
+  skip: number;
+  limit: number;
+}> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/carts?limit=${limit}&skip=${skip}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch carts: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching all carts:", error);
+    throw error;
+  }
+}
+```
+
+##### Explanation of the Code
+
+- This function fetches all carts, which is useful for admin views or general overviews. It supports pagination with `limit` and `skip` parameters.
+- It returns an object containing the carts, total count, skip, and limit values.
+
+<BackToTop />
+
+## `getPreviouslyPurchased` Function
+
+```typescript
+// src/api/carts.ts
+
+/**
+ * Gets previously purchased products for a user
+ * @param userId - The user ID to get purchase history for
+ * @returns Promise<CartProduct[]> - Array of all previously purchased products
+ */
+export async function getPreviouslyPurchased(
+  userId: number
+): Promise<CartProduct[]> {
+  try {
+    const userCarts = await fetchUserCarts(userId);
+
+    // Flatten all products from all carts
+    const allProducts: CartProduct[] = userCarts.carts.flatMap(
+      (cart) => cart.products
+    );
+
+    // Remove duplicates based on product ID and aggregate quantities
+    const uniqueProducts: { [key: number]: CartProduct } = {};
+
+    allProducts.forEach((product) => {
+      if (uniqueProducts[product.id]) {
+        // If product already exists, add to quantity and total
+        uniqueProducts[product.id].quantity += product.quantity;
+        uniqueProducts[product.id].total += product.total;
+        uniqueProducts[product.id].discountedTotal += product.discountedTotal;
+      } else {
+        // First time seeing this product
+        uniqueProducts[product.id] = { ...product };
+      }
+    });
+
+    return Object.values(uniqueProducts);
+  } catch (error) {
+    console.error("Error getting previously purchased products:", error);
+    throw error;
+  }
+}
+```
+
+##### Explanation of the Code
+
+- This function retrieves all previously purchased products for a user by fetching their carts and aggregating products across all carts.
+- It removes duplicates based on product ID and aggregates quantities and totals, returning a unique list of products.
+
+## `getOrderHistory` Function
+
+```typescript
+// src/api/carts.ts
+
+/**
+ * Gets order history with cart details for a user
+ * @param userId - The user ID to get order history for
+ * @returns Promise<Cart[]> - Array of user's order history (carts)
+ */
+export async function getOrderHistory(userId: number): Promise<Cart[]> {
+  try {
+    const userCarts = await fetchUserCarts(userId);
+
+    // Sort by cart ID (descending) to show most recent orders first
+    const sortedCarts = userCarts.carts.sort((a, b) => b.id - a.id);
+
+    return sortedCarts;
+  } catch (error) {
+    console.error("Error getting order history:", error);
+    throw error;
+  }
+}
+```
+
+##### Explanation of the Code
+
+- This function retrieves the user's order history by fetching their carts and sorting them by cart ID in descending order to show the most recent orders first.
+- It returns an array of carts representing the user's order history.
+  <BackToTop />
+
+## `getUserPurchaseStats` Function
+
+```typescript
+// src/api/carts.ts
+
+/**
+ * Gets total purchase statistics for a user
+ * @param userId - The user ID to get stats for
+ * @returns Promise<{ totalOrders: number; totalSpent: number; totalItems: number; totalSavings: number }> - Purchase statistics
+ */
+export async function getUserPurchaseStats(userId: number): Promise<{
+  totalOrders: number;
+  totalSpent: number;
+  totalItems: number;
+  totalSavings: number;
+}> {
+  try {
+    const userCarts = await fetchUserCarts(userId);
+
+    const stats = userCarts.carts.reduce(
+      (acc, cart) => {
+        acc.totalOrders += 1;
+        acc.totalSpent += cart.discountedTotal;
+        acc.totalItems += cart.totalProducts;
+        acc.totalSavings += cart.total - cart.discountedTotal;
+        return acc;
+      },
+      {
+        totalOrders: 0,
+        totalSpent: 0,
+        totalItems: 0,
+        totalSavings: 0,
+      }
+    );
+
+    return stats;
+  } catch (error) {
+    console.error("Error getting user purchase stats:", error);
+    throw error;
+  }
+}
+```
+
+##### Explanation of the Code
+
+- This function calculates total purchase statistics for a user by aggregating data from their carts.
+- It returns an object containing the total number of orders, total amount spent, total items purchased, and total savings.
+
+## Next Steps
+
+Last but not least, we have to get our user API functions set up. This will allow us to manage user authentication, profile data, and other user-related operations.
+
+Head over to [Users API Integration](/ecommerce-platform/connecting-to-the-API/users) to get the last piece of the API integration puzzle.
+
+<BackToTop />

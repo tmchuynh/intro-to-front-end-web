@@ -38,7 +38,7 @@ import { API_BASE_URL } from ".";
 
 /**
  * Fetches the shopping carts associated with the current user.
- * 
+ *
  * This asynchronous function retrieves the user's cart data from the API.
  * It can be used to display the user's current cart contents or manage cart operations.
  *
@@ -69,20 +69,24 @@ export async function fetchUserCarts(
 This function demonstrates several important concepts in API integration:
 
 **Function Parameters & TypeScript Types:**
+
 - The function accepts a `userId` parameter of type `number`, ensuring type safety
 - The return type `Promise<UserCartsResponse>` explicitly defines what the function will return asynchronously
 
 **API Endpoint Construction:**
+
 - Uses template literals to dynamically build the URL: `${API_BASE_URL}/users/${userId}/carts`
 - This follows RESTful API conventions where user-specific resources are nested under the user endpoint
 
 **Error Handling Strategy:**
+
 - The `try-catch` block provides comprehensive error handling
 - Checks `response.ok` to verify the HTTP request was successful (status 200-299)
 - Throws descriptive errors that include the HTTP status text for debugging
 - Logs errors to the console for development debugging while still throwing them up the call stack
 
 **Asynchronous Programming:**
+
 - Uses `async/await` syntax for cleaner, more readable asynchronous code
 - The `fetch()` function returns a Promise, which is handled with `await`
 - Type assertion with `UserCartsResponse` ensures the JSON response matches our expected interface structure
@@ -122,18 +126,22 @@ export async function fetchCartById(cartId: number): Promise<Cart> {
 This function showcases fundamental concepts in single-resource API fetching:
 
 **Resource Identification:**
+
 - Uses a unique `cartId` parameter to identify a specific cart resource
 - Follows RESTful conventions where each resource has a unique identifier in the URL path
 
 **HTTP GET Request Pattern:**
+
 - Demonstrates the standard pattern for fetching a single resource by ID
 - The endpoint structure `/carts/${cartId}` clearly indicates we're requesting one specific cart
 
 **Response Type Handling:**
+
 - Returns a `Promise<Cart>` indicating this function deals with a single cart object
 - The `Cart` interface ensures the response data structure matches our application's expectations
 
 **Error Management:**
+
 - Implements the same robust error handling pattern as other API functions
 - Provides specific error messages that help identify whether the issue is with the request or the response
 - The error logging helps developers debug issues during development while maintaining clean error propagation
@@ -147,7 +155,7 @@ This function showcases fundamental concepts in single-resource API fetching:
 
 /**
  * Fetches all shopping carts from the API.
- * 
+ *
  * This asynchronous function retrieves a list of all carts available in the system.
  * It can be used to display or manage user carts in the ecommerce platform.
  *
@@ -186,20 +194,24 @@ export async function fetchAllCarts(
 This function introduces advanced concepts for handling large datasets and pagination:
 
 **Default Parameters in TypeScript:**
+
 - Uses default parameter values (`limit: number = 20, skip: number = 0`) to provide sensible defaults
 - This makes the function flexible - it can be called with no parameters, one parameter, or both parameters
 
 **Query Parameters for Pagination:**
+
 - Constructs URL query parameters using template literals: `?limit=${limit}&skip=${skip}`
 - This implements pagination, which is crucial for performance when dealing with large datasets
 - `limit` controls how many records to return, while `skip` determines how many to bypass (for page navigation)
 
 **Complex Return Type:**
+
 - The return type is an object with multiple properties: `{ carts: Cart[]; total: number; skip: number; limit: number }`
 - This pattern provides not just the data, but also metadata about the pagination state
 - The `total` field helps calculate how many pages exist, while `skip` and `limit` help track current position
 
 **Administrative Use Case:**
+
 - This function is designed for admin dashboards or system overviews where you need to see all carts
 - The pagination makes it suitable for displaying large amounts of data without performance issues
 
@@ -231,6 +243,7 @@ export async function getPreviouslyPurchased(
     // Remove duplicates based on product ID and aggregate quantities
     const uniqueProducts: { [key: number]: CartProduct } = {};
 
+    // @collapse
     allProducts.forEach((product) => {
       if (uniqueProducts[product.id]) {
         // If product already exists, add to quantity and total
@@ -256,27 +269,33 @@ export async function getPreviouslyPurchased(
 This function demonstrates advanced data processing techniques and functional programming concepts:
 
 **Function Composition:**
+
 - Calls `fetchUserCarts()` first to get raw cart data, then processes it
 - This shows how to build complex operations by combining simpler functions
 
 **Array Method Chaining:**
+
 - Uses `flatMap()` to flatten nested arrays: `userCarts.carts.flatMap(cart => cart.products)`
 - `flatMap()` is more efficient than using `map()` followed by `flat()` - it combines both operations
 
 **Data Aggregation with Object as Hash Map:**
+
 - Creates an object `uniqueProducts` to track products by their ID as keys
 - This is a common pattern for deduplicating and aggregating data efficiently (O(1) lookup time)
 
 **Conditional Logic for Aggregation:**
+
 - Uses an if-else structure to either add a new product or update an existing one
 - When a product already exists, it aggregates the quantities and totals across multiple purchases
 - The spread operator `{ ...product }` creates a copy to avoid mutating the original data
 
 **Object Methods for Final Processing:**
+
 - `Object.values()` converts the hash map back to an array
 - This pattern (array → object → array) is common for deduplication and aggregation tasks
 
 **Business Logic Implementation:**
+
 - Solves the real-world problem of showing "previously purchased" items without duplicates
 - Aggregates purchase quantities and totals, giving users meaningful purchase history data
 
@@ -311,19 +330,23 @@ export async function getOrderHistory(userId: number): Promise<Cart[]> {
 This function focuses on data sorting and user experience optimization:
 
 **Data Reuse Pattern:**
+
 - Leverages the existing `fetchUserCarts()` function rather than duplicating API logic
 - This demonstrates the DRY (Don't Repeat Yourself) principle in software development
 
 **Array Sorting for User Experience:**
+
 - Uses the `sort()` method with a comparison function: `(a, b) => b.id - a.id`
 - The comparison `b.id - a.id` creates descending order (newest first)
 - Sorting by ID assumes that higher IDs represent more recent orders (common in databases with auto-incrementing IDs)
 
 **Immutable Data Handling:**
+
 - `sort()` mutates the original array, but since we're working with data from an API response, this is acceptable
 - In more complex scenarios, you might use `[...userCarts.carts].sort()` to avoid mutation
 
 **Business Logic for Order History:**
+
 - Prioritizes recent orders first, which is what users typically expect to see
 - Returns the complete cart objects, giving access to all order details (products, totals, dates, etc.)
 - This provides a foundation for building order history displays in the user interface
@@ -349,6 +372,7 @@ export async function getUserPurchaseStats(userId: number): Promise<{
   try {
     const userCarts = await fetchUserCarts(userId);
 
+    // @collapse
     const stats = userCarts.carts.reduce(
       (acc, cart) => {
         acc.totalOrders += 1;
@@ -378,27 +402,32 @@ export async function getUserPurchaseStats(userId: number): Promise<{
 This function demonstrates the powerful `reduce()` method for statistical calculations:
 
 **Array.reduce() for Aggregation:**
+
 - Uses `reduce()` to iterate through all carts and accumulate statistics
 - The accumulator (`acc`) starts with initial values of 0 for all statistics
 - Each iteration adds the current cart's values to the running totals
 
 **Accumulator Pattern:**
+
 - `acc.totalOrders += 1` - counts each cart as one order
 - `acc.totalSpent += cart.discountedTotal` - sums up the actual amounts paid (after discounts)
 - `acc.totalItems += cart.totalProducts` - aggregates the total number of items across all orders
 - `acc.totalSavings += cart.total - cart.discountedTotal` - calculates savings by subtracting discounted price from original price
 
 **Initial Value Object:**
+
 - The second parameter to `reduce()` provides the starting accumulator value
 - Uses an object with all statistics initialized to 0
 - This ensures the function works correctly even if the user has no carts
 
 **Business Intelligence:**
+
 - Creates meaningful metrics that can be displayed in user dashboards
 - Helps users understand their purchasing patterns and savings
 - The statistics can inform business decisions about pricing, promotions, and user engagement
 
 **Mathematical Operations:**
+
 - Demonstrates how to perform calculations across datasets
 - The savings calculation shows how to derive new metrics from existing data points
 

@@ -79,13 +79,13 @@ interface SidebarProps {
   onClose: () => void;
 }
 
+// Main sidebar component that manages navigation state and responsive behavior
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { navigation, loading } = useNavigation();
   const pathname = usePathname();
   const [openSection, setOpenSection] = useState<string | null>(null);
 
-  // Recursive function to check if any item or its children contain the path
-  // @collapse
+  // Recursively checks if any navigation item or its children contain the given path
   const checkItemContainsPath = useCallback(
     (items: NavigationItem[], path: string): boolean => {
       for (const item of items) {
@@ -107,7 +107,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     [],
   );
 
-  // Function to find which section contains the current path
+  // Finds which navigation section contains the current path for auto-expansion
   const findSectionForPath = useCallback(
     (path: string) => {
       for (const section of navigation) {
@@ -281,6 +281,7 @@ interface NavigationSectionProps {
   onToggle: () => void;
 }
 
+// Collapsible navigation section that manages nested navigation items
 export default function NavigationSection({
   title,
   items,
@@ -289,13 +290,14 @@ export default function NavigationSection({
 }: NavigationSectionProps) {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
-  // Reset expanded item when section is closed
+  // Resets expanded items when section is closed to maintain clean state
   useEffect(() => {
     if (!isOpen) {
       setExpandedItem(null);
     }
   }, [isOpen]);
 
+  // Toggles expansion state for individual navigation items
   const handleItemToggle = (itemTitle: string) => {
     setExpandedItem(expandedItem === itemTitle ? null : itemTitle);
   };
@@ -356,6 +358,7 @@ export default function NavigationSection({
 
 ```tsx
 // NavigationSection Component
+// Recursive component that renders individual navigation items with support for nesting
 function NavigationItem({
   item,
   isExpanded,
@@ -370,7 +373,7 @@ function NavigationItem({
   const hasChildren = item.children && item.children.length > 0;
   const [expandedChild, setExpandedChild] = useState<string | null>(null);
 
-  // Reset expanded child when this item is collapsed
+  // Resets expanded child items when parent item is collapsed
   useEffect(() => {
     if (!isExpanded) {
       setExpandedChild(null);
@@ -529,6 +532,7 @@ interface TopNavbarProps {
   onToggleSidebar: () => void;
 }
 
+// Top navigation bar with search functionality and theme switching
 export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -537,12 +541,12 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
   const { theme, setTheme } = useTheme();
   const { navigation } = useNavigation();
 
-  // Ensure component is mounted before showing theme-dependent content
+  // Ensures component is mounted before rendering theme-dependent content
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Flatten navigation for search
+  // Flattens hierarchical navigation structure for efficient searching
   const flattenedNavigation = useMemo(() => {
     return flattenNavigationForSearch(navigation);
   }, [navigation]);
@@ -559,24 +563,29 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
     }
   }, [searchQuery, flattenedNavigation]);
 
+  // Toggles between light and dark themes
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   };
 
+  // Handles search input changes and triggers search
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
+  // Clears search when a result is clicked
   const handleSearchResultClick = () => {
     setSearchQuery("");
     setShowResults(false);
   };
 
+  // Delays hiding search results to allow for clicks
   const handleSearchBlur = () => {
     // Delay hiding results to allow for clicks
     setTimeout(() => setShowResults(false), 200);
   };
 
+  // Shows search results when input is focused and has content
   const handleSearchFocus = () => {
     if (searchQuery.trim() && searchResults.length > 0) {
       setShowResults(true);
@@ -806,12 +815,14 @@ import type { NavigationSection } from "@/utils/navigation";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
+// Custom hook that manages navigation data fetching and state
 export function useNavigation() {
   const [navigation, setNavigation] = useState<NavigationSection[]>([]);
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
 
   useEffect(() => {
+    // Loads navigation data from API with current path context
     async function loadNavigation() {
       try {
         // In client-side, we'll fetch from an API route with current path

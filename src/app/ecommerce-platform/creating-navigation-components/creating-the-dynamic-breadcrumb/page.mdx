@@ -106,18 +106,23 @@ export default function DynamicBreadcrumb(): JSX.Element | null {
 - **pathSegments Calculation**: The `pathname` is split by slashes, filtered to remove empty segments, and decoded to handle URL encoding. This gives us a clean array of path segments that we can use to build our breadcrumb.
 
 ```tsx
+// src/components/navigation/breadcrumb-dynamic.tsx
+
+  // If there are no path segments, return null
   // Don't show breadcrumb on home page
   if (pathname === "/" || pathSegments.length === 0) return null;
 
   // Detect if this is a 404 page
   const isNotFoundPage = pathSegments.includes("not-found");
 
+  // Format individual breadcrumb segments based on context and position
   const formatSegment = (segment: string, isLast: boolean): string => {
     if (isLast && isNotFoundPage) return "Page Not Found";
     if (segment.length === 2) return kebabToTitle(segment).toUpperCase();
     return kebabToTitle(segment);
   };
 
+  // Build URL href for breadcrumb navigation links
   const buildHref = (index: number): string => {
     return `/${pathSegments.slice(0, index + 1).join("/")}`;
   };
@@ -142,6 +147,8 @@ export default function DynamicBreadcrumb(): JSX.Element | null {
   <BackToTop />
 
 ```tsx
+// src/components/navigation/breadcrumb-dynamic.tsx
+
   return (
     <div className="z-40 sticky backdrop-blur pt-9 w-full">
       <div className="mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-7xl">

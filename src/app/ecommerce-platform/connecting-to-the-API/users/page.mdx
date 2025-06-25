@@ -29,14 +29,12 @@ Manages user authentication and profile data:
 The application uses JWT tokens for authentication:
 
 1. **Login Process**:
-
    - Send credentials to DummyJSON auth endpoint
    - Receive JWT token
    - Store token in local storage
    - Use token for subsequent API calls
 
 2. **Token Validation**:
-
    - Check token expiration
    - Refresh token when needed
    - Clear token on logout
@@ -49,7 +47,6 @@ The application uses JWT tokens for authentication:
 
 ```typescript
 // src/api/users.ts
-
 import { DummyUser, DummyUsersResponse } from "@/lib/interfaces/user";
 import { API_BASE_URL } from ".";
 ```
@@ -88,27 +85,32 @@ export async function fetchRandomUser(): Promise<DummyUser> {
 This function demonstrates random data generation and mathematical operations for API testing:
 
 **Random Number Generation:**
+
 - `Math.random()` generates a decimal between 0 and 1 (exclusive)
 - `Math.random() * 100` scales the range to 0-100 (exclusive)
 - `Math.floor()` rounds down to get integers: 0, 1, 2, ..., 99
 - Adding `+ 1` shifts the range to 1-100, matching the API's user ID range
 
 **Mathematical Concepts:**
+
 - This approach ensures uniform distribution across all possible user IDs
 - The formula `Math.floor(Math.random() * max) + min` is a standard pattern for generating random integers within a range
 - Understanding this pattern is crucial for creating test data and simulations
 
 **API Resource Access Pattern:**
+
 - Uses the RESTful pattern: `GET /users/{id}` to fetch a specific user
 - The random ID generation makes this function useful for demos, testing, and prototyping
 - This pattern is common in development environments where you need sample data
 
 **Error Handling Strategy:**
+
 - Follows the standard async/await error handling pattern used throughout the API layer
 - Logs errors for debugging while re-throwing them for upstream handling
 - The function can fail if the random ID doesn't exist, but DummyJSON typically has users 1-100
 
 **Use Cases in Development:**
+
 - Creating demo accounts for presentations
 - Populating test environments with varied user data
 - Building user onboarding flows that show different user types
@@ -129,11 +131,11 @@ This function demonstrates random data generation and mathematical operations fo
  */
 export async function fetchUsers(
   limit: number = 10,
-  skip: number = 0
+  skip: number = 0,
 ): Promise<DummyUsersResponse> {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/users?limit=${limit}&skip=${skip}`
+      `${API_BASE_URL}/users?limit=${limit}&skip=${skip}`,
     );
 
     if (!response.ok) {
@@ -154,28 +156,33 @@ export async function fetchUsers(
 This function showcases pagination implementation and administrative data access patterns:
 
 **Default Parameters for Flexibility:**
+
 - `limit: number = 10` provides a sensible default for page size
 - `skip: number = 0` defaults to starting from the beginning
 - Default parameters make the function easy to use while allowing customization when needed
 
 **Pagination Mathematics:**
+
 - `limit` controls how many users to return (page size)
 - `skip` determines how many users to bypass (for calculating page offsets)
 - Formula for page navigation: `skip = (pageNumber - 1) * limit`
 - Example: Page 3 with 10 users per page → `skip = (3-1) * 10 = 20`
 
 **Query Parameter Construction:**
+
 - Uses template literals to build query string: `?limit=${limit}&skip=${skip}`
 - This follows standard REST API conventions for pagination
 - Query parameters are more RESTful than path parameters for optional modifiers
 
 **Administrative Use Cases:**
+
 - User management dashboards that display user lists
 - Admin panels that need to browse through all system users
 - Bulk operations that process users in batches
 - Reporting features that analyze user demographics
 
 **Response Structure Handling:**
+
 - Returns `DummyUsersResponse` which typically includes:
   - `users`: Array of user objects
   - `total`: Total number of users in the system
@@ -183,6 +190,7 @@ This function showcases pagination implementation and administrative data access
   - `limit`: Current limit value (for pagination state)
 
 **Performance Considerations:**
+
 - Pagination prevents memory overload when dealing with large user bases
 - Allows for responsive UI that loads quickly even with thousands of users
 - Enables infinite scroll or traditional pagination UI patterns
@@ -223,31 +231,37 @@ export async function fetchDemoCredentials(): Promise<{
 This function demonstrates function composition and data transformation for demo purposes:
 
 **Function Composition Pattern:**
+
 - Builds complex functionality by combining simpler functions
 - `fetchRandomUser()` provides the base data, this function transforms it
 - This is a key principle in functional programming: compose small, focused functions
 
 **Data Transformation and Extraction:**
+
 - Takes a complete user object and extracts only the needed fields
 - Creates a new object structure tailored for authentication demo purposes
 - String interpolation with template literals: `${user.firstName} ${user.lastName}`
 
 **Demo and Testing Utilities:**
+
 - Provides realistic demo credentials for presentations and testing
 - Eliminates the need to hardcode demo accounts
 - Useful for onboarding flows where users can try the system without creating accounts
 
 **Object Destructuring Alternative:**
+
 - Could be refactored using destructuring: `const { username, password, firstName, lastName } = user`
 - Current approach is more explicit about which fields are being used
 - Both patterns are valid; choice depends on team preferences and readability
 
 **Error Propagation Strategy:**
+
 - Catches errors from `fetchRandomUser()` and re-throws them with additional context
 - This provides a clear error trail: if demo credentials fail, you know it's likely a user API issue
 - The error handling preserves the original error while adding contextual information
 
 **Use Cases in Development:**
+
 - Login form demos where you need working credentials
 - Tutorial walkthrough where users need example accounts
 - QA testing with varied user profiles
@@ -288,32 +302,38 @@ export async function fetchUserById(userId: number): Promise<DummyUser> {
 This function represents the fundamental pattern for individual resource retrieval:
 
 **RESTful Resource Access:**
+
 - Follows the standard REST pattern: `GET /users/{id}` for fetching a specific user
 - Uses path parameters (not query parameters) for resource identification
 - This is the most common pattern in REST APIs for accessing individual resources
 
 **Type-Safe Parameter Handling:**
+
 - Accepts `userId: number` ensuring only valid numeric IDs are passed
 - TypeScript's type system prevents common errors like passing strings or undefined values
 - The parameter name `userId` is descriptive and self-documenting
 
 **Direct Resource Mapping:**
+
 - The API response maps directly to the `DummyUser` interface
 - No additional processing or transformation needed
 - This simplicity makes the function fast and predictable
 
 **Error Handling Consistency:**
+
 - Uses the same error handling pattern as other functions in the module
 - Consistent error messages help with debugging and logging
 - The error context includes the specific operation being performed
 
 **Common Use Cases:**
+
 - User profile pages that display detailed user information
 - Authentication systems that need to verify user details
 - Admin panels that need to look up specific users
 - Any component that needs to display user-specific information
 
 **Performance Characteristics:**
+
 - Fast and lightweight - single API call with minimal processing
 - Cacheable at the HTTP level (GET requests can be cached)
 - Suitable for frequent calls in user interfaces

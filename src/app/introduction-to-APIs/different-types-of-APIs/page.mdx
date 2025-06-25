@@ -19,19 +19,25 @@ if ("credentials" in navigator) {
     name: "John Doe",
   });
 
-  navigator.credentials.store(cred).then(() => {
-    console.log("Credentials stored.");
-  });
+  navigator.credentials.store(cred).then(
+    // Callback to confirm credential storage
+    () => {
+      console.log("Credentials stored.");
+    }
+  );
 }
 
 // Retrieving a credential
-navigator.credentials.get({ password: true }).then((credential) => {
-  if (credential) {
-    // Auto-fill login form
-    document.querySelector("#email").value = credential.id;
-    document.querySelector("#password").value = credential.password;
+navigator.credentials.get({ password: true }).then(
+  // Callback to handle retrieved credentials
+  (credential) => {
+    if (credential) {
+      // Auto-fill login form
+      document.querySelector("#email").value = credential.id;
+      document.querySelector("#password").value = credential.password;
+    }
   }
-});
+);
 ```
 
 In this example, the Credential Management API is used to store a user's credentials securely and retrieve them for auto-filling a login form. This enhances user experience by reducing the need for manual input while maintaining security.
@@ -57,11 +63,13 @@ The Geolocation API allows web applications to access the geographical location 
 ```javascript
 if ("geolocation" in navigator) {
   navigator.geolocation.getCurrentPosition(
+    // Success callback: handle position data
     (position) => {
       const { latitude, longitude } = position.coords;
       console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
       // Use the coordinates (e.g., display on a map)
     },
+    // Error callback: handle location errors
     (error) => {
       console.error("Error getting location:", error);
     },
@@ -98,14 +106,17 @@ The Notifications API allows web applications to display notifications to users,
 
 ```javascript
 // Request permission to display notifications
-Notification.requestPermission().then((permission) => {
-  if (permission === "granted") {
-    new Notification("New Message", {
-      body: "You have a new message from Jane.",
-      icon: "message-icon.png",
-    });
+Notification.requestPermission().then(
+  // Callback to handle permission response
+  (permission) => {
+    if (permission === "granted") {
+      new Notification("New Message", {
+        body: "You have a new message from Jane.",
+        icon: "message-icon.png",
+      });
+    }
   }
-});
+);
 ```
 
 In this example, the Notifications API is used to request permission from the user to display notifications. If granted, a notification is displayed with a message and an icon.
@@ -150,11 +161,14 @@ if (window.PaymentRequest) {
 
   const request = new PaymentRequest(supportedInstruments, details);
 
-  request.show().then((paymentResponse) => {
-    // Process paymentResponse
-    // Send paymentResponse.details to server
-    return paymentResponse.complete("success");
-  });
+  request.show().then(
+    // Callback to handle payment response
+    (paymentResponse) => {
+      // Process paymentResponse
+      // Send paymentResponse.details to server
+      return paymentResponse.complete("success");
+    }
+  );
 } else {
   console.log("Payment Request API not supported.");
 }
@@ -181,6 +195,7 @@ In this example, the Payment Request API is used to create a payment request wit
 The Performance API provides a way to measure and analyze the performance of web applications. It allows developers to gather metrics related to page load times, resource loading, and user interactions, helping to identify performance bottlenecks and optimize the user experience.
 
 ```javascript
+// Event listener callback to measure performance when page loads
 window.addEventListener("load", () => {
   const [navigationEntry] = performance.getEntriesByType("navigation");
   console.log("Time to Interactive:", navigationEntry.domInteractive);
@@ -216,7 +231,9 @@ if (navigator.share) {
       text: "I found this great website that I think you will love.",
       url: "https://example.com",
     })
+    // Success callback for successful sharing
     .then(() => console.log("Content shared successfully!"))
+    // Error callback for sharing failures
     .catch((error) => console.error("Error sharing content:", error));
 } else {
   console.log("Web Share API not supported.");
@@ -249,10 +266,12 @@ if (navigator.bluetooth) {
     .requestDevice({
       filters: [{ services: ["heart_rate"] }],
     })
+    // Callback to handle successful device connection
     .then((device) => {
       console.log("Connected to device:", device.name);
       return device.gatt.connect();
     })
+    // Callback to handle GATT server connection
     .then((server) => {
       console.log("Connected to GATT server:", server);
       // Interact with the device's services and characteristics

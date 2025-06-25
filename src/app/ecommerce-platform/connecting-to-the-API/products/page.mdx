@@ -127,31 +127,37 @@ export async function fetchProducts(
 This function demonstrates advanced API request handling and conditional logic:
 
 **Function Parameters & Flexibility:**
+
 - Takes `categorySlug` as a required parameter and `searchQuery` as an optional parameter
 - The optional parameter (`searchQuery?: string`) uses TypeScript's optional parameter syntax
 - This design allows the function to serve dual purposes: category browsing and product search
 
 **Conditional URL Construction:**
+
 - Uses conditional logic to determine which API endpoint to call based on the presence of `searchQuery`
 - `encodeURIComponent()` ensures URL safety by properly encoding special characters in user input
 - The `limit=0` parameter tells the API to return all results without pagination limits
 
 **URL Building Strategies:**
+
 - Search endpoint: `/products/search?q=${query}&limit=0` - searches across all product fields
 - Category endpoint: `/products/category/${category}?limit=0` - filters by specific category
 - This demonstrates how a single function can handle multiple API endpoints efficiently
 
 **Error Handling with HTTP Status Codes:**
+
 - Checks `res.ok` to verify successful HTTP responses (status codes 200-299)
 - Provides specific error handling for 404 status (category not found)
 - Uses descriptive error messages that include the category name for better debugging
 
 **TypeScript Type Safety:**
+
 - Explicitly types the API response as `DummyJSONProductsResponse`
 - Uses the nullish coalescing operator (`|| []`) to provide a fallback empty array
 - Returns `ProductItem[]` ensuring type consistency throughout the application
 
 **Defensive Programming:**
+
 - The try-catch block ensures errors are logged and re-thrown for upstream handling
 - Fallback to empty array prevents application crashes when API responses are malformed
 
@@ -164,7 +170,7 @@ This function demonstrates advanced API request handling and conditional logic:
 
 /**
  * Retrieves a product object based on the provided slug.
- * 
+ *
  * @param {string} slug - The unique identifier for the product.
  * @returns {Promise<Product>} A promise that resolves to the product data corresponding to the given slug.
  * @throws {Error} If the product cannot be found or the API request fails.
@@ -199,6 +205,7 @@ export async function getProductBySlug(
       .join(" ");
 
     // Search returns an array, so we need to find the exact match
+    // @collapse
     const product = data.products.find((p) => {
       // Convert product title to slug format for comparison
       const productSlug = p.title
@@ -226,32 +233,38 @@ export async function getProductBySlug(
 This function showcases complex string manipulation and search algorithms:
 
 **Input Validation & Early Returns:**
+
 - Uses guard clause pattern: `if (!productTitle) return null`
 - Early returns prevent unnecessary API calls and improve performance
 - Console warnings help developers identify potential issues during development
 
 **String Transformation Techniques:**
+
 - `toTitleCase()` utility function converts slug format to proper title case for API search
 - Multiple string manipulation methods: `split()`, `map()`, `charAt()`, `toUpperCase()`, `slice()`, `join()`
 - Demonstrates how to normalize data formats for API compatibility
 
 **Slug-to-Title Conversion Logic:**
+
 - Converts "product-title" → "Product Title" using functional programming approach
 - `split("-")` breaks the slug into word components
 - `map()` with arrow function capitalizes each word individually
 - `join(" ")` reassembles the words with proper spacing
 
 **Advanced Search and Filtering:**
+
 - Uses `Array.find()` to locate exact matches from search results
 - Implements bidirectional matching: title-to-slug AND slug-to-title comparison
 - Regular expressions and string replacement for slug generation: `replace(/\s+/g, "-")` and `replace(/[^a-z0-9-]/g, "")`
 
 **Multiple Comparison Strategies:**
+
 - `titleMatch`: Direct case-insensitive comparison of product titles
 - `slugMatch`: Converts product title to slug format and compares with input
 - Uses logical OR (`||`) to match either comparison method
 
 **Error Resilience:**
+
 - Returns `null` instead of throwing errors for missing products
 - This pattern allows calling code to handle missing products gracefully
 - Distinguishes between API errors (network issues) and missing data (business logic)
@@ -299,26 +312,31 @@ export async function getProductById(
 This function demonstrates the simplest and most direct API pattern:
 
 **RESTful Resource Access:**
+
 - Follows REST conventions: `GET /products/{id}` for accessing a specific resource
 - Uses template literals to construct the URL with the dynamic product ID
 - This is the standard pattern for retrieving individual resources by their unique identifier
 
 **HTTP Status Code Handling:**
+
 - Differentiates between "not found" (404) and other errors
 - Returns `null` for 404 status, indicating the resource doesn't exist (not an error condition)
 - Throws errors for other HTTP failures (500, 403, etc.) which are actual problems
 
 **Graceful Degradation:**
+
 - The function never crashes the application - it either returns data or `null`
 - This allows UI components to handle missing products elegantly (show "Product not found" instead of crashing)
 - Error logging provides debugging information without exposing errors to end users
 
 **Direct Type Assertion:**
+
 - Directly types the response as `ProductItem` since the API endpoint returns a single product
 - No need for array handling or additional processing - the API response maps directly to our interface
 - This simplicity makes the function fast and predictable
 
 **Single Responsibility:**
+
 - The function has one clear purpose: fetch a product by ID
 - No conditional logic or multiple code paths - just a straightforward API call
 - This makes it easy to test, debug, and maintain
@@ -358,26 +376,31 @@ export async function getAllProducts(): Promise<ProductItem[]> {
 This function demonstrates bulk data retrieval and performance considerations:
 
 **Bulk Data Fetching:**
+
 - Uses `limit=0` query parameter to bypass pagination and retrieve all products at once
 - This is efficient for scenarios where you need the complete product catalog
 - Ideal for building search indexes, generating sitemaps, or creating product feeds
 
 **Performance Trade-offs:**
+
 - Loading all products reduces the number of API calls (better for API rate limits)
 - However, it increases initial load time and memory usage
 - This pattern works well for moderate-sized catalogs but may need pagination for very large datasets
 
 **Consistent Error Handling:**
+
 - Follows the same error handling pattern as other functions in the module
 - Throws errors instead of returning `null` because failing to load all products is typically a critical error
 - The calling code can decide whether to show cached data, retry, or display an error message
 
 **Data Structure Consistency:**
+
 - Returns the same `ProductItem[]` type as other product functions
 - Uses the same response parsing logic: `data.products || []`
 - This consistency makes it easy to swap between different product-fetching functions
 
 **Use Case Scenarios:**
+
 - Admin dashboards that need to display all products
 - Search functionality that operates on the complete product set
 - Data export features
@@ -392,7 +415,7 @@ This function demonstrates bulk data retrieval and performance considerations:
 
 /**
  * Retrieves the list of product categories from the API.
- * 
+ *
  * @returns {Promise<Array<Category>>} A promise that resolves to an array of product category objects.
  */
 export async function getProductCategories(): Promise<
@@ -420,27 +443,32 @@ export async function getProductCategories(): Promise<
 This function handles metadata retrieval for navigation and categorization:
 
 **Metadata vs. Data:**
+
 - Unlike product functions that return actual products, this returns metadata about categories
 - Categories are used for navigation menus, filters, and organizing products
 - This separation of concerns keeps product data and navigation data distinct
 
 **Complex Return Type:**
+
 - Returns an array of objects with specific properties: `{ slug, name, url }`
 - `slug`: URL-friendly identifier for routing (e.g., "mens-clothing")
 - `name`: Human-readable display name (e.g., "Men's Clothing")
 - `url`: Complete URL path for navigation
 
 **Navigation Building:**
+
 - The returned data is perfect for building dynamic navigation menus
 - Categories can be used to create breadcrumbs, filter options, and category pages
 - The structured format makes it easy to generate both URLs and display text
 
 **API Endpoint Design:**
+
 - Uses a dedicated `/categories` endpoint rather than extracting categories from products
 - This is more efficient than processing all products to extract unique categories
 - Demonstrates proper API design where metadata has its own endpoints
 
 **UI Integration Patterns:**
+
 - Category data typically drives:
   - Main navigation menus
   - Product filter sidebars
@@ -483,25 +511,30 @@ export async function getProductCategoryList(): Promise<string[]> {
 This function provides a simplified alternative for basic category operations:
 
 **Simplified Data Structure:**
+
 - Returns a simple `string[]` instead of complex objects
 - Each string is just the category name/identifier without additional metadata
 - This simpler format is useful when you only need category names for basic operations
 
 **Different API Endpoint:**
+
 - Uses `/category-list` endpoint instead of `/categories`
 - Different APIs may provide category data in different formats
 - This function demonstrates how to handle APIs that return minimal category information
 
 **Use Case Differences:**
+
 - `getProductCategories()`: Rich category data with URLs and display names (for navigation)
 - `getProductCategoryList()`: Simple category names (for validation, quick lists, or processing)
 
 **Performance Considerations:**
+
 - Smaller payload size since it only returns strings
 - Faster parsing and processing due to simpler data structure
 - Ideal for scenarios where you don't need the full category metadata
 
 **Common Usage Patterns:**
+
 - Form validation (checking if a category exists)
 - Quick category existence checks
 - Building simple dropdown lists
@@ -509,6 +542,7 @@ This function provides a simplified alternative for basic category operations:
 - Caching scenarios where minimal data is preferred
 
 **API Design Insight:**
+
 - Shows how APIs often provide multiple endpoints for the same data at different detail levels
 - Demonstrates the principle of providing both detailed and simplified data access patterns
 

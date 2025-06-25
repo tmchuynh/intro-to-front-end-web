@@ -310,6 +310,7 @@ select.addEventListener("change", (event) => {
 
 ```javascript
 // Create form dynamically
+// Dynamically creates a complete contact form with all necessary form elements
 function createContactForm() {
   const form = document.createElement("form");
   form.id = "contactForm";
@@ -374,11 +375,13 @@ container.appendChild(createContactForm());
 
 ```javascript
 // Custom validation functions
+// Validates email format using regular expression
 function validateEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
 
+// Validates password strength with multiple criteria
 function validatePassword(password) {
   return (
     password.length >= 8 &&
@@ -409,6 +412,7 @@ emailInput.addEventListener("input", (event) => {
 });
 
 // Form submission validation
+// @collapse
 form.addEventListener("submit", (event) => {
   event.preventDefault();
 
@@ -445,6 +449,7 @@ form.addEventListener("submit", (event) => {
 
 ```javascript
 // Serialize form data to object
+// Converts form data to a JavaScript object, handling multiple values for same key
 function serializeForm(form) {
   const formData = new FormData(form);
   const serialized = {};
@@ -465,12 +470,12 @@ function serializeForm(form) {
   return serialized;
 }
 
-// Serialize to JSON
+// Converts form data to JSON string format
 function serializeFormToJSON(form) {
   return JSON.stringify(serializeForm(form));
 }
 
-// Serialize to URL parameters
+// Converts form data to URL-encoded parameter string
 function serializeFormToURL(form) {
   const formData = new FormData(form);
   const params = new URLSearchParams();
@@ -482,7 +487,7 @@ function serializeFormToURL(form) {
   return params.toString();
 }
 
-// Populate form from object
+// Populates form fields with data from an object
 function populateForm(form, data) {
   Object.keys(data).forEach((key) => {
     const element = form.elements[key];
@@ -542,6 +547,7 @@ function fadeOut(element, duration = 300) {
 }
 
 // Slide animations
+// Animates element sliding down by expanding its height
 function slideDown(element, duration = 300) {
   element.style.height = "0";
   element.style.overflow = "hidden";
@@ -556,6 +562,7 @@ function slideDown(element, duration = 300) {
   }, duration);
 }
 
+// Animates element sliding up by collapsing its height
 function slideUp(element, duration = 300) {
   const height = element.offsetHeight;
   element.style.height = height + "px";
@@ -575,6 +582,7 @@ function slideUp(element, duration = 300) {
 
 ```javascript
 // Modern animation approach
+// Creates animations using the modern Web Animations API
 function animateElement(element, keyframes, options) {
   return element.animate(keyframes, options);
 }
@@ -653,6 +661,7 @@ const complexAnimation = animateElement(
 
 ```javascript
 // Animation with promise handling
+// Executes multiple animations in sequence using async/await
 async function sequentialAnimations(element) {
   // First animation
   await animateElement(
@@ -727,6 +736,7 @@ function optimizedSlide(element, direction = "left", distance = 100) {
 }
 
 // Batch DOM reads and writes
+// @collapse
 function animateMultipleElements(elements) {
   // Read phase - batch all DOM reads
   const positions = elements.map((el) => ({
@@ -750,11 +760,12 @@ function animateMultipleElements(elements) {
   });
 }
 
-// Use requestAnimationFrame for smooth animations
+// Creates smooth counter animation using requestAnimationFrame for optimal performance
 function smoothCountUp(element, start, end, duration) {
   const startTime = performance.now();
   const range = end - start;
 
+  // Updates count value with easing animation
   function updateCount(currentTime) {
     const elapsed = currentTime - startTime;
     const progress = Math.min(elapsed / duration, 1);
@@ -782,6 +793,7 @@ Understanding common patterns helps you write more efficient and maintainable co
 
 ```javascript
 // Add item to list
+// Adds a new item to a list with optional data attributes
 function addListItem(listElement, text, data = {}) {
     const listItem = document.createElement("li");
     listItem.textContent = text;
@@ -839,12 +851,14 @@ function filterList(listElement, predicate) {
 ### Modal Dialog Management
 
 ```javascript
+// Modal management system with overlay and animation support
 class ModalManager {
   constructor() {
     this.activeModal = null;
     this.setupEventListeners();
   }
 
+  // Creates a modal element with content and optional close button
   createModal(content, options = {}) {
     const modal = document.createElement("div");
     modal.className = "modal-overlay";
@@ -871,6 +885,7 @@ class ModalManager {
     return modal;
   }
 
+  // Opens a modal with animation and manages active modal state
   openModal(content, options = {}) {
     if (this.activeModal) {
       this.closeModal(this.activeModal);
@@ -974,6 +989,7 @@ class TabManager {
     this.tabs[index].focus();
   }
 
+  // @collapse
   handleKeyNavigation(e) {
     const { key } = e;
     let newIndex = this.activeIndex;
@@ -1028,6 +1044,7 @@ class InfiniteScroll {
     );
   }
 
+  // @collapse
   handleScroll() {
     if (this.loading) return;
 
@@ -1054,6 +1071,7 @@ class InfiniteScroll {
     }
   }
 
+  // @collapse
   appendItems(items) {
     const fragment = document.createDocumentFragment();
 
@@ -1141,6 +1159,7 @@ function debugEventListeners(element) {
 }
 
 // Monitor DOM changes
+// @collapse
 function monitorDOMChanges(targetElement) {
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
@@ -1321,6 +1340,7 @@ function isValidAttributeName(name) {
 function validateAndSanitizeInput(input, type) {
   let sanitized = input.trim();
 
+  // @collapse
   switch (type) {
     case "email":
       sanitized = sanitized.toLowerCase();
@@ -1486,6 +1506,7 @@ class ShoppingCart {
     }
   }
 
+  // @collapse
   render() {
     this.container.innerHTML = `
             <div class="cart-header">
@@ -1660,6 +1681,7 @@ class ContentFilter {
     this.createCategoryFilters();
   }
 
+  // @collapse
   createCategoryFilters() {
     const categories = this.extractCategories();
     const categoriesContainer =
@@ -1721,6 +1743,7 @@ class ContentFilter {
     }));
   }
 
+  // @collapse
   attachEventListeners() {
     // Search input
     const searchInput = this.filterContainer.querySelector(".search-input");
@@ -1836,6 +1859,7 @@ class ContentFilter {
     });
   }
 
+  // @collapse
   getTextNodes(element) {
     const textNodes = [];
     const walker = document.createTreeWalker(

@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+// Simple dialog component for displaying blog post details in a modal overlay
 export default function BlogDetailsDialog() {
   const [open, setOpen] = useState(false);
 
@@ -111,8 +112,7 @@ export default function BlogCard({ blog }) {
 }
 ```
 
-
-## Examples 
+## Examples
 
 ### Basic Blog Preview Dialog
 
@@ -170,15 +170,15 @@ import { Calendar, Clock, User } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 
-export default function DetailedBlogDialog({ 
-  title, 
-  content, 
-  author, 
-  date, 
-  readTime, 
-  tags, 
+export default function DetailedBlogDialog({
+  title,
+  content,
+  author,
+  date,
+  readTime,
+  tags,
   imageUrl,
-  onNavigate 
+  onNavigate,
 }) {
   const [open, setOpen] = useState(false);
 
@@ -216,7 +216,7 @@ export default function DetailedBlogDialog({
               className="w-full h-48 object-cover rounded-lg"
             />
           )}
-          
+
           <div className="flex flex-wrap gap-2">
             {tags?.map((tag, index) => (
               <Badge key={index} variant="secondary">
@@ -236,9 +236,7 @@ export default function DetailedBlogDialog({
           </Button>
           <div className="flex gap-2">
             <Button variant="ghost">Share</Button>
-            <Button onClick={() => onNavigate?.()}>
-              Go to Full Article
-            </Button>
+            <Button onClick={() => onNavigate?.()}>Go to Full Article</Button>
           </div>
         </DialogFooter>
       </DialogContent>
@@ -265,13 +263,13 @@ import { X, Heart, Bookmark, Share2 } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 
-export default function AnimatedBlogDialog({ 
-  title, 
-  content, 
-  imageUrl, 
+export default function AnimatedBlogDialog({
+  title,
+  content,
+  imageUrl,
   excerpt,
   isLiked: initialLiked = false,
-  isBookmarked: initialBookmarked = false 
+  isBookmarked: initialBookmarked = false,
 }) {
   const [open, setOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(initialLiked);
@@ -280,8 +278,8 @@ export default function AnimatedBlogDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           className="group relative overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105"
         >
           <span className="relative z-10">Preview Article</span>
@@ -331,29 +329,33 @@ export default function AnimatedBlogDialog({
                 size="sm"
                 onClick={() => setIsLiked(!isLiked)}
                 className={`transition-all duration-200 ${
-                  isLiked 
-                    ? 'text-red-500 hover:text-red-600 hover:scale-110' 
-                    : 'text-gray-500 hover:text-red-500 hover:scale-110'
+                  isLiked
+                    ? "text-red-500 hover:text-red-600 hover:scale-110"
+                    : "text-gray-500 hover:text-red-500 hover:scale-110"
                 }`}
               >
-                <Heart className={`h-5 w-5 ${isLiked ? 'fill-current' : ''} transition-all duration-200`} />
-                <span className="ml-1">{isLiked ? 'Liked' : 'Like'}</span>
+                <Heart
+                  className={`h-5 w-5 ${isLiked ? "fill-current" : ""} transition-all duration-200`}
+                />
+                <span className="ml-1">{isLiked ? "Liked" : "Like"}</span>
               </Button>
-              
+
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsBookmarked(!isBookmarked)}
                 className={`transition-all duration-200 ${
-                  isBookmarked 
-                    ? 'text-blue-500 hover:text-blue-600 hover:scale-110' 
-                    : 'text-gray-500 hover:text-blue-500 hover:scale-110'
+                  isBookmarked
+                    ? "text-blue-500 hover:text-blue-600 hover:scale-110"
+                    : "text-gray-500 hover:text-blue-500 hover:scale-110"
                 }`}
               >
-                <Bookmark className={`h-5 w-5 ${isBookmarked ? 'fill-current' : ''} transition-all duration-200`} />
-                <span className="ml-1">{isBookmarked ? 'Saved' : 'Save'}</span>
+                <Bookmark
+                  className={`h-5 w-5 ${isBookmarked ? "fill-current" : ""} transition-all duration-200`}
+                />
+                <span className="ml-1">{isBookmarked ? "Saved" : "Save"}</span>
               </Button>
-              
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -364,7 +366,7 @@ export default function AnimatedBlogDialog({
               </Button>
             </div>
 
-            <Button 
+            <Button
               onClick={() => setOpen(false)}
               className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transition-all duration-300 hover:shadow-lg hover:scale-105"
             >
@@ -380,7 +382,7 @@ export default function AnimatedBlogDialog({
 
 <BackToTop />
 
-### Progressive Reading Experience Dialog 
+### Progressive Reading Experience Dialog
 
 ```tsx
 import {
@@ -398,24 +400,25 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function BlogNavigationDialog({ 
-  title, 
-  content, 
+export default function BlogNavigationDialog({
+  title,
+  content,
   excerpt,
   imageUrl,
   slug,
   readTime,
   views,
-  trending = false 
+  trending = false,
 }) {
   const [open, setOpen] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
   const [isNavigating, setIsNavigating] = useState(false);
 
+  // @collapse
   useEffect(() => {
     if (open) {
       const timer = setInterval(() => {
-        setReadingProgress(prev => {
+        setReadingProgress((prev) => {
           if (prev >= 100) {
             clearInterval(timer);
             return 100;
@@ -504,7 +507,8 @@ export default function BlogNavigationDialog({
             <p className="text-gray-700 leading-relaxed">{content}</p>
             <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
               <p className="text-sm text-gray-600 italic">
-                This is just a preview. Continue reading to discover more insights and detailed explanations...
+                This is just a preview. Continue reading to discover more
+                insights and detailed explanations...
               </p>
             </div>
           </div>
@@ -561,16 +565,22 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight, Bookmark, Share2, ThumbsUp } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Bookmark,
+  Share2,
+  ThumbsUp,
+} from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 
-export default function MultiStepBlogDialog({ 
-  title, 
-  sections, 
-  imageUrl, 
+export default function MultiStepBlogDialog({
+  title,
+  sections,
+  imageUrl,
   author,
-  readTime 
+  readTime,
 }) {
   const [open, setOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -600,7 +610,9 @@ export default function MultiStepBlogDialog({
         <DialogHeader>
           <DialogTitle className="text-xl">{title}</DialogTitle>
           <div className="flex items-center gap-4 text-sm text-gray-500">
-            <span>Step {currentStep + 1} of {sections.length}</span>
+            <span>
+              Step {currentStep + 1} of {sections.length}
+            </span>
             <span>•</span>
             <span>{readTime} min read</span>
             <span>•</span>
@@ -610,7 +622,7 @@ export default function MultiStepBlogDialog({
 
         <div className="space-y-4">
           <Progress value={progress} className="h-2" />
-          
+
           <div className="min-h-[400px] space-y-4">
             {imageUrl && currentStep === 0 && (
               <Image
@@ -621,14 +633,20 @@ export default function MultiStepBlogDialog({
                 className="w-full h-48 object-cover rounded-lg"
               />
             )}
-            
+
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">{sections[currentStep]?.title}</h3>
-              <p className="text-gray-700 leading-relaxed">{sections[currentStep]?.content}</p>
-              
+              <h3 className="text-lg font-semibold">
+                {sections[currentStep]?.title}
+              </h3>
+              <p className="text-gray-700 leading-relaxed">
+                {sections[currentStep]?.content}
+              </p>
+
               {sections[currentStep]?.codeExample && (
                 <div className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
-                  <pre><code>{sections[currentStep].codeExample}</code></pre>
+                  <pre>
+                    <code>{sections[currentStep].codeExample}</code>
+                  </pre>
                 </div>
               )}
             </div>
@@ -695,13 +713,13 @@ import { Heart, MessageCircle, Send, Star } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 
-export default function InteractiveBlogDialog({ 
-  title, 
-  content, 
+export default function InteractiveBlogDialog({
+  title,
+  content,
   author,
   rating,
   comments: initialComments = [],
-  tags = [] 
+  tags = [],
 }) {
   const [open, setOpen] = useState(false);
   const [liked, setLiked] = useState(false);
@@ -709,13 +727,14 @@ export default function InteractiveBlogDialog({
   const [comments, setComments] = useState(initialComments);
   const [showComments, setShowComments] = useState(false);
 
+  // @collapse
   const handleAddComment = () => {
     if (newComment.trim()) {
       const comment = {
         id: Date.now(),
         text: newComment,
         author: "You",
-        time: "just now"
+        time: "just now",
       };
       setComments([...comments, comment]);
       setNewComment("");
@@ -745,14 +764,16 @@ export default function InteractiveBlogDialog({
                 <Star
                   key={i}
                   className={`h-4 w-4 ${
-                    i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+                    i < rating
+                      ? "text-yellow-400 fill-current"
+                      : "text-gray-300"
                   }`}
                 />
               ))}
               <span className="text-sm text-gray-500 ml-1">({rating}/5)</span>
             </div>
           </div>
-          
+
           <div className="flex flex-wrap gap-2 mt-3">
             {tags.map((tag, index) => (
               <Badge key={index} variant="secondary" className="text-xs">
@@ -774,13 +795,17 @@ export default function InteractiveBlogDialog({
                 size="sm"
                 onClick={() => setLiked(!liked)}
                 className={`transition-all ${
-                  liked ? 'text-red-500 hover:text-red-600' : 'hover:text-red-500'
+                  liked
+                    ? "text-red-500 hover:text-red-600"
+                    : "hover:text-red-500"
                 }`}
               >
-                <Heart className={`h-5 w-5 mr-1 ${liked ? 'fill-current' : ''}`} />
-                {liked ? 'Liked' : 'Like'}
+                <Heart
+                  className={`h-5 w-5 mr-1 ${liked ? "fill-current" : ""}`}
+                />
+                {liked ? "Liked" : "Like"}
               </Button>
-              
+
               <Button
                 variant="ghost"
                 size="sm"
@@ -799,16 +824,25 @@ export default function InteractiveBlogDialog({
             <div className="space-y-4">
               <div className="space-y-3">
                 {comments.map((comment) => (
-                  <div key={comment.id} className="flex gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div
+                    key={comment.id}
+                    className="flex gap-3 p-3 bg-gray-50 rounded-lg"
+                  >
                     <Avatar className="h-8 w-8">
                       <AvatarFallback>{comment.author[0]}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">{comment.author}</span>
-                        <span className="text-xs text-gray-500">{comment.time}</span>
+                        <span className="text-sm font-medium">
+                          {comment.author}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {comment.time}
+                        </span>
                       </div>
-                      <p className="text-sm text-gray-700 mt-1">{comment.text}</p>
+                      <p className="text-sm text-gray-700 mt-1">
+                        {comment.text}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -849,17 +883,24 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Play, Pause, Volume2, VolumeX, Download, Headphones } from "lucide-react";
+import {
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  Download,
+  Headphones,
+} from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 
-export default function AudioBlogDialog({ 
-  title, 
-  content, 
+export default function AudioBlogDialog({
+  title,
+  content,
   audioUrl,
   audioDuration,
   imageUrl,
-  author 
+  author,
 }) {
   const [open, setOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -868,6 +909,7 @@ export default function AudioBlogDialog({
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef(null);
 
+  // @collapse
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -875,12 +917,12 @@ export default function AudioBlogDialog({
     const updateTime = () => setCurrentTime(audio.currentTime);
     const handleEnded = () => setIsPlaying(false);
 
-    audio.addEventListener('timeupdate', updateTime);
-    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener("timeupdate", updateTime);
+    audio.addEventListener("ended", handleEnded);
 
     return () => {
-      audio.removeEventListener('timeupdate', updateTime);
-      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener("timeupdate", updateTime);
+      audio.removeEventListener("ended", handleEnded);
     };
   }, []);
 
@@ -899,7 +941,7 @@ export default function AudioBlogDialog({
   const handleSeek = (value) => {
     const audio = audioRef.current;
     if (!audio) return;
-    
+
     const newTime = (value[0] / 100) * audioDuration;
     audio.currentTime = newTime;
     setCurrentTime(newTime);
@@ -930,7 +972,7 @@ export default function AudioBlogDialog({
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
   return (
@@ -980,13 +1022,13 @@ export default function AudioBlogDialog({
 
           <div className="space-y-4">
             <h3 className="text-xl font-semibold">{title}</h3>
-            
+
             <div className="bg-gray-50 p-4 rounded-lg space-y-4">
               <div className="flex items-center justify-between text-sm text-gray-600">
                 <span>{formatTime(currentTime)}</span>
                 <span>{formatTime(audioDuration)}</span>
               </div>
-              
+
               <Slider
                 value={[(currentTime / audioDuration) * 100]}
                 onValueChange={handleSeek}
@@ -994,7 +1036,7 @@ export default function AudioBlogDialog({
                 step={1}
                 max={100}
               />
-              
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" size="sm" onClick={togglePlay}>
@@ -1004,7 +1046,7 @@ export default function AudioBlogDialog({
                       <Play className="h-4 w-4" />
                     )}
                   </Button>
-                  
+
                   <div className="flex items-center gap-2">
                     <Button variant="ghost" size="sm" onClick={toggleMute}>
                       {isMuted ? (
@@ -1023,7 +1065,7 @@ export default function AudioBlogDialog({
                     </div>
                   </div>
                 </div>
-                
+
                 <Button variant="ghost" size="sm">
                   <Download className="h-4 w-4 mr-1" />
                   Download
@@ -1036,7 +1078,8 @@ export default function AudioBlogDialog({
                 {content.substring(0, 300)}...
               </p>
               <p className="text-sm text-gray-500 italic mt-2">
-                Continue listening to the full audio version for the complete article.
+                Continue listening to the full audio version for the complete
+                article.
               </p>
             </div>
           </div>
@@ -1064,28 +1107,28 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Share2, 
-  Twitter, 
-  Facebook, 
-  Linkedin, 
-  Mail, 
-  Copy, 
+import {
+  Share2,
+  Twitter,
+  Facebook,
+  Linkedin,
+  Mail,
+  Copy,
   Download,
   QrCode,
-  MessageSquare 
+  MessageSquare,
 } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 
-export default function SocialSharingBlogDialog({ 
-  title, 
+export default function SocialSharingBlogDialog({
+  title,
   excerpt,
   url,
   imageUrl,
   author,
   tags = [],
-  stats = { views: 0, likes: 0, shares: 0 }
+  stats = { views: 0, likes: 0, shares: 0 },
 }) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -1097,10 +1140,11 @@ export default function SocialSharingBlogDialog({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy: ', err);
+      console.error("Failed to copy: ", err);
     }
   };
 
+  // @collapse
   const shareOnPlatform = (platform) => {
     const encodedTitle = encodeURIComponent(title);
     const encodedUrl = encodeURIComponent(url);
@@ -1110,19 +1154,39 @@ export default function SocialSharingBlogDialog({
       twitter: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
       linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
-      email: `mailto:?subject=${encodedTitle}&body=Check out this article: ${encodedUrl}`
+      email: `mailto:?subject=${encodedTitle}&body=Check out this article: ${encodedUrl}`,
     };
 
     if (shareUrls[platform]) {
-      window.open(shareUrls[platform], '_blank', 'width=600,height=400');
+      window.open(shareUrls[platform], "_blank", "width=600,height=400");
     }
   };
 
   const socialPlatforms = [
-    { id: 'twitter', name: 'Twitter', icon: Twitter, color: 'bg-blue-500 hover:bg-blue-600' },
-    { id: 'facebook', name: 'Facebook', icon: Facebook, color: 'bg-blue-600 hover:bg-blue-700' },
-    { id: 'linkedin', name: 'LinkedIn', icon: Linkedin, color: 'bg-blue-700 hover:bg-blue-800' },
-    { id: 'email', name: 'Email', icon: Mail, color: 'bg-gray-600 hover:bg-gray-700' }
+    {
+      id: "twitter",
+      name: "Twitter",
+      icon: Twitter,
+      color: "bg-blue-500 hover:bg-blue-600",
+    },
+    {
+      id: "facebook",
+      name: "Facebook",
+      icon: Facebook,
+      color: "bg-blue-600 hover:bg-blue-700",
+    },
+    {
+      id: "linkedin",
+      name: "LinkedIn",
+      icon: Linkedin,
+      color: "bg-blue-700 hover:bg-blue-800",
+    },
+    {
+      id: "email",
+      name: "Email",
+      icon: Mail,
+      color: "bg-gray-600 hover:bg-gray-700",
+    },
   ];
 
   return (
@@ -1193,11 +1257,7 @@ export default function SocialSharingBlogDialog({
           <div className="space-y-3">
             <h4 className="font-medium">Copy link</h4>
             <div className="flex gap-2">
-              <Input
-                value={url}
-                readOnly
-                className="flex-1"
-              />
+              <Input value={url} readOnly className="flex-1" />
               <Button
                 onClick={copyToClipboard}
                 variant={copied ? "default" : "outline"}
@@ -1305,8 +1365,8 @@ Regular Dialogs are more flexible modal components that can display various type
     <AlertDialogHeader>
       <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
       <AlertDialogDescription>
-        This action cannot be undone. This will permanently delete your
-        account and remove your data from our servers.
+        This action cannot be undone. This will permanently delete your account
+        and remove your data from our servers.
       </AlertDialogDescription>
     </AlertDialogHeader>
     <AlertDialogFooter>
@@ -1357,20 +1417,24 @@ Regular Dialogs are more flexible modal components that can display various type
       <DialogTitle>{post.title}</DialogTitle>
       <DialogDescription>{post.excerpt}</DialogDescription>
     </DialogHeader>
-    
+
     <div className="space-y-4">
       <Image src={post.image} alt={post.title} width={800} height={400} />
       <div className="prose prose-lg">{post.content}</div>
-      
+
       <div className="flex gap-2">
-        {post.tags.map(tag => (
-          <Badge key={tag} variant="secondary">{tag}</Badge>
+        {post.tags.map((tag) => (
+          <Badge key={tag} variant="secondary">
+            {tag}
+          </Badge>
         ))}
       </div>
     </div>
-    
+
     <DialogFooter>
-      <Button variant="outline" onClick={() => setOpen(false)}>Close</Button>
+      <Button variant="outline" onClick={() => setOpen(false)}>
+        Close
+      </Button>
       <Button>Read Full Article</Button>
     </DialogFooter>
   </DialogContent>
@@ -1405,7 +1469,7 @@ export function DeletePostDialog({ postId, postTitle, onDelete }) {
       // Handle success (e.g., show toast, redirect)
     } catch (error) {
       // Handle error
-      console.error('Failed to delete post:', error);
+      console.error("Failed to delete post:", error);
     }
   };
 
@@ -1424,13 +1488,14 @@ export function DeletePostDialog({ postId, postTitle, onDelete }) {
             Delete Blog Post
           </AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete "{postTitle}"? This action cannot be undone 
-            and will permanently remove the post and all its associated data.
+            Are you sure you want to delete "{postTitle}"? This action cannot be
+            undone and will permanently remove the post and all its associated
+            data.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction 
+          <AlertDialogAction
             onClick={handleDelete}
             className="bg-red-600 hover:bg-red-700"
           >
@@ -1476,24 +1541,24 @@ export function EditPostDialog({ post, onSave }) {
       await onSave(formData);
       setOpen(false);
     } catch (error) {
-      console.error('Failed to save post:', error);
+      console.error("Failed to save post:", error);
     }
   };
 
   const addTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        tags: [...prev.tags, newTag.trim()]
+        tags: [...prev.tags, newTag.trim()],
       }));
       setNewTag("");
     }
   };
 
   const removeTag = (tagToRemove) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
+      tags: prev.tags.filter((tag) => tag !== tagToRemove),
     }));
   };
 
@@ -1506,14 +1571,16 @@ export function EditPostDialog({ post, onSave }) {
         <DialogHeader>
           <DialogTitle>Edit Blog Post</DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-6 mt-6">
           <div className="space-y-2">
             <Label htmlFor="title">Title</Label>
             <Input
               id="title"
               value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, title: e.target.value }))
+              }
               placeholder="Enter post title..."
             />
           </div>
@@ -1523,7 +1590,9 @@ export function EditPostDialog({ post, onSave }) {
             <Textarea
               id="excerpt"
               value={formData.excerpt}
-              onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, excerpt: e.target.value }))
+              }
               placeholder="Brief description of the post..."
               rows={3}
             />
@@ -1534,7 +1603,9 @@ export function EditPostDialog({ post, onSave }) {
             <Textarea
               id="content"
               value={formData.content}
-              onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, content: e.target.value }))
+              }
               placeholder="Write your post content..."
               rows={10}
             />
@@ -1544,10 +1615,14 @@ export function EditPostDialog({ post, onSave }) {
             <Label>Tags</Label>
             <div className="flex flex-wrap gap-2 mb-2">
               {formData.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                <Badge
+                  key={tag}
+                  variant="secondary"
+                  className="flex items-center gap-1"
+                >
                   {tag}
-                  <X 
-                    className="h-3 w-3 cursor-pointer hover:text-red-500" 
+                  <X
+                    className="h-3 w-3 cursor-pointer hover:text-red-500"
                     onClick={() => removeTag(tag)}
                   />
                 </Badge>
@@ -1558,7 +1633,7 @@ export function EditPostDialog({ post, onSave }) {
                 value={newTag}
                 onChange={(e) => setNewTag(e.target.value)}
                 placeholder="Add a tag..."
-                onKeyPress={(e) => e.key === 'Enter' && addTag()}
+                onKeyPress={(e) => e.key === "Enter" && addTag()}
               />
               <Button type="button" onClick={addTag} variant="outline">
                 Add Tag
@@ -1571,9 +1646,7 @@ export function EditPostDialog({ post, onSave }) {
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSave}>
-            Save Changes
-          </Button>
+          <Button onClick={handleSave}>Save Changes</Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -1587,25 +1660,25 @@ export function EditPostDialog({ post, onSave }) {
 
 ### Use Alert Dialog When:
 
-| Scenario | Why Alert Dialog |
-|----------|-----------------|
-| **Confirming Deletions** | Users need clear warning about irreversible actions |
-| **System Errors** | Critical errors require immediate acknowledgment |
-| **Data Loss Warnings** | Preventing accidental loss of user work |
-| **Permission Requests** | Clear consent flows for sensitive operations |
-| **Account Actions** | Confirming account-level changes (deletion, suspension) |
-| **Logout Confirmations** | Ensuring users don't accidentally lose their session |
+| Scenario                 | Why Alert Dialog                                        |
+| ------------------------ | ------------------------------------------------------- |
+| **Confirming Deletions** | Users need clear warning about irreversible actions     |
+| **System Errors**        | Critical errors require immediate acknowledgment        |
+| **Data Loss Warnings**   | Preventing accidental loss of user work                 |
+| **Permission Requests**  | Clear consent flows for sensitive operations            |
+| **Account Actions**      | Confirming account-level changes (deletion, suspension) |
+| **Logout Confirmations** | Ensuring users don't accidentally lose their session    |
 
 ### Use Regular Dialog When:
 
-| Scenario | Why Regular Dialog |
-|----------|-------------------|
-| **Content Previews** | Rich content display with images, formatting, interactions |
-| **Form Interfaces** | Complex forms with multiple fields and validation |
-| **Media Players** | Video/audio content requiring custom controls |
-| **Step-by-Step Flows** | Multi-step processes with navigation |
-| **Settings Panels** | Configuration interfaces with multiple options |
-| **Help Documentation** | Detailed information with formatting and links |
+| Scenario               | Why Regular Dialog                                         |
+| ---------------------- | ---------------------------------------------------------- |
+| **Content Previews**   | Rich content display with images, formatting, interactions |
+| **Form Interfaces**    | Complex forms with multiple fields and validation          |
+| **Media Players**      | Video/audio content requiring custom controls              |
+| **Step-by-Step Flows** | Multi-step processes with navigation                       |
+| **Settings Panels**    | Configuration interfaces with multiple options             |
+| **Help Documentation** | Detailed information with formatting and links             |
 
 ## Accessibility Considerations
 
@@ -1641,26 +1714,22 @@ export function EditPostDialog({ post, onSave }) {
 ```tsx
 // Regular dialogs require manual accessibility setup
 <Dialog>
-  <DialogContent 
+  <DialogContent
     role="dialog"
     aria-labelledby="dialog-title"
     aria-describedby="dialog-description"
   >
     <DialogHeader>
-      <DialogTitle id="dialog-title">
-        Edit Profile
-      </DialogTitle>
+      <DialogTitle id="dialog-title">Edit Profile</DialogTitle>
     </DialogHeader>
-    
+
     {/* Ensure focus management */}
     <div id="dialog-description" className="sr-only">
       Form to edit your user profile information
     </div>
-    
+
     {/* Provide clear navigation and actions */}
-    <form onSubmit={handleSubmit}>
-      {/* Form fields with proper labels */}
-    </form>
+    <form onSubmit={handleSubmit}>{/* Form fields with proper labels */}</form>
   </DialogContent>
 </Dialog>
 ```
@@ -1668,6 +1737,7 @@ export function EditPostDialog({ post, onSave }) {
 ## Best Practices Summary
 
 ### For Alert Dialogs:
+
 1. **Keep titles concise** but descriptive
 2. **Use clear, action-oriented language** in buttons
 3. **Provide sufficient context** in descriptions
@@ -1675,6 +1745,7 @@ export function EditPostDialog({ post, onSave }) {
 5. **Test with screen readers** to ensure accessibility
 
 ### For Regular Dialogs:
+
 1. **Implement proper focus management** manually
 2. **Add appropriate ARIA attributes** for accessibility
 3. **Keep content scannable** with clear hierarchy
@@ -1683,6 +1754,7 @@ export function EditPostDialog({ post, onSave }) {
 6. **Consider performance** with complex content
 
 ### Universal Guidelines:
+
 - **Always provide a way to cancel** or go back
 - **Use consistent language** across your application
 - **Test keyboard navigation** thoroughly
@@ -1717,7 +1789,7 @@ import {
 } from "@/components/ui/dialog";
 
 interface ConditionalDialogProps {
-  mode: 'alert' | 'regular';
+  mode: "alert" | "regular";
   trigger: React.ReactNode;
   title: string;
   description?: string;
@@ -1733,16 +1805,14 @@ export function ConditionalDialog({
   description,
   children,
   onConfirm,
-  onCancel
+  onCancel,
 }: ConditionalDialogProps) {
   const [open, setOpen] = useState(false);
 
-  if (mode === 'alert') {
+  if (mode === "alert") {
     return (
       <AlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialogTrigger asChild>
-          {trigger}
-        </AlertDialogTrigger>
+        <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{title}</AlertDialogTitle>
@@ -1761,9 +1831,7 @@ export function ConditionalDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger}
-      </DialogTrigger>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -1783,7 +1851,7 @@ function BlogPostActions({ post, hasUnsavedChanges }) {
         trigger={<Button>Delete Post</Button>}
         title={hasUnsavedChanges ? "Unsaved Changes" : "Delete Post"}
         description={
-          hasUnsavedChanges 
+          hasUnsavedChanges
             ? "You have unsaved changes. Are you sure you want to delete this post?"
             : undefined
         }

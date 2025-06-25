@@ -18,11 +18,13 @@ import path from "path";
 import matter from "gray-matter";
 import { GetStaticProps } from "next";
 import { BlogPost } from "@/types/blog";
+
 export const getStaticProps: GetStaticProps = async () => {
   const files = fs.readdirSync(
     path.join("src", "app", "blog-website", "blog-posts")
   );
 
+  // @collapse
   const posts = files.map((fileName) => {
     const filePath = path.join(
       "src",
@@ -67,6 +69,8 @@ import { GetStaticProps } from "next";
 import { BlogPost } from "@/types/blog";
 import BlogCard from "@/components/BlogCard";
 import BackToTop from "@/components/BackToTop";
+
+
 const BlogPage = ({ posts }: { posts: BlogPost[] }) => {
   return (
     <div className="blog-page">
@@ -191,6 +195,7 @@ const AdvancedPagination: React.FC<AdvancedPaginationProps> = ({
   const startIndex = (currentPage - 1) * postsPerPage;
   const currentPosts = posts.slice(startIndex, startIndex + postsPerPage);
 
+  // @collapse
   const getVisiblePages = () => {
     const delta = 2;
     const range = [];
@@ -255,7 +260,7 @@ const AdvancedPagination: React.FC<AdvancedPaginationProps> = ({
               />
             </svg>
           </button>
-
+          // @collapse
           {getVisiblePages().map((page, index) => (
             <React.Fragment key={index}>
               {page === "..." ? (
@@ -274,7 +279,6 @@ const AdvancedPagination: React.FC<AdvancedPaginationProps> = ({
               )}
             </React.Fragment>
           ))}
-
           <button
             onClick={() => goToPage(currentPage + 1)}
             disabled={currentPage === totalPages}
@@ -364,6 +368,7 @@ const CommandSearch: React.FC<CommandSearchProps> = ({ posts }) => {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
+  // @collapse
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     const filtered = posts.filter(

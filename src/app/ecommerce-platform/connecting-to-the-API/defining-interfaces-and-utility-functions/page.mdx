@@ -38,7 +38,7 @@ We are organizing our types and interfaces in a dedicated `lib` directory within
 
 This is what our `src/lib` directory will look like:
 
-```
+```plaintext
 src/
 └── lib/
     ├── constants/
@@ -416,37 +416,31 @@ export interface PaymentMethodWithValidation extends ValidatedPaymentMethod {
 
 ## Utility Functions
 
-Utility functions are the workhorses of our application, encapsulating complex business logic and validation rules into reusable, testable modules. These functions promote code reusability, maintain separation of concerns, and ensure consistent behavior across the entire application.
+For our utility functions, we will create a set of reusable functions that handle common operations such as formatting, validation, and data manipulation. These functions will be placed in the `src/lib/utils/` directory.
 
-##### Design Principles:
-- **Pure Functions**: Most utilities are pure functions (same input = same output) for predictability
-- **Single Responsibility**: Each function has one clear purpose and responsibility
-- **Composability**: Functions can be combined to create more complex operations
-- **Error Handling**: Robust error handling with meaningful error messages
-- **Performance**: Optimized for common use cases while maintaining readability
+Remember, utility functions should be pure, meaning they should not have side effects and should return the same output for the same input. This makes them easier to test and maintain.
 
-##### Categories of Utilities:
-- **Validation Functions**: Ensure data integrity and user input correctness
-- **Formatting Functions**: Transform data for display and storage
-- **Business Logic**: Implement domain-specific rules and calculations
-- **Helper Functions**: Common operations used throughout the application
+Right now, we will only be implementing one utility function, which is the `toTitleCase` function. This function will convert a string from kebab-case or camelCase to Title Case, making it suitable for display in user interfaces. This goes into `src/lib/utils/format.ts`:
 
-### Address Validation Utility
+```typescript
+// src/lib/utils/format.ts
 
-Address validation is a critical component of e-commerce applications, ensuring accurate shipping, proper tax calculations, and fraud prevention. Our address validation utility implements comprehensive validation rules that accommodate international address formats while maintaining data quality standards.
+/**
+ * Converts a string from kebab-case or camelCase to Title Case.
+ * @param str - The string to convert to title case
+ * @returns The title case string
+ */
+export function toTitleCase(str: string): string {
+  if (!str) return str;
 
-##### Validation Features:
-- **Format Validation**: Ensures addresses follow expected patterns and structures
-- **Required Field Checking**: Validates that essential address components are present
-- **International Support**: Handles various address formats from different countries
-- **Postal Code Validation**: Country-specific postal code format validation
-- **Sanitization**: Cleans and normalizes address data for consistency
-
-##### Business Benefits:
-- **Shipping Accuracy**: Reduces delivery failures and customer service issues
-- **Tax Compliance**: Ensures accurate location-based tax calculations
-- **Fraud Prevention**: Invalid addresses often indicate fraudulent transactions
-- **Data Quality**: Maintains clean, consistent address data in the database
+  return str
+    .replace(/[-_]/g, " ") // Replace hyphens and underscores with spaces
+    .replace(/([a-z])([A-Z])/g, "$1 $2") // Add space before capital letters in camelCase
+    .split(" ")
+    .map((word) => capitalize(word))
+    .join(" ");
+}
+```
 
 For the address validation, since the file is longer, we will link to the full code in a separate file. This utility will validate the address format and ensure that all required fields are present.
 

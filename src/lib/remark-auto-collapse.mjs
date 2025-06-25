@@ -117,14 +117,97 @@ export function remarkAutoCollapseFunctions() {
           const lineNum = index + 1;
           const trimmedLine = line.trim();
 
-          // Detect function declarations
+          // Detect function declarations and React components
           if (
             trimmedLine.match(
-              /^(function\s+\w+|const\s+\w+\s*=\s*\([^)]*\)\s*=>|async\s+function\s+\w+)/
+              /^(function\s+\w+|const\s+\w+\s*=\s*\([^)]*\)\s*=>|async\s+function\s+\w+|export\s+function\s+\w+|export\s+const\s+\w+\s*=|function\s+[A-Z]\w*|const\s+[A-Z]\w*\s*=|export\s+default\s+function)/
             )
           ) {
-            // Check if this function should be collapsed (mark with // @collapse)
+            // Check if this function/component should be collapsed (mark with @collapse)
             if (index > 0 && lines[index - 1].includes("@collapse")) {
+              currentFunction = { start: lineNum, braceCount: 0 };
+            }
+          }
+
+          if (currentFunction) {
+            // Count braces to find function end
+            for (const char of line) {
+              if (char === "{") currentFunction.braceCount++;
+              if (char === "}") currentFunction.braceCount--;
+            }
+
+            // Function ended
+            if (currentFunction.braceCount === 0 && line.includes("}")) {
+              collapseRanges.push(`${currentFunction.start}-${lineNum}`);
+              currentFunction = null;
+            }
+          }
+        });
+      }
+
+      // Add collapse annotation
+      if (collapseRanges.length > 0) {
+        const existingMeta = node.meta || "";
+        const collapseAnnotation = `collapse={${collapseRanges.join(", ")}}`;
+        node.meta = existingMeta
+          ? `${existingMeta} ${collapseAnnotation}`
+          : collapseAnnotation;
+      }
+    });
+  };
+}
+
+/**
+ * Version that auto-collapses components based on naming patterns
+ */
+export function remarkAutoCollapseComponents() {
+  return (tree) => {
+    visit(tree, "code", (node) => {
+      if (!node.lang || !node.value) return;
+
+      const lines = node.value.split("\n");
+      const collapseRanges = [];
+
+      if (
+        ["javascript", "typescript", "js", "ts", "jsx", "tsx"].includes(
+          node.lang
+        )
+      ) {
+        let currentFunction = null;
+
+        lines.forEach((line, index) => {
+          const lineNum = index + 1;
+          const trimmedLine = line.trim();
+
+          // Detect function declarations and React components
+          const functionMatch = trimmedLine.match(
+            /^(function\s+(\w+)|const\s+(\w+)\s*=\s*\([^)]*\)\s*=>|async\s+function\s+(\w+)|export\s+function\s+(\w+)|export\s+const\s+(\w+)\s*=|export\s+default\s+function\s+(\w+))/
+          );
+
+          if (functionMatch) {
+            // Extract function/component name
+            const name =
+              functionMatch[2] ||
+              functionMatch[3] ||
+              functionMatch[4] ||
+              functionMatch[5] ||
+              functionMatch[6] ||
+              functionMatch[7];
+
+            // Auto-collapse if:
+            // 1. Has @collapse comment
+            // 2. Starts with capital letter (React component)
+            // 3. Contains certain keywords
+            const shouldCollapse =
+              (index > 0 && lines[index - 1].includes("@collapse")) ||
+              (name && name[0] === name[0].toUpperCase()) || // Capitalized (React component)
+              (name &&
+                (name.toLowerCase().includes("helper") ||
+                  name.toLowerCase().includes("util") ||
+                  name.toLowerCase().includes("component") ||
+                  name.toLowerCase().includes("widget")));
+
+            if (shouldCollapse) {
               currentFunction = { start: lineNum, braceCount: 0 };
             }
           }

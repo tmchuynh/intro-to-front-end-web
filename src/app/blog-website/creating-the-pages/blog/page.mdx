@@ -21,7 +21,7 @@ import { BlogPost } from "@/types/blog";
 
 export const getStaticProps: GetStaticProps = async () => {
   const files = fs.readdirSync(
-    path.join("src", "app", "blog-website", "blog-posts")
+    path.join("src", "app", "blog-website", "blog-posts"),
   );
 
   // @collapse
@@ -31,7 +31,7 @@ export const getStaticProps: GetStaticProps = async () => {
       "app",
       "blog-website",
       "blog-posts",
-      fileName
+      fileName,
     );
     const fileContent = fs.readFileSync(filePath, "utf-8");
     const { data } = matter(fileContent);
@@ -69,7 +69,6 @@ import { GetStaticProps } from "next";
 import { BlogPost } from "@/types/blog";
 import BlogCard from "@/components/BlogCard";
 import BackToTop from "@/components/BackToTop";
-
 
 const BlogPage = ({ posts }: { posts: BlogPost[] }) => {
   return (
@@ -376,8 +375,8 @@ const CommandSearch: React.FC<CommandSearchProps> = ({ posts }) => {
         post.title.toLowerCase().includes(query.toLowerCase()) ||
         post.description?.toLowerCase().includes(query.toLowerCase()) ||
         post.tags?.some((tag) =>
-          tag.toLowerCase().includes(query.toLowerCase())
-        )
+          tag.toLowerCase().includes(query.toLowerCase()),
+        ),
     );
     setFilteredPosts(filtered);
   };
@@ -431,7 +430,7 @@ const CommandSearch: React.FC<CommandSearchProps> = ({ posts }) => {
                           .includes(searchQuery.toLowerCase()) ||
                         post.description
                           ?.toLowerCase()
-                          .includes(searchQuery.toLowerCase())
+                          .includes(searchQuery.toLowerCase()),
                     )
                     .slice(0, 10)
                     .map((post) => (
@@ -502,6 +501,7 @@ interface DebouncedSearchProps {
   posts: BlogPost[];
 }
 
+// @collapse
 const useDebounce = (value: string, delay: number): string => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -556,7 +556,7 @@ const DebouncedSearch: React.FC<DebouncedSearchProps> = ({ posts }) => {
         </mark>
       ) : (
         part
-      )
+      ),
     );
   };
 
@@ -718,6 +718,7 @@ const SimpleSearch: React.FC<SimpleSearchProps> = ({ posts }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"date" | "title" | "relevance">("date");
 
+  // @collapse
   const filteredAndSortedPosts = React.useMemo(() => {
     let filtered = posts;
 
@@ -729,7 +730,7 @@ const SimpleSearch: React.FC<SimpleSearchProps> = ({ posts }) => {
           post.title.toLowerCase().includes(query) ||
           post.description?.toLowerCase().includes(query) ||
           post.author?.toLowerCase().includes(query) ||
-          post.tags?.some((tag) => tag.toLowerCase().includes(query))
+          post.tags?.some((tag) => tag.toLowerCase().includes(query)),
       );
     }
 
@@ -755,6 +756,7 @@ const SimpleSearch: React.FC<SimpleSearchProps> = ({ posts }) => {
     return sorted;
   }, [posts, searchQuery, sortBy]);
 
+  // @collapse
   const calculateRelevance = (post: BlogPost, query: string): number => {
     const queryLower = query.toLowerCase();
     let score = 0;
@@ -904,7 +906,7 @@ const SimpleSearch: React.FC<SimpleSearchProps> = ({ posts }) => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={1}
-                d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.5-1.01-6-2.709M7 21l1.5-1.5M21 7l-1.5 1.5"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
             </svg>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -1014,7 +1016,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({ posts }) => {
 
   const handleTagToggle = (tag: string) => {
     setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
     );
   };
 
@@ -1405,7 +1407,7 @@ const FeaturedSection: React.FC<FeaturedSectionProps> = ({ posts }) => {
   const recentPosts = posts
     .sort(
       (a, b) =>
-        new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime()
+        new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime(),
     )
     .slice(0, 4);
 
@@ -1423,7 +1425,7 @@ const FeaturedSection: React.FC<FeaturedSectionProps> = ({ posts }) => {
   };
 
   const remainingPosts = posts.filter(
-    (post) => !getPostsForTab().some((fp) => fp.slug === post.slug)
+    (post) => !getPostsForTab().some((fp) => fp.slug === post.slug),
   );
 
   return (
@@ -1463,7 +1465,7 @@ const FeaturedSection: React.FC<FeaturedSectionProps> = ({ posts }) => {
             </div>
 
             <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
               <span>Curated content</span>
@@ -1504,7 +1506,7 @@ const FeaturedSection: React.FC<FeaturedSectionProps> = ({ posts }) => {
                     <h3 className="text-xl font-bold mb-3 leading-tight">
                       {getPostsForTab()[0]?.title}
                     </h3>
-                    <p className="text-gray-600 mb-4 leading-relaxed">
+                    <p className="text-gray-600 mb-3 leading-relaxed">
                       {getPostsForTab()[0]?.description}
                     </p>
                     <div className="flex items-center justify-between">
@@ -1700,6 +1702,7 @@ const SocialFAB: React.FC<SocialFABProps> = ({ post, url }) => {
   const encodedTitle = encodeURIComponent(post.title);
   const encodedDescription = encodeURIComponent(post.description || "");
 
+  // @collapse
   const socialLinks = [
     {
       name: "Twitter",
@@ -1865,6 +1868,7 @@ const SimpleShare: React.FC<SimpleShareProps> = ({ post, className = "" }) => {
 
   const postUrl = `${window.location.origin}/blog/${post.slug}`;
 
+  // @collapse
   const handleShare = async () => {
     // Try native Web Share API first (mobile browsers)
     if (navigator.share) {
@@ -1946,41 +1950,9 @@ const SimpleShare: React.FC<SimpleShareProps> = ({ post, className = "" }) => {
 // Enhanced BlogCard with integrated share button
 const BlogCardWithShare: React.FC<{ post: BlogPost }> = ({ post }) => {
   return (
-    <div className="max-w-sm rounded-lg overflow-hidden shadow-lg bg-white">
-      <img
-        className="w-full h-48 object-cover"
-        src={post.imageUrl}
-        alt={post.title}
-      />
-      <div className="p-6">
-        <div className="flex items-start justify-between mb-3">
-          <h3 className="font-bold text-xl leading-tight flex-1">
-            {post.title}
-          </h3>
-          <SimpleShare post={post} className="ml-3 flex-shrink-0" />
-        </div>
-        <p className="text-gray-700 text-base mb-4">{post.description}</p>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <img
-              src={post.authorImage || "/default-avatar.jpg"}
-              alt={post.author}
-              className="w-8 h-8 rounded-full"
-            />
-            <div>
-              <p className="text-sm font-medium">{post.author}</p>
-              <p className="text-xs text-gray-500">{post.date}</p>
-            </div>
-          </div>
-
-          <Link href={`/blog/${post.slug}`}>
-            <a className="text-blue-600 hover:text-blue-800 font-medium">
-              Read more →
-            </a>
-          </Link>
-        </div>
-      </div>
+    <div className="relative">
+      <BlogCard post={post} />
+      <SimpleShare post={post} />
     </div>
   );
 };
@@ -2026,6 +1998,7 @@ const DropdownShare: React.FC<DropdownShareProps> = ({
   const encodedTitle = encodeURIComponent(post.title);
   const encodedDescription = encodeURIComponent(post.description || "");
 
+  // @collapse
   const shareOptions = [
     {
       name: "Twitter",
@@ -2100,6 +2073,7 @@ const DropdownShare: React.FC<DropdownShareProps> = ({
   ];
 
   // Close dropdown when clicking outside
+  // @collapse
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -2114,6 +2088,7 @@ const DropdownShare: React.FC<DropdownShareProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // @collapse
   const handleShare = (platform: string, url: string) => {
     if (platform === "Copy Link") {
       handleCopyLink();
@@ -2123,6 +2098,7 @@ const DropdownShare: React.FC<DropdownShareProps> = ({
     }
   };
 
+  // @collapse
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(postUrl);
@@ -2207,7 +2183,7 @@ const DropdownShare: React.FC<DropdownShareProps> = ({
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                d="M3 8l7.89 7.89a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
               />
             </svg>
             <span className="text-sm font-medium">

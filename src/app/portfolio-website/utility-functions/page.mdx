@@ -24,7 +24,7 @@ interface Project {
 export function sortProjects(
   projects: Project[],
   sortBy: "date" | "title" | "category" = "date",
-  ascending: boolean = false
+  ascending: boolean = false,
 ): Project[] {
   return [...projects].sort((a, b) => {
     let aValue = a[sortBy];
@@ -44,11 +44,11 @@ export function sortProjects(
 
 export function filterProjectsByCategory(
   projects: Project[],
-  category: string
+  category: string,
 ): Project[] {
   if (category === "all") return projects;
   return projects.filter(
-    (project) => project.category.toLowerCase() === category.toLowerCase()
+    (project) => project.category.toLowerCase() === category.toLowerCase(),
   );
 }
 
@@ -74,7 +74,7 @@ export function formatProjectDate(date: string | Date): string {
 
 export function formatDateRange(
   startDate: string | Date,
-  endDate?: string | Date
+  endDate?: string | Date,
 ): string {
   const start = formatProjectDate(startDate);
   if (!endDate) return `${start} - Present`;
@@ -108,7 +108,7 @@ interface Skill {
 }
 
 export function groupSkillsByCategory(
-  skills: Skill[]
+  skills: Skill[],
 ): Record<string, Skill[]> {
   return skills.reduce(
     (groups, skill) => {
@@ -119,13 +119,13 @@ export function groupSkillsByCategory(
       groups[category].push(skill);
       return groups;
     },
-    {} as Record<string, Skill[]>
+    {} as Record<string, Skill[]>,
   );
 }
 
 export function getSkillsByProficiency(
   skills: Skill[],
-  level: Skill["proficiency"]
+  level: Skill["proficiency"],
 ): Skill[] {
   return skills.filter((skill) => skill.proficiency === level);
 }
@@ -160,7 +160,7 @@ export function generateSlug(title: string): string {
 
 export function createProjectUrl(
   projectTitle: string,
-  baseUrl: string = "/projects"
+  baseUrl: string = "/projects",
 ): string {
   const slug = generateSlug(projectTitle);
   return `${baseUrl}/${slug}`;

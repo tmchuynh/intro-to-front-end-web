@@ -47,7 +47,7 @@ function ActivityFeed({ userId, limit = 10 }) {
       try {
         setLoading(true);
         const response = await fetch(
-          `/api/activities?userId=${userId}&limit=${limit}`
+          `/api/activities?userId=${userId}&limit=${limit}`,
         );
         const data = await response.json();
         setActivities(data);
@@ -218,7 +218,7 @@ function NotificationCenter() {
           read: false,
         },
         ...prev,
-      ].slice(0, 50)
+      ].slice(0, 50),
     ); // Keep only last 50 notifications
 
     if (!notification.read) {
@@ -231,15 +231,15 @@ function NotificationCenter() {
       prev.map((notification) =>
         notification.id === notificationId
           ? { ...notification, read: true }
-          : notification
-      )
+          : notification,
+      ),
     );
     setUnreadCount((prev) => Math.max(0, prev - 1));
   }, []);
 
   const markAllAsRead = useCallback(() => {
     setNotifications((prev) =>
-      prev.map((notification) => ({ ...notification, read: true }))
+      prev.map((notification) => ({ ...notification, read: true })),
     );
     setUnreadCount(0);
   }, []);
@@ -329,7 +329,7 @@ function NotificationCenter() {
                   className={`notification-item ${notification.read ? "read" : "unread"}`}
                   style={{
                     "--notification-color": getNotificationColor(
-                      notification.type
+                      notification.type,
                     ),
                   }}
                 >
@@ -449,7 +449,7 @@ function Timeline({ events, orientation = "vertical" }) {
   };
 
   const sortedEvents = [...events].sort(
-    (a, b) => new Date(b.date) - new Date(a.date)
+    (a, b) => new Date(b.date) - new Date(a.date),
   );
 
   return (
@@ -535,7 +535,7 @@ function Timeline({ events, orientation = "vertical" }) {
                                     {event.details.participants.map(
                                       (participant, i) => (
                                         <li key={i}>{participant}</li>
-                                      )
+                                      ),
                                     )}
                                   </ul>
                                 </div>
@@ -611,7 +611,7 @@ function LiveActivityIndicator({ roomId, currentUserId }) {
           type: "join",
           userId: currentUserId,
           timestamp: new Date().toISOString(),
-        })
+        }),
       );
     };
 
@@ -635,7 +635,7 @@ function LiveActivityIndicator({ roomId, currentUserId }) {
             type: "leave",
             userId: currentUserId,
             timestamp: new Date().toISOString(),
-          })
+          }),
         );
       }
       ws.close();
@@ -661,7 +661,7 @@ function LiveActivityIndicator({ roomId, currentUserId }) {
 
       case "user_left":
         setActiveUsers((prev) =>
-          prev.filter((user) => user.id !== message.userId)
+          prev.filter((user) => user.id !== message.userId),
         );
         addActivity({
           id: Date.now(),
@@ -686,16 +686,16 @@ function LiveActivityIndicator({ roomId, currentUserId }) {
       case "typing_start":
         setActiveUsers((prev) =>
           prev.map((user) =>
-            user.id === message.userId ? { ...user, isTyping: true } : user
-          )
+            user.id === message.userId ? { ...user, isTyping: true } : user,
+          ),
         );
         break;
 
       case "typing_stop":
         setActiveUsers((prev) =>
           prev.map((user) =>
-            user.id === message.userId ? { ...user, isTyping: false } : user
-          )
+            user.id === message.userId ? { ...user, isTyping: false } : user,
+          ),
         );
         break;
 
@@ -848,7 +848,7 @@ function AggregatedActivityFeed({ activities, timeWindow = "hour" }) {
           return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
         case "week":
           const weekStart = new Date(
-            date.setDate(date.getDate() - date.getDay())
+            date.setDate(date.getDate() - date.getDay()),
           );
           return `${weekStart.getFullYear()}-${weekStart.getMonth()}-${weekStart.getDate()}`;
         default:
@@ -876,7 +876,7 @@ function AggregatedActivityFeed({ activities, timeWindow = "hour" }) {
     }, {});
 
     return Object.values(groupedActivities).sort(
-      (a, b) => new Date(b.lastTimestamp) - new Date(a.lastTimestamp)
+      (a, b) => new Date(b.lastTimestamp) - new Date(a.lastTimestamp),
     );
   }, [activities, timeWindow]);
 
@@ -998,21 +998,21 @@ function FilterableActivityFeed({ activities }) {
         (activity) =>
           activity.description?.toLowerCase().includes(searchLower) ||
           activity.user?.name?.toLowerCase().includes(searchLower) ||
-          activity.metadata?.title?.toLowerCase().includes(searchLower)
+          activity.metadata?.title?.toLowerCase().includes(searchLower),
       );
     }
 
     // Type filter
     if (filters.types.length > 0) {
       filtered = filtered.filter((activity) =>
-        filters.types.includes(activity.type)
+        filters.types.includes(activity.type),
       );
     }
 
     // User filter
     if (filters.users.length > 0) {
       filtered = filtered.filter((activity) =>
-        filters.users.includes(activity.user?.name)
+        filters.users.includes(activity.user?.name),
       );
     }
 
@@ -1020,7 +1020,7 @@ function FilterableActivityFeed({ activities }) {
     if (filters.dateRange.start) {
       const startDate = new Date(filters.dateRange.start);
       filtered = filtered.filter(
-        (activity) => new Date(activity.timestamp) >= startDate
+        (activity) => new Date(activity.timestamp) >= startDate,
       );
     }
 
@@ -1028,7 +1028,7 @@ function FilterableActivityFeed({ activities }) {
       const endDate = new Date(filters.dateRange.end);
       endDate.setHours(23, 59, 59, 999); // End of day
       filtered = filtered.filter(
-        (activity) => new Date(activity.timestamp) <= endDate
+        (activity) => new Date(activity.timestamp) <= endDate,
       );
     }
 

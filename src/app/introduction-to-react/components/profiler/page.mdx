@@ -53,7 +53,7 @@ function onRender(
   baseDuration: number, // Estimated time to render the entire subtree without memoization
   startTime: number, // When React began rendering this update
   commitTime: number, // When React committed this update
-  interactions: Set<Interaction> // Set of interactions that were being traced when the update was scheduled
+  interactions: Set<Interaction>, // Set of interactions that were being traced when the update was scheduled
 ) {
   // Handle performance data
 }
@@ -140,7 +140,7 @@ function usePerformanceProfiler() {
       baseDuration,
       startTime,
       commitTime,
-      interactions
+      interactions,
     ) => {
       const measurement = {
         id,
@@ -163,7 +163,7 @@ function usePerformanceProfiler() {
         console.warn(`Slow render detected in ${id}:`, measurement);
       }
     },
-    []
+    [],
   );
 
   return onRender;
@@ -258,7 +258,7 @@ function PerformanceMonitoredRoutes() {
     // Alert on slow route renders
     if (actualDuration > 100) {
       console.warn(
-        `Slow route render: ${location.pathname} took ${actualDuration}ms`
+        `Slow route render: ${location.pathname} took ${actualDuration}ms`,
       );
     }
   };
@@ -613,7 +613,7 @@ function PerformanceIntegratedApp() {
         list.getEntries().forEach((entry) => {
           if (entry.entryType === "measure") {
             console.log(
-              `Performance measure: ${entry.name} - ${entry.duration}ms`
+              `Performance measure: ${entry.name} - ${entry.duration}ms`,
             );
           }
         });

@@ -34,7 +34,7 @@ title: "Advanced React Patterns"
 description: "Learn about render props, higher-order components, and custom hooks"
 date: "2025-06-23"
 lastModified: "2025-06-23"
-author: 
+author:
   name: "John Doe"
   email: "john@example.com"
   avatar: "/images/authors/john-doe.jpg"
@@ -58,6 +58,7 @@ This is an example of an MDX page with comprehensive frontmatter.
 ### Advanced Frontmatter Examples
 
 #### Blog Post Frontmatter
+
 ```yaml
 ---
 title: "Building a Modern Blog with Next.js and MDX"
@@ -85,6 +86,7 @@ seo:
 ```
 
 #### Documentation Page Frontmatter
+
 ```yaml
 ---
 title: "API Reference - User Authentication"
@@ -110,6 +112,7 @@ beta: false
 ```
 
 #### Tutorial Frontmatter
+
 ```yaml
 ---
 title: "React Hooks Tutorial: useState and useEffect"
@@ -137,14 +140,18 @@ tags: ["react", "hooks", "useState", "useEffect"]
 Plugins are powerful extensions that transform and enhance your MDX content during the compilation process. They operate at different stages of the MDX pipeline, allowing you to modify the abstract syntax tree (AST), add custom functionality, or integrate with external services. The MDX ecosystem uses two main plugin types:
 
 ### Remark Plugins
+
 **Remark** plugins process the Markdown AST before it's converted to JSX. They work with the raw Markdown content and can:
+
 - Parse and transform Markdown syntax
 - Add new Markdown features (like tables, footnotes)
 - Extract metadata and content
 - Modify text content and structure
 
 ### Rehype Plugins
+
 **Rehype** plugins process the HTML AST after Markdown has been converted to HTML. They can:
+
 - Modify HTML elements and attributes
 - Add CSS classes and styling
 - Transform HTML structure
@@ -155,13 +162,13 @@ Plugins are powerful extensions that transform and enhance your MDX content duri
 ```typescript
 // Example of how plugins work in the MDX pipeline
 const mdxProcessor = unified()
-  .use(remarkParse)           // Parse Markdown
-  .use(remarkGfm)            // Add GitHub Flavored Markdown
-  .use(remarkFrontmatter)    // Extract frontmatter
-  .use(remarkRehype)         // Convert to HTML AST
-  .use(rehypeSlug)           // Add slugs to headings
-  .use(rehypeHighlight)      // Syntax highlighting
-  .use(rehypeStringify)      // Convert to HTML string
+  .use(remarkParse) // Parse Markdown
+  .use(remarkGfm) // Add GitHub Flavored Markdown
+  .use(remarkFrontmatter) // Extract frontmatter
+  .use(remarkRehype) // Convert to HTML AST
+  .use(rehypeSlug) // Add slugs to headings
+  .use(rehypeHighlight) // Syntax highlighting
+  .use(rehypeStringify); // Convert to HTML string
 
 const result = await mdxProcessor.process(mdxContent);
 ```
@@ -171,24 +178,24 @@ const result = await mdxProcessor.process(mdxContent);
 You can create custom plugins to extend MDX functionality:
 
 ```tsx
-import { visit } from 'unist-util-visit';
-import type { Plugin } from 'unified';
-import type { Root } from 'mdast';
+import { visit } from "unist-util-visit";
+import type { Plugin } from "unified";
+import type { Root } from "mdast";
 
 // Custom remark plugin to add reading time
 const remarkReadingTime: Plugin<[], Root> = () => {
   return (tree, file) => {
     const textNodes: string[] = [];
-    
-    visit(tree, 'text', (node) => {
+
+    visit(tree, "text", (node) => {
       textNodes.push(node.value);
     });
-    
-    const text = textNodes.join(' ');
+
+    const text = textNodes.join(" ");
     const wordsPerMinute = 200;
     const wordCount = text.split(/\s+/).length;
     const readingTime = Math.ceil(wordCount / wordsPerMinute);
-    
+
     // Add to file data
     file.data.readingTime = readingTime;
   };
@@ -210,40 +217,44 @@ npm install remark-frontmatter
 ```
 
 #### What it does:
+
 - Parses YAML frontmatter from the beginning of MDX files
 - Extracts metadata without affecting the main content
 - Provides a structured way to add metadata to your content
 - Works seamlessly with other remark plugins
 
 #### Configuration:
+
 ```typescript
-import remarkFrontmatter from 'remark-frontmatter';
+import remarkFrontmatter from "remark-frontmatter";
 
 const withMDX = createMDX({
   options: {
     remarkPlugins: [
       remarkFrontmatter, // Basic frontmatter parsing
       // or with options
-      [remarkFrontmatter, ['yaml', 'toml']], // Support multiple formats
+      [remarkFrontmatter, ["yaml", "toml"]], // Support multiple formats
     ],
   },
 });
 ```
 
 #### Advanced Usage:
+
 ```typescript
 // Custom frontmatter configuration
 const remarkFrontmatterConfig = [
   remarkFrontmatter,
   {
-    type: 'yaml',
-    marker: '-',
+    type: "yaml",
+    marker: "-",
     anywhere: true, // Allow frontmatter anywhere in the document
-  }
+  },
 ];
 ```
 
 #### Customization:
+
 - **Multiple Formats**: Support YAML, TOML, or JSON frontmatter
 - **Custom Markers**: Use different delimiters (e.g., `+++` for TOML)
 - **Validation**: Add schema validation for frontmatter fields
@@ -258,14 +269,16 @@ npm install remark-mdx-frontmatter
 ```
 
 #### What it does:
+
 - Converts frontmatter into exportable JavaScript variables
 - Makes frontmatter data available to MDX components
 - Enables dynamic content generation based on metadata
 - Provides type-safe access to frontmatter in TypeScript projects
 
 #### Configuration:
+
 ```typescript
-import remarkMdxFrontmatter from 'remark-mdx-frontmatter';
+import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 
 const withMDX = createMDX({
   options: {
@@ -278,6 +291,7 @@ const withMDX = createMDX({
 ```
 
 #### Usage Example:
+
 ```mdx
 ---
 title: "My Blog Post"
@@ -294,23 +308,25 @@ By {frontmatter.author} • Published {frontmatter.publishedAt}
 ```
 
 #### Advanced Configuration:
+
 ```typescript
 const mdxFrontmatterConfig = [
   remarkMdxFrontmatter,
   {
-    name: 'frontmatter', // Variable name (default)
-    type: { 
+    name: "frontmatter", // Variable name (default)
+    type: {
       // TypeScript type generation
-      title: 'string',
-      author: 'string',
-      publishedAt: 'string',
-      tags: 'string[]'
-    }
-  }
+      title: "string",
+      author: "string",
+      publishedAt: "string",
+      tags: "string[]",
+    },
+  },
 ];
 ```
 
 #### Customization:
+
 - **Variable Naming**: Change the exported variable name
 - **Type Generation**: Automatically generate TypeScript types
 - **Data Transformation**: Process frontmatter data before export
@@ -325,14 +341,16 @@ npm install rehype-slug
 ```
 
 #### What it does:
+
 - Adds unique `id` attributes to heading elements (h1-h6)
 - Generates URL-friendly slugs from heading text
 - Handles duplicate headings with automatic numbering
 - Enables anchor linking and table of contents generation
 
 #### Configuration:
+
 ```typescript
-import rehypeSlug from 'rehype-slug';
+import rehypeSlug from "rehype-slug";
 
 const withMDX = createMDX({
   options: {
@@ -344,13 +362,17 @@ const withMDX = createMDX({
 ```
 
 #### Generated Output:
+
 ```markdown
 # Getting Started with React
+
 ## What is React?
+
 ## What is React? (duplicate)
 ```
 
 Becomes:
+
 ```html
 <h1 id="getting-started-with-react">Getting Started with React</h1>
 <h2 id="what-is-react">What is React?</h2>
@@ -358,18 +380,20 @@ Becomes:
 ```
 
 #### Advanced Configuration:
+
 ```typescript
 const rehypeSlugConfig = [
   rehypeSlug,
   {
-    prefix: 'section-', // Add prefix to all slugs
+    prefix: "section-", // Add prefix to all slugs
     maintainCase: false, // Preserve original casing
     removeAccents: true, // Remove accented characters
-  }
+  },
 ];
 ```
 
 #### Customization:
+
 - **Custom Slug Generation**: Implement custom slug generation logic
 - **Prefix/Suffix**: Add consistent prefixes or suffixes to slugs
 - **Character Handling**: Control how special characters are processed
@@ -384,14 +408,16 @@ npm install rehype-autolink-headings
 ```
 
 #### What it does:
+
 - Adds clickable anchor links to headings
 - Provides multiple linking behaviors (wrap, prepend, append)
 - Improves content shareability and navigation
 - Works with screen readers for accessibility
 
 #### Configuration:
+
 ```typescript
-import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
 
 const withMDX = createMDX({
   options: {
@@ -400,10 +426,10 @@ const withMDX = createMDX({
       [
         rehypeAutolinkHeadings,
         {
-          behavior: 'wrap', // wrap | prepend | append | before | after
+          behavior: "wrap", // wrap | prepend | append | before | after
           properties: {
-            className: ['anchor-link'],
-            ariaLabel: 'Link to section',
+            className: ["anchor-link"],
+            ariaLabel: "Link to section",
           },
         },
       ],
@@ -415,6 +441,7 @@ const withMDX = createMDX({
 #### Behavior Options:
 
 ##### Wrap Behavior
+
 ```html
 <h2 id="my-heading">
   <a href="#my-heading" class="anchor-link">My Heading</a>
@@ -422,6 +449,7 @@ const withMDX = createMDX({
 ```
 
 ##### Prepend Behavior
+
 ```html
 <h2 id="my-heading">
   <a href="#my-heading" class="anchor-link">#</a>
@@ -430,6 +458,7 @@ const withMDX = createMDX({
 ```
 
 ##### Append Behavior
+
 ```html
 <h2 id="my-heading">
   My Heading
@@ -438,29 +467,31 @@ const withMDX = createMDX({
 ```
 
 #### Advanced Configuration:
+
 ```typescript
 const autolinkConfig = [
   rehypeAutolinkHeadings,
   {
-    behavior: 'prepend',
+    behavior: "prepend",
     content: {
-      type: 'element',
-      tagName: 'span',
-      properties: { className: ['icon', 'icon-link'] },
-      children: [{ type: 'text', value: '🔗' }]
+      type: "element",
+      tagName: "span",
+      properties: { className: ["icon", "icon-link"] },
+      children: [{ type: "text", value: "🔗" }],
     },
     headingProperties: {
-      className: ['linkable-heading']
+      className: ["linkable-heading"],
     },
     properties: {
-      className: ['heading-link'],
-      title: 'Permalink to this heading'
-    }
-  }
+      className: ["heading-link"],
+      title: "Permalink to this heading",
+    },
+  },
 ];
 ```
 
 #### Customization:
+
 - **Custom Icons**: Use SVG icons or emoji for link indicators
 - **Styling**: Add custom CSS classes for theming
 - **Accessibility**: Customize ARIA labels and titles
@@ -475,6 +506,7 @@ npm install remark-gfm
 ```
 
 #### What it does:
+
 - Adds table support with alignment options
 - Enables strikethrough text formatting
 - Supports task lists (checkboxes)
@@ -482,8 +514,9 @@ npm install remark-gfm
 - Provides footnote support
 
 #### Configuration:
+
 ```typescript
-import remarkGfm from 'remark-gfm';
+import remarkGfm from "remark-gfm";
 
 const withMDX = createMDX({
   options: {
@@ -497,15 +530,17 @@ const withMDX = createMDX({
 #### Features Examples:
 
 ##### Tables
+
 ```markdown
-| Feature | Supported | Notes |
-|---------|-----------|-------|
+| Feature | Supported | Notes                  |
+| ------- | --------- | ---------------------- |
 | Tables  | ✅        | Full alignment support |
-| Lists   | ✅        | Task lists included |
-| Links   | ✅        | Auto-linking enabled |
+| Lists   | ✅        | Task lists included    |
+| Links   | ✅        | Auto-linking enabled   |
 ```
 
 ##### Task Lists
+
 ```markdown
 - [x] Complete setup
 - [ ] Write documentation
@@ -513,11 +548,13 @@ const withMDX = createMDX({
 ```
 
 ##### Strikethrough
+
 ```markdown
 ~~This text is crossed out~~
 ```
 
 ##### Footnotes
+
 ```markdown
 Here's a sentence with a footnote[^1].
 
@@ -525,6 +562,7 @@ Here's a sentence with a footnote[^1].
 ```
 
 #### Advanced Configuration:
+
 ```typescript
 const remarkGfmConfig = [
   remarkGfm,
@@ -532,11 +570,12 @@ const remarkGfmConfig = [
     tablePipeAlign: false, // Disable table pipe alignment
     stringLength: (str) => str.length, // Custom string length calculation
     singleTilde: false, // Require double tildes for strikethrough
-  }
+  },
 ];
 ```
 
 #### Customization:
+
 - **Table Styling**: Add custom CSS classes to tables
 - **Task List Styling**: Customize checkbox appearance
 - **Footnote Positioning**: Control footnote placement and styling
@@ -551,14 +590,16 @@ npm install rehype-toc
 ```
 
 #### What it does:
+
 - Automatically generates table of contents from headings
 - Provides customizable depth and structure options
 - Adds navigation links to content sections
 - Supports nested heading hierarchies
 
 #### Configuration:
+
 ```typescript
-import rehypeToc from 'rehype-toc';
+import rehypeToc from "rehype-toc";
 
 const withMDX = createMDX({
   options: {
@@ -567,14 +608,14 @@ const withMDX = createMDX({
       [
         rehypeToc,
         {
-          headings: ['h2', 'h3', 'h4'], // Which headings to include
+          headings: ["h2", "h3", "h4"], // Which headings to include
           cssClasses: {
-            toc: 'table-of-contents',
-            list: 'toc-list',
-            listItem: 'toc-item',
-            link: 'toc-link'
-          }
-        }
+            toc: "table-of-contents",
+            list: "toc-list",
+            listItem: "toc-item",
+            link: "toc-link",
+          },
+        },
       ],
     ],
   },
@@ -582,6 +623,7 @@ const withMDX = createMDX({
 ```
 
 #### Generated Output:
+
 ```html
 <nav class="table-of-contents">
   <ol class="toc-list">
@@ -598,22 +640,24 @@ const withMDX = createMDX({
 ```
 
 #### Advanced Configuration:
+
 ```typescript
 const tocConfig = [
   rehypeToc,
   {
-    headings: ['h2', 'h3'],
+    headings: ["h2", "h3"],
     maxDepth: 3,
     tight: true, // Remove paragraphs around list items
     ordered: false, // Use unordered lists
-    prefix: 'toc-',
+    prefix: "toc-",
     nav: true, // Wrap in nav element
-    position: 'afterbegin', // Where to insert TOC
-  }
+    position: "afterbegin", // Where to insert TOC
+  },
 ];
 ```
 
 #### Customization:
+
 - **Positioning**: Control where the TOC appears in your content
 - **Styling**: Customize CSS classes and structure
 - **Filtering**: Include/exclude specific headings
@@ -698,32 +742,38 @@ npm install remark-api
 ```
 
 ##### What it does
+
 - Generates structured API documentation from markdown
 - Extracts function signatures, parameters, and return types
 - Creates navigable API reference sections
 - Supports multiple programming languages
 
 ##### Configuration
+
 ```typescript
-import remarkApi from 'remark-api';
+import remarkApi from "remark-api";
 
 const withMDX = createMDX({
   options: {
     remarkPlugins: [
-      [remarkApi, {
-        settings: {
-          bullet: '*',
-          fence: '`',
-          fences: true,
-          incrementListMarker: false
-        }
-      }]
+      [
+        remarkApi,
+        {
+          settings: {
+            bullet: "*",
+            fence: "`",
+            fences: true,
+            incrementListMarker: false,
+          },
+        },
+      ],
     ],
   },
 });
 ```
 
 ##### Use Cases
+
 - Technical documentation
 - API reference guides
 - SDK documentation
@@ -738,14 +788,16 @@ npm install remark-a11y-emoji
 ```
 
 ##### What it does
+
 - Wraps emoji in `<span>` elements with accessibility attributes
 - Adds `role="img"` and `aria-label` attributes
 - Improves screen reader support for emoji
 - Maintains visual appearance while enhancing accessibility
 
 ##### Configuration
+
 ```typescript
-import remarkA11yEmoji from 'remark-a11y-emoji';
+import remarkA11yEmoji from "remark-a11y-emoji";
 
 const withMDX = createMDX({
   options: {
@@ -757,16 +809,20 @@ const withMDX = createMDX({
 ```
 
 ##### Example Output
+
 ```markdown
 I love coding! 😍
 ```
 
 Becomes:
+
 ```html
-I love coding! <span role="img" aria-label="smiling face with heart-eyes">😍</span>
+I love coding!
+<span role="img" aria-label="smiling face with heart-eyes">😍</span>
 ```
 
 ##### Customization
+
 - Custom ARIA labels for specific emoji
 - Alternative text generation
 - Emoji filtering and replacement
@@ -780,33 +836,40 @@ npm install remark-capitalize-headings
 ```
 
 ##### What it does
+
 - Automatically formats heading capitalization
 - Supports multiple capitalization styles
 - Maintains consistency across content
 - Configurable word exclusions
 
 ##### Configuration
+
 ```typescript
-import remarkCapitalizeHeadings from 'remark-capitalize-headings';
+import remarkCapitalizeHeadings from "remark-capitalize-headings";
 
 const withMDX = createMDX({
   options: {
     remarkPlugins: [
-      [remarkCapitalizeHeadings, {
-        style: 'title', // 'title' | 'sentence' | 'upper' | 'lower'
-        excludeWords: ['and', 'or', 'but', 'for', 'nor', 'so', 'yet']
-      }]
+      [
+        remarkCapitalizeHeadings,
+        {
+          style: "title", // 'title' | 'sentence' | 'upper' | 'lower'
+          excludeWords: ["and", "or", "but", "for", "nor", "so", "yet"],
+        },
+      ],
     ],
   },
 });
 ```
 
 ##### Example
+
 ```markdown
 ## getting started with react hooks
 ```
 
 Becomes:
+
 ```markdown
 ## Getting Started with React Hooks
 ```
@@ -820,28 +883,34 @@ npm install remark-collapse
 ```
 
 ##### What it does
+
 - Creates expandable/collapsible content sections
 - Generates HTML `<details>` and `<summary>` elements
 - Improves content organization and readability
 - Supports custom styling and behavior
 
 ##### Configuration
+
 ```typescript
-import remarkCollapse from 'remark-collapse';
+import remarkCollapse from "remark-collapse";
 
 const withMDX = createMDX({
   options: {
     remarkPlugins: [
-      [remarkCollapse, {
-        test: 'FAQ', // Collapse sections with "FAQ" in the heading
-        summary: str => `Details: ${str}`
-      }]
+      [
+        remarkCollapse,
+        {
+          test: "FAQ", // Collapse sections with "FAQ" in the heading
+          summary: (str) => `Details: ${str}`,
+        },
+      ],
     ],
   },
 });
 ```
 
 ##### Usage
+
 ```markdown
 ## FAQ: How do I get started?
 
@@ -849,6 +918,7 @@ This content will be collapsed by default.
 ```
 
 ##### Customization
+
 - Custom collapse triggers
 - Default open/closed state
 - Custom summary generation
@@ -863,34 +933,41 @@ npm install remark-emoji
 ```
 
 ##### What it does
+
 - Converts text shortcodes to emoji
 - Supports GitHub-style emoji syntax
 - Maintains cross-platform emoji consistency
 - Provides fallback options for unsupported emoji
 
 ##### Configuration
+
 ```typescript
-import remarkEmoji from 'remark-emoji';
+import remarkEmoji from "remark-emoji";
 
 const withMDX = createMDX({
   options: {
     remarkPlugins: [
-      [remarkEmoji, {
-        accessible: true, // Add accessibility attributes
-        padSpaceAfter: true, // Add space after emoji
-        emoticon: true // Support emoticon conversion
-      }]
+      [
+        remarkEmoji,
+        {
+          accessible: true, // Add accessibility attributes
+          padSpaceAfter: true, // Add space after emoji
+          emoticon: true, // Support emoticon conversion
+        },
+      ],
     ],
   },
 });
 ```
 
 ##### Example
+
 ```markdown
 Great work! :thumbsup: :smile:
 ```
 
 Becomes:
+
 ```markdown
 Great work! 👍 😄
 ```
@@ -904,23 +981,28 @@ npm install remark-footnotes-extra
 ```
 
 ##### What it does
+
 - Enhanced footnote rendering
 - Automatic footnote numbering
 - Custom footnote positioning
 - Advanced footnote styling options
 
 ##### Configuration
+
 ```typescript
-import remarkFootnotesExtra from 'remark-footnotes-extra';
+import remarkFootnotesExtra from "remark-footnotes-extra";
 
 const withMDX = createMDX({
   options: {
     remarkPlugins: [
-      [remarkFootnotesExtra, {
-        inlineNotes: true,
-        backlinks: true,
-        definitions: true
-      }]
+      [
+        remarkFootnotesExtra,
+        {
+          inlineNotes: true,
+          backlinks: true,
+          definitions: true,
+        },
+      ],
     ],
   },
 });
@@ -935,24 +1017,29 @@ npm install remark-flexible-toc
 ```
 
 ##### What it does
+
 - Advanced TOC generation with flexible configuration
 - Multiple TOC styles and formats
 - Custom heading filtering and processing
 - Integration with existing content structure
 
 ##### Configuration
+
 ```typescript
-import remarkFlexibleToc from 'remark-flexible-toc';
+import remarkFlexibleToc from "remark-flexible-toc";
 
 const withMDX = createMDX({
   options: {
     remarkPlugins: [
-      [remarkFlexibleToc, {
-        maxDepth: 4,
-        skipLevels: [1], // Skip h1 headings
-        prefix: 'user-content-',
-        tight: true
-      }]
+      [
+        remarkFlexibleToc,
+        {
+          maxDepth: 4,
+          skipLevels: [1], // Skip h1 headings
+          prefix: "user-content-",
+          tight: true,
+        },
+      ],
     ],
   },
 });
@@ -967,22 +1054,27 @@ npm install remark-github
 ```
 
 ##### What it does
+
 - Automatic linking to GitHub issues, PRs, and commits
 - Repository-aware link generation
 - GitHub mention support
 - Integration with GitHub-flavored markdown
 
 ##### Configuration
+
 ```typescript
-import remarkGithub from 'remark-github';
+import remarkGithub from "remark-github";
 
 const withMDX = createMDX({
   options: {
     remarkPlugins: [
-      [remarkGithub, {
-        repository: 'user/repo',
-        mentionStrong: false
-      }]
+      [
+        remarkGithub,
+        {
+          repository: "user/repo",
+          mentionStrong: false,
+        },
+      ],
     ],
   },
 });
@@ -997,23 +1089,28 @@ npm install remark-images
 ```
 
 ##### What it does
+
 - Image optimization and processing
 - Automatic alt text generation
 - Responsive image generation
 - Integration with image CDNs
 
 ##### Configuration
+
 ```typescript
-import remarkImages from 'remark-images';
+import remarkImages from "remark-images";
 
 const withMDX = createMDX({
   options: {
     remarkPlugins: [
-      [remarkImages, {
-        maxWidth: 1200,
-        quality: 80,
-        formats: ['webp', 'jpeg']
-      }]
+      [
+        remarkImages,
+        {
+          maxWidth: 1200,
+          quality: 80,
+          formats: ["webp", "jpeg"],
+        },
+      ],
     ],
   },
 });
@@ -1028,6 +1125,7 @@ npm install remark-numbered-footnote-labels
 ```
 
 ##### What it does
+
 - Automatic footnote numbering
 - Consistent labeling across documents
 - Custom numbering schemes
@@ -1042,23 +1140,28 @@ npm install remark-oembed
 ```
 
 ##### What it does
+
 - Automatic embedding of YouTube, Twitter, CodePen, etc.
 - Rich media preview generation
 - Platform-specific optimization
 - Fallback handling for unsupported URLs
 
 ##### Configuration
+
 ```typescript
-import remarkOembed from 'remark-oembed';
+import remarkOembed from "remark-oembed";
 
 const withMDX = createMDX({
   options: {
     remarkPlugins: [
-      [remarkOembed, {
-        syncWidget: true,
-        asyncImg: true,
-        providers: ['youtube', 'twitter', 'codepen']
-      }]
+      [
+        remarkOembed,
+        {
+          syncWidget: true,
+          asyncImg: true,
+          providers: ["youtube", "twitter", "codepen"],
+        },
+      ],
     ],
   },
 });
@@ -1073,6 +1176,7 @@ npm install rehype-inline-svg
 ```
 
 ##### What it does
+
 - Inlines SVG files into HTML
 - Removes external SVG dependencies
 - Enables CSS styling of SVG elements
@@ -1087,6 +1191,7 @@ npm install retext-simplify
 ```
 
 ##### What it does
+
 - Suggests simpler word alternatives
 - Improves content readability
 - Provides writing quality feedback
@@ -1101,6 +1206,7 @@ npm install retext-spell
 ```
 
 ##### What it does
+
 - Spell checking with custom dictionaries
 - Technical term recognition
 - Multiple language support
@@ -1115,6 +1221,7 @@ npm install retext-repeated-words
 ```
 
 ##### What it does
+
 - Detects repeated words and phrases
 - Improves content quality
 - Customizable detection rules

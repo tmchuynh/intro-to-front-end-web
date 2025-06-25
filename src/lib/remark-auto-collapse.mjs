@@ -117,10 +117,10 @@ export function remarkAutoCollapseFunctions() {
           const lineNum = index + 1;
           const trimmedLine = line.trim();
 
-          // Detect function declarations, React components, and variable assignments
+          // Detect function declarations, React components, variable assignments, and constants
           if (
             trimmedLine.match(
-              /^(function\s+\w+|const\s+\w+\s*=\s*\([^)]*\)\s*=>|async\s+function\s+\w+|export\s+function\s+\w+|export\s+const\s+\w+\s*=|function\s+[A-Z]\w*|const\s+[A-Z]\w*\s*=|export\s+default\s+function|const\s+\w+\s*=\s*.*\.map\(|const\s+\w+\s*=\s*.*\.filter\(|const\s+\w+\s*=\s*.*\.reduce\(|const\s+\w+\s*=\s*files\.map\()/
+              /^(function\s+\w+|const\s+\w+\s*=\s*\([^)]*\)\s*=>|async\s+function\s+\w+|export\s+function\s+\w+|export\s+const\s+\w+\s*=|function\s+[A-Z]\w*|const\s+[A-Z]\w*\s*=|export\s+default\s+function|const\s+\w+\s*=\s*.*\.map\(|const\s+\w+\s*=\s*.*\.filter\(|const\s+\w+\s*=\s*.*\.reduce\(|const\s+\w+\s*=\s*files\.map\(|const\s+[A-Z_][A-Z0-9_]*\s*=|const\s+\w+\s*=\s*\{|const\s+\w+\s*=\s*\[)/
             )
           ) {
             // Check if this function/component/variable should be collapsed (mark with @collapse)
@@ -129,33 +129,51 @@ export function remarkAutoCollapseFunctions() {
                 start: lineNum,
                 braceCount: 0,
                 parenthesesCount: 0,
+                bracketCount: 0,
               };
             }
           }
 
           if (currentFunction) {
-            // Count braces and parentheses to find function/assignment end
+            // Count braces, parentheses, and brackets to find function/assignment end
             for (const char of line) {
               if (char === "{") currentFunction.braceCount++;
               if (char === "}") currentFunction.braceCount--;
               if (char === "(") currentFunction.parenthesesCount++;
               if (char === ")") currentFunction.parenthesesCount--;
+              if (char === "[") currentFunction.bracketCount++;
+              if (char === "]") currentFunction.bracketCount--;
             }
 
             // Function/assignment ended - check for various end conditions
             const isEndOfBlock =
-              // Traditional function with braces (only when both braces and parens are balanced)
+              // Traditional function with braces (only when all brackets are balanced)
               (currentFunction.braceCount === 0 &&
                 currentFunction.parenthesesCount === 0 &&
+                currentFunction.bracketCount === 0 &&
                 line.includes("}")) ||
               // Variable assignment ending with }) as Type; (typescript casting)
               (currentFunction.braceCount === 0 &&
                 currentFunction.parenthesesCount === 0 &&
+                currentFunction.bracketCount === 0 &&
                 line.trim().match(/\}\s*as\s+\w+;?\s*$/)) ||
               // Array method chain ending with }); (for .map, .filter, etc.)
               (currentFunction.braceCount === 0 &&
                 currentFunction.parenthesesCount === 0 &&
-                line.trim().match(/\}\);?\s*$/));
+                currentFunction.bracketCount === 0 &&
+                line.trim().match(/\}\);?\s*$/)) ||
+              // Array constants ending with ];
+              (currentFunction.braceCount === 0 &&
+                currentFunction.parenthesesCount === 0 &&
+                currentFunction.bracketCount === 0 &&
+                line.trim().match(/\];?\s*$/)) ||
+              // Simple constants ending with semicolon (but only if no brackets are open)
+              (currentFunction.braceCount === 0 &&
+                currentFunction.parenthesesCount === 0 &&
+                currentFunction.bracketCount === 0 &&
+                line.trim().endsWith(";") &&
+                !line.includes("{") &&
+                !line.includes("["));
 
             if (isEndOfBlock) {
               collapseRanges.push(`${currentFunction.start}-${lineNum}`);
@@ -202,9 +220,9 @@ export function remarkAutoCollapseFunctionsDebug() {
           const lineNum = index + 1;
           const trimmedLine = line.trim();
 
-          // Detect function declarations, React components, and variable assignments
+          // Detect function declarations, React components, variable assignments, and constants
           const matches = trimmedLine.match(
-            /^(function\s+\w+|const\s+\w+\s*=\s*\([^)]*\)\s*=>|async\s+function\s+\w+|export\s+function\s+\w+|export\s+const\s+\w+\s*=|function\s+[A-Z]\w*|const\s+[A-Z]\w*\s*=|export\s+default\s+function|const\s+\w+\s*=\s*.*\.map\(|const\s+\w+\s*=\s*.*\.filter\(|const\s+\w+\s*=\s*.*\.reduce\(|const\s+\w+\s*=\s*files\.map\()/
+            /^(function\s+\w+|const\s+\w+\s*=\s*\([^)]*\)\s*=>|async\s+function\s+\w+|export\s+function\s+\w+|export\s+const\s+\w+\s*=|function\s+[A-Z]\w*|const\s+[A-Z]\w*\s*=|export\s+default\s+function|const\s+\w+\s*=\s*.*\.map\(|const\s+\w+\s*=\s*.*\.filter\(|const\s+\w+\s*=\s*.*\.reduce\(|const\s+\w+\s*=\s*files\.map\(|const\s+[A-Z_][A-Z0-9_]*\s*=|const\s+\w+\s*=\s*\{|const\s+\w+\s*=\s*\[)/
           );
 
           if (matches) {
@@ -227,37 +245,55 @@ export function remarkAutoCollapseFunctionsDebug() {
                 start: lineNum,
                 braceCount: 0,
                 parenthesesCount: 0,
+                bracketCount: 0,
               };
             }
           }
 
           if (currentFunction) {
-            // Count braces and parentheses to find function/assignment end
+            // Count braces, parentheses, and brackets to find function/assignment end
             for (const char of line) {
               if (char === "{") currentFunction.braceCount++;
               if (char === "}") currentFunction.braceCount--;
               if (char === "(") currentFunction.parenthesesCount++;
               if (char === ")") currentFunction.parenthesesCount--;
+              if (char === "[") currentFunction.bracketCount++;
+              if (char === "]") currentFunction.bracketCount--;
             }
 
             console.log(
-              `Line ${lineNum}: braces=${currentFunction.braceCount}, parens=${currentFunction.parenthesesCount}, line="${trimmedLine}"`
+              `Line ${lineNum}: braces=${currentFunction.braceCount}, parens=${currentFunction.parenthesesCount}, brackets=${currentFunction.bracketCount}, line="${trimmedLine}"`
             );
 
             // Function/assignment ended - check for various end conditions
             const isEndOfBlock =
-              // Traditional function with braces (only when both braces and parens are balanced)
+              // Traditional function with braces (only when all brackets are balanced)
               (currentFunction.braceCount === 0 &&
                 currentFunction.parenthesesCount === 0 &&
+                currentFunction.bracketCount === 0 &&
                 line.includes("}")) ||
               // Variable assignment ending with }) as Type; (typescript casting)
               (currentFunction.braceCount === 0 &&
                 currentFunction.parenthesesCount === 0 &&
+                currentFunction.bracketCount === 0 &&
                 line.trim().match(/\}\s*as\s+\w+;?\s*$/)) ||
               // Array method chain ending with }); (for .map, .filter, etc.)
               (currentFunction.braceCount === 0 &&
                 currentFunction.parenthesesCount === 0 &&
-                line.trim().match(/\}\);?\s*$/));
+                currentFunction.bracketCount === 0 &&
+                line.trim().match(/\}\);?\s*$/)) ||
+              // Array constants ending with ];
+              (currentFunction.braceCount === 0 &&
+                currentFunction.parenthesesCount === 0 &&
+                currentFunction.bracketCount === 0 &&
+                line.trim().match(/\];?\s*$/)) ||
+              // Simple constants ending with semicolon (but only if no brackets are open)
+              (currentFunction.braceCount === 0 &&
+                currentFunction.parenthesesCount === 0 &&
+                currentFunction.bracketCount === 0 &&
+                line.trim().endsWith(";") &&
+                !line.includes("{") &&
+                !line.includes("["));
 
             if (isEndOfBlock) {
               console.log(

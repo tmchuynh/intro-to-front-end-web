@@ -7,7 +7,10 @@ import rehypeHighlight from "rehype-highlight";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import remarkToc from "remark-toc";
-import { remarkAutoCollapseFunctions } from "./src/lib/remark-auto-collapse.mjs";
+import {
+  remarkAutoCollapse,
+  remarkAutoCollapseFunctions,
+} from "./src/lib/remark-auto-collapse.mjs";
 
 /** @type {import('rehype-expressive-code').RehypeExpressiveCodeOptions} */
 const rehypeExpressiveCodeOptions = {
@@ -42,6 +45,7 @@ const withMDX = createMDX({
   options: {
     remarkPlugins: [
       remarkGfm,
+      remarkAutoCollapse, // Add the auto-collapse plugin
       remarkAutoCollapseFunctions, // Add the auto-collapse plugin
       [
         remarkToc,

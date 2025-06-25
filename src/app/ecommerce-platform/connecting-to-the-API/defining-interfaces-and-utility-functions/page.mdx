@@ -9,6 +9,7 @@ import BackToTop from "@/components/BackToTop";
 In this section, we will define the interfaces and utility functions that form the foundation of our e-commerce platform's type safety and data consistency. These TypeScript interfaces serve as contracts that define the shape and structure of our data objects, ensuring compile-time type checking and preventing runtime errors.
 
 ##### Why Interfaces Matter:
+
 - **Type Safety**: Interfaces provide compile-time type checking, catching errors before they reach production
 - **Code Documentation**: They serve as living documentation, making code self-explanatory
 - **IDE Support**: Enable better IntelliSense, auto-completion, and refactoring capabilities
@@ -16,6 +17,7 @@ In this section, we will define the interfaces and utility functions that form t
 - **Team Collaboration**: Establish clear contracts between different parts of the application
 
 ##### Utility Functions Purpose:
+
 Our utility functions encapsulate complex business logic and validation rules, promoting code reusability and maintaining separation of concerns. They handle common operations like data validation, formatting, and transformation, ensuring consistent behavior across the application.
 
 ## File Structure
@@ -23,6 +25,7 @@ Our utility functions encapsulate complex business logic and validation rules, p
 We are organizing our types and interfaces in a dedicated `lib` directory within the `src` folder. This architectural decision follows industry best practices for maintaining a clean, scalable codebase.
 
 ##### Directory Structure Benefits:
+
 - **Separation of Concerns**: Types, utilities, and constants are logically grouped
 - **Reusability**: Centralized location makes functions and types easily importable
 - **Testing**: Dedicated test directory alongside implementation files
@@ -30,6 +33,7 @@ We are organizing our types and interfaces in a dedicated `lib` directory within
 - **Developer Experience**: Clear navigation and predictable file locations
 
 ##### Directory Breakdown:
+
 - **`interfaces/`**: TypeScript interfaces defining data structures
 - **`utils/`**: Pure functions for data manipulation and business logic
 - **`constants/`**: Static values and configuration objects
@@ -74,12 +78,14 @@ src/
 The `Product` interface represents the comprehensive data structure for products in our e-commerce platform. This interface is designed to handle the full spectrum of product information that might be returned from modern e-commerce APIs, particularly the DummyJSON API we're integrating with.
 
 ##### Key Design Considerations:
+
 - **Optional Properties**: Most fields are optional to accommodate varying API responses and partial data scenarios
 - **Nested Objects**: Complex data like dimensions and reviews are properly structured
 - **Type Safety**: Specific types ensure data integrity (numbers for prices, arrays for images, etc.)
 - **Extensibility**: Structure allows for future enhancements without breaking existing code
 
 ##### Property Explanations:
+
 - **`id`**: Unique identifier, essential for database operations and React keys
 - **`discountPercentage`**: Enables dynamic pricing and promotional features
 - **`rating`**: Supports product review and recommendation systems
@@ -143,12 +149,14 @@ export interface DummyJSONProductsResponse {
 The `DummyUser` interface defines a comprehensive user profile structure that encompasses personal information, banking details, and professional data. This interface is specifically designed to work with the DummyJSON API's user endpoints while providing flexibility for real-world applications.
 
 ##### Interface Design Philosophy:
+
 - **Comprehensive Coverage**: Includes personal, financial, and professional information
 - **Privacy Considerations**: Structured to support data access controls and privacy settings
 - **Nested Data Structures**: Organized related information into logical groupings
 - **API Compatibility**: Matches external API response formats for seamless integration
 
 ##### Critical Properties:
+
 - **Authentication Fields**: `username`, `password`, `email` for user authentication
 - **Personal Information**: `firstName`, `lastName`, `birthDate`, `gender` for user profiles
 - **Address Structure**: Nested object supporting international address formats
@@ -157,6 +165,7 @@ The `DummyUser` interface defines a comprehensive user profile structure that en
 - **Role-Based Access**: `role` property enables permission-based features
 
 ##### Security Considerations:
+
 - Sensitive fields like `password` should be handled with appropriate encryption
 - Banking information requires PCI compliance measures
 - Personal data must comply with GDPR and similar privacy regulations
@@ -222,11 +231,13 @@ export interface DummyUsersResponse {
 The cart interfaces represent the complex data structures involved in e-commerce shopping cart functionality. These interfaces handle the transition from individual products to cart items, applying discounts, calculating totals, and managing quantities.
 
 ##### Interface Hierarchy:
+
 1. **`CartItem`**: Represents a product as it appears in the cart with additional cart-specific properties
 2. **`CartProduct`**: API-specific structure with calculated totals and discounts
 3. **`Cart`**: Complete cart structure with aggregated totals and metadata
 
 ##### Key Features:
+
 - **Quantity Management**: Tracks individual item quantities and total quantities
 - **Price Calculations**: Supports original prices, discounts, and final totals
 - **Product Linking**: Maintains connection to original product data via `productId`
@@ -234,6 +245,7 @@ The cart interfaces represent the complex data structures involved in e-commerce
 - **Flexibility**: Supports both local storage and API-based cart management
 
 ##### Business Logic Considerations:
+
 - **Discount Application**: Separate tracking of original and discounted prices
 - **Inventory Validation**: Product information enables stock checking
 - **Tax Calculations**: Structure supports future tax calculation features
@@ -287,17 +299,20 @@ export interface UserCartsResponse {
 The address interfaces provide a robust foundation for handling international shipping and billing addresses. These interfaces emphasize validation, error handling, and standardization across different address formats worldwide.
 
 ##### Validation-First Design:
+
 - **Error Handling**: `AddressValidationError` provides detailed feedback for form validation
 - **Result Structures**: `AddressValidationResult` aggregates validation status and errors
 - **Standardization**: `ValidatedAddress` ensures consistent address format post-validation
 
 ##### International Considerations:
+
 - **Flexible Fields**: Structure accommodates different international address formats
 - **Postal Code Variations**: Supports various postal code systems (ZIP, postal codes, etc.)
 - **State/Province Handling**: Flexible state field for different governmental structures
 - **Country Standardization**: Enables country code validation and standardization
 
 ##### Use Cases:
+
 - **Shipping Calculations**: Validated addresses enable accurate shipping cost calculations
 - **Tax Compliance**: Address information supports location-based tax calculations
 - **Fraud Prevention**: Address validation helps prevent fraudulent transactions
@@ -328,6 +343,7 @@ export interface ValidatedAddress {
 The payment interfaces form a comprehensive system for handling secure payment processing in e-commerce applications. These interfaces prioritize security, validation, and compliance with industry standards while providing flexibility for different payment scenarios.
 
 ##### Security-Focused Architecture:
+
 - **Validation Layers**: Multiple validation interfaces ensure data integrity at every step
 - **Card Detection**: `CardDetectionResult` provides real-time card type identification
 - **Expiry Handling**: Specialized validation for expiration date formats and business rules
@@ -336,26 +352,31 @@ The payment interfaces form a comprehensive system for handling secure payment p
 ##### Key Interface Purposes:
 
 **`ValidatedPaymentMethod`**: Core payment data structure after validation
+
 - Stores essential payment information in a standardized format
 - Includes optional CVV for security flexibility
 - Links to billing address for comprehensive fraud prevention
 
 **`CardDetectionResult`**: Real-time card analysis
+
 - Determines card brand and type from number patterns
 - Provides validation status and formatting requirements
 - Specifies CVV length requirements for different card types
 
 **`ExpiryValidationResult`**: Comprehensive expiration validation
+
 - Checks format validity and expiration status
 - Prevents unrealistic future dates
 - Extracts month/year for further processing
 
 **`PaymentMethodWithValidation`**: Enhanced structure for user interfaces
+
 - Includes UI-specific properties like default status
 - Supports multiple payment method management
 - Provides masked display information for security
 
 ##### PCI Compliance Considerations:
+
 - Interfaces designed to support tokenization strategies
 - Sensitive data handling patterns built into structure
 - Validation ensures compliance with payment industry standards
@@ -453,6 +474,7 @@ Remember, this file goes in the `src/lib/constants/validate/` directory and gets
 Payment validation is one of the most critical security components in e-commerce applications. Our payment validation utility implements industry-standard validation algorithms and security checks to ensure payment data integrity while providing excellent user experience through real-time feedback.
 
 ##### Security Implementation:
+
 - **Luhn Algorithm**: Validates credit card numbers using the industry-standard checksum
 - **Card Type Detection**: Identifies card brands from number patterns for appropriate validation
 - **CVV Validation**: Ensures security codes match expected formats for each card type
@@ -460,6 +482,7 @@ Payment validation is one of the most critical security components in e-commerce
 - **PCI Compliance**: Validation patterns support secure payment processing standards
 
 ##### User Experience Features:
+
 - **Real-time Validation**: Immediate feedback as users type payment information
 - **Formatting Assistance**: Automatic formatting of card numbers and expiry dates
 - **Error Messaging**: Clear, actionable error messages for validation failures
@@ -474,12 +497,14 @@ Remember, this file goes in the `src/lib/constants/validate/` directory and gets
 Credit card validation requires sophisticated pattern matching to handle the diverse landscape of payment card formats. Our card patterns implement comprehensive validation rules that cover major international card networks while providing the flexibility to support emerging payment methods.
 
 ##### Pattern Design Philosophy:
+
 - **Comprehensive Coverage**: Supports major global card networks (Visa, Mastercard, American Express, etc.)
 - **Security Focus**: Each pattern includes specific validation rules to prevent fraud
 - **User Experience**: Different CVV lengths and formatting rules enhance user interaction
 - **Extensibility**: Structure allows easy addition of new card types
 
 ##### Technical Implementation:
+
 - **Regular Expressions**: Precise patterns that match specific card number formats
 - **Length Validation**: Multiple valid lengths accommodate different card variations
 - **CVV Specifications**: Card-specific security code requirements
@@ -566,6 +591,7 @@ export const CARD_PATTERNS = {
 Each card type definition in our `CARD_PATTERNS` object represents a comprehensive validation ruleset that goes beyond simple pattern matching:
 
 ##### Pattern Structure Components:
+
 - **`pattern`**: A precise regular expression that validates the complete card number format
 - **`lengths`**: Array of acceptable card number lengths to accommodate variations within card types
 - **`cvvLength`**: Security code length requirement (3 digits for most cards, 4 for American Express)
@@ -573,12 +599,14 @@ Each card type definition in our `CARD_PATTERNS` object represents a comprehensi
 - **`icon`**: Reference identifier for brand-specific icons and styling
 
 ##### Regular Expression Breakdown:
+
 - **Visa (`/^4[0-9]{12}(?:[0-9]{3})?$/`)**: Starts with 4, followed by 12 digits, with optional 3 additional digits
 - **Mastercard**: Complex pattern accommodating both traditional 5xxx series and new 2221-2720 range
 - **American Express (`/^3[47][0-9]{13}$/`)**: Starts with 34 or 37, exactly 15 digits total
 - **Discover**: Multiple prefix patterns (6011, 644-649, 65) with consistent 16-digit length
 
 ##### Business Logic Integration:
+
 - **CVV Validation**: Different card types require different security code lengths
 - **Format Assistance**: Length arrays enable progressive input formatting
 - **Brand Recognition**: Icon references support dynamic UI branding
@@ -589,12 +617,14 @@ Each card type definition in our `CARD_PATTERNS` object represents a comprehensi
 The card type detection patterns serve as the first line of card identification, providing immediate feedback to users as they begin entering their payment information. These simplified patterns prioritize speed and user experience over comprehensive validation.
 
 ##### Performance Optimization:
+
 - **Minimal Processing**: Simple prefix matching requires minimal computational resources
 - **Real-time Feedback**: Instant card type identification as users type
 - **Progressive Enhancement**: Initial detection followed by comprehensive validation
 - **Error Reduction**: Early identification prevents users from entering invalid formats
 
 ##### Pattern Strategy:
+
 - **Prefix-Based**: Matches only the beginning digits for quick identification
 - **Broad Coverage**: Captures the most common card number starts for each type
 - **User Guidance**: Enables immediate UI updates (icons, formatting hints, etc.)
@@ -603,6 +633,7 @@ The card type detection patterns serve as the first line of card identification,
 We will also define simpler patterns for initial card type detection. These patterns will match the starting digits of the card numbers, allowing us to quickly identify the card type before performing more detailed validation.
 
 ##### Implementation Benefits:
+
 - **Instant UI Updates**: Card brand logos appear immediately
 - **Format Assistance**: Input fields can adapt formatting rules in real-time
 - **Validation Preparation**: Sets up appropriate validation rules for detected card type
@@ -627,18 +658,21 @@ export const CARD_TYPE_PATTERNS = {
 These simplified detection patterns represent a strategic balance between performance and accuracy, designed specifically for real-time user interface interactions:
 
 ##### Pattern Design Principles:
+
 - **Speed Over Precision**: Quick prefix matching for immediate feedback
 - **Common Cases First**: Patterns prioritize the most frequently encountered card numbers
 - **UI Responsiveness**: Enables instant visual feedback without complex processing
 - **Graceful Degradation**: Works reliably even with partial input
 
 ##### Specific Pattern Analysis:
+
 - **Visa (`/^4/`)**: Simply matches any number starting with 4
 - **Mastercard (`/^5[1-5]|^2[2-7]/`)**: Covers both traditional 5xxx and new 2xxx ranges
 - **American Express (`/^3[47]/`)**: Matches 34xx and 37xx prefixes
 - **Discover**: Multiple patterns covering various prefix ranges (6011, 644-649, 65)
 
 ##### Usage in Application Flow:
+
 1. **User Input**: As user types the first digit
 2. **Pattern Matching**: System checks against type patterns
 3. **UI Update**: Brand logo and styling appear
@@ -651,12 +685,14 @@ These simplified detection patterns represent a strategic balance between perfor
 Expiration date validation is crucial for payment processing, as it directly impacts transaction authorization and fraud prevention. Our comprehensive pattern system accommodates various user input preferences while ensuring data consistency and security.
 
 ##### Pattern Flexibility:
+
 - **Multiple Formats**: Supports common user input patterns (MM/YY, MM/YYYY, etc.)
 - **With/Without Separators**: Accommodates both formatted and unformatted input
 - **International Variations**: Handles different cultural preferences for date formatting
 - **Error Prevention**: Strict patterns prevent invalid month/year combinations
 
 ##### Security Considerations:
+
 - **Expiry Validation**: Prevents use of expired payment methods
 - **Future Date Limits**: Protects against unrealistic expiration dates
 - **Format Standardization**: Ensures consistent storage and processing
@@ -665,6 +701,7 @@ Expiration date validation is crucial for payment processing, as it directly imp
 We will define a set of regular expressions that match common expiration date formats. This will help us validate the expiry dates of payment methods.
 
 ##### User Experience Benefits:
+
 - **Input Flexibility**: Users can enter dates in their preferred format
 - **Auto-formatting**: System can convert between formats automatically
 - **Clear Feedback**: Specific error messages for different format violations
@@ -685,24 +722,28 @@ export const EXPIRY_PATTERNS = {
 Our expiration date validation system provides comprehensive coverage of common date input formats while maintaining strict validation rules for security and data integrity:
 
 ##### Pattern Format Analysis:
+
 - **`MM_YY` (`/^(0[1-9]|1[0-2])\/([0-9]{2})$/`)**: Standard format with slash separator (e.g., "12/25")
 - **`MM_YYYY` (`/^(0[1-9]|1[0-2])\/([0-9]{4})$/`)**: Full year format with separator (e.g., "12/2025")
 - **`MMYY` (`/^(0[1-9]|1[0-2])([0-9]{2})$/`)**: Compact format without separator (e.g., "1225")
 - **`MMYYYY` (`/^(0[1-9]|1[0-2])([0-9]{4})$/`)**: Full year without separator (e.g., "122025")
 
 ##### Validation Logic Breakdown:
+
 - **Month Validation**: `(0[1-9]|1[0-2])` ensures months 01-12 only
 - **Leading Zero Enforcement**: Maintains consistent two-digit month format
 - **Year Flexibility**: Supports both 2-digit and 4-digit year formats
 - **Separator Handling**: Accommodates user preferences for formatting
 
 ##### Business Rule Implementation:
+
 - **Format Standardization**: All patterns convert to consistent internal format
 - **Error Specificity**: Different patterns enable specific error messaging
 - **Auto-completion**: 2-digit years can be auto-expanded to 4-digit format
 - **International Support**: Patterns work across different locale preferences
 
 ##### Security and Validation Features:
+
 - **Range Checking**: Month validation prevents invalid values like "13" or "00"
 - **Format Consistency**: Ensures reliable date parsing and comparison
 - **Expiry Logic**: Supports proper expiration date business logic
@@ -713,12 +754,14 @@ Our expiration date validation system provides comprehensive coverage of common 
 The accepted card types array represents our business decision about which payment methods to support, balancing market coverage with operational complexity. This strategic choice affects payment processing fees, international reach, and customer conversion rates.
 
 ##### Business Strategy Considerations:
+
 - **Market Coverage**: Selected cards represent the majority of global payment volume
 - **Processing Costs**: Different card networks have varying transaction fees
 - **International Reach**: Supports major cards across different geographical markets
 - **Compliance Requirements**: Each card type may have specific regulatory requirements
 
 ##### Technical Implementation:
+
 - **TypeScript Const Assertion**: `as const` creates a readonly tuple for type safety
 - **Compile-time Validation**: TypeScript ensures only valid card types are used
 - **Runtime Checks**: Array can be used for dynamic validation of payment methods
@@ -727,6 +770,7 @@ The accepted card types array represents our business decision about which payme
 We will define a set of accepted card types that our application will support. This will help us ensure that users can only enter valid card types during payment processing.
 
 ##### Card Network Analysis:
+
 - **Visa**: Global leader, essential for any e-commerce platform
 - **Mastercard**: Second largest network, international presence
 - **American Express**: Premium segment, higher transaction fees but affluent customers
@@ -737,6 +781,7 @@ We will define a set of accepted card types that our application will support. T
 - **UnionPay**: Critical for Chinese market access
 
 ##### Operational Benefits:
+
 - **Clear Boundaries**: Defines exactly which payment methods are supported
 - **Error Prevention**: Prevents processing of unsupported card types
 - **UI Guidance**: Enables appropriate user interface elements
@@ -761,24 +806,28 @@ export const ACCEPTED_CARD_TYPES = [
 This array represents a strategic business decision that balances market coverage, operational complexity, and revenue optimization:
 
 ##### Market Coverage Analysis:
+
 - **Primary Networks (Visa, Mastercard)**: Cover approximately 80% of global card transactions
 - **Premium Segment (American Express)**: Higher fees but affluent customer base
 - **Regional Leaders (JCB, UnionPay)**: Essential for specific geographical markets
 - **Specialized Networks (Diners Club, Maestro)**: Serve specific customer segments
 
 ##### Technical Implementation Benefits:
+
 - **Type Safety**: `as const` assertion creates a literal type for compile-time checking
 - **Runtime Validation**: Array membership checks prevent invalid card type processing
 - **Configuration Centralization**: Single source of truth for supported payment methods
 - **Easy Maintenance**: Adding or removing card types requires minimal code changes
 
 ##### Business Impact Considerations:
+
 - **Conversion Rates**: Unsupported cards lead to abandoned transactions
 - **Processing Costs**: Each network has different fee structures
 - **International Expansion**: Card support affects global market penetration
 - **Compliance Requirements**: Different networks have varying regulatory obligations
 
 ##### Integration Points:
+
 - **Payment Processing**: Validates against payment gateway capabilities
 - **User Interface**: Determines which card logos and input validations to show
 - **Analytics**: Enables tracking of payment method preferences and success rates
@@ -789,12 +838,14 @@ This array represents a strategic business decision that balances market coverag
 The error messages and security constants form the foundation of our user experience and security posture. These carefully crafted messages provide clear guidance to users while the security constants enforce industry best practices and regulatory compliance.
 
 ##### Error Message Design Philosophy:
+
 - **User-Friendly Language**: Clear, non-technical language that guides users toward resolution
 - **Actionable Guidance**: Each message provides specific steps for correction
 - **Security Awareness**: Messages avoid revealing sensitive system information
 - **Internationalization Ready**: Structure supports easy translation and localization
 
 ##### Security Constants Rationale:
+
 - **Industry Standards**: Values align with PCI DSS and payment industry guidelines
 - **User Experience Balance**: Security requirements balanced with usability
 - **Future-Proofing**: Constants can be adjusted as security requirements evolve
@@ -805,22 +856,27 @@ We will define a set of error messages and security constants that will be used 
 ##### Message Categories:
 
 ##### Card Number Validation:
+
 - Covers required field, format validation, and security algorithm checks
 - Includes Luhn algorithm failure messaging for enhanced security
 
 ##### Cardholder Information:
+
 - Name validation with length and character restrictions
 - Balances security with international name variations
 
 ##### Expiration Validation:
+
 - Comprehensive coverage of format, expiry, and business rule violations
 - Includes protection against unrealistic future dates
 
 ##### CVV Security:
+
 - Format and length validation specific to card types
 - Security-focused messaging without revealing system internals
 
 ##### Security Boundaries:
+
 - **Expiry Date Limits**: 20-year future limit prevents unrealistic dates
 - **Name Length Constraints**: Balances legitimate names with security requirements
 - **CVV Specifications**: Industry-standard 3-4 digit requirements
@@ -864,6 +920,7 @@ Our error messaging and security constant system represents a comprehensive appr
 ##### Error Message Architecture:
 
 ##### `PAYMENT_ERROR_MESSAGES` Structure:
+
 - **Consistency**: All messages follow a consistent tone and structure
 - **Specificity**: Each error type has a dedicated, specific message
 - **User Focus**: Language prioritizes user understanding over technical accuracy
@@ -872,12 +929,14 @@ Our error messaging and security constant system represents a comprehensive appr
 ##### Message Category Breakdown:
 
 ##### Card Number Messages:
+
 - `CARD_NUMBER_REQUIRED`: Direct, clear requirement statement
 - `CARD_NUMBER_INVALID`: Generic format error without revealing validation logic
 - `CARD_NUMBER_LUHN_FAILED`: Security-focused message for algorithm validation
 - `CARD_TYPE_UNSUPPORTED`: Business rule communication
 
 ##### Personal Information Messages:
+
 - Length-based validation ensures reasonable input bounds
 - Character validation prevents malicious input attempts
 - International considerations for legitimate name variations
@@ -885,18 +944,21 @@ Our error messaging and security constant system represents a comprehensive appr
 ##### Security Constants Analysis:
 
 ##### `SECURITY_CONSTANTS` Design Principles:
+
 - **Industry Alignment**: Values match or exceed industry security standards
 - **Flexibility**: Constants can be adjusted without code changes throughout the application
 - **Compliance Support**: Helps maintain PCI DSS and other regulatory requirements
 - **User Experience**: Balances security with reasonable user expectations
 
 ##### Specific Constant Justifications:
+
 - **`MAX_EXPIRY_YEARS_FUTURE: 20`**: Prevents unrealistic dates while accommodating long-term cards
 - **`MIN_CARDHOLDER_NAME_LENGTH: 2`**: Accommodates legitimate short names while preventing empty input
 - **`MAX_CARDHOLDER_NAME_LENGTH: 50`**: Industry standard that handles most international names
 - **CVV Length Constants**: Match actual card network requirements
 
 ##### Implementation Benefits:
+
 - **Centralized Messaging**: Single source of truth for all payment error messages
 - **Type Safety**: `as const` ensures compile-time validation of message keys
 - **Maintainability**: Changes to messaging or limits affect entire application consistently
@@ -914,36 +976,43 @@ export type AcceptedCardType = (typeof ACCEPTED_CARD_TYPES)[number];
 These TypeScript type exports represent sophisticated type-level programming that enhances code safety and developer experience throughout our application:
 
 ##### `CardType` Type Analysis:
+
 ```typescript
 export type CardType = keyof typeof CARD_PATTERNS;
 ```
+
 - **Keyof Operator**: Extracts all property names from the `CARD_PATTERNS` object as a union type
 - **Compile-time Safety**: Ensures only valid card types can be used in function parameters
 - **IntelliSense Support**: Provides autocomplete for all supported card types
 - **Refactoring Protection**: Automatically updates when card patterns are modified
 
 ##### `AcceptedCardType` Type Analysis:
+
 ```typescript
 export type AcceptedCardType = (typeof ACCEPTED_CARD_TYPES)[number];
 ```
+
 - **Indexed Access**: Uses `[number]` to extract the element type from the readonly array
 - **Literal Type Union**: Creates a union of all accepted card type strings
 - **Runtime-Type Alignment**: Ensures TypeScript types match runtime validation arrays
 - **Configuration Driven**: Type automatically updates when accepted cards array changes
 
 ##### Advanced TypeScript Features:
+
 - **Template Literal Types**: Enable sophisticated string manipulation at the type level
 - **Conditional Types**: Support complex business logic validation in the type system
 - **Mapped Types**: Allow transformation of existing types for different use cases
 - **Type Guards**: Enable runtime type checking with compile-time guarantees
 
 ##### Practical Applications:
+
 - **Function Parameters**: Restrict payment functions to only accept valid card types
 - **API Responses**: Validate that external APIs return expected card type values
 - **Form Validation**: Ensure UI components only work with supported payment methods
 - **Database Models**: Maintain consistency between database schemas and TypeScript types
 
 ##### Development Benefits:
+
 - **Error Prevention**: Catch type mismatches at compile time rather than runtime
 - **Code Documentation**: Types serve as living documentation of system capabilities
 - **Refactoring Safety**: Changes to card types are automatically propagated throughout the codebase
@@ -954,6 +1023,7 @@ export type AcceptedCardType = (typeof ACCEPTED_CARD_TYPES)[number];
 With our comprehensive interface and utility function foundation established, we're now ready to implement the API integration layer that will bring our e-commerce platform to life. The robust type system we've created will ensure type safety throughout our API interactions, while our utility functions will provide consistent data validation and processing.
 
 ##### What We've Accomplished:
+
 - **Type Safety Foundation**: Comprehensive TypeScript interfaces for all major data structures
 - **Validation Architecture**: Robust validation utilities for addresses and payment methods
 - **Security Implementation**: Industry-standard patterns for payment processing security
@@ -961,7 +1031,9 @@ With our comprehensive interface and utility function foundation established, we
 - **Scalability Preparation**: Extensible architecture ready for future enhancements
 
 ##### Upcoming API Integration:
+
 The next phase involves creating API functions that leverage these interfaces to:
+
 - **Fetch Product Data**: Retrieve and display product catalogs with full type safety
 - **Manage User Sessions**: Handle authentication and user profile management
 - **Process Shopping Carts**: Implement cart operations with real-time updates
@@ -969,6 +1041,7 @@ The next phase involves creating API functions that leverage these interfaces to
 - **Order Management**: Track and manage customer orders throughout their lifecycle
 
 ##### Benefits of Our Foundation:
+
 - **Reduced Bugs**: Type checking catches errors before they reach production
 - **Faster Development**: Autocomplete and IntelliSense accelerate coding
 - **Easier Maintenance**: Clear interfaces make code changes predictable and safe

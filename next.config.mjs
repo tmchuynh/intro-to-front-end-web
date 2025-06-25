@@ -1,16 +1,23 @@
+import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
 import createMDX from "@next/mdx";
-import type { NextConfig } from "next";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeExpressiveCode from "rehype-expressive-code";
 import rehypeHighlight from "rehype-highlight";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import remarkToc from "remark-toc";
 
+/** @type {import('rehype-expressive-code').RehypeExpressiveCodeOptions} */
+const rehypeExpressiveCodeOptions = {
+  plugins: [pluginLineNumbers()],
+};
+
 /** @type {import('next').NextConfig} */
-const nextConfig: NextConfig = {
+const nextConfig = {
   // Configure `pageExtensions` to include MDX files
   pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
   // Other config options here
+  reactStrictMode: true,
 };
 
 const withMDX = createMDX({
@@ -28,6 +35,7 @@ const withMDX = createMDX({
     ],
     rehypePlugins: [
       rehypeSlug,
+      [rehypeExpressiveCode, rehypeExpressiveCodeOptions],
       [
         rehypeHighlight,
         {

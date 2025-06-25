@@ -1,0 +1,503 @@
+import BackToTop from "@/components/BackToTop";
+
+# Defining Interfaces and Utility Functions
+
+## Table of Contents
+
+## Overview
+
+In this section, we will define the interfaces and utility functions that will be used throughout our e-commerce platform. These interfaces will help us maintain a consistent structure for our data, while the utility functions will provide reusable logic for common operations.
+
+## File Structure
+
+We are organizing our types and interfaces in a dedicated `lib` directory within the `src` folder. This will keep our codebase clean and maintainable.
+
+This is what our `src/lib` directory will look like:
+
+```
+src/
+└── lib/
+    ├── constants/
+    │   ├── navigation.ts
+    │   └── validate/
+    │       ├── address.ts
+    │       └── payment.ts
+    ├── displayRatingStars.tsx
+    ├── interfaces/
+    │   ├── address.ts
+    │   ├── cart.ts
+    │   ├── payment.ts
+    │   ├── product.ts
+    │   └── user.ts
+    ├── test/
+    │   ├── address-validation-test.ts
+    │   ├── contact-validation-test.ts
+    │   └── payment-validation-test.ts
+    ├── utils/
+    │   ├── accessibility.ts
+    │   ├── contact.ts
+    │   ├── format.ts
+    │   ├── orders.tsx
+    │   ├── payment.ts
+    │   └── validate.ts
+    └── utils.ts
+```
+
+## Defining Interfaces
+
+### Product Interface
+
+We will define a `Product` interface that represents the structure of a product in our e-commerce platform. This interface will include properties such as `id`, `title`, `description`, `price`, and more.
+
+```typescript
+// src/lib/interfaces/product.ts
+
+export interface ProductItem {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  price: number;
+  discountPercentage?: number;
+  rating?: number;
+  stock?: number;
+  tags?: string[];
+  brand?: string;
+  sku?: string;
+  weight?: number;
+  dimensions?: {
+    width?: number;
+    height?: number;
+    depth?: number;
+  };
+  warrantyInformation?: string;
+  shippingInformation?: string;
+  availabilityStatus?: string;
+  reviews?: {
+    rating?: number;
+    comment?: string;
+    date?: string;
+    reviewerName?: string;
+    reviewerEmail?: string;
+  }[];
+  returnPolicy?: string;
+  minimumOrderQuantity?: number;
+  meta?: {
+    createdAt?: string;
+    updatedAt?: string;
+    barcode?: string;
+    qrCode?: string;
+  };
+  thumbnail?: string;
+  images?: string[];
+}
+
+export interface DummyJSONProductsResponse {
+  products: ProductItem[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+```
+
+### User Interface
+
+We will define a `User` interface that represents the structure of a user in our e-commerce platform. This interface will include properties such as `id`, `name`, `email`, and more.
+
+```typescript
+export interface DummyUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  maidenName?: string;
+  age: number;
+  email: string;
+  phone: string;
+  username: string;
+  password: string;
+  image: string;
+  role: string; // Added from DummyJSON /auth/me
+  birthDate: string;
+  gender: string;
+  address: {
+    address: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  bank: {
+    cardNumber: string;
+    cardType: string;
+    cardExpire: string;
+    iban: string;
+  };
+  university: string;
+  company: {
+    department: string;
+    name: string;
+    title: string;
+    address: {
+      address: string;
+      city: string;
+      state: string;
+      stateCode: string;
+      postalCode: string;
+      country: string;
+      coordinates: {
+        lat: number;
+        lng: number;
+      };
+    };
+  };
+}
+
+export interface DummyUsersResponse {
+  users: DummyUser[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+```
+
+### Cart Interface
+
+We will define a `Cart` interface that represents the structure of a shopping cart in our e-commerce platform. This interface will include properties such as `id`, `userId`, `items`, and more.
+
+```typescript
+export interface CartItem {
+  id: number;
+  productId: number;
+  title: string;
+  price: number;
+  quantity: number;
+  image?: string;
+  category: string;
+  thumbnail?: string;
+  discountPercentage?: number;
+  brand?: string;
+}
+
+export interface CartProduct {
+  id: number;
+  title: string;
+  price: number;
+  quantity: number;
+  total: number;
+  discountPercentage: number;
+  discountedTotal: number;
+  thumbnail: string;
+}
+
+export interface Cart {
+  id: number;
+  products: CartProduct[];
+  total: number;
+  discountedTotal: number;
+  userId: number;
+  totalProducts: number;
+  totalQuantity: number;
+}
+
+export interface UserCartsResponse {
+  carts: Cart[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+```
+
+### Address Interface
+
+We will define an `Address` interface that represents the structure of an address in our e-commerce platform. This interface will include properties such as `street`, `city`, `state`, and more.
+
+```typescript
+export interface AddressValidationError {
+  field: string;
+  message: string;
+}
+
+export interface AddressValidationResult {
+  isValid: boolean;
+  errors: AddressValidationError[];
+}
+
+export interface ValidatedAddress {
+  address: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+}
+```
+
+### Payment Interface
+
+We will define a `Payment` interface that represents the structure of a payment in our e-commerce platform. This interface will include properties such as `id`, `amount`, `currency`, and more.
+
+```typescript
+// Payment validation interfaces and types
+
+export interface PaymentValidationError {
+  field: string;
+  message: string;
+}
+
+export interface PaymentValidationResult {
+  isValid: boolean;
+  errors: PaymentValidationError[];
+}
+
+export interface ValidatedPaymentMethod {
+  cardNumber: string;
+  cardType: string;
+  cardExpire: string;
+  cardHolderName: string;
+  cvv?: string;
+  billingAddress?: {
+    address: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+}
+
+export interface CardDetectionResult {
+  type: string;
+  isValid: boolean;
+  brand: string;
+  maxLength: number;
+  cvvLength: number;
+}
+
+export interface ExpiryValidationResult {
+  isValid: boolean;
+  isExpired: boolean;
+  isTooFarFuture: boolean;
+  month?: number;
+  year?: number;
+}
+
+// Enhanced payment method interface for the settings page
+export interface PaymentMethodWithValidation extends ValidatedPaymentMethod {
+  id: string;
+  isDefault: boolean;
+  isFromAPI: boolean;
+  lastFourDigits?: string;
+  maskedNumber?: string;
+}
+```
+
+## Utility Functions
+
+We will also create utility functions that will help us validate addresses and payment methods. These functions will be used throughout our application to ensure that user inputs are valid and conform to the expected formats.
+
+### Address Validation Utility
+
+For the address validation, since the file is longer, we will link to the full code in a separate file. This utility will validate the address format and ensure that all required fields are present.
+
+Remember, this file goes in the `src/lib/constants/validate/` directory and gets saved as `address.ts`:
+
+[address.ts code](https://gist.github.com/tmchuynh/62aa48cb0d7971d0473d5c1f6d443130)
+
+### Payment Validation Utility
+
+Similarly, we will create a payment validation utility that checks the format of payment methods and ensures that all required fields are present. This utility will also handle card detection and expiry validation.
+
+Remember, this file goes in the `src/lib/constants/validate/` directory and gets saved as `payment.ts`:
+
+#### Card Patterns
+
+For the card patterns, we will define a set of regular expressions that match common credit card formats. This will help us validate card numbers and detect their types.
+
+```typescript
+// Credit card type patterns with validation rules
+export const CARD_PATTERNS = {
+  VISA: {
+    pattern: /^4[0-9]{12}(?:[0-9]{3})?$/,
+    lengths: [13, 16, 19],
+    cvvLength: 3,
+    name: "Visa",
+    icon: "visa",
+  },
+  MASTERCARD: {
+    pattern:
+      /^5[1-5][0-9]{14}$|^2(?:2(?:2[1-9]|[3-9][0-9])|[3-6][0-9][0-9]|7(?:[01][0-9]|20))[0-9]{12}$/,
+    lengths: [16],
+    cvvLength: 3,
+    name: "Mastercard",
+    icon: "mastercard",
+  },
+  AMERICAN_EXPRESS: {
+    pattern: /^3[47][0-9]{13}$/,
+    lengths: [15],
+    cvvLength: 4,
+    name: "American Express",
+    icon: "amex",
+  },
+  DISCOVER: {
+    pattern: /^6(?:011|5[0-9]{2})[0-9]{12}$/,
+    lengths: [16],
+    cvvLength: 3,
+    name: "Discover",
+    icon: "discover",
+  },
+  JCB: {
+    pattern: /^(?:2131|1800|35\d{3})\d{11}$/,
+    lengths: [16],
+    cvvLength: 3,
+    name: "JCB",
+    icon: "jcb",
+  },
+  DINERS_CLUB: {
+    pattern: /^3(?:0[0-5]|[68][0-9])[0-9]{11}$/,
+    lengths: [14],
+    cvvLength: 3,
+    name: "Diners Club",
+    icon: "diners",
+  },
+  MAESTRO: {
+    pattern: /^(?:5[0678]\d\d|6304|6390|67\d\d)\d{8,15}$/,
+    lengths: [12, 13, 14, 15, 16, 17, 18, 19],
+    cvvLength: 3,
+    name: "Maestro",
+    icon: "maestro",
+  },
+  UNIONPAY: {
+    pattern: /^(62|88)\d{14,17}$/,
+    lengths: [16, 17, 18, 19],
+    cvvLength: 3,
+    name: "UnionPay",
+    icon: "unionpay",
+  },
+};
+```
+
+##### Explanation of Card Patterns
+
+- Each card type has a `pattern` that matches the card number format.
+- The `lengths` array specifies the valid lengths for the card number.
+- The `cvvLength` specifies the expected length of the CVV code.
+
+#### Card Type Patterns
+
+We will also define simpler patterns for initial card type detection. These patterns will match the starting digits of the card numbers, allowing us to quickly identify the card type before performing more detailed validation.
+
+```typescript
+// Card type detection patterns (simpler patterns for initial detection)
+export const CARD_TYPE_PATTERNS = {
+  VISA: /^4/,
+  MASTERCARD: /^5[1-5]|^2[2-7]/,
+  AMERICAN_EXPRESS: /^3[47]/,
+  DISCOVER: /^6011|^644|^645|^646|^647|^648|^649|^65/,
+  JCB: /^35/,
+  DINERS_CLUB: /^30[0-5]|^36|^38/,
+  MAESTRO: /^5018|^5020|^5038|^5893|^6304|^6759|^6761|^6762|^6763/,
+  UNIONPAY: /^62|^88/,
+};
+```
+
+##### Explanation of Card Type Patterns
+
+- Each card type has a simpler pattern that matches the starting digits of the card number.
+
+#### Expiration Date Patterns
+
+We will define a set of regular expressions that match common expiration date formats. This will help us validate the expiry dates of payment methods.
+
+```typescript
+// Expiry date validation constants
+export const EXPIRY_PATTERNS = {
+  MM_YY: /^(0[1-9]|1[0-2])\/([0-9]{2})$/,
+  MM_YYYY: /^(0[1-9]|1[0-2])\/([0-9]{4})$/,
+  MMYY: /^(0[1-9]|1[0-2])([0-9]{2})$/,
+  MMYYYY: /^(0[1-9]|1[0-2])([0-9]{4})$/,
+};
+```
+
+#### Explanation of Expiry Date Patterns
+
+- Each pattern matches a specific format for the expiration date, such as `MM/YY`, `MM/YYYY`, `MMYY`, and `MMYYYY`.
+
+#### Accepted Card Types
+
+We will define a set of accepted card types that our application will support. This will help us ensure that users can only enter valid card types during payment processing.
+
+```typescript
+// Valid card types for different use cases
+export const ACCEPTED_CARD_TYPES = [
+  "VISA",
+  "MASTERCARD",
+  "AMERICAN_EXPRESS",
+  "DISCOVER",
+  "JCB",
+  "DINERS_CLUB",
+  "MAESTRO",
+  "UNIONPAY",
+] as const;
+```
+
+#### Explanation of Accepted Card Types
+
+- This array contains the card types that our application will accept for payment processing.
+
+#### Error Messages and Security Constants
+
+We will define a set of error messages and security constants that will be used throughout our application.
+
+```typescript
+// Common validation error messages
+export const PAYMENT_ERROR_MESSAGES = {
+  CARD_NUMBER_REQUIRED: "Card number is required",
+  CARD_NUMBER_INVALID: "Invalid card number",
+  CARD_NUMBER_LUHN_FAILED: "Card number failed security check",
+  CARD_TYPE_UNSUPPORTED: "Card type is not supported",
+  CARDHOLDER_NAME_REQUIRED: "Cardholder name is required",
+  CARDHOLDER_NAME_TOO_SHORT: "Cardholder name must be at least 2 characters",
+  CARDHOLDER_NAME_TOO_LONG: "Cardholder name must not exceed 50 characters",
+  CARDHOLDER_NAME_INVALID: "Cardholder name contains invalid characters",
+  EXPIRY_DATE_REQUIRED: "Expiry date is required",
+  EXPIRY_DATE_INVALID_FORMAT: "Expiry date must be in MM/YY format",
+  EXPIRY_DATE_EXPIRED: "Card has expired",
+  EXPIRY_DATE_TOO_FAR: "Expiry date cannot be more than 20 years in the future",
+  CVV_REQUIRED: "CVV is required",
+  CVV_INVALID_LENGTH: "CVV must be 3-4 digits",
+  CVV_INVALID_FORMAT: "CVV must contain only numbers",
+  BILLING_ADDRESS_REQUIRED: "Billing address is required for this card type",
+} as const;
+
+// Security constants
+export const SECURITY_CONSTANTS = {
+  MAX_EXPIRY_YEARS_FUTURE: 20,
+  MIN_CARDHOLDER_NAME_LENGTH: 2,
+  MAX_CARDHOLDER_NAME_LENGTH: 50,
+  CVV_MIN_LENGTH: 3,
+  CVV_MAX_LENGTH: 4,
+} as const;
+```
+
+#### Explanation of Error Messages and Security Constants
+
+- `PAYMENT_ERROR_MESSAGES` contains common validation error messages that will be used throughout the payment processing flow.
+- `SECURITY_CONSTANTS` defines security-related constants, such as the maximum number of years in the future for an expiry date, and the minimum and maximum lengths for the cardholder name and CVV.
+
+#### Export Statements
+
+```typescript
+export type CardType = keyof typeof CARD_PATTERNS;
+export type AcceptedCardType = (typeof ACCEPTED_CARD_TYPES)[number];
+```
+
+#### Explanation of Export Statements
+
+- `CardType` is a type that represents the keys of the `CARD_PATTERNS` object, allowing us to use it for type checking card types.
+- `AcceptedCardType` is a type that represents the accepted card types defined in the `ACCEPTED_CARD_TYPES` array.
+
+## Next Steps
+
+Next, we will implement the API functions to interact with our backend services. This will include creating functions to fetch products, manage user authentication, and handle shopping cart operations. These API functions will be essential for building the core functionality of our e-commerce platform.
+
+Let's start with the [Products API Integration](/ecommerce-platform/connecting-to-the-API/products) and continue from there.
+
+<BackToTop />

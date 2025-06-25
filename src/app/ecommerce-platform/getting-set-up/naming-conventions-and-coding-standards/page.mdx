@@ -4,34 +4,251 @@ import BackToTop from "@/components/BackToTop";
 
 ## Table of Contents
 
-## File Naming Conventions
+## Conventions
 
-##### Components
+### File Naming Conventions
+
+#### Components
 
 - Use PascalCase: `ProductCard.tsx`
 - Include component type: `ProductForm.tsx`, `UserModal.tsx`
 - Use descriptive names: `NavigationHeader.tsx` not `Header.tsx`
 
-##### Hooks
+#### Hooks
 
 - Prefix with "use": `useProductSearch.ts`
 - Be descriptive: `useShoppingCart.ts` not `useCart.ts`
 
-##### Utilities
+#### Utilities
 
 - Use camelCase: `formatCurrency.ts`
 - Group related functions: `dateUtils.ts`, `stringUtils.ts`
 
-##### Types and Interfaces
+#### Types and Interfaces
 
 - Use PascalCase: `Product.ts`, `UserProfile.ts`
 - Suffix interfaces with "Interface" if needed: `ApiResponseInterface.ts`
 
-## TypeScript Best Practices
+### Git & Github
 
-##### Type Definitions
+#### Git Branch Naming Convention
+
+```bash
+# Feature branches
+feature/add-product-search
+feature/implement-payment-integration
+feature/user-authentication
+
+# Bug fix branches
+bugfix/fix-cart-calculation
+bugfix/resolve-mobile-navigation
+hotfix/critical-security-fix
+
+# Improvement branches
+improvement/optimize-product-loading
+improvement/enhance-accessibility
+refactor/modernize-api-layer
+```
+
+#### Commit Message Convention
+
+##### Format
+
+`type(scope): description`
+
+##### Types
+
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Formatting, missing semicolons, etc.
+- `refactor`: Code refactoring
+- `test`: Adding tests
+- `chore`: Maintenance tasks
+
+##### Examples
+
+```bash
+feat(cart): add quantity update functionality
+fix(auth): resolve token expiration handling
+docs(api): update endpoint documentation
+style(components): format ProductCard component
+refactor(hooks): simplify useProductSearch logic
+test(cart): add unit tests for cart operations
+chore(deps): update dependencies to latest versions
+```
+
+### Documentations
+
+#### JSDoc Comments
+
+````typescript
+/**
+ * Calculates the total price of items in the cart including tax and shipping.
+ *
+ * @param items - Array of cart items
+ * @param taxRate - Tax rate as a decimal (e.g., 0.08 for 8%)
+ * @param shippingCost - Fixed shipping cost
+ * @returns Object containing subtotal, tax, shipping, and total
+ *
+ * @example
+ * ```typescript
+ * const total = calculateCartTotal(cartItems, 0.08, 9.99);
+ * console.log(total.total); // Final total price
+ * ```
+ */
+function calculateCartTotal(
+  items: CartItem[],
+  taxRate: number,
+  shippingCost: number
+): CartTotals {
+  // Implementation
+}
+````
+
+<BackToTop />
+
+## Configurations
+
+### Code Formatting and Linting
+
+#### ESLint Configuration
+
+```json
+// .eslintrc.json
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:import/errors",
+    "plugin:import/typescript",
+    "plugin:tailwindcss/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "react",
+    "react-hooks",
+    "jsx-a11y",
+    "import",
+    "tailwindcss"
+  ],
+  "rules": {
+    "react/react-in-jsx-scope": "off", // Next.js handles React import
+    "react/prop-types": "off", // TypeScript handles prop types
+    "import/no-unresolved": "error",
+    "import/named": "error",
+    "import/default": "error",
+    "import/namespace": "error",
+    "import/no-named-as-default": "error",
+    "import/no-named-as-default-member": "error",
+    "tailwindcss/classnames-order": "warn",
+    "tailwindcss/no-custom-classname": "off", // Allow custom classnames
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { "argsIgnorePattern": "^_" }
+    ],
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "jsx-a11y/anchor-is-valid": "warn",
+    "jsx-a11y/no-static-element-interactions": "warn",
+    "jsx-a11y/click-events-have-key-events": "warn",
+    "jsx-a11y/no-noninteractive-element-interactions": "warn"
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    },
+    "import/resolver": {
+      "typescript": {}
+    }
+  }
+}
+```
+
+#### Prettier Configuration
+
+```json
+// .prettierrc.json
+
+{
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "tabWidth": 2,
+  "printWidth": 80,
+  "bracketSpacing": true,
+  "arrowParens": "always",
+  "endOfLine": "lf",
+  "jsxSingleQuote": false,
+  "jsxBracketSameLine": false,
+  "useTabs": false,
+  "htmlWhitespaceSensitivity": "ignore",
+  "tailwindConfig": "./tailwind.config.js"
+}
+```
+
+## Guidelines
+
+### Performance Guidelines
+
+#### Code Splitting
+
+##### Route-based Splitting
 
 ```typescript
+
+// `app/products/[id]/page.tsx` - Product page
+
+
+// Lazy load pages
+const ProductPage = lazy(() => import('@/app/products/[id]/page'));
+const CheckoutPage = lazy(() => import('@/app/checkout/page'));
+const DashboardPage = lazy(() => import('@/app/dashboard/page'));
+
+// Use Suspense for loading states
+<Suspense fallback={<PageSkeleton />}>
+  <ProductPage />
+</Suspense>
+```
+
+##### Component-based Splitting
+
+```typescript
+// Lazy load heavy components
+const ProductReviews = lazy(() => import('@/components/ProductReviews'));
+const AdvancedFilters = lazy(() => import('@/components/AdvancedFilters'));
+
+// Use dynamic imports for conditional components
+const AdminPanel = dynamic(() => import('@/components/AdminPanel'), {
+  loading: () => <AdminPanelSkeleton />,
+  ssr: false
+});
+```
+
+## Best Practices
+
+### TypeScript Best Practices
+
+#### Type Definitions
+
+```typescript
+// lib/interfaces.ts
+
 // Define clear interfaces
 interface Product {
   id: string;
@@ -67,9 +284,11 @@ type UpdateProductRequest = Partial<
 >;
 ```
 
-##### Function Declarations
+#### Function Declarations
 
 ```typescript
+// lib/api.ts
+
 // Use descriptive parameter names and return types
 async function fetchProductsByCategory(
   categoryId: string,
@@ -99,11 +318,13 @@ async function createOrder(orderData: CreateOrderData): Promise<Order> {
 
 <BackToTop />
 
-## React Component Patterns
+### React Component Patterns
 
-##### Component Structure
+#### Component Structure
 
 ```typescript
+// components/ProductCard.tsx
+
 // Component with proper typing and documentation
 interface ProductCardProps {
   /** The product to display */
@@ -157,9 +378,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 export default ProductCard;
 ```
 
-##### Custom Hooks Pattern
+#### Custom Hooks Pattern
 
 ```typescript
+// hooks/useProductSearch.ts
+
 // Custom hook with proper typing and error handling
 interface UseProductSearchOptions {
   initialQuery?: string;
@@ -233,11 +456,11 @@ export function useProductSearch(
 }
 ```
 
-## CSS and Styling Guidelines
-
-##### Tailwind CSS Best Practices
+### Tailwind CSS Best Practices
 
 ```typescript
+// tailwind.config.js
+
 // Use consistent spacing scale
 const spacing = {
   xs: "p-1", // 4px
@@ -273,9 +496,11 @@ const dynamicStyles = {
 } as React.CSSProperties;
 ```
 
-##### Component Styling
+#### Component Styling
 
 ```typescript
+// components/Button.tsx
+
 // Use the cn utility for conditional classes
 import { cn } from '@/lib/utils';
 
@@ -317,10 +542,11 @@ const Button = ({ variant, size, className, ...props }) => {
 
 ### Unit Testing with Jest
 
-##### Component Testing
+#### Component Testing
 
 ```typescript
-// ProductCard.test.tsx
+// components/ProductCard.test.tsx
+
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ProductCard } from '@/components/ProductCard';
 import { mockProduct } from '@/lib/test/mockData';
@@ -365,10 +591,11 @@ describe('ProductCard', () => {
 });
 ```
 
-##### Hook Testing
+#### Hook Testing
 
 ```typescript
-// useProductSearch.test.ts
+// my_project/__tests__/useProductSearch.test.ts
+
 import { renderHook, act } from "@testing-library/react";
 import { useProductSearch } from "@/hooks/useProductSearch";
 
@@ -426,10 +653,11 @@ describe("useProductSearch", () => {
 
 ### Integration Testing
 
-##### API Integration Tests
+#### API Integration Tests
 
 ```typescript
-// api.integration.test.ts
+// my_project/__tests__/api.integration.test.ts
+
 import { fetchProducts, createOrder } from "@/lib/api";
 
 describe("API Integration", () => {
@@ -463,185 +691,83 @@ describe("API Integration", () => {
 });
 ```
 
-### End-to-End Testing with Playwright
-
-##### E2E Test Setup
+### End-to-End Testing with Jest
 
 ```typescript
-// playwright.config.ts
-import { defineConfig, devices } from "@playwright/test";
+// my_project/__tests__/e2e.test.ts
+import { render, screen } from '@testing-library/react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { App } from '@/App';
 
-export default defineConfig({
-  testDir: "./e2e",
-  fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: "html",
-  use: {
-    baseURL: "http://localhost:3000",
-    trace: "on-first-retry",
-    screenshot: "only-on-failure",
-  },
-  projects: [
-    {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
-    },
-    {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
-    },
-    {
-      name: "webkit",
-      use: { ...devices["Desktop Safari"] },
-    },
-  ],
-  webServer: {
-    command: "npm run dev",
-    url: "http://localhost:3000",
-    reuseExistingServer: !process.env.CI,
-  },
-});
-```
+describe('E2E Tests', () => {
+  it('renders the homepage and navigates to product page', () => {
+    render(
+      <Router>
+        <App />
+      </Router>
+    );
 
-##### E2E Test Example
+    // Check homepage content
+    expect(screen.getByText(/welcome to our store/i)).toBeInTheDocument();
 
-```typescript
-// e2e/shopping-flow.spec.ts
-import { test, expect } from "@playwright/test";
+    // Navigate to product page
+    const productLink = screen.getByRole('link', { name: /view products/i });
+    productLink.click();
 
-test.describe("Shopping Flow", () => {
-  test("complete shopping journey", async ({ page }) => {
-    // Navigate to home page
-    await page.goto("/");
+    // Check product page content
+    expect(screen.getByText(/product list/i)).toBeInTheDocument();
+  });
 
-    // Search for products
-    await page.fill('[data-testid="search-input"]', "laptop");
-    await page.press('[data-testid="search-input"]', "Enter");
+  it('adds a product to the cart', () => {
+    render(
+      <Router>
+        <App />
+      </Router>
+    );
 
-    // Verify search results
-    await expect(page.locator('[data-testid="product-card"]')).toHaveCount(10, {
-      timeout: 5000,
-    });
+    // Navigate to product page
+    const productLink = screen.getByRole('link', { name: /view products/i });
+    productLink.click();
 
-    // Click on first product
-    await page.locator('[data-testid="product-card"]').first().click();
+    // Add first product to cart
+    const addToCartButton = screen.getByRole('button', { name: /add to cart/i });
+    addToCartButton.click();
 
-    // Add to cart
-    await page.click('[data-testid="add-to-cart-button"]');
-
-    // Verify cart update
-    await expect(page.locator('[data-testid="cart-count"]')).toContainText("1");
-
-    // Go to cart
-    await page.click('[data-testid="cart-icon"]');
-
-    // Verify cart contents
-    await expect(page.locator('[data-testid="cart-item"]')).toHaveCount(1);
-
-    // Proceed to checkout (if authentication is implemented)
-    await page.click('[data-testid="checkout-button"]');
-
-    // Fill checkout form
-    await page.fill('[data-testid="customer-name"]', "Test User");
-    await page.fill('[data-testid="customer-email"]', "test@example.com");
-
-    // Submit order
-    await page.click('[data-testid="place-order-button"]');
-
-    // Verify order confirmation
-    await expect(
-      page.locator('[data-testid="order-confirmation"]')
-    ).toBeVisible();
+    // Check cart content
+    expect(screen.getByText(/1 item in your cart/i)).toBeInTheDocument();
   });
 });
 ```
 
-## Git Workflow
+#### Adding Script to `package.json`
 
-### Branch Naming Convention
+```json
+{
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "jest --config jest.config.js --testPathPattern=e2e"
+  }
+}
+```
+
+#### Running Tests
 
 ```bash
-# Feature branches
-feature/add-product-search
-feature/implement-payment-integration
-feature/user-authentication
-
-# Bug fix branches
-bugfix/fix-cart-calculation
-bugfix/resolve-mobile-navigation
-hotfix/critical-security-fix
-
-# Improvement branches
-improvement/optimize-product-loading
-improvement/enhance-accessibility
-refactor/modernize-api-layer
+# Run all tests
+npm run test
+# Run tests in watch mode
+npm run test:watch
+# Run tests with coverage report
+npm run test:coverage
+# Run end-to-end tests
+npm run test:e2e
 ```
 
-## Commit Message Convention
+## Optimization Strategies
 
-**Format**: `type(scope): description`
-
-**Types**:
-
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Formatting, missing semicolons, etc.
-- `refactor`: Code refactoring
-- `test`: Adding tests
-- `chore`: Maintenance tasks
-
-**Examples**:
-
-```bash
-feat(cart): add quantity update functionality
-fix(auth): resolve token expiration handling
-docs(api): update endpoint documentation
-style(components): format ProductCard component
-refactor(hooks): simplify useProductSearch logic
-test(cart): add unit tests for cart operations
-chore(deps): update dependencies to latest versions
-```
-
-<BackToTop />
-
-## Performance Guidelines
-
-### Code Splitting
-
-##### Route-based Splitting
-
-```typescript
-// Lazy load pages
-const ProductPage = lazy(() => import('@/app/products/[id]/page'));
-const CheckoutPage = lazy(() => import('@/app/checkout/page'));
-const DashboardPage = lazy(() => import('@/app/dashboard/page'));
-
-// Use Suspense for loading states
-<Suspense fallback={<PageSkeleton />}>
-  <ProductPage />
-</Suspense>
-```
-
-##### Component-based Splitting
-
-```typescript
-// Lazy load heavy components
-const ProductReviews = lazy(() => import('@/components/ProductReviews'));
-const AdvancedFilters = lazy(() => import('@/components/AdvancedFilters'));
-
-// Use dynamic imports for conditional components
-const AdminPanel = dynamic(() => import('@/components/AdminPanel'), {
-  loading: () => <AdminPanelSkeleton />,
-  ssr: false
-});
-```
-
-### Optimization Strategies
-
-##### React Performance
+### React Performance
 
 ```typescript
 // Use React.memo for expensive components
@@ -683,77 +809,6 @@ const ProductList = ({ products, onProductSelect }) => {
     </div>
   );
 };
-```
-
-## Documentation Standards
-
-##### JSDoc Comments
-
-````typescript
-/**
- * Calculates the total price of items in the cart including tax and shipping.
- *
- * @param items - Array of cart items
- * @param taxRate - Tax rate as a decimal (e.g., 0.08 for 8%)
- * @param shippingCost - Fixed shipping cost
- * @returns Object containing subtotal, tax, shipping, and total
- *
- * @example
- * ```typescript
- * const total = calculateCartTotal(cartItems, 0.08, 9.99);
- * console.log(total.total); // Final total price
- * ```
- */
-function calculateCartTotal(
-  items: CartItem[],
-  taxRate: number,
-  shippingCost: number
-): CartTotals {
-  // Implementation
-}
-````
-
-## Troubleshooting
-
-### Development Server Issues
-
-```bash
-# Clear Next.js cache
-rm -rf .next
-
-# Clear node modules and reinstall
-rm -rf node_modules package-lock.json
-npm install
-
-# Check for port conflicts
-lsof -ti:3000
-kill -9 <PID>
-```
-
-### TypeScript Errors
-
-```bash
-# Check TypeScript configuration
-npx tsc --showConfig
-
-# Run type checking
-npm run type-check
-
-# Clear TypeScript cache
-rm -rf node_modules/.cache
-```
-
-### Build Issues
-
-```bash
-# Analyze bundle size
-npm run analyze
-
-# Check for circular dependencies
-npx madge --circular src/
-
-# Verify environment variables
-printenv | grep NEXT_PUBLIC
 ```
 
 <BackToTop />

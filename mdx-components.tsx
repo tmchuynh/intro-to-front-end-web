@@ -122,16 +122,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         {children}
       </code>
     ),
-    pre: ({ children }) => {
-      return (
-        <>
-          <div className="relative shadow-md my-5 px-4 rounded-2xl overflow-y-auto">
-            <pre className="my-4 p-4">{children}</pre>
-          </div>
-          <br />
-        </>
-      );
-    },
     a: ({ href, children }) => (
       <a
         href={href}

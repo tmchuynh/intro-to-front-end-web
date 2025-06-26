@@ -1,0 +1,535 @@
+import BackToTop from "@/components/BackToTop";
+
+# Payments Utility Functions
+
+## Table of Contents
+
+## The `import` Statements
+
+```typescript
+// src/lib/utils/payment.ts
+import {
+  CARD_PATTERNS,
+  CARD_TYPE_PATTERNS,
+  CardType,
+  EXPIRY_PATTERNS,
+  PAYMENT_ERROR_MESSAGES,
+  SECURITY_CONSTANTS,
+} from "../constants/validate/payment";
+import {
+  CardDetectionResult,
+  ExpiryValidationResult,
+  PaymentValidationError,
+  PaymentValidationResult,
+  ValidatedPaymentMethod,
+} from "../interfaces/payment";
+```
+
+## The Luhn Algorithm
+
+The Luhn algorithm is also known as the "modulus 10" or "mod 10" algorithm. It is a simple checksum formula used to validate a variety of identification numbers, such as credit card numbers. The algorithm works by performing a series of mathematical operations on the digits of the number to ensure that it meets certain criteria.
+
+It is designed to catch common errors in data entry, such as transposed digits or mistyped numbers. The Luhn algorithm is widely used in the financial industry to validate credit card numbers and other identification numbers.
+
+### How the Luhn Algorithm Works
+
+The Luhn algorithm works as follows:
+
+1. Starting from the rightmost digit, double the value of every second digit.
+2. If doubling a digit results in a number greater than 9, subtract 9 from the result.
+3. Sum all the digits together.
+4. If the total modulo 10 is equal to 0, then the number is valid according to the Luhn algorithm.
+
+```typescript startLineNumber=17
+// src/lib/utils/payment.ts
+/**
+ * Validates a credit card number using the Luhn algorithm
+ */
+export function validateLuhnAlgorithm(cardNumber: string): boolean {
+  const cleaned = cardNumber.replace(/\s+/g, "");
+
+  if (!/^\d+$/.test(cleaned)) {
+    return false;
+  }
+
+  let sum = 0;
+  let isEven = false;
+
+  for (let i = cleaned.length - 1; i >= 0; i--) {
+    let digit = parseInt(cleaned.charAt(i));
+
+    if (isEven) {
+      digit *= 2;
+      if (digit > 9) {
+        digit -= 9;
+      }
+    }
+
+    sum += digit;
+    isEven = !isEven;
+  }
+
+  return sum % 10 === 0;
+}
+```
+
+##### Explanation of the Code
+
+This function first cleans the card number by removing any spaces. It then checks if the cleaned number contains only digits. If it does, it iterates through the digits from right to left, doubling every second digit and adjusting the value if it exceeds 9. Finally, it sums all the digits and checks if the total modulo 10 is equal to 0, returning `true` if valid and `false` otherwise.
+
+## Card Type Detection
+
+Card type detection is essential for e-commerce platforms to ensure that users enter valid credit card numbers. This utility function detects the type of credit card based on its number, allowing for appropriate validation and processing.
+
+```typescript startLineNumber=47
+// src/lib/utils/payment.ts
+/**
+ * Detects the credit card type and validates format
+ */
+export function detectCardType(cardNumber: string): CardDetectionResult {
+  const cleaned = cardNumber.replace(/\s+/g, "");
+
+  for (const [type, pattern] of Object.entries(CARD_TYPE_PATTERNS)) {
+    if (pattern.test(cleaned)) {
+      const cardInfo = CARD_PATTERNS[type as CardType];
+      const isValidLength = cardInfo.lengths.includes(cleaned.length);
+      const isValidLuhn = validateLuhnAlgorithm(cleaned);
+
+      return {
+        type,
+        isValid: isValidLength && isValidLuhn,
+        brand: cardInfo.name,
+        maxLength: Math.max(...cardInfo.lengths),
+        cvvLength: cardInfo.cvvLength,
+      };
+    }
+  }
+
+  return {
+    type: "UNKNOWN",
+    isValid: false,
+    brand: "Unknown",
+    maxLength: 19,
+    cvvLength: 3,
+  };
+}
+```
+
+##### Explanation of the Code
+
+This function first cleans the card number by removing any spaces. It then iterates through the predefined `CARD_TYPE_PATTERNS` to check if the cleaned card number matches any of the patterns. If a match is found, it retrieves the card information, checks if the length is valid, and validates the card number using the Luhn algorithm. It returns an object containing the card type, validity status, brand name, maximum length, and CVV length.
+
+## Expiry Date Validation
+
+Expiry date validation is crucial for ensuring that credit card transactions are processed securely and accurately. This utility function checks if the provided expiry date is valid, formatted correctly, and not in the past.
+
+```typescript startLineNumber=78
+/**
+ * Validates card expiry date
+ */
+export function validateExpiryDate(expiry: string): ExpiryValidationResult {
+  const trimmed = expiry.trim();
+
+  // Check format
+  const match = trimmed.match(EXPIRY_PATTERNS.MM_YY);
+  if (!match) {
+    return {
+      isValid: false,
+      isExpired: false,
+      isTooFarFuture: false,
+    };
+  }
+
+  const month = parseInt(match[1]);
+  const year = parseInt(match[2]) + 2000; // Convert YY to YYYY
+
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+
+  // Check if expired
+  const isExpired =
+    year < currentYear || (year === currentYear && month < currentMonth);
+
+  // Check if too far in the future
+  const isTooFarFuture =
+    year > currentYear + SECURITY_CONSTANTS.MAX_EXPIRY_YEARS_FUTURE;
+
+  return {
+    isValid: !isExpired && !isTooFarFuture,
+    isExpired,
+    isTooFarFuture,
+    month,
+    year,
+  };
+}
+```
+
+##### Explanation of the Code
+
+This function first trims the expiry date and checks if it matches the expected MM/YY format using a regular expression. If the format is valid, it extracts the month and year, converts the year from YY to YYYY, and compares it with the current date to determine if the card has expired or if the expiry date is too far in the future. It returns an object indicating whether the expiry date is valid, expired, or too far in the future.
+
+## CVV Validation
+
+CVV validation is essential for ensuring the security of credit card transactions. This utility function checks if the provided CVV is valid, formatted correctly, and meets the length requirements for different card types.
+
+```typescript startLineNumber=116
+/**
+ * Validates CVV code
+ */
+export function validateCVV(cvv: string, cardType?: string): boolean {
+  const trimmed = cvv.trim();
+
+  if (!/^\d+$/.test(trimmed)) {
+    return false;
+  }
+
+  if (cardType && CARD_PATTERNS[cardType as CardType]) {
+    const expectedLength = CARD_PATTERNS[cardType as CardType].cvvLength;
+    return trimmed.length === expectedLength;
+  }
+
+  // Default validation for unknown card types
+  return (
+    trimmed.length >= SECURITY_CONSTANTS.CVV_MIN_LENGTH &&
+    trimmed.length <= SECURITY_CONSTANTS.CVV_MAX_LENGTH
+  );
+}
+```
+
+##### Explanation of the Code
+
+This function first trims the CVV and checks if it contains only digits. If a card type is provided, it checks the expected CVV length for that card type. If no card type is provided, it validates the CVV against the minimum and maximum length constants defined in `SECURITY_CONSTANTS`. The function returns `true` if the CVV is valid and `false` otherwise.
+
+## Check Cardholder Name
+
+Validating the cardholder's name is important for ensuring that the name matches the credit card being used. This utility function checks if the cardholder's name meets the required length and format, ensuring it is appropriate for processing payments.
+
+```typescript startLineNumber=136
+/**
+ * Validates cardholder name
+ */
+export function validateCardholderName(name: string): string | null {
+  const trimmed = name.trim();
+
+  if (!trimmed) {
+    return PAYMENT_ERROR_MESSAGES.CARDHOLDER_NAME_REQUIRED;
+  }
+
+  if (trimmed.length < SECURITY_CONSTANTS.MIN_CARDHOLDER_NAME_LENGTH) {
+    return PAYMENT_ERROR_MESSAGES.CARDHOLDER_NAME_TOO_SHORT;
+  }
+
+  if (trimmed.length > SECURITY_CONSTANTS.MAX_CARDHOLDER_NAME_LENGTH) {
+    return PAYMENT_ERROR_MESSAGES.CARDHOLDER_NAME_TOO_LONG;
+  }
+
+  // Allow letters, spaces, hyphens, apostrophes, and periods
+  if (!/^[a-zA-Z\s\-'\.]+$/.test(trimmed)) {
+    return PAYMENT_ERROR_MESSAGES.CARDHOLDER_NAME_INVALID;
+  }
+
+  return null;
+}
+```
+
+##### Explanation of the Code
+
+This function first trims the cardholder's name and checks if it is empty. It then validates the length of the name against predefined constants. If the name is too short or too long, it returns an appropriate error message. Finally, it checks if the name contains only valid characters (letters, spaces, hyphens, apostrophes, and periods) and returns an error message if it contains invalid characters.
+
+## Validate Payment Method
+
+The `validatePaymentMethodEnhanced` function combines all the previous utility functions to validate a complete payment method. It checks the card number, expiry date, CVV, and cardholder name, returning a comprehensive result that indicates whether the payment method is valid or if there are any errors.
+
+```typescript startLineNumber=165
+export function validatePaymentMethodEnhanced(
+  payment: Partial<ValidatedPaymentMethod>
+): PaymentValidationResult {
+  const errors: PaymentValidationError[] = [];
+
+  // Validate card number
+  if (!payment.cardNumber?.trim()) {
+    errors.push({
+      field: "cardNumber",
+      message: PAYMENT_ERROR_MESSAGES.CARD_NUMBER_REQUIRED,
+    });
+  } else {
+    const cardDetection = detectCardType(payment.cardNumber);
+
+    if (cardDetection.type === "UNKNOWN") {
+      errors.push({
+        field: "cardNumber",
+        message: PAYMENT_ERROR_MESSAGES.CARD_TYPE_UNSUPPORTED,
+      });
+    } else if (!cardDetection.isValid) {
+      if (!validateLuhnAlgorithm(payment.cardNumber)) {
+        errors.push({
+          field: "cardNumber",
+          message: PAYMENT_ERROR_MESSAGES.CARD_NUMBER_LUHN_FAILED,
+        });
+      } else {
+        errors.push({
+          field: "cardNumber",
+          message: PAYMENT_ERROR_MESSAGES.CARD_NUMBER_INVALID,
+        });
+      }
+    }
+  }
+```
+
+```typescript startLineNumber=199
+// Validate cardholder name
+const nameError = validateCardholderName(payment.cardHolderName || "");
+if (nameError) {
+  errors.push({
+    field: "cardHolderName",
+    message: nameError,
+  });
+}
+
+// Validate expiry date
+if (!payment.cardExpire?.trim()) {
+  errors.push({
+    field: "cardExpire",
+    message: PAYMENT_ERROR_MESSAGES.EXPIRY_DATE_REQUIRED,
+  });
+} else {
+  const expiryValidation = validateExpiryDate(payment.cardExpire);
+
+  if (!expiryValidation.isValid) {
+    if (expiryValidation.isExpired) {
+      errors.push({
+        field: "cardExpire",
+        message: PAYMENT_ERROR_MESSAGES.EXPIRY_DATE_EXPIRED,
+      });
+    } else if (expiryValidation.isTooFarFuture) {
+      errors.push({
+        field: "cardExpire",
+        message: PAYMENT_ERROR_MESSAGES.EXPIRY_DATE_TOO_FAR,
+      });
+    } else {
+      errors.push({
+        field: "cardExpire",
+        message: PAYMENT_ERROR_MESSAGES.EXPIRY_DATE_INVALID_FORMAT,
+      });
+    }
+  }
+}
+```
+
+```typescript startLineNumber=237
+  // Validate CVV if provided
+  if (payment.cvv) {
+    const cardDetection = detectCardType(payment.cardNumber || "");
+    if (!validateCVV(payment.cvv, cardDetection.type)) {
+      errors.push({
+        field: "cvv",
+        message: `CVV must be ${cardDetection.cvvLength} digits`,
+      });
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+```
+
+##### Explanation of the Code
+
+This function first checks if the card number is provided and valid. It then validates the cardholder's name, expiry date, and CVV. If any validation fails, it adds an appropriate error message to the `errors` array. Finally, it returns a result indicating whether the payment method is valid and any errors encountered during validation.
+
+## Validating Payment for Forms
+
+When integrating the payment validation utility into forms, you can use the `validatePaymentMethodEnhanced` function to validate user input before processing payments. This ensures that all required fields are filled out correctly and that the payment method is valid.
+
+```typescript startLineNumber=254
+/**
+ * Real-time field validation for payment forms
+ */
+export function validatePaymentField(
+  field: keyof ValidatedPaymentMethod,
+  value: string,
+  payment?: Partial<ValidatedPaymentMethod>
+): string | null {
+  const trimmedValue = value.trim();
+
+  switch (field) {
+    case "cardNumber":
+      if (!trimmedValue) return PAYMENT_ERROR_MESSAGES.CARD_NUMBER_REQUIRED;
+
+      const cardDetection = detectCardType(trimmedValue);
+      if (cardDetection.type === "UNKNOWN") {
+        return PAYMENT_ERROR_MESSAGES.CARD_TYPE_UNSUPPORTED;
+      }
+
+      if (!cardDetection.isValid) {
+        if (!validateLuhnAlgorithm(trimmedValue)) {
+          return PAYMENT_ERROR_MESSAGES.CARD_NUMBER_LUHN_FAILED;
+        } else {
+          return PAYMENT_ERROR_MESSAGES.CARD_NUMBER_INVALID;
+        }
+      }
+      break;
+
+    case "cardHolderName":
+      return validateCardholderName(trimmedValue);
+
+    case "cardExpire":
+      if (!trimmedValue) return PAYMENT_ERROR_MESSAGES.EXPIRY_DATE_REQUIRED;
+
+      const expiryValidation = validateExpiryDate(trimmedValue);
+      if (!expiryValidation.isValid) {
+        if (expiryValidation.isExpired) {
+          return PAYMENT_ERROR_MESSAGES.EXPIRY_DATE_EXPIRED;
+        } else if (expiryValidation.isTooFarFuture) {
+          return PAYMENT_ERROR_MESSAGES.EXPIRY_DATE_TOO_FAR;
+        } else {
+          return PAYMENT_ERROR_MESSAGES.EXPIRY_DATE_INVALID_FORMAT;
+        }
+      }
+      break;
+
+    case "cvv":
+      if (!trimmedValue) return PAYMENT_ERROR_MESSAGES.CVV_REQUIRED;
+
+      const cardType =
+        payment?.cardType || detectCardType(payment?.cardNumber || "").type;
+      if (!validateCVV(trimmedValue, cardType)) {
+        const expectedLength =
+          cardType && CARD_PATTERNS[cardType as CardType]
+            ? CARD_PATTERNS[cardType as CardType].cvvLength
+            : 3;
+        return `CVV must be ${expectedLength} digits`;
+      }
+      break;
+
+    default:
+      return null;
+  }
+
+  return null;
+}
+```
+
+##### Explanation of the Code
+
+This function takes a field name and its value, along with an optional payment object. It validates the input based on the field type, returning appropriate error messages if the input is invalid. This can be used in real-time validation scenarios, such as when users are filling out payment forms.
+
+## Formatting Card Numbers
+
+Formatting card numbers enhances readability and user experience by grouping digits into recognizable patterns. This utility function formats credit card numbers into groups of four digits, making it easier for users to enter their card information accurately.
+
+```typescript startLineNumber=319
+/**
+ * Formats card number with appropriate spacing
+ */
+export function formatCardNumber(cardNumber: string): string {
+  const cleaned = cardNumber.replace(/\s+/g, "");
+  const cardType = detectCardType(cleaned);
+
+  // American Express uses different formatting
+  if (cardType.type === "AMERICAN_EXPRESS") {
+    return cleaned.replace(/(\d{4})(\d{6})(\d{5})/, "$1 $2 $3");
+  }
+
+  // Most other cards use 4-4-4-4 format
+  return cleaned.replace(/(\d{4})(?=\d)/g, "$1 ");
+}
+```
+
+##### Explanation of the Code
+
+This function first cleans the card number by removing any spaces. It then detects the card type to apply the appropriate formatting. For American Express cards, it formats the number as four digits, six digits, and five digits. For other card types, it formats the number in groups of four digits separated by spaces.
+
+## Masking Card Numbers
+
+Masking card numbers is crucial for security and privacy. This utility function replaces all but the last four digits of a credit card number with asterisks, ensuring that sensitive information is not exposed while still allowing users to verify their card number.
+
+```typescript startLineNumber=335
+/**
+ * Masks card number for display
+ */
+export function maskCardNumber(cardNumber: string): string {
+  const cleaned = cardNumber.replace(/\s+/g, "");
+  if (cleaned.length < 4) return cleaned;
+
+  const lastFour = cleaned.slice(-4);
+  const masked = "•".repeat(cleaned.length - 4);
+
+  return formatCardNumber(masked + lastFour);
+}
+```
+
+##### Explanation of the Code
+
+This function first cleans the card number by removing any spaces. It then checks if the cleaned number has fewer than four digits, in which case it returns the cleaned number as is. If there are four or more digits, it masks all but the last four digits with asterisks and formats the result using the `formatCardNumber` function to ensure proper spacing.
+
+## Normalizing Payment Method
+
+Normalizing payment method data ensures consistency and reliability across your e-commerce platform. This utility function takes a payment method object and normalizes its properties, ensuring that all required fields are present and formatted correctly.
+
+```typescript startLineNumber=348
+/**
+ * Validates and normalizes a payment method
+ */
+export function validateAndNormalizePaymentMethod(
+  payment: Partial<ValidatedPaymentMethod>
+): {
+  isValid: boolean;
+  errors: PaymentValidationError[];
+  normalizedPayment?: ValidatedPaymentMethod;
+} {
+  const validation = validatePaymentMethodEnhanced(payment);
+
+  if (!validation.isValid) {
+    return validation;
+  }
+
+  const cardDetection = detectCardType(payment.cardNumber!);
+
+  // Normalize the payment method
+  const normalizedPayment: ValidatedPaymentMethod = {
+    cardNumber: payment.cardNumber!.replace(/\s+/g, ""),
+    cardType: cardDetection.brand,
+    cardExpire: payment.cardExpire!.trim(),
+    cardHolderName: payment.cardHolderName!.trim().replace(/\s+/g, " "), // Normalize spaces
+    cvv: payment.cvv?.trim(),
+    billingAddress: payment.billingAddress,
+  };
+
+  return {
+    isValid: true,
+    errors: [],
+    normalizedPayment,
+  };
+}
+```
+
+##### Explanation of the Code
+
+This function first validates the payment method using the `validatePaymentMethodEnhanced` function. If the payment method is valid, it normalizes the card number by removing any spaces, trims the expiry date and cardholder name, and ensures that the CVV is also trimmed. The normalized payment method is then returned along with a success status.
+
+## Formatting Expiration Date
+
+Formatting the expiration date is essential for ensuring that users enter their card's expiry date in a consistent format. This utility function formats the expiry date into a standard MM/YY format, making it easier for users to input their card information correctly.
+
+```typescript startLineNumber=383
+/**
+ * Format expiry date as MM/YY
+ */
+export function formatExpiryDate(value: string): string {
+  const cleaned = value.replace(/\D/g, "");
+
+  if (cleaned.length >= 2) {
+    return cleaned.slice(0, 2) + "/" + cleaned.slice(2, 4);
+  }
+
+  return cleaned;
+}
+```
+
+##### Explanation of the Code
+
+This function removes any non-digit characters from the input value and formats it into a MM/YY format. If the cleaned value has at least two digits, it formats the first two digits as the month and the next two as the year. If there are fewer than two digits, it simply returns the cleaned value.

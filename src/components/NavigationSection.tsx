@@ -126,10 +126,11 @@ function NavigationItem({
         <button
           onClick={onToggle}
           className={cn("", {
-            "flex justify-between items-center px-3 py-2 ml-1 max-w-full hover:bg-nav-item-hover hover:text-nav-text-hover w-[95%] font-medium text-left text-sm transition-colors rounded-md": true,
-            "bg-nav-item-active": hasActiveChild || isActiveItem,
-            "bg-sidebar-active-bg text-sidebar-active-text": isExpanded,
+            "flex justify-between items-center px-3 py-2 ml-1 max-w-full hover:bg-sidebar-hover-bg hover:text-nav-text-hover w-[95%] font-medium text-left text-sm transition-colors rounded-md": true,
+            "active:bg-sidebar-active-bg":
+              hasActiveChild || isActiveItem || isExpanded,
             "text-foreground": depth >= 0,
+            "text-white bg-sidebar-active-bg": depth >= 0 && isExpanded,
           })}
         >
           {item.title}

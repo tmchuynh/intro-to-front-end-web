@@ -1,4 +1,5 @@
 import { useNavigation } from "@/hooks/useNavigation";
+import { cn } from "@/lib/utils";
 import type { NavigationItem } from "@/utils/navigation";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -123,14 +124,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <Link
               href="/"
               onClick={onClose}
-              className={`
-                flex items-center space-x-3 uppercase py-2 rounded-lg transition-colors duration-200
-                ${
-                  pathname === "/"
-                    ? "bg-primary text-white"
-                    : "text-sidebar-text hover:bg-sidebar-hover-bg hover:text-sidebar-text-hover"
+              className={cn(
+                "flex items-center space-x-3 uppercase py-2 rounded-lg transition-colors duration-200",
+                {
+                  "text-sidebar-active-text": pathname === "/",
                 }
-              `}
+              )}
             >
               Home
             </Link>

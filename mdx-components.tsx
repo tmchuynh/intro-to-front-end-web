@@ -79,10 +79,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <CustomHeading
         level={4}
         id={props.id}
-        className="my-4 font-[DMSerifText] text-sidebar-active-text text-xl"
+        className="mb-4 mt-7 font-[DMSerifText] text-accent text-xl"
       >
-        <br />
-        <br />
         {children}
       </CustomHeading>
     ),

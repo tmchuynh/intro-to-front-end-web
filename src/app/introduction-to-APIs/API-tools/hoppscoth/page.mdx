@@ -65,21 +65,21 @@ Hoppscotch offers multiple ways to get started, each tailored to different use c
 
 ### Quick Start Options
 
-#####  Web App (Recommended for Beginners)
+##### Web App (Recommended for Beginners)
 
 - No installation required
 - Works in any modern browser
 - Instant access to all core features
 - Perfect for individual developers and quick testing
 
-#####  Desktop App
+##### Desktop App
 
 - Native performance and offline capabilities
 - Better handling of CORS restrictions
 - System-level certificate management
 - Ideal for enterprise environments
 
-#####  CLI Tool
+##### CLI Tool
 
 - Automation and scripting capabilities
 - CI/CD pipeline integration
@@ -213,7 +213,7 @@ Workspaces in Hoppscotch serve as organizational units for your API projects and
 
 **Workspace Management Features**:
 
-```
+```txt title="Workspace Management"
 My E-commerce API Workspace
 ├── Team Members (12)
 ├── Collections (8)
@@ -265,7 +265,7 @@ Collections help organize related API requests and provide structure for your AP
 
 **Collection Structure Example**:
 
-```
+```txt title="Collection Structure"
 E-commerce API v2.0
 ├── Authentication
 │   ├── POST Login
@@ -309,7 +309,7 @@ E-commerce API v2.0
 
 **Advanced Collection Features**:
 
-```javascript
+```javascript title="Collection-level Scripts"
 // Collection-level Pre-request Script
 pm.environment.set("timestamp", new Date().toISOString());
 pm.environment.set("requestId", pm.variables.replaceIn("{{$randomUUID}}"));
@@ -344,7 +344,7 @@ Environment variables allow you to store reusable values and switch between diff
 
 ##### Development Environment
 
-```json
+```json title="Development Environment"
 {
   "name": "Development",
   "variables": [
@@ -366,7 +366,7 @@ Environment variables allow you to store reusable values and switch between diff
 
 ##### Production Environment
 
-```json
+```json title="Production Environment"
 {
   "name": "Production",
   "variables": [
@@ -390,7 +390,8 @@ Environment variables allow you to store reusable values and switch between diff
 
 **In Request URLs**:
 
-```
+```bash
+GET {{baseURL}}/api/v1/products
 {{baseURL}}/api/v1/users
 {{baseURL}}/products/{{productId}}
 ```
@@ -564,7 +565,7 @@ if (!pm.environment.get("accessToken")) {
         const jsonData = response.json();
         pm.environment.set("accessToken", jsonData.access_token);
       }
-    },
+    }
   );
 }
 ```
@@ -793,14 +794,14 @@ pm.environment.set("timestamp", new Date().toISOString());
 // Generate random data
 pm.environment.set(
   "randomEmail",
-  `user${Math.random().toString(36).substr(2, 9)}@example.com`,
+  `user${Math.random().toString(36).substr(2, 9)}@example.com`
 );
 
 // Calculate signature for API authentication
 const message = pm.request.url.toString() + pm.environment.get("timestamp");
 const signature = CryptoJS.HmacSHA256(
   message,
-  pm.environment.get("secretKey"),
+  pm.environment.get("secretKey")
 ).toString();
 pm.environment.set("signature", signature);
 

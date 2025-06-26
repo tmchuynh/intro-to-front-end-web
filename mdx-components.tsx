@@ -97,7 +97,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <CustomHeading
         level={6}
         id={props.id}
-        className="mb-1 font-[BodoniModaSC] font-light text-accent text-sm tracking-wider"
+        className="my-1 font-[IbarraRealNova] text-accent text-base tracking-wider underline decoration-double"
       >
         {children}
       </CustomHeading>

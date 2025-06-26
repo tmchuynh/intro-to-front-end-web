@@ -12,15 +12,8 @@ import rehypeSlug from "rehype-slug"; // Generates URL-friendly slugs for headin
 
 // Remark plugins for markdown processing (runs before HTML conversion)
 import remarkGfm from "remark-gfm"; // GitHub Flavored Markdown support
+import remarkNormalizeHeadings from "remark-normalize-headings"; // Normalize heading levels for consistent TOC generation
 import remarkToc from "remark-toc"; // Table of contents generation
-
-// Retext plugins for natural language processing (optional, not used in this config)
-import remarkMdx from "remark-mdx";
-import remarkRetext from "remark-retext";
-import retextEnglish from "retext-english";
-import retextOveruse from "retext-overuse";
-import retextSmartypants from "retext-smartypants";
-import { unified } from "unified";
 
 // Custom plugin for auto-collapsing function code blocks
 import { remarkAutoCollapseFunctions } from "./src/lib/remark-auto-collapse.mjs";
@@ -85,8 +78,8 @@ const withMDX = createMDX({
   options: {
     // Remark plugins process the markdown before conversion to HTML
     remarkPlugins: [
-      remarkMdx, // Enable MDX support for markdown files
       remarkGfm, // Enable GitHub Flavored Markdown (tables, strikethrough, etc.)
+      remarkNormalizeHeadings, // Normalize heading levels for consistent TOC generation
       remarkAutoCollapseFunctions, // Custom plugin to auto-collapse function code blocks
       [
         remarkToc, // Generate table of contents
@@ -94,19 +87,6 @@ const withMDX = createMDX({
           maxDepth: 4, // Allow up to h4
           tight: true, // Compile list items tightly
         },
-      ],
-      [
-        remarkRetext,
-        unified()
-          .use(retextSmartypants) // Convert straight quotes to smart quotes
-          .use(retextEnglish) // Use English language support
-          .use(retextOveruse, {
-            // Configure retext-overuse
-            limit: 3, // Set the overuse limit to 3 occurrences
-            // You can also define custom 'list' or 'ignore' options here
-            // list: { 'some phrase': 'a suggested alternative' },
-            // ignore: ['some phrase'],
-          }),
       ],
     ],
 

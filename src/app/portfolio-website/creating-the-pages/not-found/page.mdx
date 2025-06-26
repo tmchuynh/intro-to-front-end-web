@@ -43,7 +43,9 @@ export default function BasicNotFound() {
       <div className="max-w-md w-full text-center">
         {/* 404 Number */}
         <div className="mb-8">
-          <h1 className="text-9xl font-bold text-slate-200 leading-none">404</h1>
+          <h1 className="text-9xl font-bold text-slate-200 leading-none">
+            404
+          </h1>
         </div>
 
         {/* Error Message */}
@@ -64,7 +66,7 @@ export default function BasicNotFound() {
           >
             Go Back Home
           </Link>
-          
+
           <button
             onClick={() => window.history.back()}
             className="inline-block w-full bg-slate-100 text-slate-700 px-6 py-3 rounded-lg hover:bg-slate-200 transition-colors font-semibold"
@@ -92,6 +94,7 @@ export default function BasicNotFound() {
 ```
 
 ##### Customization Options
+
 - **Error messages**: Modify the heading and description text to match your brand tone
 - **Colors**: Update the color scheme to match your site's branding
 - **Navigation**: Add links to specific popular pages or sections
@@ -117,56 +120,58 @@ interface SuggestedPage {
 export default function NotFoundWithDataFetching() {
   const [suggestedPages, setSuggestedPages] = useState<SuggestedPage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [errorType, setErrorType] = useState<'route' | 'data' | 'mixed'>('route');
+  const [errorType, setErrorType] = useState<"route" | "data" | "mixed">(
+    "route",
+  );
 
   useEffect(() => {
     const fetchSuggestedPages = async () => {
       try {
         // Simulate API call to get suggested pages
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
         // Simulate different error scenarios
         const shouldSimulateDataError = Math.random() > 0.7;
-        
+
         if (shouldSimulateDataError) {
-          throw new Error('Failed to load suggestions');
+          throw new Error("Failed to load suggestions");
         }
 
         const mockSuggestions: SuggestedPage[] = [
           {
             title: "Home",
             href: "/",
-            description: "Return to our homepage"
+            description: "Return to our homepage",
           },
           {
             title: "About",
             href: "/about",
-            description: "Learn more about us"
+            description: "Learn more about us",
           },
           {
             title: "Contact",
             href: "/contact",
-            description: "Get in touch with our team"
+            description: "Get in touch with our team",
           },
           {
             title: "Portfolio",
             href: "/portfolio",
-            description: "View our latest work"
-          }
+            description: "View our latest work",
+          },
         ];
 
         setSuggestedPages(mockSuggestions);
-        setErrorType('route');
+        setErrorType("route");
       } catch (error) {
-        console.error('Failed to fetch suggested pages:', error);
-        setErrorType('mixed');
+        console.error("Failed to fetch suggested pages:", error);
+        setErrorType("mixed");
         // Provide fallback suggestions even when data fetching fails
         setSuggestedPages([
           {
             title: "Home",
             href: "/",
-            description: "Return to our homepage"
-          }
+            description: "Return to our homepage",
+          },
         ]);
       } finally {
         setIsLoading(false);
@@ -178,11 +183,11 @@ export default function NotFoundWithDataFetching() {
 
   const getErrorMessage = () => {
     switch (errorType) {
-      case 'route':
+      case "route":
         return "The page you're looking for doesn't exist.";
-      case 'data':
+      case "data":
         return "We couldn't load the requested content.";
-      case 'mixed':
+      case "mixed":
         return "The page doesn't exist and we're having trouble loading suggestions.";
       default:
         return "Something went wrong.";
@@ -200,10 +205,8 @@ export default function NotFoundWithDataFetching() {
           <h1 className="text-4xl font-bold text-slate-900 mb-4">
             Oops! Page Not Found
           </h1>
-          <p className="text-xl text-slate-600 mb-2">
-            {getErrorMessage()}
-          </p>
-          {errorType === 'mixed' && (
+          <p className="text-xl text-slate-600 mb-2">{getErrorMessage()}</p>
+          {errorType === "mixed" && (
             <p className="text-sm text-orange-600 bg-orange-50 border border-orange-200 rounded-lg px-4 py-2 inline-block">
               ⚠️ Some features may be temporarily unavailable
             </p>
@@ -215,7 +218,7 @@ export default function NotFoundWithDataFetching() {
           <h2 className="text-2xl font-semibold text-slate-900 mb-6">
             Where would you like to go?
           </h2>
-          
+
           {isLoading ? (
             <div className="space-y-4">
               {[...Array(3)].map((_, index) => (
@@ -273,7 +276,7 @@ export default function NotFoundWithDataFetching() {
         </div>
 
         {/* Technical Details (for development) */}
-        {process.env.NODE_ENV === 'development' && (
+        {process.env.NODE_ENV === "development" && (
           <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <h4 className="text-sm font-semibold text-red-800 mb-2">
               Development Info:
@@ -281,7 +284,10 @@ export default function NotFoundWithDataFetching() {
             <div className="text-xs text-red-700 space-y-1">
               <p>Error Type: {errorType}</p>
               <p>Suggested Pages Loaded: {suggestedPages.length}</p>
-              <p>Current URL: {typeof window !== 'undefined' ? window.location.href : 'SSR'}</p>
+              <p>
+                Current URL:{" "}
+                {typeof window !== "undefined" ? window.location.href : "SSR"}
+              </p>
             </div>
           </div>
         )}
@@ -292,6 +298,7 @@ export default function NotFoundWithDataFetching() {
 ```
 
 ##### Customization Options
+
 - **Data sources**: Replace mock data with actual API calls to get page suggestions
 - **Error handling**: Customize error messages and recovery actions based on your needs
 - **Loading states**: Adjust loading animations and skeleton screens
@@ -317,12 +324,12 @@ export default function AnimatedNotFound() {
     "Looks like you found a secret path! 🗺️",
     "This page is on vacation! 🏖️",
     "We're still building this part! 🚧",
-    "You've discovered uncharted territory! 🧭"
+    "You've discovered uncharted territory! 🧭",
   ];
 
   useEffect(() => {
     setIsVisible(true);
-    
+
     // Cycle through messages
     const messageInterval = setInterval(() => {
       setCurrentMessage((prev) => (prev + 1) % messages.length);
@@ -348,7 +355,7 @@ export default function AnimatedNotFound() {
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
               animationDelay: `${i * 0.5}s`,
-              animationDuration: `${3 + Math.random() * 2}s`
+              animationDuration: `${3 + Math.random() * 2}s`,
             }}
           />
         ))}
@@ -363,7 +370,7 @@ export default function AnimatedNotFound() {
               className="absolute w-3 h-3 bg-yellow-400 rounded-full animate-confetti"
               style={{
                 left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 0.5}s`
+                animationDelay: `${Math.random() * 0.5}s`,
               }}
             />
           ))}
@@ -371,16 +378,17 @@ export default function AnimatedNotFound() {
       )}
 
       <div className="min-h-screen flex items-center justify-center px-6">
-        <div className={`max-w-lg w-full text-center transition-all duration-1000 transform ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-        }`}>
-          
+        <div
+          className={`max-w-lg w-full text-center transition-all duration-1000 transform ${
+            isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+          }`}
+        >
           {/* Animated 404 */}
           <div className="mb-8 relative">
             <h1 className="text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 animate-pulse">
               4
             </h1>
-            <div 
+            <div
               className="inline-block text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 animate-bounce cursor-pointer"
               onClick={handleEasterEgg}
               title="Click me for a surprise!"
@@ -394,17 +402,19 @@ export default function AnimatedNotFound() {
 
           {/* Animated Character */}
           <div className="mb-8">
-            <div className="text-6xl animate-bounce">
-              🤖
-            </div>
+            <div className="text-6xl animate-bounce">🤖</div>
             <div className="mt-4 h-2 w-16 bg-blue-200 rounded-full mx-auto animate-pulse"></div>
           </div>
 
           {/* Dynamic Messages */}
           <div className="mb-8 h-16 flex items-center justify-center">
-            <h2 className={`text-2xl font-bold text-slate-800 transition-all duration-500 transform ${
-              isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-            }`}>
+            <h2
+              className={`text-2xl font-bold text-slate-800 transition-all duration-500 transform ${
+                isVisible
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-4 opacity-0"
+              }`}
+            >
               {messages[currentMessage]}
             </h2>
           </div>
@@ -427,7 +437,7 @@ export default function AnimatedNotFound() {
             >
               🏠 Beam Me Home
             </Link>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <button
                 onClick={() => window.history.back()}
@@ -435,7 +445,7 @@ export default function AnimatedNotFound() {
               >
                 ⬅️ Go Back
               </button>
-              
+
               <Link
                 href="/contact"
                 className="bg-white text-slate-700 px-6 py-3 rounded-xl hover:bg-slate-50 transition-all duration-300 transform hover:scale-105 font-semibold shadow-md border border-slate-200"
@@ -448,7 +458,8 @@ export default function AnimatedNotFound() {
           {/* Fun Facts */}
           <div className="mt-8 p-4 bg-white/70 backdrop-blur-sm rounded-xl border border-white/20">
             <p className="text-sm text-slate-600 mb-2">
-              <span className="font-semibold">Fun Fact:</span> 404 errors got their name from room 404 at CERN, where the web was born! 🌐
+              <span className="font-semibold">Fun Fact:</span> 404 errors got
+              their name from room 404 at CERN, where the web was born! 🌐
             </p>
             <div className="flex items-center justify-center space-x-2 text-xs text-slate-500">
               <span>Error Code: ADVENTURE_NOT_FOUND</span>
@@ -462,29 +473,46 @@ export default function AnimatedNotFound() {
       {/* Custom CSS for animations */}
       <style jsx>{`
         @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
+          0%,
+          100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-20px);
+          }
         }
-        
+
         @keyframes confetti {
-          0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
-          100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+          0% {
+            transform: translateY(-10px) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100vh) rotate(360deg);
+            opacity: 0;
+          }
         }
-        
+
         @keyframes progress {
-          0% { transform: translateX(-100%); }
-          50% { transform: translateX(0%); }
-          100% { transform: translateX(100%); }
+          0% {
+            transform: translateX(-100%);
+          }
+          50% {
+            transform: translateX(0%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
         }
-        
+
         .animate-float {
           animation: float 3s ease-in-out infinite;
         }
-        
+
         .animate-confetti {
           animation: confetti 2s ease-out forwards;
         }
-        
+
         .animate-progress {
           animation: progress 3s ease-in-out infinite;
         }
@@ -495,6 +523,7 @@ export default function AnimatedNotFound() {
 ```
 
 ##### Customization Options
+
 - **Animation timing**: Adjust animation durations and delays for different effects
 - **Color schemes**: Modify gradients and colors to match your brand
 - **Interactive elements**: Add more clickable easter eggs or hover effects
@@ -532,43 +561,43 @@ export default function NotFoundWithSearch() {
       title: "About Us",
       href: "/about",
       description: "Learn more about our company and mission",
-      category: "Page"
+      category: "Page",
     },
     {
       id: "2",
       title: "Contact Information",
       href: "/contact",
       description: "Get in touch with our team",
-      category: "Page"
+      category: "Page",
     },
     {
       id: "3",
       title: "Portfolio Projects",
       href: "/portfolio",
       description: "View our latest work and case studies",
-      category: "Page"
+      category: "Page",
     },
     {
       id: "4",
       title: "Web Development Services",
       href: "/services/web-development",
       description: "Professional web development solutions",
-      category: "Service"
+      category: "Service",
     },
     {
       id: "5",
       title: "React Development Guide",
       href: "/blog/react-guide",
       description: "Complete guide to modern React development",
-      category: "Blog"
+      category: "Blog",
     },
     {
       id: "6",
       title: "UI/UX Design Process",
       href: "/blog/design-process",
       description: "Our approach to creating user-centered designs",
-      category: "Blog"
-    }
+      category: "Blog",
+    },
   ];
 
   const performSearch = async (query: string) => {
@@ -582,14 +611,14 @@ export default function NotFoundWithSearch() {
     setHasSearched(true);
 
     // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Filter mock content based on search query
     const filtered = mockContent.filter(
-      item =>
+      (item) =>
         item.title.toLowerCase().includes(query.toLowerCase()) ||
         item.description.toLowerCase().includes(query.toLowerCase()) ||
-        item.category.toLowerCase().includes(query.toLowerCase())
+        item.category.toLowerCase().includes(query.toLowerCase()),
     );
 
     setSearchResults(filtered);
@@ -610,16 +639,18 @@ export default function NotFoundWithSearch() {
     { title: "Portfolio", href: "/portfolio", icon: "💼" },
     { title: "Contact", href: "/contact", icon: "📧" },
     { title: "Blog", href: "/blog", icon: "📝" },
-    { title: "Services", href: "/services", icon: "⚡" }
+    { title: "Services", href: "/services", icon: "⚡" },
   ];
 
   const getCategoryColor = (category: string) => {
     const colors = {
-      'Page': 'bg-blue-100 text-blue-700',
-      'Service': 'bg-green-100 text-green-700',
-      'Blog': 'bg-purple-100 text-purple-700'
+      Page: "bg-blue-100 text-blue-700",
+      Service: "bg-green-100 text-green-700",
+      Blog: "bg-purple-100 text-purple-700",
     };
-    return colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-700';
+    return (
+      colors[category as keyof typeof colors] || "bg-gray-100 text-gray-700"
+    );
   };
 
   return (
@@ -646,9 +677,7 @@ export default function NotFoundWithSearch() {
             <h2 className="text-2xl font-bold text-slate-900 mb-2">
               Search Our Site
             </h2>
-            <p className="text-slate-600">
-              Try searching for what you need
-            </p>
+            <p className="text-slate-600">Try searching for what you need</p>
           </div>
 
           {/* Search Input */}
@@ -690,7 +719,9 @@ export default function NotFoundWithSearch() {
                               <h4 className="font-semibold text-slate-900 group-hover:text-blue-700">
                                 {result.title}
                               </h4>
-                              <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(result.category)}`}>
+                              <span
+                                className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(result.category)}`}
+                              >
                                 {result.category}
                               </span>
                             </div>
@@ -713,7 +744,8 @@ export default function NotFoundWithSearch() {
                     No results found
                   </h3>
                   <p className="text-slate-600">
-                    Try adjusting your search terms or browse our popular pages below
+                    Try adjusting your search terms or browse our popular pages
+                    below
                   </p>
                 </div>
               )}
@@ -772,8 +804,11 @@ export default function NotFoundWithSearch() {
         {/* SEO and Error Info */}
         <div className="mt-8 text-center">
           <p className="text-sm text-slate-500">
-            Error 404 - Page not found | 
-            <Link href="/sitemap" className="text-blue-600 hover:text-blue-700 ml-1">
+            Error 404 - Page not found |
+            <Link
+              href="/sitemap"
+              className="text-blue-600 hover:text-blue-700 ml-1"
+            >
               View Sitemap
             </Link>
           </p>
@@ -785,6 +820,7 @@ export default function NotFoundWithSearch() {
 ```
 
 ##### Customization Options
+
 - **Search implementation**: Replace mock search with real search API or static site search
 - **Content indexing**: Connect to your CMS or build a search index of your content
 - **Search filters**: Add category filters or advanced search options
@@ -821,19 +857,20 @@ export default function NotFoundWithSitemap() {
       title: "Home",
       href: "/",
       icon: "🏠",
-      description: "Welcome to our website - your starting point for everything we offer",
+      description:
+        "Welcome to our website - your starting point for everything we offer",
       subsections: [
         {
           title: "Featured Projects",
           href: "/#featured",
-          description: "Showcase of our best work"
+          description: "Showcase of our best work",
         },
         {
           title: "Services Overview",
           href: "/#services",
-          description: "Quick look at what we do"
-        }
-      ]
+          description: "Quick look at what we do",
+        },
+      ],
     },
     {
       title: "About",
@@ -844,19 +881,19 @@ export default function NotFoundWithSitemap() {
         {
           title: "Our Story",
           href: "/about#story",
-          description: "How we started and where we're going"
+          description: "How we started and where we're going",
         },
         {
           title: "Team Members",
           href: "/about#team",
-          description: "Meet the people behind the work"
+          description: "Meet the people behind the work",
         },
         {
           title: "Values & Mission",
           href: "/about#mission",
-          description: "What drives us every day"
-        }
-      ]
+          description: "What drives us every day",
+        },
+      ],
     },
     {
       title: "Portfolio",
@@ -867,19 +904,19 @@ export default function NotFoundWithSitemap() {
         {
           title: "Web Development",
           href: "/portfolio/web-development",
-          description: "Custom websites and web applications"
+          description: "Custom websites and web applications",
         },
         {
           title: "Mobile Apps",
           href: "/portfolio/mobile-apps",
-          description: "iOS and Android app development"
+          description: "iOS and Android app development",
         },
         {
           title: "UI/UX Design",
           href: "/portfolio/design",
-          description: "User interface and experience design"
-        }
-      ]
+          description: "User interface and experience design",
+        },
+      ],
     },
     {
       title: "Services",
@@ -890,19 +927,19 @@ export default function NotFoundWithSitemap() {
         {
           title: "Web Development",
           href: "/services/web-development",
-          description: "Full-stack web development services"
+          description: "Full-stack web development services",
         },
         {
           title: "Consulting",
           href: "/services/consulting",
-          description: "Technical consulting and strategy"
+          description: "Technical consulting and strategy",
         },
         {
           title: "Maintenance",
           href: "/services/maintenance",
-          description: "Ongoing support and updates"
-        }
-      ]
+          description: "Ongoing support and updates",
+        },
+      ],
     },
     {
       title: "Blog",
@@ -913,19 +950,19 @@ export default function NotFoundWithSitemap() {
         {
           title: "Latest Posts",
           href: "/blog/latest",
-          description: "Most recent articles and updates"
+          description: "Most recent articles and updates",
         },
         {
           title: "Tutorials",
           href: "/blog/tutorials",
-          description: "Step-by-step guides and how-tos"
+          description: "Step-by-step guides and how-tos",
         },
         {
           title: "Industry News",
           href: "/blog/news",
-          description: "Latest trends and developments"
-        }
-      ]
+          description: "Latest trends and developments",
+        },
+      ],
     },
     {
       title: "Contact",
@@ -936,28 +973,48 @@ export default function NotFoundWithSitemap() {
         {
           title: "Contact Form",
           href: "/contact#form",
-          description: "Send us a message directly"
+          description: "Send us a message directly",
         },
         {
           title: "Office Locations",
           href: "/contact#locations",
-          description: "Find us in person"
+          description: "Find us in person",
         },
         {
           title: "Phone & Email",
           href: "/contact#direct",
-          description: "Direct contact information"
-        }
-      ]
-    }
+          description: "Direct contact information",
+        },
+      ],
+    },
   ];
 
   const popularLinks = [
-    { title: "Latest Project", href: "/portfolio/latest", views: "1.2k", icon: "🌟" },
-    { title: "Getting Started Guide", href: "/blog/getting-started", views: "856", icon: "📚" },
-    { title: "Pricing Information", href: "/services/pricing", views: "743", icon: "💰" },
+    {
+      title: "Latest Project",
+      href: "/portfolio/latest",
+      views: "1.2k",
+      icon: "🌟",
+    },
+    {
+      title: "Getting Started Guide",
+      href: "/blog/getting-started",
+      views: "856",
+      icon: "📚",
+    },
+    {
+      title: "Pricing Information",
+      href: "/services/pricing",
+      views: "743",
+      icon: "💰",
+    },
     { title: "FAQ", href: "/support/faq", views: "692", icon: "❓" },
-    { title: "Free Consultation", href: "/contact/consultation", views: "634", icon: "💬" }
+    {
+      title: "Free Consultation",
+      href: "/contact/consultation",
+      views: "634",
+      icon: "💬",
+    },
   ];
 
   const toggleSection = (sectionTitle: string) => {
@@ -976,7 +1033,8 @@ export default function NotFoundWithSitemap() {
             Let's Find Your Way
           </h1>
           <p className="text-xl text-slate-600 mb-8">
-            The page you're looking for doesn't exist, but we can help you discover everything else we have to offer.
+            The page you're looking for doesn't exist, but we can help you
+            discover everything else we have to offer.
           </p>
           <Link
             href="/"
@@ -989,7 +1047,6 @@ export default function NotFoundWithSitemap() {
 
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="grid lg:grid-cols-3 gap-8">
-          
           {/* Site Map */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-lg p-8">
@@ -998,12 +1055,16 @@ export default function NotFoundWithSitemap() {
                 Site Map
               </h2>
               <p className="text-slate-600 mb-8">
-                Explore all sections of our website to find exactly what you need.
+                Explore all sections of our website to find exactly what you
+                need.
               </p>
 
               <div className="space-y-4">
                 {siteStructure.map((section) => (
-                  <div key={section.title} className="border border-slate-200 rounded-lg overflow-hidden">
+                  <div
+                    key={section.title}
+                    className="border border-slate-200 rounded-lg overflow-hidden"
+                  >
                     {/* Main Section */}
                     <div
                       className="p-4 hover:bg-slate-50 cursor-pointer transition-colors"
@@ -1030,9 +1091,13 @@ export default function NotFoundWithSitemap() {
                             className="p-2 text-slate-400 hover:text-slate-600"
                             onClick={() => toggleSection(section.title)}
                           >
-                            <span className={`transform transition-transform ${
-                              expandedSection === section.title ? 'rotate-180' : ''
-                            }`}>
+                            <span
+                              className={`transform transition-transform ${
+                                expandedSection === section.title
+                                  ? "rotate-180"
+                                  : ""
+                              }`}
+                            >
                               ▼
                             </span>
                           </button>
@@ -1041,24 +1106,25 @@ export default function NotFoundWithSitemap() {
                     </div>
 
                     {/* Subsections */}
-                    {section.subsections && expandedSection === section.title && (
-                      <div className="bg-slate-50 border-t border-slate-200">
-                        {section.subsections.map((subsection, index) => (
-                          <Link
-                            key={index}
-                            href={subsection.href}
-                            className="block p-4 pl-16 hover:bg-white transition-colors group border-b border-slate-100 last:border-b-0"
-                          >
-                            <h4 className="font-medium text-slate-800 group-hover:text-blue-600">
-                              {subsection.title}
-                            </h4>
-                            <p className="text-sm text-slate-600">
-                              {subsection.description}
-                            </p>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
+                    {section.subsections &&
+                      expandedSection === section.title && (
+                        <div className="bg-slate-50 border-t border-slate-200">
+                          {section.subsections.map((subsection, index) => (
+                            <Link
+                              key={index}
+                              href={subsection.href}
+                              className="block p-4 pl-16 hover:bg-white transition-colors group border-b border-slate-100 last:border-b-0"
+                            >
+                              <h4 className="font-medium text-slate-800 group-hover:text-blue-600">
+                                {subsection.title}
+                              </h4>
+                              <p className="text-sm text-slate-600">
+                                {subsection.description}
+                              </p>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
                   </div>
                 ))}
               </div>
@@ -1067,7 +1133,6 @@ export default function NotFoundWithSitemap() {
 
           {/* Sidebar */}
           <div className="space-y-8">
-            
             {/* Popular Pages */}
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center">
@@ -1135,18 +1200,25 @@ export default function NotFoundWithSitemap() {
                 Need Help?
               </h3>
               <p className="text-sm text-slate-600 mb-4">
-                Can't find what you're looking for? Our support team is here to help.
+                Can't find what you're looking for? Our support team is here to
+                help.
               </p>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center space-x-2">
                   <span>📧</span>
-                  <a href="mailto:support@example.com" className="text-blue-600 hover:text-blue-700">
+                  <a
+                    href="mailto:support@example.com"
+                    className="text-blue-600 hover:text-blue-700"
+                  >
                     support@example.com
                   </a>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span>💬</span>
-                  <Link href="/support/chat" className="text-blue-600 hover:text-blue-700">
+                  <Link
+                    href="/support/chat"
+                    className="text-blue-600 hover:text-blue-700"
+                  >
                     Live Chat Support
                   </Link>
                 </div>
@@ -1161,6 +1233,7 @@ export default function NotFoundWithSitemap() {
 ```
 
 ##### Customization Options
+
 - **Site structure**: Update the siteStructure array to match your actual site organization
 - **Popular pages**: Replace with real analytics data to show actually popular content
 - **Subsection management**: Add/remove subsections based on your site's depth

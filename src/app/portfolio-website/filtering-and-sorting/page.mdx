@@ -133,14 +133,14 @@ const CategoryFilter: React.FC = () => {
   const [projects] = useState<Project[]>(mockProjects);
 
   const categories = Array.from(
-    new Set(projects.map((project) => project.category))
+    new Set(projects.map((project) => project.category)),
   );
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategories((prev) =>
       prev.includes(category)
         ? prev.filter((c) => c !== category)
-        : [...prev, category]
+        : [...prev, category],
     );
   };
 
@@ -148,7 +148,7 @@ const CategoryFilter: React.FC = () => {
     selectedCategories.length === 0
       ? projects
       : projects.filter((project) =>
-          selectedCategories.includes(project.category)
+          selectedCategories.includes(project.category),
         );
 
   return (
@@ -387,15 +387,15 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 const TagTechnologyFilter: React.FC = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [selectedTechnologies, setSelectedTechnologies] = useState<string[]>(
-    []
+    [],
   );
   const [projects] = useState<Project[]>(mockProjects);
 
   const allTags = Array.from(
-    new Set(projects.flatMap((project) => project.tags))
+    new Set(projects.flatMap((project) => project.tags)),
   );
   const allTechnologies = Array.from(
-    new Set(projects.flatMap((project) => project.technologies))
+    new Set(projects.flatMap((project) => project.technologies)),
   );
 
   const filteredProjects = projects.filter((project) => {
@@ -635,7 +635,7 @@ const SearchWithDebounce: React.FC = () => {
         project.description.toLowerCase().includes(searchLower) ||
         project.category.toLowerCase().includes(searchLower) ||
         project.technologies.some((tech) =>
-          tech.toLowerCase().includes(searchLower)
+          tech.toLowerCase().includes(searchLower),
         )
       );
     });
@@ -658,7 +658,7 @@ const SearchWithDebounce: React.FC = () => {
         </mark>
       ) : (
         part
-      )
+      ),
     );
   };
 
@@ -903,7 +903,7 @@ const DateFilter: React.FC = () => {
 
   // Quick filter options
   const getQuickFilterDate = (
-    option: string
+    option: string,
   ): { start: string; end: string } => {
     const now = new Date();
     const today = now.toISOString().split("T")[0];
@@ -1309,7 +1309,7 @@ const ProjectSorting: React.FC = () => {
       // Set new field with appropriate default direction
       setSortField(field);
       setSortDirection(
-        field === "title" ? "asc" : "desc" // Title defaults to A-Z, others to highest first
+        field === "title" ? "asc" : "desc", // Title defaults to A-Z, others to highest first
       );
     }
   };
@@ -1706,7 +1706,7 @@ const MultiCriteriaFilter: React.FC = () => {
   const allCategories = Array.from(new Set(projects.map((p) => p.category)));
   const allStatuses = Array.from(new Set(projects.map((p) => p.status)));
   const allDifficulties = Array.from(
-    new Set(projects.map((p) => p.difficulty))
+    new Set(projects.map((p) => p.difficulty)),
   );
 
   // Cascading filters: available options based on selected categories
@@ -1717,10 +1717,10 @@ const MultiCriteriaFilter: React.FC = () => {
   }, [projects, filters.categories]);
 
   const availableTags = Array.from(
-    new Set(availableProjects.flatMap((p) => p.tags))
+    new Set(availableProjects.flatMap((p) => p.tags)),
   );
   const availableTechnologies = Array.from(
-    new Set(availableProjects.flatMap((p) => p.technologies))
+    new Set(availableProjects.flatMap((p) => p.technologies)),
   );
 
   // Filter projects based on all selected criteria
@@ -1740,7 +1740,7 @@ const MultiCriteriaFilter: React.FC = () => {
       const technologiesMatch =
         filters.technologies.length === 0 ||
         filters.technologies.some((tech) =>
-          project.technologies.includes(tech)
+          project.technologies.includes(tech),
         );
 
       // Status filter
@@ -1775,10 +1775,10 @@ const MultiCriteriaFilter: React.FC = () => {
       // Clear dependent filters when categories change
       if (filterType === "categories") {
         newFilters.tags = newFilters.tags.filter((tag) =>
-          availableTags.includes(tag)
+          availableTags.includes(tag),
         );
         newFilters.technologies = newFilters.technologies.filter((tech) =>
-          availableTechnologies.includes(tech)
+          availableTechnologies.includes(tech),
         );
       }
 

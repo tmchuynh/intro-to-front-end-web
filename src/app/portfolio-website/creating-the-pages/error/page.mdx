@@ -63,11 +63,12 @@ export default function MinimalisticError({ error, reset }: ErrorPageProps) {
             Something went wrong
           </h1>
           <p className="text-lg text-slate-600 mb-6">
-            We apologize for the inconvenience. An unexpected error has occurred.
+            We apologize for the inconvenience. An unexpected error has
+            occurred.
           </p>
-          
+
           {/* Development error details */}
-          {process.env.NODE_ENV === 'development' && error && (
+          {process.env.NODE_ENV === "development" && error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-left">
               <h3 className="text-sm font-semibold text-red-800 mb-2">
                 Development Error Details:
@@ -89,7 +90,7 @@ export default function MinimalisticError({ error, reset }: ErrorPageProps) {
               Try Again
             </button>
           )}
-          
+
           <Link
             href="/"
             className="block w-full bg-slate-100 text-slate-700 px-6 py-3 rounded-lg hover:bg-slate-200 transition-colors font-semibold"
@@ -124,6 +125,7 @@ export default function MinimalisticError({ error, reset }: ErrorPageProps) {
 ```
 
 ##### Customization Options
+
 - **Error messages**: Customize the text to match your brand voice and tone
 - **Colors**: Update the color scheme to match your site's branding
 - **Contact information**: Replace with your actual support email or contact form
@@ -160,44 +162,60 @@ export default function DetailedError({ error, reset }: ErrorPageProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [showErrorDetails, setShowErrorDetails] = useState(false);
 
-  const errorCode = error?.digest || `ERR_${Date.now().toString(36).toUpperCase()}`;
+  const errorCode =
+    error?.digest || `ERR_${Date.now().toString(36).toUpperCase()}`;
   const timestamp = new Date().toISOString();
 
   // Mock search suggestions - replace with real search functionality
   const searchSuggestions = [
     { title: "Home Page", href: "/", description: "Return to the main page" },
-    { title: "Portfolio", href: "/portfolio", description: "View our work samples" },
-    { title: "About Us", href: "/about", description: "Learn more about our team" },
+    {
+      title: "Portfolio",
+      href: "/portfolio",
+      description: "View our work samples",
+    },
+    {
+      title: "About Us",
+      href: "/about",
+      description: "Learn more about our team",
+    },
     { title: "Contact", href: "/contact", description: "Get in touch with us" },
-    { title: "Help Center", href: "/help", description: "Find answers to common questions" }
+    {
+      title: "Help Center",
+      href: "/help",
+      description: "Find answers to common questions",
+    },
   ];
 
   const filteredSuggestions = searchQuery
     ? searchSuggestions.filter(
-        suggestion =>
+        (suggestion) =>
           suggestion.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          suggestion.description.toLowerCase().includes(searchQuery.toLowerCase())
+          suggestion.description
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()),
       )
     : searchSuggestions.slice(0, 3);
 
   const submitErrorReport = async () => {
     setIsReporting(true);
-    
+
     const errorReport: ErrorReport = {
-      userAgent: typeof window !== 'undefined' ? navigator.userAgent : 'Unknown',
+      userAgent:
+        typeof window !== "undefined" ? navigator.userAgent : "Unknown",
       timestamp,
-      url: typeof window !== 'undefined' ? window.location.href : 'Unknown',
-      errorMessage: error?.message || 'Unknown error',
-      userDescription
+      url: typeof window !== "undefined" ? window.location.href : "Unknown",
+      errorMessage: error?.message || "Unknown error",
+      userDescription,
     };
 
     try {
       // Simulate API call to submit error report
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Error report submitted:', errorReport);
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log("Error report submitted:", errorReport);
       setReportSubmitted(true);
     } catch (err) {
-      console.error('Failed to submit error report:', err);
+      console.error("Failed to submit error report:", err);
     } finally {
       setIsReporting(false);
     }
@@ -207,9 +225,9 @@ export default function DetailedError({ error, reset }: ErrorPageProps) {
     const details = `
 Error Code: ${errorCode}
 Timestamp: ${timestamp}
-URL: ${typeof window !== 'undefined' ? window.location.href : 'N/A'}
-User Agent: ${typeof window !== 'undefined' ? navigator.userAgent : 'N/A'}
-Error Message: ${error?.message || 'Unknown error'}
+URL: ${typeof window !== "undefined" ? window.location.href : "N/A"}
+User Agent: ${typeof window !== "undefined" ? navigator.userAgent : "N/A"}
+Error Message: ${error?.message || "Unknown error"}
     `.trim();
 
     navigator.clipboard?.writeText(details);
@@ -233,10 +251,8 @@ Error Message: ${error?.message || 'Unknown error'}
 
       <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="grid lg:grid-cols-3 gap-8">
-          
           {/* Main Error Content */}
           <div className="lg:col-span-2 space-y-8">
-            
             {/* Error Message */}
             <div className="bg-white rounded-xl shadow-lg p-8">
               <div className="flex items-start space-x-4">
@@ -250,8 +266,9 @@ Error Message: ${error?.message || 'Unknown error'}
                     Application Error
                   </h1>
                   <p className="text-lg text-slate-600 mb-4">
-                    We encountered an unexpected error while processing your request. 
-                    Our team has been notified and is working to resolve this issue.
+                    We encountered an unexpected error while processing your
+                    request. Our team has been notified and is working to
+                    resolve this issue.
                   </p>
 
                   {/* Action Buttons */}
@@ -322,7 +339,7 @@ Error Message: ${error?.message || 'Unknown error'}
             </div>
 
             {/* Error Details for Development */}
-            {process.env.NODE_ENV === 'development' && error && (
+            {process.env.NODE_ENV === "development" && error && (
               <div className="bg-white rounded-xl shadow-lg p-8">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold text-slate-900">
@@ -332,10 +349,10 @@ Error Message: ${error?.message || 'Unknown error'}
                     onClick={() => setShowErrorDetails(!showErrorDetails)}
                     className="text-sm text-blue-600 hover:text-blue-700"
                   >
-                    {showErrorDetails ? 'Hide' : 'Show'} Details
+                    {showErrorDetails ? "Hide" : "Show"} Details
                   </button>
                 </div>
-                
+
                 {showErrorDetails && (
                   <div className="space-y-4">
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -346,7 +363,7 @@ Error Message: ${error?.message || 'Unknown error'}
                         {error.message}
                       </pre>
                     </div>
-                    
+
                     {error.stack && (
                       <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
                         <h3 className="text-sm font-semibold text-slate-800 mb-2">
@@ -372,13 +389,12 @@ Error Message: ${error?.message || 'Unknown error'}
 
           {/* Sidebar */}
           <div className="space-y-8">
-            
             {/* Report Error */}
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h3 className="text-lg font-bold text-slate-900 mb-4">
                 Report This Error
               </h3>
-              
+
               {reportSubmitted ? (
                 <div className="text-center py-4">
                   <div className="text-4xl mb-2">✅</div>
@@ -394,7 +410,7 @@ Error Message: ${error?.message || 'Unknown error'}
                   <p className="text-sm text-slate-600">
                     Help us fix this issue by providing additional details.
                   </p>
-                  
+
                   <textarea
                     placeholder="What were you trying to do when this error occurred? (optional)"
                     value={userDescription}
@@ -402,7 +418,7 @@ Error Message: ${error?.message || 'Unknown error'}
                     rows={4}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm resize-none"
                   />
-                  
+
                   <button
                     onClick={submitErrorReport}
                     disabled={isReporting}
@@ -472,6 +488,7 @@ Error Message: ${error?.message || 'Unknown error'}
 ```
 
 ##### Customization Options
+
 - **Error reporting**: Integrate with real error tracking services (Sentry, Bugsnag, etc.)
 - **Search functionality**: Connect to your actual search API or static site search
 - **Support links**: Update with your real help center, FAQ, and contact pages
@@ -506,7 +523,7 @@ export default function AnimatedError({ error, reset }: ErrorPageProps) {
     "We're temporarily lost in cyberspace 🌌",
     "Houston, we have a problem 🚀",
     "The pixels are staging a revolt 🎨",
-    "Something went sideways in the matrix 🔀"
+    "Something went sideways in the matrix 🔀",
   ];
 
   const encouragingMessages = [
@@ -514,15 +531,15 @@ export default function AnimatedError({ error, reset }: ErrorPageProps) {
     "Every error is a step toward perfection ✨",
     "Thanks for your patience! 🙏",
     "We'll have this fixed in no time ⚡",
-    "Your feedback helps us improve 📈"
+    "Your feedback helps us improve 📈",
   ];
 
   useEffect(() => {
     setIsVisible(true);
-    
+
     // Cycle through messages
     const messageInterval = setInterval(() => {
-      setCurrentMessage(prev => (prev + 1) % humorousMessages.length);
+      setCurrentMessage((prev) => (prev + 1) % humorousMessages.length);
     }, 3000);
 
     // Mouse tracking for interactive elements
@@ -530,11 +547,11 @@ export default function AnimatedError({ error, reset }: ErrorPageProps) {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove);
 
     return () => {
       clearInterval(messageInterval);
-      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener("mousemove", handleMouseMove);
     };
   }, []);
 
@@ -543,11 +560,11 @@ export default function AnimatedError({ error, reset }: ErrorPageProps) {
     setTimeout(() => setShowBalloons(false), 3000);
   };
 
-  const errorCode = error?.digest || `ERR_${Date.now().toString(36).toUpperCase()}`;
+  const errorCode =
+    error?.digest || `ERR_${Date.now().toString(36).toUpperCase()}`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-indigo-100 overflow-hidden relative">
-      
       {/* Floating Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(8)].map((_, i) => (
@@ -555,14 +572,14 @@ export default function AnimatedError({ error, reset }: ErrorPageProps) {
             key={i}
             className="absolute opacity-20"
             style={{
-              left: `${10 + (i * 12)}%`,
+              left: `${10 + i * 12}%`,
               top: `${10 + (i % 3) * 30}%`,
               animation: `float ${3 + (i % 3)}s ease-in-out infinite`,
-              animationDelay: `${i * 0.5}s`
+              animationDelay: `${i * 0.5}s`,
             }}
           >
             <div className="text-4xl">
-              {['🌟', '⭐', '✨', '💫', '🎈', '🎪', '🎭', '🎨'][i]}
+              {["🌟", "⭐", "✨", "💫", "🎈", "🎪", "🎭", "🎨"][i]}
             </div>
           </div>
         ))}
@@ -578,7 +595,7 @@ export default function AnimatedError({ error, reset }: ErrorPageProps) {
               style={{
                 left: `${Math.random() * 100}%`,
                 animationDelay: `${Math.random() * 1}s`,
-                animationDuration: `${2 + Math.random() * 2}s`
+                animationDuration: `${2 + Math.random() * 2}s`,
               }}
             >
               🎈
@@ -594,21 +611,25 @@ export default function AnimatedError({ error, reset }: ErrorPageProps) {
           <div
             className="absolute top-4 left-4 w-4 h-4 bg-black rounded-full transition-transform duration-200"
             style={{
-              transform: `translate(${Math.min(Math.max((mousePosition.x - 100) / 50, -5), 5)}px, ${Math.min(Math.max((mousePosition.y - 100) / 50, -3), 3)}px)`
+              transform: `translate(${Math.min(Math.max((mousePosition.x - 100) / 50, -5), 5)}px, ${Math.min(Math.max((mousePosition.y - 100) / 50, -3), 3)}px)`,
             }}
           />
         </div>
       </div>
 
       <div className="min-h-screen flex items-center justify-center px-6 relative z-10">
-        <div className={`max-w-2xl w-full text-center transition-all duration-1000 transform ${
-          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-        }`}>
-          
+        <div
+          className={`max-w-2xl w-full text-center transition-all duration-1000 transform ${
+            isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+          }`}
+        >
           {/* Animated Error Robot */}
           <div className="mb-8 relative">
             <div className="inline-block relative">
-              <div className="text-8xl animate-bounce" style={{ animationDuration: '2s' }}>
+              <div
+                className="text-8xl animate-bounce"
+                style={{ animationDuration: "2s" }}
+              >
                 🤖
               </div>
               {/* Robot Speech Bubble */}
@@ -617,7 +638,7 @@ export default function AnimatedError({ error, reset }: ErrorPageProps) {
                 <div className="absolute bottom-0 left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white"></div>
               </div>
             </div>
-            
+
             {/* Glitch Effect */}
             <div className="mt-4 relative">
               <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-yellow-500 to-purple-500 animate-pulse">
@@ -631,9 +652,13 @@ export default function AnimatedError({ error, reset }: ErrorPageProps) {
 
           {/* Dynamic Humorous Messages */}
           <div className="mb-8">
-            <h1 className={`text-3xl font-bold text-slate-800 mb-4 transition-all duration-500 ${
-              isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-            }`}>
+            <h1
+              className={`text-3xl font-bold text-slate-800 mb-4 transition-all duration-500 ${
+                isVisible
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-4 opacity-0"
+              }`}
+            >
               {humorousMessages[currentMessage]}
             </h1>
             <p className="text-lg text-slate-600 mb-4">
@@ -661,7 +686,7 @@ export default function AnimatedError({ error, reset }: ErrorPageProps) {
                 🔄 Try the Magic Again
               </button>
             )}
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Link
                 href="/"
@@ -669,7 +694,7 @@ export default function AnimatedError({ error, reset }: ErrorPageProps) {
               >
                 🏠 Beam Me Home
               </Link>
-              
+
               <button
                 onClick={triggerBalloons}
                 className="bg-white bg-opacity-80 backdrop-blur-sm text-slate-700 px-6 py-3 rounded-xl hover:bg-opacity-100 transition-all duration-300 transform hover:scale-105 font-semibold shadow-md border border-white"
@@ -686,11 +711,11 @@ export default function AnimatedError({ error, reset }: ErrorPageProps) {
             </h3>
             <div className="flex justify-center space-x-4">
               {[
-                { emoji: '😭', label: 'Frustrated' },
-                { emoji: '😕', label: 'Confused' },
-                { emoji: '😐', label: 'Meh' },
-                { emoji: '😊', label: 'Understanding' },
-                { emoji: '😂', label: 'Amused' }
+                { emoji: "😭", label: "Frustrated" },
+                { emoji: "😕", label: "Confused" },
+                { emoji: "😐", label: "Meh" },
+                { emoji: "😊", label: "Understanding" },
+                { emoji: "😂", label: "Amused" },
               ].map((mood, index) => (
                 <button
                   key={index}
@@ -710,7 +735,8 @@ export default function AnimatedError({ error, reset }: ErrorPageProps) {
               🎯 Did You Know?
             </h3>
             <p className="text-slate-600 text-sm mb-3">
-              The first computer bug was an actual bug! In 1947, Grace Hopper found a moth trapped in a computer relay.
+              The first computer bug was an actual bug! In 1947, Grace Hopper
+              found a moth trapped in a computer relay.
             </p>
             <div className="flex items-center justify-between text-xs text-slate-500">
               <span>Error Code: {errorCode}</span>
@@ -721,7 +747,7 @@ export default function AnimatedError({ error, reset }: ErrorPageProps) {
           {/* Contact Support with Style */}
           <div className="mt-8 text-center">
             <p className="text-sm text-slate-600 mb-3">
-              Still stuck? Our friendly humans are here to help! 
+              Still stuck? Our friendly humans are here to help!
             </p>
             <div className="flex justify-center space-x-4">
               <Link
@@ -744,27 +770,48 @@ export default function AnimatedError({ error, reset }: ErrorPageProps) {
       {/* Custom CSS Animations */}
       <style jsx>{`
         @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(5deg); }
+          0%,
+          100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          50% {
+            transform: translateY(-20px) rotate(5deg);
+          }
         }
-        
+
         @keyframes balloon {
-          0% { transform: translateY(100vh) scale(0); opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { transform: translateY(-20vh) scale(1.2); opacity: 0; }
+          0% {
+            transform: translateY(100vh) scale(0);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(-20vh) scale(1.2);
+            opacity: 0;
+          }
         }
-        
+
         @keyframes loading-bar {
-          0% { transform: translateX(-100%); }
-          50% { transform: translateX(0%); }
-          100% { transform: translateX(100%); }
+          0% {
+            transform: translateX(-100%);
+          }
+          50% {
+            transform: translateX(0%);
+          }
+          100% {
+            transform: translateX(100%);
+          }
         }
-        
+
         .animate-balloon {
           animation: balloon linear forwards;
         }
-        
+
         .animate-loading-bar {
           animation: loading-bar 3s ease-in-out infinite;
         }
@@ -775,6 +822,7 @@ export default function AnimatedError({ error, reset }: ErrorPageProps) {
 ```
 
 ##### Customization Options
+
 - **Animations**: Adjust timing, easing, and effects for different feels
 - **Messages**: Customize humorous and encouraging messages to match your brand personality
 - **Interactive elements**: Add more interactive features like games or puzzles
@@ -819,10 +867,10 @@ export default function TechnicalError({ error, reset }: ErrorPageProps) {
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
       url: window.location.href,
-      referrer: document.referrer || 'Direct access',
+      referrer: document.referrer || "Direct access",
       viewport: `${window.innerWidth}x${window.innerHeight}`,
-      errorBoundary: 'React Error Boundary',
-      componentStack: error?.stack
+      errorBoundary: "React Error Boundary",
+      componentStack: error?.stack,
     };
     setErrorContext(context);
   }, [error]);
@@ -832,14 +880,14 @@ export default function TechnicalError({ error, reset }: ErrorPageProps) {
       error: {
         message: error?.message,
         stack: error?.stack,
-        digest: error?.digest
+        digest: error?.digest,
       },
       context: errorContext,
       retryCount,
       buildInfo: {
         env: process.env.NODE_ENV,
-        version: process.env.NEXT_PUBLIC_APP_VERSION || 'unknown'
-      }
+        version: process.env.NEXT_PUBLIC_APP_VERSION || "unknown",
+      },
     };
 
     try {
@@ -847,18 +895,19 @@ export default function TechnicalError({ error, reset }: ErrorPageProps) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy error report:', err);
+      console.error("Failed to copy error report:", err);
     }
   };
 
   const handleRetry = () => {
-    setRetryCount(prev => prev + 1);
+    setRetryCount((prev) => prev + 1);
     if (reset) {
       reset();
     }
   };
 
-  const errorCode = error?.digest || `ERR_${Date.now().toString(36).toUpperCase()}`;
+  const errorCode =
+    error?.digest || `ERR_${Date.now().toString(36).toUpperCase()}`;
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
@@ -883,29 +932,31 @@ export default function TechnicalError({ error, reset }: ErrorPageProps) {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid lg:grid-cols-3 gap-8">
-          
           {/* Main Error Information */}
           <div className="lg:col-span-2 space-y-6">
-            
             {/* Error Summary */}
             <div className="bg-slate-800 rounded-lg border border-slate-700 p-6">
               <h2 className="text-xl font-bold text-red-400 mb-4 flex items-center">
                 <span className="mr-2">🐛</span>
                 Error Summary
               </h2>
-              
+
               {error ? (
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-300 mb-2">Message</h3>
+                    <h3 className="text-sm font-semibold text-slate-300 mb-2">
+                      Message
+                    </h3>
                     <div className="bg-slate-900 border border-slate-600 rounded p-3 font-mono text-sm text-red-300">
-                      {error.message || 'Unknown error occurred'}
+                      {error.message || "Unknown error occurred"}
                     </div>
                   </div>
-                  
+
                   {error.digest && (
                     <div>
-                      <h3 className="text-sm font-semibold text-slate-300 mb-2">Digest</h3>
+                      <h3 className="text-sm font-semibold text-slate-300 mb-2">
+                        Digest
+                      </h3>
                       <div className="bg-slate-900 border border-slate-600 rounded p-3 font-mono text-sm text-yellow-300">
                         {error.digest}
                       </div>
@@ -931,16 +982,16 @@ export default function TechnicalError({ error, reset }: ErrorPageProps) {
                     onClick={() => setShowFullStack(!showFullStack)}
                     className="text-sm bg-slate-700 text-slate-300 px-3 py-1 rounded hover:bg-slate-600 transition-colors"
                   >
-                    {showFullStack ? 'Collapse' : 'Expand'}
+                    {showFullStack ? "Collapse" : "Expand"}
                   </button>
                 </div>
-                
+
                 <div className="bg-slate-900 border border-slate-600 rounded p-4 overflow-auto">
                   <pre className="text-xs text-slate-300 whitespace-pre-wrap">
-                    {showFullStack 
-                      ? error.stack 
-                      : error.stack.split('\n').slice(0, 5).join('\n') + '\n...'
-                    }
+                    {showFullStack
+                      ? error.stack
+                      : error.stack.split("\n").slice(0, 5).join("\n") +
+                        "\n..."}
                   </pre>
                 </div>
               </div>
@@ -953,15 +1004,15 @@ export default function TechnicalError({ error, reset }: ErrorPageProps) {
                   <span className="mr-2">🔍</span>
                   Context Information
                 </h2>
-                
+
                 <div className="grid md:grid-cols-2 gap-4">
                   {Object.entries(errorContext).map(([key, value]) => (
                     <div key={key}>
                       <h3 className="text-sm font-semibold text-slate-300 mb-1 capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                        {key.replace(/([A-Z])/g, " $1").trim()}
                       </h3>
                       <div className="bg-slate-900 border border-slate-600 rounded p-2 text-sm text-slate-300 font-mono break-all">
-                        {value || 'N/A'}
+                        {value || "N/A"}
                       </div>
                     </div>
                   ))}
@@ -975,10 +1026,12 @@ export default function TechnicalError({ error, reset }: ErrorPageProps) {
                 <span className="mr-2">🔄</span>
                 Debugging Actions
               </h2>
-              
+
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-slate-300">Quick Actions</h3>
+                  <h3 className="text-sm font-semibold text-slate-300">
+                    Quick Actions
+                  </h3>
                   {reset && (
                     <button
                       onClick={handleRetry}
@@ -1000,14 +1053,16 @@ export default function TechnicalError({ error, reset }: ErrorPageProps) {
                     Return Home
                   </Link>
                 </div>
-                
+
                 <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-slate-300">Report Actions</h3>
+                  <h3 className="text-sm font-semibold text-slate-300">
+                    Report Actions
+                  </h3>
                   <button
                     onClick={copyErrorReport}
                     className="w-full bg-purple-600 text-white px-4 py-3 rounded hover:bg-purple-700 transition-colors font-semibold"
                   >
-                    {copied ? '✓ Copied!' : 'Copy Error Report'}
+                    {copied ? "✓ Copied!" : "Copy Error Report"}
                   </button>
                   <Link
                     href="/support/bug-report"
@@ -1028,7 +1083,6 @@ export default function TechnicalError({ error, reset }: ErrorPageProps) {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            
             {/* Error Statistics */}
             <div className="bg-slate-800 rounded-lg border border-slate-700 p-6">
               <h3 className="text-lg font-bold text-slate-200 mb-4">
@@ -1050,7 +1104,7 @@ export default function TechnicalError({ error, reset }: ErrorPageProps) {
                 <div className="flex justify-between">
                   <span className="text-slate-400">Timestamp:</span>
                   <span className="text-slate-300 font-mono text-xs">
-                    {errorContext?.timestamp.split('T')[1]?.split('.')[0]}
+                    {errorContext?.timestamp.split("T")[1]?.split(".")[0]}
                   </span>
                 </div>
               </div>
@@ -1099,22 +1153,26 @@ export default function TechnicalError({ error, reset }: ErrorPageProps) {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-slate-400">Mode:</span>
-                  <span className={`font-semibold ${
-                    process.env.NODE_ENV === 'development' ? 'text-yellow-400' : 'text-green-400'
-                  }`}>
+                  <span
+                    className={`font-semibold ${
+                      process.env.NODE_ENV === "development"
+                        ? "text-yellow-400"
+                        : "text-green-400"
+                    }`}
+                  >
                     {process.env.NODE_ENV}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Build:</span>
                   <span className="text-slate-300 font-mono text-xs">
-                    {process.env.NEXT_PUBLIC_APP_VERSION || 'unknown'}
+                    {process.env.NEXT_PUBLIC_APP_VERSION || "unknown"}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Browser:</span>
                   <span className="text-slate-300 text-xs">
-                    {navigator.userAgent.split(' ')[0]}
+                    {navigator.userAgent.split(" ")[0]}
                   </span>
                 </div>
               </div>
@@ -1155,6 +1213,7 @@ export default function TechnicalError({ error, reset }: ErrorPageProps) {
 ```
 
 ##### Customization Options
+
 - **Error tracking**: Integrate with monitoring services like Sentry, DataDog, or custom logging
 - **Context collection**: Add more environment-specific information (user ID, feature flags, etc.)
 - **Debugging tools**: Add buttons to toggle debug mode, clear cache, or reset state
@@ -1199,7 +1258,8 @@ const translations: Record<string, Translation> = {
   en: {
     title: "An Error Occurred",
     subtitle: "We're sorry for the inconvenience",
-    description: "Something unexpected happened while processing your request. Our team has been notified and is working to resolve this issue.",
+    description:
+      "Something unexpected happened while processing your request. Our team has been notified and is working to resolve this issue.",
     tryAgain: "Try Again",
     goHome: "Go to Homepage",
     contactSupport: "Contact Support",
@@ -1208,15 +1268,17 @@ const translations: Record<string, Translation> = {
     whatHappened: "What happened?",
     howToFix: "How to fix this:",
     needHelp: "Need additional help?",
-    accessibilityNote: "For screen reader users: This page contains error information and recovery options.",
+    accessibilityNote:
+      "For screen reader users: This page contains error information and recovery options.",
     skipToContent: "Skip to main content",
     mainContent: "Main content",
-    supportInfo: "Our support team is available 24/7 to assist you"
+    supportInfo: "Our support team is available 24/7 to assist you",
   },
   es: {
     title: "Ha Ocurrido un Error",
     subtitle: "Lamentamos las molestias",
-    description: "Algo inesperado ocurrió mientras procesábamos su solicitud. Nuestro equipo ha sido notificado y está trabajando para resolver este problema.",
+    description:
+      "Algo inesperado ocurrió mientras procesábamos su solicitud. Nuestro equipo ha sido notificado y está trabajando para resolver este problema.",
     tryAgain: "Intentar de Nuevo",
     goHome: "Ir al Inicio",
     contactSupport: "Contactar Soporte",
@@ -1225,15 +1287,17 @@ const translations: Record<string, Translation> = {
     whatHappened: "¿Qué pasó?",
     howToFix: "Cómo solucionarlo:",
     needHelp: "¿Necesita ayuda adicional?",
-    accessibilityNote: "Para usuarios de lectores de pantalla: Esta página contiene información de error y opciones de recuperación.",
+    accessibilityNote:
+      "Para usuarios de lectores de pantalla: Esta página contiene información de error y opciones de recuperación.",
     skipToContent: "Saltar al contenido principal",
     mainContent: "Contenido principal",
-    supportInfo: "Nuestro equipo de soporte está disponible 24/7 para ayudarle"
+    supportInfo: "Nuestro equipo de soporte está disponible 24/7 para ayudarle",
   },
   fr: {
     title: "Une Erreur s'est Produite",
     subtitle: "Nous sommes désolés pour la gêne occasionnée",
-    description: "Quelque chose d'inattendu s'est produit lors du traitement de votre demande. Notre équipe a été notifiée et travaille à résoudre ce problème.",
+    description:
+      "Quelque chose d'inattendu s'est produit lors du traitement de votre demande. Notre équipe a été notifiée et travaille à résoudre ce problème.",
     tryAgain: "Réessayer",
     goHome: "Aller à l'Accueil",
     contactSupport: "Contacter le Support",
@@ -1242,33 +1306,42 @@ const translations: Record<string, Translation> = {
     whatHappened: "Que s'est-il passé ?",
     howToFix: "Comment résoudre ceci :",
     needHelp: "Besoin d'aide supplémentaire ?",
-    accessibilityNote: "Pour les utilisateurs de lecteurs d'écran : Cette page contient des informations d'erreur et des options de récupération.",
+    accessibilityNote:
+      "Pour les utilisateurs de lecteurs d'écran : Cette page contient des informations d'erreur et des options de récupération.",
     skipToContent: "Passer au contenu principal",
     mainContent: "Contenu principal",
-    supportInfo: "Notre équipe de support est disponible 24h/24 et 7j/7 pour vous aider"
-  }
+    supportInfo:
+      "Notre équipe de support est disponible 24h/24 et 7j/7 pour vous aider",
+  },
 };
 
 export default function AccessibleError({ error, reset }: ErrorPageProps) {
-  const [language, setLanguage] = useState<string>('en');
+  const [language, setLanguage] = useState<string>("en");
   const [highContrast, setHighContrast] = useState(false);
-  const [fontSize, setFontSize] = useState<'normal' | 'large' | 'larger'>('normal');
+  const [fontSize, setFontSize] = useState<"normal" | "large" | "larger">(
+    "normal",
+  );
   const [announceError, setAnnounceError] = useState(false);
 
   const t = translations[language] || translations.en;
-  const errorCode = error?.digest || `ERR_${Date.now().toString(36).toUpperCase()}`;
+  const errorCode =
+    error?.digest || `ERR_${Date.now().toString(36).toUpperCase()}`;
 
   useEffect(() => {
     // Detect user's preferred language
-    const userLanguage = navigator.language.split('-')[0];
+    const userLanguage = navigator.language.split("-")[0];
     if (translations[userLanguage]) {
       setLanguage(userLanguage);
     }
 
     // Check for accessibility preferences
-    const prefersHighContrast = window.matchMedia('(prefers-contrast: high)').matches;
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    
+    const prefersHighContrast = window.matchMedia(
+      "(prefers-contrast: high)",
+    ).matches;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
     setHighContrast(prefersHighContrast);
 
     // Announce error to screen readers
@@ -1279,17 +1352,19 @@ export default function AccessibleError({ error, reset }: ErrorPageProps) {
   }, [language, t.title]);
 
   const fontSizeClasses = {
-    normal: 'text-base',
-    large: 'text-lg',
-    larger: 'text-xl'
+    normal: "text-base",
+    large: "text-lg",
+    larger: "text-xl",
   };
 
   const themeClasses = highContrast
-    ? 'bg-black text-white'
-    : 'bg-gray-50 text-gray-900';
+    ? "bg-black text-white"
+    : "bg-gray-50 text-gray-900";
 
   return (
-    <div className={`min-h-screen ${themeClasses} ${fontSizeClasses[fontSize]}`}>
+    <div
+      className={`min-h-screen ${themeClasses} ${fontSizeClasses[fontSize]}`}
+    >
       {/* Skip Link for Keyboard Navigation */}
       <a
         href="#main-content"
@@ -1325,27 +1400,27 @@ export default function AccessibleError({ error, reset }: ErrorPageProps) {
               className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               aria-label="Toggle high contrast mode"
             >
-              {highContrast ? '🌞' : '🌙'} Contrast
+              {highContrast ? "🌞" : "🌙"} Contrast
             </button>
-            
+
             <div className="flex items-center space-x-1">
               <button
-                onClick={() => setFontSize('normal')}
-                className={`px-2 py-1 rounded text-sm ${fontSize === 'normal' ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                onClick={() => setFontSize("normal")}
+                className={`px-2 py-1 rounded text-sm ${fontSize === "normal" ? "bg-blue-600" : "bg-gray-700 hover:bg-gray-600"} focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 aria-label="Normal font size"
               >
                 A
               </button>
               <button
-                onClick={() => setFontSize('large')}
-                className={`px-2 py-1 rounded text-base ${fontSize === 'large' ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                onClick={() => setFontSize("large")}
+                className={`px-2 py-1 rounded text-base ${fontSize === "large" ? "bg-blue-600" : "bg-gray-700 hover:bg-gray-600"} focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 aria-label="Large font size"
               >
                 A
               </button>
               <button
-                onClick={() => setFontSize('larger')}
-                className={`px-2 py-1 rounded text-lg ${fontSize === 'larger' ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                onClick={() => setFontSize("larger")}
+                className={`px-2 py-1 rounded text-lg ${fontSize === "larger" ? "bg-blue-600" : "bg-gray-700 hover:bg-gray-600"} focus:outline-none focus:ring-2 focus:ring-blue-500`}
                 aria-label="Larger font size"
               >
                 A
@@ -1356,11 +1431,7 @@ export default function AccessibleError({ error, reset }: ErrorPageProps) {
       </div>
 
       {/* Live Region for Screen Reader Announcements */}
-      <div
-        aria-live="polite"
-        aria-atomic="true"
-        className="sr-only"
-      >
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
         {announceError && `${t.accessibilityNote} ${t.errorCode}: ${errorCode}`}
       </div>
 
@@ -1368,42 +1439,45 @@ export default function AccessibleError({ error, reset }: ErrorPageProps) {
       <main id="main-content" className="max-w-4xl mx-auto px-6 py-12">
         <div className="text-center mb-12">
           {/* Error Icon with Alt Text */}
-          <div 
+          <div
             className={`w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center ${
-              highContrast ? 'bg-white text-black' : 'bg-red-100 text-red-600'
+              highContrast ? "bg-white text-black" : "bg-red-100 text-red-600"
             }`}
             role="img"
             aria-label="Error icon"
           >
-            <span className="text-4xl" aria-hidden="true">⚠️</span>
+            <span className="text-4xl" aria-hidden="true">
+              ⚠️
+            </span>
           </div>
 
           {/* Main Error Message */}
-          <h1 className="text-3xl font-bold mb-4">
-            {t.title}
-          </h1>
-          <p className="text-xl mb-6 text-gray-600">
-            {t.subtitle}
-          </p>
-          <p className="text-lg max-w-2xl mx-auto">
-            {t.description}
-          </p>
+          <h1 className="text-3xl font-bold mb-4">{t.title}</h1>
+          <p className="text-xl mb-6 text-gray-600">{t.subtitle}</p>
+          <p className="text-lg max-w-2xl mx-auto">{t.description}</p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">
-          
           {/* Error Information */}
-          <section className={`rounded-xl p-6 ${
-            highContrast ? 'bg-gray-900 border border-white' : 'bg-white shadow-lg border border-gray-200'
-          }`}>
+          <section
+            className={`rounded-xl p-6 ${
+              highContrast
+                ? "bg-gray-900 border border-white"
+                : "bg-white shadow-lg border border-gray-200"
+            }`}
+          >
             <h2 className="text-xl font-bold mb-4">{t.whatHappened}</h2>
-            
+
             <div className="space-y-4">
               <div>
                 <h3 className="font-semibold mb-2">{t.errorCode}:</h3>
-                <code className={`block p-3 rounded font-mono text-sm ${
-                  highContrast ? 'bg-black border border-gray-600' : 'bg-gray-100 border border-gray-300'
-                }`}>
+                <code
+                  className={`block p-3 rounded font-mono text-sm ${
+                    highContrast
+                      ? "bg-black border border-gray-600"
+                      : "bg-gray-100 border border-gray-300"
+                  }`}
+                >
                   {errorCode}
                 </code>
               </div>
@@ -1411,9 +1485,13 @@ export default function AccessibleError({ error, reset }: ErrorPageProps) {
               {error?.message && (
                 <div>
                   <h3 className="font-semibold mb-2">Technical Details:</h3>
-                  <div className={`p-3 rounded text-sm ${
-                    highContrast ? 'bg-black border border-gray-600' : 'bg-gray-100 border border-gray-300'
-                  }`}>
+                  <div
+                    className={`p-3 rounded text-sm ${
+                      highContrast
+                        ? "bg-black border border-gray-600"
+                        : "bg-gray-100 border border-gray-300"
+                    }`}
+                  >
                     {error.message}
                   </div>
                 </div>
@@ -1422,11 +1500,15 @@ export default function AccessibleError({ error, reset }: ErrorPageProps) {
           </section>
 
           {/* Recovery Actions */}
-          <section className={`rounded-xl p-6 ${
-            highContrast ? 'bg-gray-900 border border-white' : 'bg-white shadow-lg border border-gray-200'
-          }`}>
+          <section
+            className={`rounded-xl p-6 ${
+              highContrast
+                ? "bg-gray-900 border border-white"
+                : "bg-white shadow-lg border border-gray-200"
+            }`}
+          >
             <h2 className="text-xl font-bold mb-4">{t.howToFix}</h2>
-            
+
             <div className="space-y-4">
               {reset && (
                 <button
@@ -1438,15 +1520,16 @@ export default function AccessibleError({ error, reset }: ErrorPageProps) {
                 </button>
               )}
               <p id="try-again-desc" className="text-sm text-gray-600 sr-only">
-                Attempts to reload the current page and retry the failed operation
+                Attempts to reload the current page and retry the failed
+                operation
               </p>
 
               <Link
                 href="/"
                 className={`block w-full text-center px-6 py-4 rounded-lg transition-colors font-semibold focus:outline-none focus:ring-4 ${
                   highContrast
-                    ? 'bg-white text-black hover:bg-gray-200 focus:ring-gray-300'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-300'
+                    ? "bg-white text-black hover:bg-gray-200 focus:ring-gray-300"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-300"
                 }`}
                 aria-describedby="go-home-desc"
               >
@@ -1460,8 +1543,8 @@ export default function AccessibleError({ error, reset }: ErrorPageProps) {
                 href="/contact"
                 className={`block w-full text-center px-6 py-4 rounded-lg transition-colors font-semibold focus:outline-none focus:ring-4 ${
                   highContrast
-                    ? 'border border-white hover:bg-gray-800 focus:ring-gray-300'
-                    : 'border border-gray-300 hover:bg-gray-50 focus:ring-gray-300'
+                    ? "border border-white hover:bg-gray-800 focus:ring-gray-300"
+                    : "border border-gray-300 hover:bg-gray-50 focus:ring-gray-300"
                 }`}
                 aria-describedby="contact-desc"
               >
@@ -1475,12 +1558,16 @@ export default function AccessibleError({ error, reset }: ErrorPageProps) {
         </div>
 
         {/* Support Information */}
-        <section className={`mt-12 text-center p-6 rounded-xl ${
-          highContrast ? 'bg-gray-900 border border-white' : 'bg-blue-50 border border-blue-200'
-        }`}>
+        <section
+          className={`mt-12 text-center p-6 rounded-xl ${
+            highContrast
+              ? "bg-gray-900 border border-white"
+              : "bg-blue-50 border border-blue-200"
+          }`}
+        >
           <h2 className="text-xl font-bold mb-4">{t.needHelp}</h2>
           <p className="mb-6">{t.supportInfo}</p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="mailto:support@example.com"
@@ -1499,8 +1586,10 @@ export default function AccessibleError({ error, reset }: ErrorPageProps) {
           {/* Additional Accessibility Info */}
           <div className="mt-6 pt-6 border-t border-gray-300">
             <p className="text-sm text-gray-600">
-              <strong>Accessibility:</strong> If you're having trouble using this page with assistive technology, 
-              please contact us directly at accessibility@example.com or call our accessibility hotline at +1 (555) 123-4568.
+              <strong>Accessibility:</strong> If you're having trouble using
+              this page with assistive technology, please contact us directly at
+              accessibility@example.com or call our accessibility hotline at +1
+              (555) 123-4568.
             </p>
           </div>
         </section>
@@ -1511,6 +1600,7 @@ export default function AccessibleError({ error, reset }: ErrorPageProps) {
 ```
 
 ##### Customization Options
+
 - **Languages**: Add more languages by extending the translations object
 - **Accessibility features**: Add more accessibility controls (motion preferences, color blind support)
 - **Screen reader support**: Enhance ARIA labels and live regions for better screen reader experience

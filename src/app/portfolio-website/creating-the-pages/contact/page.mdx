@@ -51,25 +51,27 @@ interface ContactFormData {
 
 export default function MinimalistContact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
   } = useForm<ContactFormData>();
 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Form submitted:', data);
-      setSubmitStatus('success');
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log("Form submitted:", data);
+      setSubmitStatus("success");
       reset();
     } catch (error) {
-      setSubmitStatus('error');
+      setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
     }
@@ -79,27 +81,37 @@ export default function MinimalistContact() {
     <div className="min-h-screen bg-white py-16">
       <div className="max-w-2xl mx-auto px-6">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-light text-gray-900 mb-4">Get In Touch</h1>
+          <h1 className="text-4xl font-light text-gray-900 mb-4">
+            Get In Touch
+          </h1>
           <p className="text-gray-600 leading-relaxed">
-            I'd love to hear from you. Send me a message and I'll get back to you as soon as possible.
+            I'd love to hear from you. Send me a message and I'll get back to
+            you as soon as possible.
           </p>
         </div>
 
-        {submitStatus === 'success' && (
+        {submitStatus === "success" && (
           <div className="mb-8 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-green-700">Thank you for your message! I'll get back to you soon.</p>
+            <p className="text-green-700">
+              Thank you for your message! I'll get back to you soon.
+            </p>
           </div>
         )}
 
-        {submitStatus === 'error' && (
+        {submitStatus === "error" && (
           <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-700">Something went wrong. Please try again later.</p>
+            <p className="text-red-700">
+              Something went wrong. Please try again later.
+            </p>
           </div>
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Name
             </label>
             <input
@@ -115,7 +127,10 @@ export default function MinimalistContact() {
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Email
             </label>
             <input
@@ -125,19 +140,24 @@ export default function MinimalistContact() {
                 required: "Email is required",
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: "Invalid email address"
-                }
+                  message: "Invalid email address",
+                },
               })}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
               placeholder="your.email@example.com"
             />
             {errors.email && (
-              <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
           <div>
-            <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="subject"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Subject
             </label>
             <input
@@ -148,12 +168,17 @@ export default function MinimalistContact() {
               placeholder="What's this about?"
             />
             {errors.subject && (
-              <p className="mt-1 text-sm text-red-600">{errors.subject.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.subject.message}
+              </p>
             )}
           </div>
 
           <div>
-            <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="message"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Message
             </label>
             <textarea
@@ -164,7 +189,9 @@ export default function MinimalistContact() {
               placeholder="Tell me about your project or just say hello..."
             />
             {errors.message && (
-              <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.message.message}
+              </p>
             )}
           </div>
 
@@ -183,6 +210,7 @@ export default function MinimalistContact() {
 ```
 
 ##### Customization Options
+
 - **Colors**: Replace gray theme with your brand colors
 - **Typography**: Adjust font weights and sizes to match your style
 - **Input styling**: Modify border styles, padding, and focus states
@@ -214,28 +242,30 @@ interface ContactFormData {
 
 export default function ConsentContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-    watch
+    watch,
   } = useForm<ContactFormData>();
 
-  const privacyConsent = watch('privacyConsent');
+  const privacyConsent = watch("privacyConsent");
 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log('Form submitted with consent:', data);
-      setSubmitStatus('success');
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      console.log("Form submitted with consent:", data);
+      setSubmitStatus("success");
       reset();
     } catch (error) {
-      setSubmitStatus('error');
+      setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
     }
@@ -246,24 +276,28 @@ export default function ConsentContactForm() {
       <div className="max-w-3xl mx-auto px-6">
         <div className="bg-white rounded-xl shadow-sm p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-slate-900 mb-4">Contact Us</h1>
+            <h1 className="text-3xl font-bold text-slate-900 mb-4">
+              Contact Us
+            </h1>
             <p className="text-slate-600">
-              We're here to help! Fill out the form below and we'll get back to you promptly.
+              We're here to help! Fill out the form below and we'll get back to
+              you promptly.
             </p>
           </div>
 
-          {submitStatus === 'success' && (
+          {submitStatus === "success" && (
             <div className="mb-8 p-4 bg-green-50 border border-green-200 rounded-lg">
               <div className="flex items-center">
                 <span className="text-green-500 mr-2">✓</span>
                 <p className="text-green-700">
-                  Your message has been sent successfully! We'll respond within 24 hours.
+                  Your message has been sent successfully! We'll respond within
+                  24 hours.
                 </p>
               </div>
             </div>
           )}
 
-          {submitStatus === 'error' && (
+          {submitStatus === "error" && (
             <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg">
               <div className="flex items-center">
                 <span className="text-red-500 mr-2">✗</span>
@@ -277,7 +311,10 @@ export default function ConsentContactForm() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-semibold text-slate-700 mb-2"
+                >
                   Full Name *
                 </label>
                 <input
@@ -288,12 +325,17 @@ export default function ConsentContactForm() {
                   placeholder="John Doe"
                 />
                 {errors.name && (
-                  <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.name.message}
+                  </p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-semibold text-slate-700 mb-2"
+                >
                   Email Address *
                 </label>
                 <input
@@ -303,21 +345,26 @@ export default function ConsentContactForm() {
                     required: "Email is required",
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Please enter a valid email address"
-                    }
+                      message: "Please enter a valid email address",
+                    },
                   })}
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="john@example.com"
                 />
                 {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.email.message}
+                  </p>
                 )}
               </div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="phone" className="block text-sm font-semibold text-slate-700 mb-2">
+                <label
+                  htmlFor="phone"
+                  className="block text-sm font-semibold text-slate-700 mb-2"
+                >
                   Phone Number (Optional)
                 </label>
                 <input
@@ -330,7 +377,10 @@ export default function ConsentContactForm() {
               </div>
 
               <div>
-                <label htmlFor="company" className="block text-sm font-semibold text-slate-700 mb-2">
+                <label
+                  htmlFor="company"
+                  className="block text-sm font-semibold text-slate-700 mb-2"
+                >
                   Company (Optional)
                 </label>
                 <input
@@ -344,12 +394,17 @@ export default function ConsentContactForm() {
             </div>
 
             <div>
-              <label htmlFor="subject" className="block text-sm font-semibold text-slate-700 mb-2">
+              <label
+                htmlFor="subject"
+                className="block text-sm font-semibold text-slate-700 mb-2"
+              >
                 Subject *
               </label>
               <select
                 id="subject"
-                {...register("subject", { required: "Please select a subject" })}
+                {...register("subject", {
+                  required: "Please select a subject",
+                })}
                 className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Select a subject</option>
@@ -360,54 +415,74 @@ export default function ConsentContactForm() {
                 <option value="other">Other</option>
               </select>
               {errors.subject && (
-                <p className="mt-1 text-sm text-red-600">{errors.subject.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.subject.message}
+                </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="message" className="block text-sm font-semibold text-slate-700 mb-2">
+              <label
+                htmlFor="message"
+                className="block text-sm font-semibold text-slate-700 mb-2"
+              >
                 Message *
               </label>
               <textarea
                 id="message"
                 rows={6}
-                {...register("message", { 
+                {...register("message", {
                   required: "Message is required",
                   minLength: {
                     value: 10,
-                    message: "Message must be at least 10 characters long"
-                  }
+                    message: "Message must be at least 10 characters long",
+                  },
                 })}
                 className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 placeholder="Tell us about your project, ask a question, or just say hello..."
               />
               {errors.message && (
-                <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.message.message}
+                </p>
               )}
             </div>
 
             {/* Privacy and Consent Section */}
             <div className="border-t border-slate-200 pt-6">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Privacy & Consent</h3>
-              
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                Privacy & Consent
+              </h3>
+
               <div className="space-y-4">
                 <div className="flex items-start">
                   <input
                     type="checkbox"
                     id="privacyConsent"
-                    {...register("privacyConsent", { required: "You must agree to the privacy policy" })}
+                    {...register("privacyConsent", {
+                      required: "You must agree to the privacy policy",
+                    })}
                     className="mt-1 w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
                   />
-                  <label htmlFor="privacyConsent" className="ml-3 text-sm text-slate-700">
+                  <label
+                    htmlFor="privacyConsent"
+                    className="ml-3 text-sm text-slate-700"
+                  >
                     I agree to the{" "}
-                    <Link href="/privacy-policy" className="text-blue-600 hover:text-blue-800 underline">
+                    <Link
+                      href="/privacy-policy"
+                      className="text-blue-600 hover:text-blue-800 underline"
+                    >
                       Privacy Policy
                     </Link>{" "}
-                    and consent to the processing of my personal data for the purpose of responding to my inquiry. *
+                    and consent to the processing of my personal data for the
+                    purpose of responding to my inquiry. *
                   </label>
                 </div>
                 {errors.privacyConsent && (
-                  <p className="ml-7 text-sm text-red-600">{errors.privacyConsent.message}</p>
+                  <p className="ml-7 text-sm text-red-600">
+                    {errors.privacyConsent.message}
+                  </p>
                 )}
 
                 <div className="flex items-start">
@@ -417,18 +492,23 @@ export default function ConsentContactForm() {
                     {...register("marketingConsent")}
                     className="mt-1 w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
                   />
-                  <label htmlFor="marketingConsent" className="ml-3 text-sm text-slate-700">
-                    I would like to receive occasional updates about new projects, blog posts, and other relevant content. 
-                    You can unsubscribe at any time.
+                  <label
+                    htmlFor="marketingConsent"
+                    className="ml-3 text-sm text-slate-700"
+                  >
+                    I would like to receive occasional updates about new
+                    projects, blog posts, and other relevant content. You can
+                    unsubscribe at any time.
                   </label>
                 </div>
               </div>
 
               <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                 <p className="text-xs text-slate-600">
-                  <strong>Data Protection:</strong> Your personal information will be stored securely and used only 
-                  for the purposes stated above. We will never sell or share your data with third parties without 
-                  your explicit consent.
+                  <strong>Data Protection:</strong> Your personal information
+                  will be stored securely and used only for the purposes stated
+                  above. We will never sell or share your data with third
+                  parties without your explicit consent.
                 </p>
               </div>
             </div>
@@ -441,9 +521,25 @@ export default function ConsentContactForm() {
               >
                 {isSubmitting ? (
                   <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Sending Message...
                   </span>
@@ -468,6 +564,7 @@ export default function ConsentContactForm() {
 ```
 
 ##### Customization Options
+
 - **Consent requirements**: Modify required vs optional checkboxes
 - **Privacy policy links**: Update links to your actual privacy policy
 - **Subject options**: Customize dropdown options for your business
@@ -490,29 +587,31 @@ interface ContactFormData {
   email: string;
   subject: string;
   message: string;
-  preferredContact: 'email' | 'phone' | 'meeting';
+  preferredContact: "email" | "phone" | "meeting";
 }
 
 export default function ContactWithMap() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
   } = useForm<ContactFormData>();
 
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      console.log('Form submitted:', data);
-      setSubmitStatus('success');
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      console.log("Form submitted:", data);
+      setSubmitStatus("success");
       reset();
     } catch (error) {
-      setSubmitStatus('error');
+      setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
     }
@@ -534,32 +633,43 @@ export default function ContactWithMap() {
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Contact Form */}
           <div className="bg-white rounded-xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Send a Message</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">
+              Send a Message
+            </h2>
 
-            {submitStatus === 'success' && (
+            {submitStatus === "success" && (
               <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                 <div className="flex items-center">
                   <span className="text-green-500 text-xl mr-3">✓</span>
                   <div>
-                    <p className="text-green-700 font-semibold">Message sent successfully!</p>
-                    <p className="text-green-600 text-sm">I'll get back to you within 24 hours.</p>
+                    <p className="text-green-700 font-semibold">
+                      Message sent successfully!
+                    </p>
+                    <p className="text-green-600 text-sm">
+                      I'll get back to you within 24 hours.
+                    </p>
                   </div>
                 </div>
               </div>
             )}
 
-            {submitStatus === 'error' && (
+            {submitStatus === "error" && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                 <div className="flex items-center">
                   <span className="text-red-500 text-xl mr-3">✗</span>
-                  <p className="text-red-700">Failed to send message. Please try again.</p>
+                  <p className="text-red-700">
+                    Failed to send message. Please try again.
+                  </p>
                 </div>
               </div>
             )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-semibold text-slate-700 mb-2"
+                >
                   Full Name
                 </label>
                 <input
@@ -570,12 +680,17 @@ export default function ContactWithMap() {
                   placeholder="Your full name"
                 />
                 {errors.name && (
-                  <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.name.message}
+                  </p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-semibold text-slate-700 mb-2"
+                >
                   Email Address
                 </label>
                 <input
@@ -585,24 +700,31 @@ export default function ContactWithMap() {
                     required: "Email is required",
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address"
-                    }
+                      message: "Invalid email address",
+                    },
                   })}
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="your.email@example.com"
                 />
                 {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.email.message}
+                  </p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="subject" className="block text-sm font-semibold text-slate-700 mb-2">
+                <label
+                  htmlFor="subject"
+                  className="block text-sm font-semibold text-slate-700 mb-2"
+                >
                   Subject
                 </label>
                 <select
                   id="subject"
-                  {...register("subject", { required: "Please select a subject" })}
+                  {...register("subject", {
+                    required: "Please select a subject",
+                  })}
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Choose a subject</option>
@@ -612,7 +734,9 @@ export default function ContactWithMap() {
                   <option value="general">General Inquiry</option>
                 </select>
                 {errors.subject && (
-                  <p className="mt-1 text-sm text-red-600">{errors.subject.message}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.subject.message}
+                  </p>
                 )}
               </div>
 
@@ -622,31 +746,43 @@ export default function ContactWithMap() {
                 </label>
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { value: 'email', label: 'Email', icon: '📧' },
-                    { value: 'phone', label: 'Phone', icon: '📞' },
-                    { value: 'meeting', label: 'Video Call', icon: '💻' }
+                    { value: "email", label: "Email", icon: "📧" },
+                    { value: "phone", label: "Phone", icon: "📞" },
+                    { value: "meeting", label: "Video Call", icon: "💻" },
                   ].map((option) => (
-                    <label key={option.value} className="flex items-center cursor-pointer">
+                    <label
+                      key={option.value}
+                      className="flex items-center cursor-pointer"
+                    >
                       <input
                         type="radio"
                         value={option.value}
-                        {...register("preferredContact", { required: "Please select a contact method" })}
+                        {...register("preferredContact", {
+                          required: "Please select a contact method",
+                        })}
                         className="sr-only"
                       />
                       <div className="flex-1 text-center p-3 border-2 border-slate-200 rounded-lg hover:border-blue-300 transition-colors peer-checked:border-blue-500 peer-checked:bg-blue-50">
                         <div className="text-2xl mb-1">{option.icon}</div>
-                        <div className="text-sm font-medium text-slate-700">{option.label}</div>
+                        <div className="text-sm font-medium text-slate-700">
+                          {option.label}
+                        </div>
                       </div>
                     </label>
                   ))}
                 </div>
                 {errors.preferredContact && (
-                  <p className="mt-2 text-sm text-red-600">{errors.preferredContact.message}</p>
+                  <p className="mt-2 text-sm text-red-600">
+                    {errors.preferredContact.message}
+                  </p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="message" className="block text-sm font-semibold text-slate-700 mb-2">
+                <label
+                  htmlFor="message"
+                  className="block text-sm font-semibold text-slate-700 mb-2"
+                >
                   Message
                 </label>
                 <textarea
@@ -657,7 +793,9 @@ export default function ContactWithMap() {
                   placeholder="Tell me about your project..."
                 />
                 {errors.message && (
-                  <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.message.message}
+                  </p>
                 )}
               </div>
 
@@ -681,10 +819,14 @@ export default function ContactWithMap() {
                     <span className="text-2xl">📍</span>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-1">Office Location</h3>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                      Office Location
+                    </h3>
                     <p className="text-slate-600">
-                      123 Business Street<br />
-                      San Francisco, CA 94105<br />
+                      123 Business Street
+                      <br />
+                      San Francisco, CA 94105
+                      <br />
                       United States
                     </p>
                   </div>
@@ -697,9 +839,13 @@ export default function ContactWithMap() {
                     <span className="text-2xl">📧</span>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-1">Email</h3>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                      Email
+                    </h3>
                     <p className="text-slate-600">hello@example.com</p>
-                    <p className="text-slate-500 text-sm mt-1">Response within 24 hours</p>
+                    <p className="text-slate-500 text-sm mt-1">
+                      Response within 24 hours
+                    </p>
                   </div>
                 </div>
               </div>
@@ -710,9 +856,13 @@ export default function ContactWithMap() {
                     <span className="text-2xl">📞</span>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-slate-900 mb-1">Phone</h3>
+                    <h3 className="text-lg font-semibold text-slate-900 mb-1">
+                      Phone
+                    </h3>
                     <p className="text-slate-600">+1 (555) 123-4567</p>
-                    <p className="text-slate-500 text-sm mt-1">Mon-Fri, 9AM-6PM PST</p>
+                    <p className="text-slate-500 text-sm mt-1">
+                      Mon-Fri, 9AM-6PM PST
+                    </p>
                   </div>
                 </div>
               </div>
@@ -725,7 +875,9 @@ export default function ContactWithMap() {
                 <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
                   <div className="text-center">
                     <div className="text-6xl mb-4">🗺️</div>
-                    <h3 className="text-xl font-semibold text-slate-700 mb-2">Interactive Map</h3>
+                    <h3 className="text-xl font-semibold text-slate-700 mb-2">
+                      Interactive Map
+                    </h3>
                     <p className="text-slate-500">
                       Integrate with Google Maps, Mapbox, or OpenStreetMap
                     </p>
@@ -753,16 +905,20 @@ export default function ContactWithMap() {
 
             {/* Business Hours */}
             <div className="bg-white p-6 rounded-xl shadow-lg">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Business Hours</h3>
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                Business Hours
+              </h3>
               <div className="space-y-2">
                 {[
-                  { day: 'Monday - Friday', hours: '9:00 AM - 6:00 PM' },
-                  { day: 'Saturday', hours: '10:00 AM - 4:00 PM' },
-                  { day: 'Sunday', hours: 'Closed' }
+                  { day: "Monday - Friday", hours: "9:00 AM - 6:00 PM" },
+                  { day: "Saturday", hours: "10:00 AM - 4:00 PM" },
+                  { day: "Sunday", hours: "Closed" },
                 ].map((schedule, index) => (
                   <div key={index} className="flex justify-between">
                     <span className="text-slate-600">{schedule.day}</span>
-                    <span className="text-slate-900 font-medium">{schedule.hours}</span>
+                    <span className="text-slate-900 font-medium">
+                      {schedule.hours}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -776,6 +932,7 @@ export default function ContactWithMap() {
 ```
 
 ##### Customization Options
+
 - **Map integration**: Replace placeholder with Google Maps, Mapbox, or OpenStreetMap
 - **Contact information**: Update with your actual address, phone, and email
 - **Business hours**: Modify schedule to match your availability
@@ -813,7 +970,12 @@ interface CustomInputProps {
   children: React.ReactNode;
 }
 
-const CustomInput: React.FC<CustomInputProps> = ({ label, error, required, children }) => (
+const CustomInput: React.FC<CustomInputProps> = ({
+  label,
+  error,
+  required,
+  children,
+}) => (
   <div className="space-y-2">
     <label className="block text-sm font-semibold text-slate-700">
       {label}
@@ -835,7 +997,7 @@ const PhoneInput: React.FC<{
   error?: string;
 }> = ({ value, onChange, error }) => {
   const formatPhoneNumber = (phone: string) => {
-    const cleaned = phone.replace(/\D/g, '');
+    const cleaned = phone.replace(/\D/g, "");
     const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
     if (match) {
       return `(${match[1]}) ${match[2]}-${match[3]}`;
@@ -856,8 +1018,8 @@ const PhoneInput: React.FC<{
       placeholder="(555) 123-4567"
       className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors ${
         error
-          ? 'border-red-300 focus:border-red-500'
-          : 'border-slate-300 focus:border-blue-500'
+          ? "border-red-300 focus:border-red-500"
+          : "border-slate-300 focus:border-blue-500"
       }`}
     />
   );
@@ -866,7 +1028,9 @@ const PhoneInput: React.FC<{
 export default function AdvancedContactForm() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -875,26 +1039,34 @@ export default function AdvancedContactForm() {
     control,
     formState: { errors, isValid },
     watch,
-    trigger
+    trigger,
   } = useForm<ContactFormData>({
-    mode: 'onChange',
+    mode: "onChange",
     defaultValues: {
-      newsletter: false
-    }
+      newsletter: false,
+    },
   });
 
   const watchedFields = watch();
 
   const steps = [
-    { number: 1, title: 'Personal Info', fields: ['name', 'email', 'company', 'phone'] },
-    { number: 2, title: 'Project Details', fields: ['projectType', 'budget', 'timeline'] },
-    { number: 3, title: 'Description', fields: ['description', 'attachments'] }
+    {
+      number: 1,
+      title: "Personal Info",
+      fields: ["name", "email", "company", "phone"],
+    },
+    {
+      number: 2,
+      title: "Project Details",
+      fields: ["projectType", "budget", "timeline"],
+    },
+    { number: 3, title: "Description", fields: ["description", "attachments"] },
   ];
 
   const nextStep = async () => {
     const fieldsToValidate = steps[currentStep - 1].fields;
     const isStepValid = await trigger(fieldsToValidate as any);
-    
+
     if (isStepValid && currentStep < steps.length) {
       setCurrentStep(currentStep + 1);
     }
@@ -910,11 +1082,11 @@ export default function AdvancedContactForm() {
     setIsSubmitting(true);
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Advanced form submitted:', data);
-      setSubmitStatus('success');
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log("Advanced form submitted:", data);
+      setSubmitStatus("success");
     } catch (error) {
-      setSubmitStatus('error');
+      setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
     }
@@ -922,23 +1094,26 @@ export default function AdvancedContactForm() {
 
   const getStepCompletion = (stepNumber: number) => {
     const stepFields = steps[stepNumber - 1].fields;
-    const completedFields = stepFields.filter(field => {
+    const completedFields = stepFields.filter((field) => {
       const value = watchedFields[field as keyof ContactFormData];
-      return value && value !== '';
+      return value && value !== "";
     });
     return (completedFields.length / stepFields.length) * 100;
   };
 
-  if (submitStatus === 'success') {
+  if (submitStatus === "success") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-6">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <span className="text-4xl">✅</span>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">Message Sent Successfully!</h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">
+            Message Sent Successfully!
+          </h2>
           <p className="text-slate-600 mb-6">
-            Thank you for reaching out. I'll review your project details and get back to you within 24 hours.
+            Thank you for reaching out. I'll review your project details and get
+            back to you within 24 hours.
           </p>
           <button
             onClick={() => window.location.reload()}
@@ -956,7 +1131,9 @@ export default function AdvancedContactForm() {
       <div className="max-w-4xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">Start Your Project</h1>
+          <h1 className="text-4xl font-bold text-slate-900 mb-4">
+            Start Your Project
+          </h1>
           <p className="text-xl text-slate-600">
             Tell us about your vision and let's bring it to life
           </p>
@@ -969,23 +1146,25 @@ export default function AdvancedContactForm() {
               const isActive = currentStep === step.number;
               const isCompleted = currentStep > step.number;
               const completion = getStepCompletion(step.number);
-              
+
               return (
                 <div key={step.number} className="flex-1">
                   <div className="flex items-center">
                     <div className="relative">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${
-                        isCompleted 
-                          ? 'bg-green-500 border-green-500 text-white' 
-                          : isActive 
-                          ? 'bg-blue-500 border-blue-500 text-white' 
-                          : 'bg-white border-slate-300 text-slate-400'
-                      }`}>
-                        {isCompleted ? '✓' : step.number}
+                      <div
+                        className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${
+                          isCompleted
+                            ? "bg-green-500 border-green-500 text-white"
+                            : isActive
+                              ? "bg-blue-500 border-blue-500 text-white"
+                              : "bg-white border-slate-300 text-slate-400"
+                        }`}
+                      >
+                        {isCompleted ? "✓" : step.number}
                       </div>
                       {isActive && (
                         <div className="absolute -bottom-1 left-0 w-full bg-blue-200 h-1 rounded-full">
-                          <div 
+                          <div
                             className="bg-blue-500 h-full rounded-full transition-all duration-300"
                             style={{ width: `${completion}%` }}
                           />
@@ -993,15 +1172,23 @@ export default function AdvancedContactForm() {
                       )}
                     </div>
                     {index < steps.length - 1 && (
-                      <div className={`flex-1 h-0.5 mx-4 ${
-                        isCompleted ? 'bg-green-500' : 'bg-slate-300'
-                      }`} />
+                      <div
+                        className={`flex-1 h-0.5 mx-4 ${
+                          isCompleted ? "bg-green-500" : "bg-slate-300"
+                        }`}
+                      />
                     )}
                   </div>
                   <div className="text-center mt-3">
-                    <p className={`text-sm font-medium ${
-                      isActive ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-slate-400'
-                    }`}>
+                    <p
+                      className={`text-sm font-medium ${
+                        isActive
+                          ? "text-blue-600"
+                          : isCompleted
+                            ? "text-green-600"
+                            : "text-slate-400"
+                      }`}
+                    >
                       {step.title}
                     </p>
                   </div>
@@ -1017,10 +1204,16 @@ export default function AdvancedContactForm() {
             {/* Step 1: Personal Information */}
             {currentStep === 1 && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">Personal Information</h2>
-                
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">
+                  Personal Information
+                </h2>
+
                 <div className="grid md:grid-cols-2 gap-6">
-                  <CustomInput label="Full Name" error={errors.name?.message} required>
+                  <CustomInput
+                    label="Full Name"
+                    error={errors.name?.message}
+                    required
+                  >
                     <input
                       type="text"
                       {...register("name", { required: "Name is required" })}
@@ -1029,15 +1222,19 @@ export default function AdvancedContactForm() {
                     />
                   </CustomInput>
 
-                  <CustomInput label="Email Address" error={errors.email?.message} required>
+                  <CustomInput
+                    label="Email Address"
+                    error={errors.email?.message}
+                    required
+                  >
                     <input
                       type="email"
                       {...register("email", {
                         required: "Email is required",
                         pattern: {
                           value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                          message: "Invalid email address"
-                        }
+                          message: "Invalid email address",
+                        },
                       })}
                       className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
                       placeholder="john@example.com"
@@ -1053,14 +1250,18 @@ export default function AdvancedContactForm() {
                     />
                   </CustomInput>
 
-                  <CustomInput label="Phone Number" error={errors.phone?.message} required>
+                  <CustomInput
+                    label="Phone Number"
+                    error={errors.phone?.message}
+                    required
+                  >
                     <Controller
                       name="phone"
                       control={control}
                       rules={{ required: "Phone number is required" }}
                       render={({ field }) => (
                         <PhoneInput
-                          value={field.value || ''}
+                          value={field.value || ""}
                           onChange={field.onChange}
                           error={errors.phone?.message}
                         />
@@ -1074,15 +1275,25 @@ export default function AdvancedContactForm() {
             {/* Step 2: Project Details */}
             {currentStep === 2 && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">Project Details</h2>
-                
-                <CustomInput label="Project Type" error={errors.projectType?.message} required>
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">
+                  Project Details
+                </h2>
+
+                <CustomInput
+                  label="Project Type"
+                  error={errors.projectType?.message}
+                  required
+                >
                   <select
-                    {...register("projectType", { required: "Please select a project type" })}
+                    {...register("projectType", {
+                      required: "Please select a project type",
+                    })}
                     className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
                   >
                     <option value="">Select project type</option>
-                    <option value="website">Website Design & Development</option>
+                    <option value="website">
+                      Website Design & Development
+                    </option>
                     <option value="webapp">Web Application</option>
                     <option value="mobile">Mobile App</option>
                     <option value="ecommerce">E-commerce Platform</option>
@@ -1093,9 +1304,15 @@ export default function AdvancedContactForm() {
                 </CustomInput>
 
                 <div className="grid md:grid-cols-2 gap-6">
-                  <CustomInput label="Budget Range" error={errors.budget?.message} required>
+                  <CustomInput
+                    label="Budget Range"
+                    error={errors.budget?.message}
+                    required
+                  >
                     <select
-                      {...register("budget", { required: "Please select a budget range" })}
+                      {...register("budget", {
+                        required: "Please select a budget range",
+                      })}
                       className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
                     >
                       <option value="">Select budget range</option>
@@ -1108,9 +1325,15 @@ export default function AdvancedContactForm() {
                     </select>
                   </CustomInput>
 
-                  <CustomInput label="Timeline" error={errors.timeline?.message} required>
+                  <CustomInput
+                    label="Timeline"
+                    error={errors.timeline?.message}
+                    required
+                  >
                     <select
-                      {...register("timeline", { required: "Please select a timeline" })}
+                      {...register("timeline", {
+                        required: "Please select a timeline",
+                      })}
                       className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
                     >
                       <option value="">Select timeline</option>
@@ -1129,11 +1352,19 @@ export default function AdvancedContactForm() {
             {/* Step 3: Description & Files */}
             {currentStep === 3 && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold text-slate-900 mb-6">Project Description</h2>
-                
-                <CustomInput label="Project Description" error={errors.description?.message} required>
+                <h2 className="text-2xl font-bold text-slate-900 mb-6">
+                  Project Description
+                </h2>
+
+                <CustomInput
+                  label="Project Description"
+                  error={errors.description?.message}
+                  required
+                >
                   <textarea
-                    {...register("description", { required: "Project description is required" })}
+                    {...register("description", {
+                      required: "Project description is required",
+                    })}
                     rows={6}
                     className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 transition-colors resize-none"
                     placeholder="Tell us about your project goals, requirements, and any specific features you need..."
@@ -1141,13 +1372,15 @@ export default function AdvancedContactForm() {
                 </CustomInput>
 
                 <CustomInput label="Attachments (Optional)">
-                  <div 
+                  <div
                     className="w-full p-6 border-2 border-dashed border-slate-300 rounded-lg hover:border-blue-400 transition-colors cursor-pointer"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <div className="text-center">
                       <div className="text-4xl mb-2">📎</div>
-                      <p className="text-slate-600 mb-1">Click to upload files</p>
+                      <p className="text-slate-600 mb-1">
+                        Click to upload files
+                      </p>
                       <p className="text-sm text-slate-500">
                         Documents, images, wireframes, etc. (Max 10MB each)
                       </p>
@@ -1172,7 +1405,8 @@ export default function AdvancedContactForm() {
                     />
                     <div className="text-sm">
                       <p className="text-slate-700">
-                        Subscribe to our newsletter for web development tips and industry insights.
+                        Subscribe to our newsletter for web development tips and
+                        industry insights.
                       </p>
                       <p className="text-slate-500 text-xs mt-1">
                         You can unsubscribe at any time. No spam, ever.
@@ -1217,12 +1451,13 @@ export default function AdvancedContactForm() {
           </form>
         </div>
 
-        {submitStatus === 'error' && (
+        {submitStatus === "error" && (
           <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
             <div className="flex items-center">
               <span className="text-red-500 text-xl mr-3">⚠</span>
               <p className="text-red-700">
-                Failed to send your message. Please try again or contact us directly.
+                Failed to send your message. Please try again or contact us
+                directly.
               </p>
             </div>
           </div>
@@ -1234,6 +1469,7 @@ export default function AdvancedContactForm() {
 ```
 
 ##### Customization Options
+
 - **Multi-step navigation**: Adjust the number of steps and fields per step
 - **Custom validation**: Add specific validation rules for different input types
 - **File upload**: Configure file types, size limits, and storage handling
@@ -1349,11 +1585,11 @@ const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children })
   const t = (key: TranslationKey | string): string => {
     const keys = key.split('.');
     let value: any = translations[language];
-    
+
     for (const k of keys) {
       value = value?.[k];
     }
-    
+
     return value || key;
   };
 
@@ -1633,6 +1869,7 @@ const InternationalizedContactContent: React.FC = () => {
 ```
 
 ##### Customization Options
+
 - **Add more languages**: Extend the translations object with additional language objects
 - **Translation management**: Integrate with services like i18next, react-intl, or Crowdin
 - **RTL support**: Add right-to-left language support for Arabic, Hebrew, etc.

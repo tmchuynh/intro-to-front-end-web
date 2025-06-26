@@ -1,5 +1,7 @@
+import { cn } from "@/lib/utils";
 import type { NavigationItem } from "@/utils/navigation";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface NavigationSectionProps {
@@ -92,8 +94,20 @@ function NavigationItem({
   onToggle?: () => void;
   depth?: number;
 }) {
+  const pathname = usePathname();
   const hasChildren = item.children && item.children.length > 0;
   const [expandedChild, setExpandedChild] = useState<string | null>(null);
+
+  // Check if current item or any of its children is active
+  const isActiveItem = pathname === item.href;
+  const hasActiveChild =
+    hasChildren &&
+    item.children!.some(
+      (child) =>
+        pathname === child.href ||
+        (child.children &&
+          child.children.some((grandchild) => pathname === grandchild.href))
+    );
 
   // Reset expanded child when this item is collapsed
   useEffect(() => {
@@ -111,11 +125,11 @@ function NavigationItem({
       <li className="">
         <button
           onClick={onToggle}
-          className={`flex justify-between items-center px-3 py-2 ml-1 max-w-full w-[95%] font-medium text-left text-sm transition-colors rounded-md ${
-            isExpanded
-              ? "bg-sidebar-active-bg text-sidebar-active-text"
-              : "hover:bg-nav-item-hover hover:text-nav-text-hover"
-          } `}
+          className={cn("", {
+            "flex justify-between items-center px-3 py-2 ml-1 max-w-full hover:bg-nav-item-hover hover:text-nav-text-hover w-[95%] font-medium text-left text-sm transition-colors rounded-md": true,
+            "bg-nav-item-active": hasActiveChild || isActiveItem,
+            "bg-sidebar-active-bg text-sidebar-active-text": isExpanded,
+          })}
         >
           {item.title}
           <svg
@@ -169,7 +183,12 @@ function NavigationItem({
     <li>
       <Link
         href={item.href}
-        className="block hover:bg-nav-item-hover ml-1 px-3 py-2 rounded-md max-w-full w-[95%] text-sm hover:text-nav-text-hover transition-colors"
+        className={cn(
+          "block hover:bg-nav-item-hover active:bg-nav-item-active ml-1 px-3 py-2 rounded-md max-w-full w-[95%] text-sm hover:text-nav-text-hover transition-colors",
+          {
+            "bg-nav-item-active": isActiveItem,
+          }
+        )}
       >
         {item.title}
       </Link>

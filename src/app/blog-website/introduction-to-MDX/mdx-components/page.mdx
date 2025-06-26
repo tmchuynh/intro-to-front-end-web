@@ -13,6 +13,7 @@ This is useful for creating consistent styles and functionality across your MDX 
 Create an `mdx-components.tsx` file in the root of your project to define global MDX components. This file will be used to register components that can be used in your MDX files.
 
 ```tsx
+// src/app/mdx-components.tsx
 import type { MDXComponents } from "mdx/types";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
@@ -31,8 +32,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 To style your MDX components, you can use CSS modules or any CSS-in-JS solution you prefer. You can import styles directly into your `mdx-components.tsx` file and apply them to your custom components.
 
 ```tsx
+// src/app/mdx-components.tsx
 import styles from "./mdx-components.module.css";
 import type { MDXComponents } from "mdx/types";
+
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     ...components,
@@ -50,7 +53,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 To customize built-in MDX components, you can override them in your `mdx-components.tsx` file. This allows you to change the default behavior or styling of components like headings, paragraphs, and images.
 
 ```tsx
+// src/app/mdx-components.tsx
+import React from "react";
 import type { MDXComponents } from "mdx/types";
+
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     // This is the default set of MDX components
@@ -72,8 +78,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 This is where you will define your custom components that can be used in your MDX files. You can import and use any React components you have created in your project.
 
 ```typescript
+// src/app/mdx-components.tsx
 import type { MDXComponents } from "mdx/types";
 import { MyCustomComponent } from "./components/MyCustomComponent";
+
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     ...components,
@@ -126,6 +134,12 @@ export function CustomHeading({ children, level, id, className }: Props) {
   );
 }
 
+/**
+ * Custom hook to provide or override MDX components.
+ *
+ * @param components - An object containing custom MDX components to use for rendering.
+ * @returns The merged MDX components to be used by the MDX provider.
+ */
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     // This is the default set of MDX components

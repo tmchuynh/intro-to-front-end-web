@@ -160,6 +160,8 @@ Plugins are powerful extensions that transform and enhance your MDX content duri
 ### Plugin Architecture Example
 
 ```typescript
+// next.config.js
+
 // Example of how plugins work in the MDX pipeline
 const mdxProcessor = unified()
   .use(remarkParse) // Parse Markdown
@@ -178,6 +180,7 @@ const result = await mdxProcessor.process(mdxContent);
 You can create custom plugins to extend MDX functionality:
 
 ```tsx
+// src/lib/remark-reading-time.ts
 import { visit } from "unist-util-visit";
 import type { Plugin } from "unified";
 import type { Root } from "mdast";
@@ -226,6 +229,8 @@ npm install remark-frontmatter
 #### Configuration:
 
 ```typescript
+// next.config.js
+import createMDX from "@next/mdx";
 import remarkFrontmatter from "remark-frontmatter";
 
 const withMDX = createMDX({
@@ -242,6 +247,8 @@ const withMDX = createMDX({
 #### Advanced Usage:
 
 ```typescript
+// next.config.js
+import remarkFrontmatter from "remark-frontmatter";
 // Custom frontmatter configuration
 const remarkFrontmatterConfig = [
   remarkFrontmatter,
@@ -278,7 +285,10 @@ npm install remark-mdx-frontmatter
 #### Configuration:
 
 ```typescript
+// next.config.js
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
+import createMDX from "@next/mdx";
+import remarkFrontmatter from "remark-frontmatter";
 
 const withMDX = createMDX({
   options: {
@@ -310,19 +320,18 @@ By {frontmatter.author} • Published {frontmatter.publishedAt}
 #### Advanced Configuration:
 
 ```typescript
-const mdxFrontmatterConfig = [
-  remarkMdxFrontmatter,
-  {
-    name: "frontmatter", // Variable name (default)
-    type: {
-      // TypeScript type generation
-      title: "string",
-      author: "string",
-      publishedAt: "string",
-      tags: "string[]",
-    },
+// next.config.js
+import remarkMdxFrontmatter from "remark-mdx-frontmatter";
+import createMDX from "@next/mdx";
+import remarkFrontmatter from "remark-frontmatter";
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: [
+      remarkFrontmatter,
+      [remarkMdxFrontmatter, { variableName: "frontmatter" }], // Custom variable name
+    ],
   },
-];
+});
 ```
 
 #### Customization:
@@ -350,6 +359,8 @@ npm install rehype-slug
 #### Configuration:
 
 ```typescript
+// next.config.js
+import createMDX from "@next/mdx";
 import rehypeSlug from "rehype-slug";
 
 const withMDX = createMDX({
@@ -382,14 +393,20 @@ Becomes:
 #### Advanced Configuration:
 
 ```typescript
-const rehypeSlugConfig = [
-  rehypeSlug,
-  {
-    prefix: "section-", // Add prefix to all slugs
-    maintainCase: false, // Preserve original casing
-    removeAccents: true, // Remove accented characters
+// next.config.js
+import rehypeSlug from "rehype-slug";
+import createMDX from "@next/mdx";
+
+const withMDX = createMDX({
+  options: {
+    rehypePlugins: [
+      [
+        rehypeSlug,
+        { prefix: "section-", maintainCase: false, removeAccents: true },
+      ],
+    ],
   },
-];
+});
 ```
 
 #### Customization:
@@ -417,7 +434,10 @@ npm install rehype-autolink-headings
 #### Configuration:
 
 ```typescript
+// next.config.js
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import createMDX from "@next/mdx";
+import rehypeSlug from "rehype-slug";
 
 const withMDX = createMDX({
   options: {
@@ -469,25 +489,31 @@ const withMDX = createMDX({
 #### Advanced Configuration:
 
 ```typescript
-const autolinkConfig = [
-  rehypeAutolinkHeadings,
-  {
-    behavior: "prepend",
-    content: {
-      type: "element",
-      tagName: "span",
-      properties: { className: ["icon", "icon-link"] },
-      children: [{ type: "text", value: "🔗" }],
-    },
-    headingProperties: {
-      className: ["linkable-heading"],
-    },
-    properties: {
-      className: ["heading-link"],
-      title: "Permalink to this heading",
-    },
+// next.config.js
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import createMDX from "@next/mdx";
+import rehypeSlug from "rehype-slug";
+const withMDX = createMDX({
+  options: {
+    rehypePlugins: [
+      rehypeSlug,
+      [
+        rehypeAutolinkHeadings,
+        {
+          behavior: "prepend",
+          content: {
+            type: "text",
+            value: "🔗", // Custom link icon
+          },
+          properties: {
+            className: ["heading-link"],
+            title: "Permalink to this heading",
+          },
+        },
+      ],
+    ],
   },
-];
+});
 ```
 
 #### Customization:
@@ -516,6 +542,8 @@ npm install remark-gfm
 #### Configuration:
 
 ```typescript
+// next.config.js
+import createMDX from "@next/mdx";
 import remarkGfm from "remark-gfm";
 
 const withMDX = createMDX({
@@ -564,14 +592,16 @@ Here's a sentence with a footnote[^1].
 #### Advanced Configuration:
 
 ```typescript
-const remarkGfmConfig = [
-  remarkGfm,
-  {
-    tablePipeAlign: false, // Disable table pipe alignment
-    stringLength: (str) => str.length, // Custom string length calculation
-    singleTilde: false, // Require double tildes for strikethrough
+// next.config.js
+import remarkGfm from "remark-gfm";
+import createMDX from "@next/mdx";
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: [
+      [remarkGfm, { tablePipeAlign: false, stringLength: (str) => str.length }],
+    ],
   },
-];
+});
 ```
 
 #### Customization:
@@ -599,6 +629,9 @@ npm install rehype-toc
 #### Configuration:
 
 ```typescript
+// next.config.js
+import createMDX from "@next/mdx";
+import rehypeSlug from "rehype-slug";
 import rehypeToc from "rehype-toc";
 
 const withMDX = createMDX({
@@ -642,18 +675,35 @@ const withMDX = createMDX({
 #### Advanced Configuration:
 
 ```typescript
-const tocConfig = [
-  rehypeToc,
-  {
-    headings: ["h2", "h3"],
-    maxDepth: 3,
-    tight: true, // Remove paragraphs around list items
-    ordered: false, // Use unordered lists
-    prefix: "toc-",
-    nav: true, // Wrap in nav element
-    position: "afterbegin", // Where to insert TOC
+// next.config.js
+import rehypeToc from "rehype-toc";
+import createMDX from "@next/mdx";
+import rehypeSlug from "rehype-slug";
+const withMDX = createMDX({
+  options: {
+    rehypePlugins: [
+      rehypeSlug, // Required for TOC links
+      [
+        rehypeToc,
+        {
+          headings: ["h2", "h3"],
+          maxDepth: 3, // Limit TOC depth to 3 levels
+          tight: true, // Remove paragraphs around list items
+          ordered: false, // Use unordered lists
+          prefix: "toc-", // Add prefix to TOC IDs
+          nav: true, // Wrap in nav element
+          position: "afterbegin", // Where to insert TOC
+          cssClasses: {
+            toc: "table-of-contents",
+            list: "toc-list",
+            listItem: "toc-item",
+            link: "toc-link",
+          },
+        },
+      ],
+    ],
   },
-];
+});
 ```
 
 #### Customization:
@@ -668,6 +718,7 @@ const tocConfig = [
 To configure these plugins, you will need to update your `next.config.mjs` file to include the necessary settings. Here’s an example configuration:
 
 ```typescript
+// next.config.mjs
 import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
@@ -752,6 +803,8 @@ npm install remark-api
 
 ```typescript
 import remarkApi from "remark-api";
+import createMDX from "@next/mdx";
+import rehypeSlug from "rehype-slug";
 
 const withMDX = createMDX({
   options: {
@@ -798,6 +851,8 @@ npm install remark-a11y-emoji
 
 ```typescript
 import remarkA11yEmoji from "remark-a11y-emoji";
+import createMDX from "@next/mdx";
+import rehypeSlug from "rehype-slug";
 
 const withMDX = createMDX({
   options: {
@@ -845,6 +900,8 @@ npm install remark-capitalize-headings
 ##### Configuration
 
 ```typescript
+// next.config.js
+import createMDX from "@next/mdx";
 import remarkCapitalizeHeadings from "remark-capitalize-headings";
 
 const withMDX = createMDX({
@@ -892,6 +949,8 @@ npm install remark-collapse
 ##### Configuration
 
 ```typescript
+// next.config.js
+import createMDX from "@next/mdx";
 import remarkCollapse from "remark-collapse";
 
 const withMDX = createMDX({
@@ -942,6 +1001,8 @@ npm install remark-emoji
 ##### Configuration
 
 ```typescript
+// next.config.js
+import createMDX from "@next/mdx";
 import remarkEmoji from "remark-emoji";
 
 const withMDX = createMDX({
@@ -990,6 +1051,8 @@ npm install remark-footnotes-extra
 ##### Configuration
 
 ```typescript
+// next.config.js
+import createMDX from "@next/mdx";
 import remarkFootnotesExtra from "remark-footnotes-extra";
 
 const withMDX = createMDX({
@@ -1026,6 +1089,8 @@ npm install remark-flexible-toc
 ##### Configuration
 
 ```typescript
+// next.config.js
+import createMDX from "@next/mdx";
 import remarkFlexibleToc from "remark-flexible-toc";
 
 const withMDX = createMDX({
@@ -1063,6 +1128,8 @@ npm install remark-github
 ##### Configuration
 
 ```typescript
+// next.config.js
+import createMDX from "@next/mdx";
 import remarkGithub from "remark-github";
 
 const withMDX = createMDX({
@@ -1098,6 +1165,8 @@ npm install remark-images
 ##### Configuration
 
 ```typescript
+// next.config.js
+import createMDX from "@next/mdx";
 import remarkImages from "remark-images";
 
 const withMDX = createMDX({
@@ -1149,6 +1218,8 @@ npm install remark-oembed
 ##### Configuration
 
 ```typescript
+// next.config.js
+import createMDX from "@next/mdx";
 import remarkOembed from "remark-oembed";
 
 const withMDX = createMDX({

@@ -1,0 +1,410 @@
+import BackToTop from "@/components/BackToTop";
+
+# Contact Utility Functions
+
+## Table of Contents
+
+## The `import` Statements
+
+```typescript
+// src/lib/utils/contact.ts
+import {
+  ContactFormData,
+  ContactValidationError,
+  ContactValidationResult,
+} from "../interfaces/contact";
+```
+
+## Email Validation
+
+We will be defining the email validation utility function for our e-commerce platform. This will help us ensure that users are entering valid email addresses when they fill out contact forms.
+
+```typescript
+// src/lib/utils/contact.ts
+export function isValidEmail(email: string): boolean {
+  const emailRegex =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  return emailRegex.test(email);
+}
+```
+
+##### Explanation of the Email Validation Function
+
+This function uses a regular expression to validate email addresses. It checks if the input string matches the standard email format, which includes a local part, an "@" symbol, and a domain part.
+
+## Name Validation
+
+### isValidName Function
+
+We will be defining the name validation utility function for our e-commerce platform. This will help us ensure that users are entering valid names when they fill out contact forms.
+
+```typescript
+// src/lib/utils/contact.ts
+export function isValidName(name: string): boolean {
+  const nameRegex = /^[a-zA-Z\s\-'\.]+$/;
+  return nameRegex.test(name) && name.trim().length >= 2;
+}
+```
+
+##### Explanation of the Name Validation Function
+
+This function uses a regular expression to validate names. It checks if the input string contains only letters, spaces, hyphens, apostrophes, and periods. It also ensures that the name is at least two characters long after trimming whitespace.
+
+### Validating Names
+
+This function checks if the input string contains only letters, spaces, hyphens, apostrophes, and periods. It also ensures that the name is at least two characters long after trimming whitespace
+
+```typescript
+// src/lib/utils/contact.ts
+export function validateName(name: string): string | null {
+  if (!name || !name.trim()) {
+    return "Name is required";
+  }
+
+  const trimmedName = name.trim();
+
+  if (trimmedName.length < 2) {
+    return "Name must be at least 2 characters long";
+  }
+
+  if (trimmedName.length > 100) {
+    return "Name must not exceed 100 characters";
+  }
+
+  if (!isValidName(trimmedName)) {
+    return "Name can only contain letters, spaces, hyphens, and apostrophes";
+  }
+
+  // Check for suspicious patterns
+  if (/^\d+$/.test(trimmedName)) {
+    return "Name cannot contain only numbers";
+  }
+
+  if (/<[^>]*>/.test(trimmedName)) {
+    return "Name cannot contain HTML tags";
+  }
+
+  return null;
+}
+```
+
+##### Explanation of the Name Validation Function
+
+This function checks if the input string is empty or contains only whitespace. If it does, it returns an error message indicating that the name is required. It then trims the name and checks its length. If the name is less than two characters long or exceeds 100 characters, it returns an appropriate error message. It also checks if the name contains only valid characters using the `isValidName` function. If the name contains suspicious patterns, such as being composed entirely of numbers or containing HTML tags, it returns an error message. If all checks pass, it returns `null`, indicating that the name is valid.
+
+<BackToTop />
+
+## Email Validation
+
+We will be defining the email validation utility function for our e-commerce platform. This will help us ensure that users are entering valid email addresses when they fill out contact forms.
+
+```typescript
+// src/lib/utils/contact.ts
+export function validateEmail(email: string): string | null {
+  if (!email || !email.trim()) {
+    return "Email address is required";
+  }
+
+  const trimmedEmail = email.trim();
+
+  if (trimmedEmail.length > 254) {
+    return "Email address is too long";
+  }
+
+  if (!isValidEmail(trimmedEmail)) {
+    return "Please enter a valid email address";
+  }
+
+  // Check for common typos in domains
+  const commonDomainTypos = [
+    { typo: "gmial.com", correct: "gmail.com" },
+    { typo: "gmai.com", correct: "gmail.com" },
+    { typo: "yahooo.com", correct: "yahoo.com" },
+    { typo: "hotmial.com", correct: "hotmail.com" },
+    { typo: "outlok.com", correct: "outlook.com" },
+  ];
+
+  for (const { typo, correct } of commonDomainTypos) {
+    if (trimmedEmail.toLowerCase().includes(typo)) {
+      return `Did you mean ${trimmedEmail
+        .toLowerCase()
+        .replace(typo, correct)}?`;
+    }
+  }
+
+  return null;
+}
+```
+
+##### Explanation of the Email Validation Function
+
+This function checks if the input string is empty or contains only whitespace. If it does, it returns an error message indicating that the email address is required. It then trims the email and checks its length. If the email exceeds 254 characters, it returns an error message. It also checks if the email is valid using the `isValidEmail` function. If the email contains common typos in domains, it suggests the correct domain. If all checks pass, it returns `null`, indicating that the email is valid.
+
+## Formatting Contact Person Name
+
+We will be defining the contact person name formatting utility function for our e-commerce platform. This will help us ensure that names are formatted correctly when users fill out contact forms.
+
+```typescript
+// src/lib/utils/contact.ts
+export function formatContactName(name: string): string {
+  return name
+    .trim()
+    .split(" ")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+}
+```
+
+##### Explanation of the Contact Name Formatting Function
+
+This function takes a name as input, trims any leading or trailing whitespace, and splits the name into individual parts (words). It then capitalizes the first letter of each part and converts the rest to lowercase. Finally, it joins the parts back together with a single space between them. This ensures that names are consistently formatted, making them more readable and professional.
+
+## Subject Field Validation
+
+We will be defining the subject field validation utility function for our e-commerce platform. This will help us ensure that users are entering valid subjects when they fill out contact forms.
+
+```typescript
+// src/lib/utils/contact.ts
+export function validateSubject(subject: string): string | null {
+  if (!subject || !subject.trim()) {
+    return "Subject is required";
+  }
+
+  const trimmedSubject = subject.trim();
+
+  if (trimmedSubject.length < 5) {
+    return "Subject must be at least 5 characters long";
+  }
+
+  if (trimmedSubject.length > 200) {
+    return "Subject must not exceed 200 characters";
+  }
+
+  // Check for suspicious content
+  if (/<[^>]*>/.test(trimmedSubject)) {
+    return "Subject cannot contain HTML tags";
+  }
+
+  if (/script|javascript|vbscript/i.test(trimmedSubject)) {
+    return "Subject contains prohibited content";
+  }
+
+  return null;
+}
+```
+
+##### Explanation of the Subject Validation Function
+
+This function checks if the input string is empty or contains only whitespace. If it does, it returns an error message indicating that the subject is required. It then trims the subject and checks its length. If the subject is less than five characters long or exceeds 200 characters, it returns an appropriate error message. It also checks if the subject contains HTML tags or prohibited content, such as "script", "javascript", or "vbscript". If all checks pass, it returns `null`, indicating that the subject is valid.
+
+## Message Validation
+
+We will be defining the message validation utility function for our e-commerce platform. This will help us ensure that users are entering valid messages when they fill out contact forms.
+
+```typescript
+// src/lib/utils/contact.ts
+export function validateMessage(message: string): string | null {
+  if (!message || !message.trim()) {
+    return "Message is required";
+  }
+
+  const trimmedMessage = message.trim();
+
+  if (trimmedMessage.length < 10) {
+    return "Message must be at least 10 characters long";
+  }
+
+  if (trimmedMessage.length > 5000) {
+    return "Message must not exceed 5000 characters";
+  }
+
+  // Check for suspicious content
+  if (/<script[^>]*>.*?<\/script>/gi.test(trimmedMessage)) {
+    return "Message contains prohibited content";
+  }
+
+  if (/javascript:|vbscript:|data:|file:/gi.test(trimmedMessage)) {
+    return "Message contains prohibited content";
+  }
+
+  // Check for excessive special characters (potential spam)
+  const specialCharCount = (
+    trimmedMessage.match(/[!@#$%^&*()_+={}[\]|\\:";'<>?,./]/g) || []
+  ).length;
+  const specialCharRatio = specialCharCount / trimmedMessage.length;
+
+  if (specialCharRatio > 0.3) {
+    return "Message contains too many special characters";
+  }
+
+  return null;
+}
+```
+
+##### Explanation of the Message Validation Function
+
+This function checks if the input string is empty or contains only whitespace. If it does, it returns an error message indicating that the message is required. It then trims the message and checks its length. If the message is less than ten characters long or exceeds 5000 characters, it returns an appropriate error message. It also checks for prohibited content, such as `<script>` tags, `javascript:`, `vbscript:`, `data:`, or `file:` URLs. Additionally, it checks for excessive special characters, which could indicate spam. If the ratio of special characters to the total message length exceeds 30%, it returns an error message indicating that the message contains too many special characters. If all checks pass, it returns `null`, indicating that the message is valid.
+
+## Validate Contact Form
+
+We will be defining the contact form validation utility function for our e-commerce platform. This will help us ensure that users are filling out contact forms correctly and that all required fields are validated.
+
+```typescript
+// src/lib/utils/contact.ts
+export function validateContactForm(
+  formData: Partial<ContactFormData>
+): ContactValidationResult {
+  const errors: ContactValidationError[] = [];
+
+  // Validate each field
+  const fields: (keyof ContactFormData)[] = [
+    "name",
+    "email",
+    "subject",
+    "category",
+    "message",
+  ];
+
+  fields.forEach((field) => {
+    const value = formData[field] || "";
+    const error = validateContactField(field, value, formData);
+
+    if (error) {
+      errors.push({ field, message: error });
+    }
+  });
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+```
+
+##### Explanation of the Contact Form Validation Function
+
+This function takes the form data as input and initializes an empty array to store validation errors. It iterates over each field in the `ContactFormData` interface and calls the `validateContactField` function for each field. If any validation errors are found, they are added to the `errors` array. Finally, the function returns an object containing a boolean `isValid` property indicating whether the form is valid and an array of `errors` containing any validation errors found.
+
+## Santizing Contact Form Data
+
+We will be defining the contact form data sanitization utility function for our e-commerce platform. This will help us ensure that the contact form data is clean and free from any malicious content before processing it.
+
+```typescript
+// src/lib/utils/contact.ts
+export function sanitizeContactForm(
+  formData: ContactFormData
+): ContactFormData {
+  return {
+    name: formData.name.trim().replace(/\s+/g, " "),
+    email: formData.email.trim().toLowerCase(),
+    subject: formData.subject.trim().replace(/\s+/g, " "),
+    category: formData.category.toLowerCase(),
+    message: formData.message
+      .trim()
+      .replace(/\s+/g, " ")
+      .replace(/\n\s*\n/g, "\n\n"),
+  };
+}
+```
+
+##### Explanation of the Contact Form Data Sanitization Function
+
+This function takes the contact form data as input and returns a sanitized version of the data. It trims whitespace from each field, replaces multiple spaces with a single space, and converts the email to lowercase. It also ensures that the category is in lowercase and formats the message by removing excessive whitespace and preserving line breaks. This sanitization helps prevent issues with data consistency and security by ensuring that the data is clean and properly formatted before further processing.
+
+## Validate Contact Field
+
+We will be defining the contact field validation utility function for our e-commerce platform. This will help us ensure that users are entering valid contact information when they fill out contact forms.
+
+```typescript
+// src/lib/utils/contact.ts
+export function validateContactField(
+  field: keyof ContactFormData,
+  value: string,
+  formData?: Partial<ContactFormData>
+): string | null {
+  switch (field) {
+    case "name":
+      return validateName(value);
+    case "email":
+      return validateEmail(value);
+    case "subject":
+      return validateSubject(value);
+    case "category":
+      return validateCategory(value);
+    case "message":
+      return validateMessage(value);
+    default:
+      return null;
+  }
+}
+```
+
+##### Explanation of the Contact Field Validation Function
+
+This function takes a field name and its value, along with optional form data. It uses a switch statement to determine which validation function to call based on the field name. It returns the result of the corresponding validation function. If the field name does not match any of the predefined fields, it returns `null`, indicating that no validation is needed for that field.
+
+<BackToTop />
+
+## Retrieving Category Name
+
+We will be defining the category name retrieval utility function for our e-commerce platform. This will help us retrieve the category name based on the selected category when users fill out contact forms.
+
+```typescript
+// src/lib/utils/contact.ts
+export function getCategoryDisplayName(category: string): string {
+  const categoryMap: Record<string, string> = {
+    orders: "Orders & Shipping",
+    account: "Account & Membership",
+    returns: "Returns & Refunds",
+    technical: "Technical Support",
+    general: "General Inquiry",
+    feedback: "Feedback",
+  };
+
+  return categoryMap[category.toLowerCase()] || category;
+}
+```
+
+##### Explanation of the Category Name Retrieval Function
+
+This function takes a category string as input and returns the corresponding display name from a predefined mapping. If the category is not found in the mapping, it returns the original category string. This function helps ensure that the category names are displayed in a user-friendly format, making it easier for users to understand the purpose of their selected category when filling out contact forms.
+
+## Validate Category
+
+We will be defining the category validation utility function for our e-commerce platform. This will help us ensure that users are selecting valid categories when they fill out contact forms.
+
+```typescript
+// src/lib/utils/contact.ts
+export function validateCategory(category: string): string | null {
+  const validCategories = [
+    "orders",
+    "account",
+    "returns",
+    "technical",
+    "general",
+    "feedback",
+  ];
+
+  if (!category || !category.trim()) {
+    return "Please select a category";
+  }
+
+  if (!validCategories.includes(category.toLowerCase())) {
+    return "Please select a valid category";
+  }
+
+  return null;
+}
+```
+
+##### Explanation of the Category Validation Function
+
+This function checks if the input string is empty or contains only whitespace. If it does, it returns an error message indicating that a category must be selected. It then checks if the selected category is one of the predefined valid categories. If it is not, it returns an error message indicating that a valid category must be selected. If all checks pass, it returns `null`, indicating that the category is valid.
+
+## Next Steps
+
+Now that we have the main portion of our utility functions and constants implemented, we only have a couple more things to do before we can start building out the rest of our e-commerce platform. The next utility functions we will be creating are the [order utility functions](/ecommerce-platform/utility-functions-and-validation-constants/orders-utility-functions) and then, finally, the [Display Rating Stars](ecommerce-platform/utility-functions-and-validation-constants/display-rating-stars) component.
+
+Head on over to the [Order Utility Functions](/ecommerce-platform/utility-functions-and-validation-constants/orders-utility-functions) to continue building out your e-commerce platform. This will help us set up the necessary utility functions for our e-commerce platform, ensuring that our data is clean and consistent.
+
+<BackToTop />

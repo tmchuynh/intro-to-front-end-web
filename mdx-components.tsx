@@ -72,7 +72,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <CustomHeading
         level={4}
         id={props.id}
-        className="my-4 font-[BodoniModaSC] text-xl"
+        className="my-4 font-[DMSerifText] text-xl"
       >
         <br />
         <br />
@@ -83,13 +83,17 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <CustomHeading
         level={5}
         id={props.id}
-        className="mt-6 decoration-border font-[BodoniModaSC] text-lg"
+        className="mt-6 decoration-border font-[DMSerifText] text-lg"
       >
         {children}
       </CustomHeading>
     ),
     h6: ({ children, ...props }) => (
-      <CustomHeading level={6} id={props.id} className="mb-1 font-medium">
+      <CustomHeading
+        level={6}
+        id={props.id}
+        className="mb-1 font-[BodoniModaSC] font-light"
+      >
         {children}
       </CustomHeading>
     ),
@@ -174,7 +178,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     blockquote: ({ children }) => (
       <>
         <blockquote>{children}</blockquote>
-        <br />
       </>
     ),
     // Custom components

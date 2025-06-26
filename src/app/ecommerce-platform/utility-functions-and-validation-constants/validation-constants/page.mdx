@@ -1,0 +1,322 @@
+import BackToTop from "@/components/BackToTop";
+
+# Validation Constants
+
+## Table of Contents
+
+## Address Validation Constants
+
+### Valid Countries
+
+We will be listing out the valid countries that we will be using for our e-commerce platform. This will help us ensure that we are only accepting valid country codes when users enter their shipping information.
+
+Due to the length of the address validation constants, they have been moved to a GitHub Gist. You can find them [here](https://gist.github.com/tmchuynh/62aa48cb0d7971d0473d5c1f6d443130).
+
+### Postal Code Patterns
+
+We will be defining the postal code patterns for the countries we are supporting. This will help us ensure that users are entering valid postal codes when they enter their shipping information.
+
+```typescript
+// src/lib/constants/validate/address.ts
+export const POSTAL_CODE_PATTERNS = {
+  US: /^\d{5}(-\d{4})?$/, // 12345 or 12345-6789
+  CA: /^[A-Z]\d[A-Z]\s?\d[A-Z]\d$/i, // A1A 1A1 or A1A1A1
+  GB: /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i, // SW1A 1AA or M1 1AA
+  AU: /^\d{4}$/, // 1234
+  DE: /^\d{5}$/, // 12345
+  FR: /^\d{5}$/, // 12345
+  JP: /^\d{3}-\d{4}$/, // 123-4567
+  CN: /^\d{6}$/, // 123456
+  IN: /^\d{6}$/, // 123456
+  BR: /^\d{5}-?\d{3}$/, // 12345-678 or 12345678
+  IT: /^\d{5}$/, // 12345
+  ES: /^\d{5}$/, // 12345
+  NL: /^\d{4}\s?[A-Z]{2}$/i, // 1234 AB or 1234AB
+  MX: /^\d{5}$/, // 12345
+  RU: /^\d{6}$/, // 123456
+  KR: /^\d{5}$/, // 12345
+  ZA: /^\d{4}$/, // 1234
+  PL: /^\d{2}-\d{3}$/, // 12-345
+  SE: /^\d{3}\s?\d{2}$/, // 123 45 or 12345
+  NO: /^\d{4}$/, // 1234
+  DK: /^\d{4}$/, // 1234
+  FI: /^\d{5}$/, // 12345
+  AT: /^\d{4}$/, // 1234
+  CH: /^\d{4}$/, // 1234
+  BE: /^\d{4}$/, // 1234
+  IE: /^[A-Z]\d{2}\s?[A-Z\d]{4}$/i, // A12 B345 or A12B345
+  PT: /^\d{4}-\d{3}$/, // 1234-567
+  GR: /^\d{3}\s?\d{2}$/, // 123 45 or 12345
+  CZ: /^\d{3}\s?\d{2}$/, // 123 45 or 12345
+  HU: /^\d{4}$/, // 1234
+  SK: /^\d{3}\s?\d{2}$/, // 123 45 or 12345
+  SI: /^\d{4}$/, // 1234
+  HR: /^\d{5}$/, // 12345
+  BG: /^\d{4}$/, // 1234
+  RO: /^\d{6}$/, // 123456
+  LT: /^\d{5}$/, // 12345
+  LV: /^\d{4}$/, // 1234
+  EE: /^\d{5}$/, // 12345
+  MT: /^[A-Z]{3}\s?\d{4}$/i, // ABC 1234 or ABC1234
+  LU: /^\d{4}$/, // 1234
+  CY: /^\d{4}$/, // 1234
+  IS: /^\d{3}$/, // 123
+  LI: /^\d{4}$/, // 1234
+  MC: /^980\d{2}$/, // 98000-98099
+  SM: /^4789\d$/, // 47890-47899
+  VA: /^00120$/, // 00120
+  AD: /^AD\d{3}$/i, // AD123
+};
+```
+
+### Valid States
+
+We will be defining the valid states for the countries we are supporting. This will help us ensure that users are entering valid state codes when they enter their shipping information.
+
+```typescript
+// src/lib/constants/validate/address.ts
+
+export const VALID_STATES = {
+  US: [
+    "AL",
+    "AK",
+    "AZ",
+    "AR",
+    "CA",
+    "CO",
+    "CT",
+    "DE",
+    "FL",
+    "GA",
+    "HI",
+    "ID",
+    "IL",
+    "IN",
+    "IA",
+    "KS",
+    "KY",
+    "LA",
+    "ME",
+    "MD",
+    "MA",
+    "MI",
+    "MN",
+    "MS",
+    "MO",
+    "MT",
+    "NE",
+    "NV",
+    "NH",
+    "NJ",
+    "NM",
+    "NY",
+    "NC",
+    "ND",
+    "OH",
+    "OK",
+    "OR",
+    "PA",
+    "RI",
+    "SC",
+    "SD",
+    "TN",
+    "TX",
+    "UT",
+    "VT",
+    "VA",
+    "WA",
+    "WV",
+    "WI",
+    "WY",
+    "DC",
+  ],
+  CA: [
+    "AB",
+    "BC",
+    "MB",
+    "NB",
+    "NL",
+    "NS",
+    "NT",
+    "NU",
+    "ON",
+    "PE",
+    "QC",
+    "SK",
+    "YT",
+  ],
+  AU: ["ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA"],
+};
+```
+
+<BackToTop />
+
+## Credit Card Validation Constants
+
+### Credit Card Patterns
+
+We will be defining the credit card patterns for the credit cards we are supporting. This will help us ensure that users are entering valid credit card numbers when they enter their payment information.
+
+```typescript
+// src/lib/constants/validate/payment.ts
+export const CARD_PATTERNS = {
+  VISA: {
+    pattern: /^4[0-9]{12}(?:[0-9]{3})?$/,
+    lengths: [13, 16, 19],
+    cvvLength: 3,
+    name: "Visa",
+    icon: "visa",
+  },
+  MASTERCARD: {
+    pattern:
+      /^5[1-5][0-9]{14}$|^2(?:2(?:2[1-9]|[3-9][0-9])|[3-6][0-9][0-9]|7(?:[01][0-9]|20))[0-9]{12}$/,
+    lengths: [16],
+    cvvLength: 3,
+    name: "Mastercard",
+    icon: "mastercard",
+  },
+  AMERICAN_EXPRESS: {
+    pattern: /^3[47][0-9]{13}$/,
+    lengths: [15],
+    cvvLength: 4,
+    name: "American Express",
+    icon: "amex",
+  },
+  DISCOVER: {
+    pattern: /^6(?:011|5[0-9]{2})[0-9]{12}$/,
+    lengths: [16],
+    cvvLength: 3,
+    name: "Discover",
+    icon: "discover",
+  },
+  JCB: {
+    pattern: /^(?:2131|1800|35\d{3})\d{11}$/,
+    lengths: [16],
+    cvvLength: 3,
+    name: "JCB",
+    icon: "jcb",
+  },
+  DINERS_CLUB: {
+    pattern: /^3(?:0[0-5]|[68][0-9])[0-9]{11}$/,
+    lengths: [14],
+    cvvLength: 3,
+    name: "Diners Club",
+    icon: "diners",
+  },
+  MAESTRO: {
+    pattern: /^(?:5[0678]\d\d|6304|6390|67\d\d)\d{8,15}$/,
+    lengths: [12, 13, 14, 15, 16, 17, 18, 19],
+    cvvLength: 3,
+    name: "Maestro",
+    icon: "maestro",
+  },
+  UNIONPAY: {
+    pattern: /^(62|88)\d{14,17}$/,
+    lengths: [16, 17, 18, 19],
+    cvvLength: 3,
+    name: "UnionPay",
+    icon: "unionpay",
+  },
+};
+export type CardType = keyof typeof CARD_PATTERNS;
+```
+
+### Card Type Patterns
+
+We will be defining the card type patterns for the credit cards we are supporting. This will help us ensure that users are entering valid card types when they enter their payment information.
+
+```typescript
+// src/lib/constants/validate/payment.ts
+export const CARD_TYPE_PATTERNS = {
+  VISA: /^4/,
+  MASTERCARD: /^5[1-5]|^2[2-7]/,
+  AMERICAN_EXPRESS: /^3[47]/,
+  DISCOVER: /^6011|^644|^645|^646|^647|^648|^649|^65/,
+  JCB: /^35/,
+  DINERS_CLUB: /^30[0-5]|^36|^38/,
+  MAESTRO: /^5018|^5020|^5038|^5893|^6304|^6759|^6761|^6762|^6763/,
+  UNIONPAY: /^62|^88/,
+};
+```
+
+### Expiration Date Patterns
+
+We will be defining the expiration date patterns for the credit cards we are supporting. This will help us ensure that users are entering valid expiration dates when they enter their payment information.
+
+```typescript
+// src/lib/constants/validate/payment.ts
+export const EXPIRY_PATTERNS = {
+  MM_YY: /^(0[1-9]|1[0-2])\/([0-9]{2})$/,
+  MM_YYYY: /^(0[1-9]|1[0-2])\/([0-9]{4})$/,
+  MMYY: /^(0[1-9]|1[0-2])([0-9]{2})$/,
+  MMYYYY: /^(0[1-9]|1[0-2])([0-9]{4})$/,
+};
+```
+
+### Accepted Cards Array
+
+We will be defining the accepted cards array for the credit cards we are supporting. This will help us ensure that users are entering valid credit card numbers when they enter their payment information.
+
+```typescript
+// src/lib/constants/validate/payment.ts
+export const ACCEPTED_CARD_TYPES = [
+  "VISA",
+  "MASTERCARD",
+  "AMERICAN_EXPRESS",
+  "DISCOVER",
+  "JCB",
+  "DINERS_CLUB",
+  "MAESTRO",
+  "UNIONPAY",
+] as const;
+export type AcceptedCardType = (typeof ACCEPTED_CARD_TYPES)[number];
+```
+
+## Payment Error Messages
+
+We will be defining the payment error messages for the credit cards we are supporting. This will help us ensure that users are entering valid credit card numbers when they enter their payment information.
+
+```typescript
+// src/lib/constants/validate/payment.ts
+export const PAYMENT_ERROR_MESSAGES = {
+  CARD_NUMBER_REQUIRED: "Card number is required",
+  CARD_NUMBER_INVALID: "Invalid card number",
+  CARD_NUMBER_LUHN_FAILED: "Card number failed security check",
+  CARD_TYPE_UNSUPPORTED: "Card type is not supported",
+  CARDHOLDER_NAME_REQUIRED: "Cardholder name is required",
+  CARDHOLDER_NAME_TOO_SHORT: "Cardholder name must be at least 2 characters",
+  CARDHOLDER_NAME_TOO_LONG: "Cardholder name must not exceed 50 characters",
+  CARDHOLDER_NAME_INVALID: "Cardholder name contains invalid characters",
+  EXPIRY_DATE_REQUIRED: "Expiry date is required",
+  EXPIRY_DATE_INVALID_FORMAT: "Expiry date must be in MM/YY format",
+  EXPIRY_DATE_EXPIRED: "Card has expired",
+  EXPIRY_DATE_TOO_FAR: "Expiry date cannot be more than 20 years in the future",
+  CVV_REQUIRED: "CVV is required",
+  CVV_INVALID_LENGTH: "CVV must be 3-4 digits",
+  CVV_INVALID_FORMAT: "CVV must contain only numbers",
+  BILLING_ADDRESS_REQUIRED: "Billing address is required for this card type",
+} as const;
+```
+
+## Security Constants
+
+We will be defining the security constants for the e-commerce platform. This will help us ensure that we are following best practices for security and protecting user data.
+
+```typescript
+// src/lib/constants/validate/payment.ts
+export const SECURITY_CONSTANTS = {
+  MAX_EXPIRY_YEARS_FUTURE: 20,
+  MIN_CARDHOLDER_NAME_LENGTH: 2,
+  MAX_CARDHOLDER_NAME_LENGTH: 50,
+  CVV_MIN_LENGTH: 3,
+  CVV_MAX_LENGTH: 4,
+} as const;
+```
+
+## Next Steps
+
+Now that we have our validation constants, we will start implementing the utility functions that will use these constants to validate user input across our e-commerce platform. This will help us maintain clean and consistent data, ensuring a smooth user experience.
+
+Head over to [Formatting Utility Functions](/ecommerce-platform/utility-functions-and-validation-constants/formatting-utility-functions) to continue building out your e-commerce platform. This will help us set up the necessary utility functions for our e-commerce platform, ensuring that our data is clean and consistent.
+
+<BackToTop />

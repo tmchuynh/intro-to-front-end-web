@@ -8,9 +8,6 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     "./mdx-components.tsx",
   ],
-  theme: {
-    extend: {},
-  },
   plugins: [typography],
 };
 

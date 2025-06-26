@@ -1,6 +1,6 @@
 import BackToTop from "@/components/BackToTop";
 
-# Creating the Wishlist Provider
+# The Wishlist Provider
 
 ## Table of Contents
 
@@ -82,7 +82,9 @@ interface WishlistProviderProps {
   children: React.ReactNode;
 }
 
-export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) => {
+export const WishlistProvider: React.FC<WishlistProviderProps> = ({
+  children,
+}) => {
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { user, isLoggedIn } = useAuth();
@@ -107,8 +109,8 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   const markAsPurchased = (productIds: number[]) => {
     if (!isLoggedIn) return;
 
-    setWishlistItems(prev =>
-      prev.map(item =>
+    setWishlistItems((prev) =>
+      prev.map((item) =>
         productIds.includes(item.id)
           ? { ...item, isPurchased: true, purchasedAt: new Date() }
           : item
@@ -128,7 +130,10 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     window.addEventListener("cart-checkout", handleCheckout as EventListener);
 
     return () => {
-      window.removeEventListener("cart-checkout", handleCheckout as EventListener);
+      window.removeEventListener(
+        "cart-checkout",
+        handleCheckout as EventListener
+      );
     };
   }, [isLoggedIn]); // Add isLoggedIn as dependency
 
@@ -148,7 +153,9 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
         const wishlistWithDates = parsedWishlist.map((item: any) => ({
           ...item,
           addedAt: new Date(item.addedAt),
-          purchasedAt: item.purchasedAt ? new Date(item.purchasedAt) : undefined,
+          purchasedAt: item.purchasedAt
+            ? new Date(item.purchasedAt)
+            : undefined,
         }));
         setWishlistItems(wishlistWithDates);
       }
@@ -168,9 +175,14 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     }
   };
 
-  const addToWishlist = async (product: ProductItem): Promise<{ success: boolean; message: string }> => {
+  const addToWishlist = async (
+    product: ProductItem
+  ): Promise<{ success: boolean; message: string }> => {
     if (!isLoggedIn) {
-      return { success: false, message: "Please log in to add items to your wishlist" };
+      return {
+        success: false,
+        message: "Please log in to add items to your wishlist",
+      };
     }
 
     if (isInWishlist(product.id)) {
@@ -186,7 +198,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
         isPurchased: false,
       };
 
-      setWishlistItems(prev => [...prev, newWishlistItem]);
+      setWishlistItems((prev) => [...prev, newWishlistItem]);
       return { success: true, message: "Item added to wishlist" };
     } catch (error) {
       console.error("Error adding to wishlist:", error);
@@ -196,14 +208,19 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     }
   };
 
-  const removeFromWishlist = async (productId: number): Promise<{ success: boolean; message: string }> => {
+  const removeFromWishlist = async (
+    productId: number
+  ): Promise<{ success: boolean; message: string }> => {
     if (!isLoggedIn) {
-      return { success: false, message: "Please log in to manage your wishlist" };
+      return {
+        success: false,
+        message: "Please log in to manage your wishlist",
+      };
     }
 
     setIsLoading(true);
     try {
-      setWishlistItems(prev => prev.filter(item => item.id !== productId));
+      setWishlistItems((prev) => prev.filter((item) => item.id !== productId));
       return { success: true, message: "Item removed from wishlist" };
     } catch (error) {
       console.error("Error removing from wishlist:", error);
@@ -213,12 +230,14 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
     }
   };
 
-  const moveToCart = async (productId: number): Promise<{ success: boolean; message: string }> => {
+  const moveToCart = async (
+    productId: number
+  ): Promise<{ success: boolean; message: string }> => {
     if (!isLoggedIn) {
       return { success: false, message: "Please log in to move items to cart" };
     }
 
-    const wishlistItem = wishlistItems.find(item => item.id === productId);
+    const wishlistItem = wishlistItems.find((item) => item.id === productId);
     if (!wishlistItem) {
       return { success: false, message: "Item not found in wishlist" };
     }
@@ -235,7 +254,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   };
 
   const isInWishlist = (productId: number): boolean => {
-    return wishlistItems.some(item => item.id === productId);
+    return wishlistItems.some((item) => item.id === productId);
   };
 
   const clearWishlist = () => {
@@ -243,8 +262,8 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   };
 
   // Computed values
-  const activeWishlistItems = wishlistItems.filter(item => !item.isPurchased);
-  const purchasedItems = wishlistItems.filter(item => item.isPurchased);
+  const activeWishlistItems = wishlistItems.filter((item) => !item.isPurchased);
+  const purchasedItems = wishlistItems.filter((item) => item.isPurchased);
   const wishlistCount = activeWishlistItems.length;
 
   const value: WishlistContextType = {
@@ -279,7 +298,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
 
 ## Next Steps
 
-Last, but not least, we will implement the [Order Provider](/ecommerce-platform/context-providers-and-hooks/orderProvider). This provider will manage the order processing functionality, including order creation, status tracking, and history management. It will integrate with the authentication provider to ensure that orders are user-specific and persist across sessions.
+Last, but not least, we will implement the [Order Provider](/ecommerce-platform/context-and-hooks/creating-context/orderProvider). This provider will manage the order processing functionality, including order creation, status tracking, and history management. It will integrate with the authentication provider to ensure that orders are user-specific and persist across sessions.
 
 The Order Provider will introduce you to:
 

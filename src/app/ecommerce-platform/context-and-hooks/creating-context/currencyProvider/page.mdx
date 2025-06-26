@@ -1,6 +1,6 @@
 import BackToTop from "@/components/BackToTop";
 
-# Creating the Currency Provider
+# The Currency Provider
 
 ## Table of Contents
 
@@ -55,16 +55,16 @@ graph TD
     A --> C[Fallback Rate System]
     A --> D[Currency Formatter]
     A --> E[Persistence Layer]
-    
+
     B --> F[Real-time Rates]
     C --> G[Static Rates]
     D --> H[Intl.NumberFormat]
     E --> I[localStorage]
-    
+
     A --> J[Price Conversion Engine]
     J --> K[USD Base Conversion]
     J --> L[Target Currency Conversion]
-    
+
     A --> M[Currency Selection]
     M --> N[User Preferences]
     M --> O[Regional Detection]
@@ -122,6 +122,7 @@ This sophisticated interface design represents the foundation of our internation
 ### Deep Dive into Interface Architecture
 
 #### CurrencyRates Interface Analysis
+
 ```tsx
 export interface CurrencyRates {
   [key: string]: number;
@@ -129,45 +130,50 @@ export interface CurrencyRates {
 ```
 
 **Design Philosophy:**
+
 - **Dynamic Key Structure**: Allows support for any currency code without interface modifications
 - **Numeric Precision**: Uses JavaScript numbers for exchange rates (sufficient for most e-commerce use cases)
 - **Extensibility**: New currencies can be added without code changes
 - **Type Safety**: Ensures rate values are always numeric
 
 **Real-world Considerations:**
+
 - Exchange rates are typically provided with 4-6 decimal places
 - JavaScript's number precision is sufficient for currency calculations up to ~15 significant digits
 - For financial applications requiring higher precision, consider using libraries like `decimal.js`
 
 #### CurrencyData Interface Analysis
+
 ```tsx
 export interface CurrencyData {
-  code: string;     // ISO 4217 currency code (e.g., "USD", "EUR")
-  name: string;     // Human-readable currency name
-  symbol: string;   // Currency symbol for display
+  code: string; // ISO 4217 currency code (e.g., "USD", "EUR")
+  name: string; // Human-readable currency name
+  symbol: string; // Currency symbol for display
 }
 ```
 
 **Standards Compliance:**
+
 - **ISO 4217**: International standard for currency codes
 - **Unicode Support**: Symbols support international characters (₹, ¥, €)
 - **Accessibility**: Names provide screen-reader friendly descriptions
 - **Localization Ready**: Structure supports future i18n enhancements
 
 #### CurrencyContextType Interface Analysis
+
 ```tsx
 export interface CurrencyContextType {
   // State Properties
-  currentCurrency: CurrencyData;        // Currently selected currency
-  rates: CurrencyRates;                 // All available exchange rates
-  isLoading: boolean;                   // Loading state for UX
-  error: string | null;                 // Error handling for API failures
-  
+  currentCurrency: CurrencyData; // Currently selected currency
+  rates: CurrencyRates; // All available exchange rates
+  isLoading: boolean; // Loading state for UX
+  error: string | null; // Error handling for API failures
+
   // Core Operations
-  setCurrency: (currency: CurrencyData) => void;           // Currency selection
-  convertPrice: (price: number, fromCurrency?: string) => number;  // Price conversion
-  formatPrice: (price: number, fromCurrency?: string) => string;   // Formatted display
-  refreshRates: () => Promise<void>;                               // Manual refresh
+  setCurrency: (currency: CurrencyData) => void; // Currency selection
+  convertPrice: (price: number, fromCurrency?: string) => number; // Price conversion
+  formatPrice: (price: number, fromCurrency?: string) => string; // Formatted display
+  refreshRates: () => Promise<void>; // Manual refresh
 }
 ```
 
@@ -179,9 +185,11 @@ export interface CurrencyContextType {
 4. **`refreshRates`**: Async operation with promise-based error handling
 
 **Optional Parameters Strategy:**
+
 ```tsx
 convertPrice: (price: number, fromCurrency?: string) => number;
 ```
+
 - **Default Assumption**: Prices are in USD unless specified
 - **Flexibility**: Supports conversion from any currency
 - **Backwards Compatibility**: Existing code works without modification
@@ -189,19 +197,25 @@ convertPrice: (price: number, fromCurrency?: string) => number;
 ### Advanced tsx Patterns
 
 #### Union Types for Error Handling
+
 ```tsx
 error: string | null;
 ```
+
 **Benefits:**
+
 - **Explicit Null Handling**: tsx enforces null checks
 - **Clear State**: Distinguishes between "no error" (null) and "error message" (string)
 - **Type Safety**: Prevents accidental string operations on null values
 
 #### Function Signature Design
+
 ```tsx
 formatPrice: (price: number, fromCurrency?: string) => string;
 ```
+
 **Considerations:**
+
 - **Return Type Specificity**: Always returns formatted string for display
 - **Parameter Ordering**: Most common parameter (price) comes first
 - **Optional Parameters**: Less common parameter (fromCurrency) is optional
@@ -214,16 +228,16 @@ The interfaces are designed for future enhancements:
 ```tsx
 // Future enhancement possibilities
 export interface EnhancedCurrencyData extends CurrencyData {
-  locale?: string;              // For regional formatting
-  decimalPlaces?: number;       // Custom precision per currency
-  grouping?: boolean;           // Thousand separators
-  prefix?: boolean;             // Symbol position preference
+  locale?: string; // For regional formatting
+  decimalPlaces?: number; // Custom precision per currency
+  grouping?: boolean; // Thousand separators
+  prefix?: boolean; // Symbol position preference
 }
 
 export interface AdvancedCurrencyRates extends CurrencyRates {
-  timestamp?: number;           // Rate freshness tracking
-  source?: string;              // Rate provider identification
-  spread?: number;              // Buy/sell spread for trading
+  timestamp?: number; // Rate freshness tracking
+  source?: string; // Rate provider identification
+  spread?: number; // Buy/sell spread for trading
 }
 ```
 
@@ -234,14 +248,14 @@ The interfaces are designed to work seamlessly with modern browser APIs:
 ```tsx
 // Intl.NumberFormat integration
 const formatter = new Intl.NumberFormat(locale, {
-  style: 'currency',
-  currency: currentCurrency.code,  // Uses our CurrencyData.code
+  style: "currency",
+  currency: currentCurrency.code, // Uses our CurrencyData.code
   // Additional options based on currency characteristics
 });
 
 // Intl.DisplayNames integration (future enhancement)
-const currencyDisplayNames = new Intl.DisplayNames(['en'], {
-  type: 'currency'
+const currencyDisplayNames = new Intl.DisplayNames(["en"], {
+  type: "currency",
 });
 ```
 
@@ -301,6 +315,7 @@ This comprehensive currency configuration represents a strategic approach to glo
 ### Currency Selection Strategy
 
 #### Default Currency Analysis
+
 ```tsx
 const defaultCurrency: CurrencyData = {
   code: "USD",
@@ -310,6 +325,7 @@ const defaultCurrency: CurrencyData = {
 ```
 
 **Strategic Rationale:**
+
 - **USD as Base**: Most international commerce is priced in USD
 - **Exchange Rate Standard**: USD serves as the common conversion base
 - **API Compatibility**: Most exchange rate APIs use USD as primary currency
@@ -320,22 +336,26 @@ const defaultCurrency: CurrencyData = {
 Our currency selection covers **major economic regions**:
 
 **Tier 1 - Global Reserve Currencies:**
+
 - USD (United States) - World's primary reserve currency
 - EUR (European Union) - Second largest reserve currency
 - GBP (United Kingdom) - Historic global currency
 - JPY (Japan) - Major Asian reserve currency
 
 **Tier 2 - Major Trading Currencies:**
+
 - AUD, CAD - Resource-rich developed economies
 - CNY - World's second-largest economy
 - CHF - Safe-haven currency
 
 **Tier 3 - Regional Powers:**
+
 - INR (India) - Large emerging market
 - BRL (Brazil) - Latin America's largest economy
 - RUB (Russia) - Major commodity exporter
 
 **Tier 4 - Strategic Markets:**
+
 - Emerging markets and specialized economies
 - Tourism-dependent economies (AED, THB)
 - Resource extraction economies (ZAR, NOK)
@@ -343,6 +363,7 @@ Our currency selection covers **major economic regions**:
 ### Symbol Design Considerations
 
 #### Unicode Support Strategy
+
 ```tsx
 { code: "EUR", name: "Euro", symbol: "€" },
 { code: "GBP", name: "British Pound", symbol: "£" },
@@ -351,13 +372,16 @@ Our currency selection covers **major economic regions**:
 ```
 
 **Technical Implementation:**
+
 - **Unicode Compatibility**: All symbols use proper Unicode characters
 - **Font Support**: Symbols are widely supported across device fonts
 - **Fallback Strategy**: ASCII alternatives available for older systems
 - **RTL Support**: Arabic currency symbols (د.إ) support right-to-left display
 
 #### Symbol Disambiguation
+
 Notice how we handle symbol conflicts:
+
 ```tsx
 { code: "USD", name: "US Dollar", symbol: "$" },
 { code: "CAD", name: "Canadian Dollar", symbol: "C$" },
@@ -366,6 +390,7 @@ Notice how we handle symbol conflicts:
 ```
 
 **Disambiguation Strategy:**
+
 - **Regional Prefixes**: C$, A$, HK$ for clarity
 - **Context-Aware Display**: Different symbols based on user location
 - **ISO Code Fallback**: Always available as unambiguous identifier
@@ -373,25 +398,37 @@ Notice how we handle symbol conflicts:
 ### Market Coverage Analysis
 
 #### Geographic Distribution
+
 ```javascript
 const regionCoverage = {
   "North America": ["USD", "CAD", "MXN"],
-  "Europe": ["EUR", "GBP", "CHF", "NOK", "PLN", "UAH"],
-  "Asia": ["JPY", "CNY", "INR", "KRW", "THB", "SGD", "HKD", "IDR", "VND"],
+  Europe: ["EUR", "GBP", "CHF", "NOK", "PLN", "UAH"],
+  Asia: ["JPY", "CNY", "INR", "KRW", "THB", "SGD", "HKD", "IDR", "VND"],
   "Middle East": ["AED", "MAD"],
-  "Africa": ["ZAR", "XOF", "TZS"],
-  "Oceania": ["AUD", "VUV", "WST"],
-  "South America": ["BRL", "DOP"]
+  Africa: ["ZAR", "XOF", "TZS"],
+  Oceania: ["AUD", "VUV", "WST"],
+  "South America": ["BRL", "DOP"],
 };
 ```
 
 #### Economic Significance
+
 ```javascript
 const economicWeight = {
-  "Major Economies (GDP > $1T)": ["USD", "CNY", "JPY", "EUR", "INR", "GBP", "BRL", "CAD", "AUD"],
+  "Major Economies (GDP > $1T)": [
+    "USD",
+    "CNY",
+    "JPY",
+    "EUR",
+    "INR",
+    "GBP",
+    "BRL",
+    "CAD",
+    "AUD",
+  ],
   "Regional Powers": ["MXN", "KRW", "RUB", "CHF", "THB"],
   "Emerging Markets": ["ZAR", "PLN", "UAH", "VND", "IDR"],
-  "Specialized Markets": ["AED", "SGD", "HKD", "NOK"]
+  "Specialized Markets": ["AED", "SGD", "HKD", "NOK"],
 };
 ```
 
@@ -405,41 +442,46 @@ const zeroDecimalCurrencies = ["JPY", "KRW", "VND", "IDR"];
 
 // Different grouping patterns
 const groupingPatterns = {
-  "USD": "1,234.56",      // Comma thousands, period decimal
-  "EUR": "1.234,56",      // Period thousands, comma decimal (some regions)
-  "INR": "1,23,456.78",   // Indian numbering system
-  "CHF": "1'234.56"       // Apostrophe thousands separator
+  USD: "1,234.56", // Comma thousands, period decimal
+  EUR: "1.234,56", // Period thousands, comma decimal (some regions)
+  INR: "1,23,456.78", // Indian numbering system
+  CHF: "1'234.56", // Apostrophe thousands separator
 };
 
 // Symbol positioning
 const symbolPositions = {
-  "USD": "before",        // $1.00
-  "EUR": "after",         // 1,00 €
-  "GBP": "before",        // £1.00
-  "JPY": "before"         // ¥100
+  USD: "before", // $1.00
+  EUR: "after", // 1,00 €
+  GBP: "before", // £1.00
+  JPY: "before", // ¥100
 };
 ```
 
 ### Performance Optimization in Currency Data
 
 #### Memory Efficiency
+
 ```tsx
 // Efficient storage - only essential data
-const currencyData = currencies.reduce((acc, currency) => {
-  acc[currency.code] = currency;
-  return acc;
-}, {} as Record<string, CurrencyData>);
+const currencyData = currencies.reduce(
+  (acc, currency) => {
+    acc[currency.code] = currency;
+    return acc;
+  },
+  {} as Record<string, CurrencyData>
+);
 
 // Fast lookups O(1) instead of O(n)
 const getCurrency = (code: string) => currencyData[code];
 ```
 
 #### Lazy Loading Strategy
+
 ```tsx
 // Load only active currencies initially
 const activeCurrencies = ["USD", "EUR", "GBP", "JPY"];
-const extendedCurrencies = currencies.filter(c => 
-  !activeCurrencies.includes(c.code)
+const extendedCurrencies = currencies.filter(
+  (c) => !activeCurrencies.includes(c.code)
 );
 
 // Load extended currencies on demand
@@ -457,14 +499,20 @@ The currency constants are designed for easy extension:
 const cryptoCurrencies: CurrencyData[] = [
   { code: "BTC", name: "Bitcoin", symbol: "₿" },
   { code: "ETH", name: "Ethereum", symbol: "Ξ" },
-  { code: "USDC", name: "USD Coin", symbol: "USDC" }
+  { code: "USDC", name: "USD Coin", symbol: "USDC" },
 ];
 
 // Regional currency sets (future)
 const regionalSets = {
-  european: currencies.filter(c => ["EUR", "GBP", "CHF", "NOK", "PLN"].includes(c.code)),
-  asian: currencies.filter(c => ["JPY", "CNY", "KRW", "INR", "THB"].includes(c.code)),
-  americas: currencies.filter(c => ["USD", "CAD", "BRL", "MXN"].includes(c.code))
+  european: currencies.filter((c) =>
+    ["EUR", "GBP", "CHF", "NOK", "PLN"].includes(c.code)
+  ),
+  asian: currencies.filter((c) =>
+    ["JPY", "CNY", "KRW", "INR", "THB"].includes(c.code)
+  ),
+  americas: currencies.filter((c) =>
+    ["USD", "CAD", "BRL", "MXN"].includes(c.code)
+  ),
 };
 ```
 
@@ -494,8 +542,11 @@ This implementation establishes the foundational infrastructure for currency man
 ### Context Architecture Deep Dive
 
 #### Context Creation Strategy
+
 ```tsx
-const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
+const CurrencyContext = createContext<CurrencyContextType | undefined>(
+  undefined
+);
 ```
 
 **Advanced Design Patterns:**
@@ -506,6 +557,7 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined
 4. **Fail-Fast Philosophy**: Immediate error detection during development
 
 #### Custom Hook Implementation Analysis
+
 ```tsx
 export const useCurrency = () => {
   const context = useContext(CurrencyContext);
@@ -527,21 +579,25 @@ export const useCurrency = () => {
 ### Advanced Context Patterns
 
 #### Error Message Strategy
+
 ```tsx
 throw new Error("useCurrency must be used within a CurrencyProvider");
 ```
 
 **Error Design Philosophy:**
+
 - **Specific**: Clearly identifies the required provider
 - **Actionable**: Tells developers exactly what to do
 - **Contextual**: References the specific hook name
 - **Development-Friendly**: Helps with debugging and onboarding
 
 #### Type Safety Benefits
+
 ```tsx
 // Without custom hook (error-prone)
 const context = useContext(CurrencyContext);
-if (context) {  // Developer must remember null check
+if (context) {
+  // Developer must remember null check
   const { formatPrice } = context;
 }
 
@@ -552,21 +608,26 @@ const { formatPrice } = useCurrency(); // Always defined, no null checks needed
 ### Performance Considerations
 
 #### Context Value Optimization
+
 ```tsx
 // The provider will need to memoize the context value
-const contextValue = useMemo(() => ({
-  currentCurrency,
-  rates,
-  isLoading,
-  error,
-  setCurrency,
-  convertPrice,
-  formatPrice,
-  refreshRates,
-}), [currentCurrency, rates, isLoading, error]);
+const contextValue = useMemo(
+  () => ({
+    currentCurrency,
+    rates,
+    isLoading,
+    error,
+    setCurrency,
+    convertPrice,
+    formatPrice,
+    refreshRates,
+  }),
+  [currentCurrency, rates, isLoading, error]
+);
 ```
 
 #### Selective Re-rendering
+
 ```tsx
 // Components can destructure only needed values
 const ProductPrice = ({ price }) => {
@@ -583,10 +644,11 @@ const CurrencySelector = () => {
 ### Context Consumer Patterns
 
 #### Basic Usage Pattern
+
 ```tsx
 const ProductCard = ({ product }) => {
   const { formatPrice, currentCurrency } = useCurrency();
-  
+
   return (
     <div>
       <h3>{product.name}</h3>
@@ -598,34 +660,33 @@ const ProductCard = ({ product }) => {
 ```
 
 #### Advanced Usage Pattern
+
 ```tsx
 const ShoppingCart = () => {
   const { convertPrice, formatPrice, currentCurrency } = useCurrency();
   const { items } = useCart();
-  
+
   // Calculate totals in current currency
   const total = items.reduce((sum, item) => {
     return sum + convertPrice(item.price * item.quantity);
   }, 0);
-  
+
   const savings = items.reduce((sum, item) => {
     const originalPrice = convertPrice(item.originalPrice * item.quantity);
     const currentPrice = convertPrice(item.price * item.quantity);
     return sum + (originalPrice - currentPrice);
   }, 0);
-  
+
   return (
     <div>
       <h2>Shopping Cart</h2>
-      {items.map(item => (
+      {items.map((item) => (
         <CartItem key={item.id} item={item} />
       ))}
       <div className="totals">
         <p>Subtotal: {formatPrice(total)}</p>
         {savings > 0 && (
-          <p className="savings">
-            You saved: {formatPrice(savings)}
-          </p>
+          <p className="savings">You saved: {formatPrice(savings)}</p>
         )}
       </div>
     </div>
@@ -636,6 +697,7 @@ const ShoppingCart = () => {
 ### Error Handling Integration
 
 #### Component Error Boundaries
+
 ```tsx
 class CurrencyErrorBoundary extends React.Component {
   constructor(props) {
@@ -645,15 +707,15 @@ class CurrencyErrorBoundary extends React.Component {
 
   static getDerivedStateFromError(error) {
     // Check if it's a currency context error
-    if (error.message.includes('useCurrency must be used within')) {
-      return { hasError: true, errorType: 'provider' };
+    if (error.message.includes("useCurrency must be used within")) {
+      return { hasError: true, errorType: "provider" };
     }
-    return { hasError: true, errorType: 'unknown' };
+    return { hasError: true, errorType: "unknown" };
   }
 
   render() {
     if (this.state.hasError) {
-      if (this.state.errorType === 'provider') {
+      if (this.state.errorType === "provider") {
         return (
           <div className="currency-error">
             <h3>Currency System Error</h3>
@@ -670,28 +732,31 @@ class CurrencyErrorBoundary extends React.Component {
 ```
 
 #### Development vs Production Error Handling
+
 ```tsx
 const useCurrency = () => {
   const context = useContext(CurrencyContext);
   if (!context) {
-    const error = new Error("useCurrency must be used within a CurrencyProvider");
-    
+    const error = new Error(
+      "useCurrency must be used within a CurrencyProvider"
+    );
+
     // In development, throw immediately for debugging
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === "development") {
       throw error;
     }
-    
+
     // In production, log error and return safe defaults
     console.error(error);
     return {
-      currentCurrency: { code: 'USD', name: 'US Dollar', symbol: '$' },
+      currentCurrency: { code: "USD", name: "US Dollar", symbol: "$" },
       rates: { USD: 1 },
       isLoading: false,
-      error: 'Currency system unavailable',
+      error: "Currency system unavailable",
       setCurrency: () => {},
       convertPrice: (price) => price,
       formatPrice: (price) => `$${price.toFixed(2)}`,
-      refreshRates: async () => {}
+      refreshRates: async () => {},
     };
   }
   return context;
@@ -895,8 +960,10 @@ This sophisticated CurrencyProvider implementation represents a production-ready
 ### State Management Architecture
 
 #### Multi-layered State Design
+
 ```tsx
-const [currentCurrency, setCurrentCurrency] = useState<CurrencyData>(defaultCurrency);
+const [currentCurrency, setCurrentCurrency] =
+  useState<CurrencyData>(defaultCurrency);
 const [rates, setRates] = useState<CurrencyRates>({});
 const [isLoading, setIsLoading] = useState(true);
 const [error, setError] = useState<string | null>(null);
@@ -929,6 +996,7 @@ const [error, setError] = useState<string | null>(null);
 ### API Integration Strategy
 
 #### Primary API Integration
+
 ```tsx
 const fetchExchangeRates = async () => {
   try {
@@ -965,13 +1033,14 @@ const fetchExchangeRates = async () => {
 5. **USD Base Currency**: Consistent with most financial APIs
 
 #### Fallback Rate System
+
 ```tsx
 const setFallbackRates = () => {
   setRates({
-    USD: 1,      // Base currency
-    EUR: 0.92,   // European markets
-    GBP: 0.79,   // UK market
-    JPY: 149.5,  // Asian markets
+    USD: 1, // Base currency
+    EUR: 0.92, // European markets
+    GBP: 0.79, // UK market
+    JPY: 149.5, // Asian markets
     AUD: 1.52,
     CAD: 1.36,
     CNY: 7.23,
@@ -1017,6 +1086,7 @@ const setFallbackRates = () => {
 ### Rate Refresh Mechanisms
 
 #### Automatic Refresh System
+
 ```tsx
 useEffect(() => {
   fetchExchangeRates();
@@ -1036,6 +1106,7 @@ useEffect(() => {
 4. **Background Updates**: Transparent to user experience
 
 #### Manual Refresh Capability
+
 ```tsx
 const refreshRates = async () => {
   await fetchExchangeRates();
@@ -1043,6 +1114,7 @@ const refreshRates = async () => {
 ```
 
 **Manual Refresh Benefits:**
+
 - User control over rate freshness
 - Recovery mechanism for failed automatic updates
 - Testing and debugging capabilities
@@ -1051,6 +1123,7 @@ const refreshRates = async () => {
 ### Persistence and User Preferences
 
 #### Currency Preference Persistence
+
 ```tsx
 useEffect(() => {
   const savedCurrency = localStorage.getItem("preferred-currency");
@@ -1086,6 +1159,7 @@ const setCurrency = (currency: CurrencyData) => {
 ### Two-step Conversion Process
 
 #### USD-based Conversion Algorithm
+
 ```tsx
 const convertPrice = (price: number, fromCurrency: string = "USD"): number => {
   if (!rates || Object.keys(rates).length === 0) {
@@ -1111,19 +1185,20 @@ const convertPrice = (price: number, fromCurrency: string = "USD"): number => {
 5. **Performance**: Simple mathematical operations
 
 #### Precision and Rounding Considerations
+
 ```tsx
 // Enhanced conversion with precision handling
 const convertPriceWithPrecision = (
-  price: number, 
+  price: number,
   fromCurrency: string = "USD"
 ): number => {
   const converted = convertPrice(price, fromCurrency);
-  
+
   // Different precision for different currencies
   if (currentCurrency.code === "JPY" || currentCurrency.code === "KRW") {
     return Math.round(converted); // No decimal places
   }
-  
+
   // Standard 2 decimal places for most currencies
   return Math.round(converted * 100) / 100;
 };
@@ -1134,6 +1209,7 @@ const convertPriceWithPrecision = (
 ### Advanced Formatting with Intl API
 
 #### Culture-aware Price Formatting
+
 ```tsx
 const formatPrice = (price: number, fromCurrency: string = "USD"): string => {
   const convertedPrice = convertPrice(price, fromCurrency);
@@ -1158,17 +1234,18 @@ const formatPrice = (price: number, fromCurrency: string = "USD"): string => {
 5. **Regional Variants**: Supports regional formatting differences
 
 #### Enhanced Formatting with Locale Detection
+
 ```tsx
 // Future enhancement: locale-aware formatting
 const formatPriceWithLocale = (
-  price: number, 
+  price: number,
   fromCurrency: string = "USD"
 ): string => {
   const convertedPrice = convertPrice(price, fromCurrency);
-  
+
   // Detect user's locale or use currency-specific locale
   const locale = getUserLocale() || getCurrencyLocale(currentCurrency.code);
-  
+
   const formatter = new Intl.NumberFormat(locale, {
     style: "currency",
     currency: currentCurrency.code,
@@ -1182,11 +1259,11 @@ const formatPriceWithLocale = (
 // Helper functions for enhanced formatting
 const getCurrencyLocale = (currencyCode: string): string => {
   const localeMap = {
-    "USD": "en-US",
-    "EUR": "de-DE",
-    "GBP": "en-GB",
-    "JPY": "ja-JP",
-    "CNY": "zh-CN",
+    USD: "en-US",
+    EUR: "de-DE",
+    GBP: "en-GB",
+    JPY: "ja-JP",
+    CNY: "zh-CN",
     // ... more mappings
   };
   return localeMap[currencyCode] || "en-US";
@@ -1201,65 +1278,71 @@ const getDecimalPlaces = (currencyCode: string): number => {
 ### Context Value Optimization
 
 #### Memoized Context Value
+
 ```tsx
-const contextValue: CurrencyContextType = useMemo(() => ({
-  currentCurrency,
-  rates,
-  isLoading,
-  error,
-  setCurrency,
-  convertPrice,
-  formatPrice,
-  refreshRates,
-}), [
-  currentCurrency,
-  rates,
-  isLoading,
-  error,
-  // Functions are stable and don't need dependencies
-]);
+const contextValue: CurrencyContextType = useMemo(
+  () => ({
+    currentCurrency,
+    rates,
+    isLoading,
+    error,
+    setCurrency,
+    convertPrice,
+    formatPrice,
+    refreshRates,
+  }),
+  [
+    currentCurrency,
+    rates,
+    isLoading,
+    error,
+    // Functions are stable and don't need dependencies
+  ]
+);
 ```
 
 #### Memoization Strategies
 
 #### Function Memoization for Expensive Operations
+
 ```tsx
 // Memoized conversion function for repeated calculations
 const memoizedConvertPrice = useMemo(() => {
   const cache = new Map<string, number>();
-  
+
   return (price: number, fromCurrency: string = "USD"): number => {
     const cacheKey = `${price}-${fromCurrency}-${currentCurrency.code}`;
-    
+
     if (cache.has(cacheKey)) {
       return cache.get(cacheKey)!;
     }
-    
+
     const converted = convertPrice(price, fromCurrency);
     cache.set(cacheKey, converted);
-    
+
     // Limit cache size to prevent memory leaks
     if (cache.size > 1000) {
       const firstKey = cache.keys().next().value;
       cache.delete(firstKey);
     }
-    
+
     return converted;
   };
 }, [currentCurrency.code, rates]);
 ```
 
 #### Component-Level Optimization
+
 ```tsx
 // Optimized price display component
 const PriceDisplay = memo(({ price, fromCurrency, className }) => {
   const { formatPrice } = useCurrency();
-  
+
   // Memoize formatted price to prevent recalculation
   const formattedPrice = useMemo(() => {
     return formatPrice(price, fromCurrency);
   }, [price, fromCurrency, formatPrice]);
-  
+
   return <span className={className}>{formattedPrice}</span>;
 });
 
@@ -1267,13 +1350,10 @@ const PriceDisplay = memo(({ price, fromCurrency, className }) => {
 const ProductList = ({ products }) => {
   return (
     <div className="product-grid">
-      {products.map(product => (
+      {products.map((product) => (
         <ProductCard key={product.id}>
           <h3>{product.name}</h3>
-          <PriceDisplay 
-            price={product.price} 
-            className="product-price"
-          />
+          <PriceDisplay price={product.price} className="product-price" />
         </ProductCard>
       ))}
     </div>
@@ -1284,6 +1364,7 @@ const ProductList = ({ products }) => {
 ### Debouncing and Throttling
 
 #### API Call Optimization
+
 ```tsx
 // Debounced rate refresh for user-triggered updates
 const debouncedRefreshRates = useCallback(
@@ -1306,12 +1387,15 @@ const throttledSetCurrency = useCallback(
 ### Lazy Loading and Code Splitting
 
 #### Dynamic Currency Loading
+
 ```tsx
 // Lazy load extended currency data
 const loadExtendedCurrencies = useMemo(() => {
-  return lazy(() => import('./extendedCurrencies').then(module => ({
-    default: () => module.extendedCurrencies
-  })));
+  return lazy(() =>
+    import("./extendedCurrencies").then((module) => ({
+      default: () => module.extendedCurrencies,
+    }))
+  );
 }, []);
 
 // Conditional loading based on user region
@@ -1326,6 +1410,7 @@ const getRegionalCurrencies = async (region: string) => {
 ### Multi-layer Caching System
 
 #### Rate Caching Implementation
+
 ```tsx
 interface CachedRates {
   rates: CurrencyRates;
@@ -1334,26 +1419,26 @@ interface CachedRates {
 }
 
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
-const CACHE_KEY = 'currency-rates-cache';
+const CACHE_KEY = "currency-rates-cache";
 
 const getCachedRates = (): CachedRates | null => {
   try {
     const cached = localStorage.getItem(CACHE_KEY);
     if (!cached) return null;
-    
+
     const cachedData: CachedRates = JSON.parse(cached);
     const now = Date.now();
-    
+
     // Check if cache is still valid
     if (now - cachedData.timestamp < cachedData.ttl) {
       return cachedData;
     }
-    
+
     // Cache expired, remove it
     localStorage.removeItem(CACHE_KEY);
     return null;
   } catch (error) {
-    console.error('Error reading cached rates:', error);
+    console.error("Error reading cached rates:", error);
     return null;
   }
 };
@@ -1362,13 +1447,13 @@ const setCachedRates = (rates: CurrencyRates) => {
   const cacheData: CachedRates = {
     rates,
     timestamp: Date.now(),
-    ttl: CACHE_DURATION
+    ttl: CACHE_DURATION,
   };
-  
+
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
   } catch (error) {
-    console.error('Error caching rates:', error);
+    console.error("Error caching rates:", error);
   }
 };
 
@@ -1381,13 +1466,13 @@ const fetchExchangeRatesWithCache = async () => {
     setIsLoading(false);
     return;
   }
-  
+
   // Fetch from API if no cache
   try {
     setIsLoading(true);
     const response = await fetch(/* API call */);
     const data = await response.json();
-    
+
     // Update state and cache
     setRates(data.conversion_rates);
     setCachedRates(data.conversion_rates);
@@ -1400,46 +1485,47 @@ const fetchExchangeRatesWithCache = async () => {
 ```
 
 #### Conversion Result Caching
+
 ```tsx
 class ConversionCache {
   private cache = new Map<string, { result: number; timestamp: number }>();
   private readonly TTL = 5 * 60 * 1000; // 5 minutes
-  
+
   getCachedConversion(
-    price: number, 
-    fromCurrency: string, 
+    price: number,
+    fromCurrency: string,
     toCurrency: string
   ): number | null {
     const key = `${price}-${fromCurrency}-${toCurrency}`;
     const cached = this.cache.get(key);
-    
+
     if (!cached) return null;
-    
+
     // Check if cache entry is still valid
     if (Date.now() - cached.timestamp > this.TTL) {
       this.cache.delete(key);
       return null;
     }
-    
+
     return cached.result;
   }
-  
+
   setCachedConversion(
-    price: number, 
-    fromCurrency: string, 
-    toCurrency: string, 
+    price: number,
+    fromCurrency: string,
+    toCurrency: string,
     result: number
   ) {
     const key = `${price}-${fromCurrency}-${toCurrency}`;
     this.cache.set(key, {
       result,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
-    
+
     // Cleanup old entries periodically
     this.cleanup();
   }
-  
+
   private cleanup() {
     const now = Date.now();
     for (const [key, value] of this.cache.entries()) {
@@ -1458,32 +1544,39 @@ const conversionCache = new ConversionCache();
 ### Comprehensive Error Recovery
 
 #### Network Error Handling
+
 ```tsx
-const fetchWithRetry = async (url: string, options: RequestInit, retries = 3): Promise<Response> => {
+const fetchWithRetry = async (
+  url: string,
+  options: RequestInit,
+  retries = 3
+): Promise<Response> => {
   let lastError: Error;
-  
+
   for (let i = 0; i < retries; i++) {
     try {
       const response = await fetch(url, {
         ...options,
         timeout: 5000, // 5 second timeout
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-      
+
       return response;
     } catch (error) {
       lastError = error as Error;
-      
+
       // Wait before retrying (exponential backoff)
       if (i < retries - 1) {
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+        await new Promise((resolve) =>
+          setTimeout(resolve, Math.pow(2, i) * 1000)
+        );
       }
     }
   }
-  
+
   throw lastError!;
 };
 
@@ -1501,7 +1594,7 @@ const fetchExchangeRatesWithRetry = async () => {
 
     const response = await fetchWithRetry(
       `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`,
-      { method: 'GET' }
+      { method: "GET" }
     );
 
     const data = await response.json();
@@ -1523,37 +1616,40 @@ const fetchExchangeRatesWithRetry = async () => {
 ```
 
 #### Graceful Degradation Patterns
+
 ```tsx
 // Safe conversion with fallback
 const safeConvertPrice = (
-  price: number, 
+  price: number,
   fromCurrency: string = "USD"
 ): number => {
   try {
     // Validate inputs
-    if (typeof price !== 'number' || isNaN(price) || price < 0) {
-      console.warn('Invalid price provided for conversion:', price);
+    if (typeof price !== "number" || isNaN(price) || price < 0) {
+      console.warn("Invalid price provided for conversion:", price);
       return 0;
     }
-    
+
     if (!rates || Object.keys(rates).length === 0) {
-      console.warn('No exchange rates available, returning original price');
+      console.warn("No exchange rates available, returning original price");
       return price;
     }
-    
+
     if (!rates[fromCurrency]) {
       console.warn(`Exchange rate not found for currency: ${fromCurrency}`);
       return price;
     }
-    
+
     if (!rates[currentCurrency.code]) {
-      console.warn(`Exchange rate not found for target currency: ${currentCurrency.code}`);
+      console.warn(
+        `Exchange rate not found for target currency: ${currentCurrency.code}`
+      );
       return price;
     }
-    
+
     return convertPrice(price, fromCurrency);
   } catch (error) {
-    console.error('Error during price conversion:', error);
+    console.error("Error during price conversion:", error);
     return price; // Return original price as fallback
   }
 };
@@ -1562,31 +1658,32 @@ const safeConvertPrice = (
 ### User-Friendly Error Messages
 
 #### Error State Management
+
 ```tsx
 interface CurrencyError {
-  type: 'network' | 'api' | 'validation' | 'cache';
+  type: "network" | "api" | "validation" | "cache";
   message: string;
   recoverable: boolean;
   timestamp: number;
 }
 
-const setUserFriendlyError = (error: Error, type: CurrencyError['type']) => {
+const setUserFriendlyError = (error: Error, type: CurrencyError["type"]) => {
   const errorMessages = {
     network: "Unable to connect to currency service. Using offline rates.",
     api: "Currency service temporarily unavailable. Rates may be outdated.",
     validation: "Invalid currency data detected. Using default settings.",
-    cache: "Unable to save currency preferences. Settings may not persist."
+    cache: "Unable to save currency preferences. Settings may not persist.",
   };
-  
+
   const userError: CurrencyError = {
     type,
     message: errorMessages[type],
-    recoverable: type !== 'validation',
-    timestamp: Date.now()
+    recoverable: type !== "validation",
+    timestamp: Date.now(),
   };
-  
+
   setError(userError.message);
-  
+
   // Log technical details for debugging
   console.error(`Currency ${type} error:`, error);
 };
@@ -1597,18 +1694,21 @@ const setUserFriendlyError = (error: Error, type: CurrencyError['type']) => {
 ### Authentication Provider Integration
 
 #### User-Specific Currency Preferences
+
 ```tsx
 // Enhanced currency provider with authentication integration
 const AuthAwareCurrencyProvider = ({ children }) => {
   const { user } = useAuth();
   const [userCurrencyPrefs, setUserCurrencyPrefs] = useState(null);
-  
+
   // Load user-specific currency preferences
   useEffect(() => {
     if (user) {
-      loadUserCurrencyPreferences(user.id).then(prefs => {
+      loadUserCurrencyPreferences(user.id).then((prefs) => {
         if (prefs && prefs.preferredCurrency) {
-          const currency = currencies.find(c => c.code === prefs.preferredCurrency);
+          const currency = currencies.find(
+            (c) => c.code === prefs.preferredCurrency
+          );
           if (currency) {
             setCurrentCurrency(currency);
           }
@@ -1619,49 +1719,49 @@ const AuthAwareCurrencyProvider = ({ children }) => {
       setCurrentCurrency(defaultCurrency);
     }
   }, [user]);
-  
+
   // Sync currency changes with user preferences
   useEffect(() => {
     if (user) {
       updateUserCurrencyPreference(user.id, currentCurrency.code);
     }
   }, [currentCurrency, user]);
-  
-  return (
-    <CurrencyProvider>
-      {children}
-    </CurrencyProvider>
-  );
+
+  return <CurrencyProvider>{children}</CurrencyProvider>;
 };
 ```
 
 ## Next Steps
 
-Next, we'll implement the [Cart Provider](/ecommerce-platform/context-providers-and-hooks/cartProvider). This provider will manage the shopping cart functionality, allowing users to add, remove, and update items in their cart. It will also handle cart persistence across sessions and integrate with the authentication provider to ensure a seamless user experience.
+Next, we'll implement the [Cart Provider](/ecommerce-platform/context-and-hooks/creating-context/cartProvider). This provider will manage the shopping cart functionality, allowing users to add, remove, and update items in their cart. It will also handle cart persistence across sessions and integrate with the authentication provider to ensure a seamless user experience.
 
 ### What You've Mastered
 
 In this comprehensive currency implementation, you've learned:
 
 #### International E-commerce Architecture
+
 - **Global Market Considerations**: Understanding currency requirements for international sales
 - **Exchange Rate Management**: Real-time rate fetching with robust fallback systems
 - **Internationalization Patterns**: Culture-aware formatting using native browser APIs
 - **Performance Optimization**: Caching strategies and memoization for real-time conversions
 
 #### Advanced React Patterns
+
 - **Complex State Coordination**: Managing multiple interdependent state variables
 - **API Integration Resilience**: Error handling and graceful degradation patterns
 - **Performance Engineering**: Debouncing, throttling, and selective re-rendering
 - **Accessibility Implementation**: Screen reader support and keyboard navigation
 
 #### Financial Software Principles
+
 - **Precision Handling**: Floating-point arithmetic considerations for currency
 - **Data Validation**: Ensuring exchange rate integrity and user input safety
 - **Caching Strategies**: Multi-layer caching for performance and reliability
 - **Audit Trail**: Logging and monitoring for financial operations
 
 #### Enterprise Development Practices
+
 - **Testing Strategies**: Comprehensive unit and integration testing approaches
 - **Error Recovery**: Resilient systems that continue functioning during failures
 - **User Experience Design**: Seamless currency switching with persistent preferences
@@ -1672,24 +1772,28 @@ In this comprehensive currency implementation, you've learned:
 The Cart Provider will build upon these currency concepts while introducing:
 
 #### Complex State Management
+
 - **Normalized State Structure**: Organizing cart items efficiently for performance
 - **Optimistic Updates**: Immediate UI feedback with background synchronization
 - **Conflict Resolution**: Handling concurrent cart modifications across devices
 - **State Persistence**: Multi-level storage strategies for cart data
 
 #### Advanced Business Logic
+
 - **Dynamic Pricing**: Real-time price calculations with discounts and taxes
 - **Inventory Integration**: Stock checking and reservation systems
 - **Cross-sell Logic**: Smart product recommendations and bundling
 - **Checkout Preparation**: Order validation and preparation for payment
 
 #### Performance at Scale
+
 - **Large Dataset Handling**: Efficient cart operations with hundreds of items
 - **Memory Management**: Preventing memory leaks in long-running sessions
 - **Background Sync**: Intelligent synchronization with minimal user impact
 - **Offline Capability**: Cart functionality without network connectivity
 
 #### Integration Complexity
+
 - **Multi-Provider Coordination**: Seamless integration with authentication and currency
 - **Real-time Updates**: WebSocket integration for cart synchronization
 - **Payment Integration**: Preparing data for checkout and payment processing

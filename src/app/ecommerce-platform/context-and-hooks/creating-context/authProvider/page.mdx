@@ -1,6 +1,6 @@
 import BackToTop from "@/components/BackToTop";
 
-# Creating the Authentication Provider
+# The Authentication Provider
 
 ## Table of Contents
 
@@ -39,20 +39,20 @@ graph TD
     A --> C[Authentication Methods]
     A --> D[Membership Management]
     A --> E[Session Persistence]
-    
+
     B --> F[User Profile]
     B --> G[Membership Status]
     B --> H[Preferences]
-    
+
     C --> I[Local Registration]
     C --> J[Local Login]
     C --> K[Demo Login]
     C --> L[Logout]
-    
+
     D --> M[Purchase Membership]
     D --> N[Cancel Membership]
     D --> O[Tier Management]
-    
+
     E --> P[localStorage]
     E --> Q[State Hydration]
 ```
@@ -137,16 +137,17 @@ Take note of the sophisticated type system that drives our authentication archit
 ### Deep Dive into Interface Design
 
 #### User Interface Analysis
+
 ```tsx
 export interface User {
-  id: string;                           // Unique identifier for the user
-  username: string;                     // Display name and login credential
-  phoneNumber: string;                  // Required contact method
-  email?: string;                       // Optional secondary contact
+  id: string; // Unique identifier for the user
+  username: string; // Display name and login credential
+  phoneNumber: string; // Required contact method
+  email?: string; // Optional secondary contact
   membershipTier: MembershipTier | null; // Current subscription status
-  membershipExpiry?: Date;              // When membership benefits end
-  membershipCancellationDate?: Date;    // Cancellation timestamp (still active until expiry)
-  joinedDate: Date;                     // Account creation date
+  membershipExpiry?: Date; // When membership benefits end
+  membershipCancellationDate?: Date; // Cancellation timestamp (still active until expiry)
+  joinedDate: Date; // Account creation date
 }
 ```
 
@@ -162,15 +163,16 @@ export interface User {
 - **`joinedDate: Date`**: Business intelligence data for user lifecycle analytics
 
 #### MembershipTier Interface Analysis
+
 ```tsx
 export interface MembershipTier {
-  id: string;              // Unique tier identifier
-  name: string;            // Human-readable tier name
-  price: number;           // Monthly subscription cost
-  duration: number;        // Subscription length in months
-  benefits: string[];      // List of tier-specific benefits
+  id: string; // Unique tier identifier
+  name: string; // Human-readable tier name
+  price: number; // Monthly subscription cost
+  duration: number; // Subscription length in months
+  benefits: string[]; // List of tier-specific benefits
   discountPercentage: number; // Automatic discount applied
-  color: string;           // UI theming for tier display
+  color: string; // UI theming for tier display
 }
 ```
 
@@ -182,26 +184,34 @@ export interface MembershipTier {
 - **`duration: number`**: Flexible subscription periods (monthly, annual, custom)
 
 #### AuthContextType Interface Analysis
+
 ```tsx
 export interface AuthContextType {
   // State Properties
-  user: User | null;                    // Current user or null for anonymous
-  isLoading: boolean;                   // Authentication state loading indicator
-  
+  user: User | null; // Current user or null for anonymous
+  isLoading: boolean; // Authentication state loading indicator
+
   // Authentication Actions
-  login: (username: string, password: string) => Promise<{success: boolean; message: string}>;
-  register: (userData: RegisterData) => Promise<{success: boolean; message: string}>;
-  logout: () => void;                   // Synchronous logout action
-  
+  login: (
+    username: string,
+    password: string
+  ) => Promise<{ success: boolean; message: string }>;
+  register: (
+    userData: RegisterData
+  ) => Promise<{ success: boolean; message: string }>;
+  logout: () => void; // Synchronous logout action
+
   // Membership Actions
-  purchaseMembership: (tierName: string) => Promise<{success: boolean; message: string}>;
-  cancelMembership: () => Promise<{success: boolean; message: string}>;
-  
+  purchaseMembership: (
+    tierName: string
+  ) => Promise<{ success: boolean; message: string }>;
+  cancelMembership: () => Promise<{ success: boolean; message: string }>;
+
   // Computed Properties
-  isLoggedIn: boolean;                  // Derived from user state
-  hasMembership: boolean;               // Derived from membership status and expiry
-  isMembershipCancelled: boolean;       // Derived from cancellation date
-  membershipDiscount: number;           // Derived from current tier benefits
+  isLoggedIn: boolean; // Derived from user state
+  hasMembership: boolean; // Derived from membership status and expiry
+  isMembershipCancelled: boolean; // Derived from cancellation date
+  membershipDiscount: number; // Derived from current tier benefits
 }
 ```
 
@@ -213,6 +223,7 @@ export interface AuthContextType {
 - **Loading States**: Built-in loading indicators for better UX during async operations
 
 #### RegisterData Interface Analysis
+
 ```tsx
 export interface RegisterData {
   username: string;
@@ -290,6 +301,7 @@ export const useAuth = () => {
 ### Error Handling Philosophy
 
 The custom hook implements a **fail-fast** approach:
+
 - **Runtime Validation**: Immediately detects improper usage
 - **Clear Error Messages**: Developers get specific guidance on fixing the issue
 - **Development vs Production**: Errors help during development but won't crash production apps
@@ -298,9 +310,10 @@ The custom hook implements a **fail-fast** approach:
 ### Usage Pattern Comparison
 
 **Without Custom Hook (Complex)**:
+
 ```tsx
-import { useContext } from 'react';
-import { AuthContext } from './AuthContext';
+import { useContext } from "react";
+import { AuthContext } from "./AuthContext";
 
 function MyComponent() {
   const context = useContext(AuthContext);
@@ -313,8 +326,9 @@ function MyComponent() {
 ```
 
 **With Custom Hook (Simple)**:
+
 ```tsx
-import { useAuth } from './AuthContext';
+import { useAuth } from "./AuthContext";
 
 function MyComponent() {
   const { user, login } = useAuth();
@@ -325,6 +339,7 @@ function MyComponent() {
 ### Context Provider Pattern Benefits
 
 This pattern enables:
+
 - **Separation of Concerns**: Authentication logic is centralized
 - **Testability**: Easy to mock for unit tests
 - **Reusability**: Same authentication logic across different parts of the app
@@ -392,18 +407,21 @@ This tiered membership structure follows proven e-commerce subscription models w
 #### Tier Design Psychology
 
 **Basic Tier ($9.99)**:
+
 - **Entry Point Strategy**: Low barrier to entry encourages initial commitment
 - **Core Benefits**: Essential features that provide immediate value
 - **Customer Acquisition**: Designed to convert free users to paying customers
 - **Upgrade Path**: Positioned to make premium tiers look attractive
 
 **Premium Tier ($19.99)**:
+
 - **Sweet Spot Pricing**: 2x Basic price with significantly enhanced benefits
 - **Shipping Benefits**: High-value perception for frequent shoppers
 - **Exclusive Access**: Creates FOMO (Fear of Missing Out) for product launches
 - **Community Building**: Member events foster brand loyalty
 
 **VIP Tier ($39.99)**:
+
 - **Luxury Positioning**: 4x Basic price for premium experience
 - **Comprehensive Benefits**: All lower-tier benefits plus exclusive perks
 - **Personal Touch**: Individual attention through shopping assistant
@@ -416,14 +434,14 @@ This tiered membership structure follows proven e-commerce subscription models w
 const monthlyRevenue = {
   basic: 9.99 * basicSubscribers,
   premium: 19.99 * premiumSubscribers,
-  vip: 39.99 * vipSubscribers
+  vip: 39.99 * vipSubscribers,
 };
 
 // Profit Margins (Estimated)
 const tierMargins = {
-  basic: 0.70,    // 70% margin - mostly digital benefits
-  premium: 0.65,  // 65% margin - shipping costs reduce margin
-  vip: 0.75       // 75% margin - high price point covers personal services
+  basic: 0.7, // 70% margin - mostly digital benefits
+  premium: 0.65, // 65% margin - shipping costs reduce margin
+  vip: 0.75, // 75% margin - high price point covers personal services
 };
 ```
 
@@ -447,7 +465,7 @@ Each tier is designed with **perceived value** exceeding **actual cost**:
 #### Color Psychology in Tier Design
 
 - **Basic (Blue)**: Trust, reliability, professionalism
-- **Premium (Purple)**: Luxury, creativity, sophistication  
+- **Premium (Purple)**: Luxury, creativity, sophistication
 - **VIP (Amber/Gold)**: Wealth, success, exclusivity
 
 ### Implementation Benefits
@@ -802,6 +820,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 ```
 
 **Design Decisions:**
+
 - **Functional Component with tsx**: Modern React patterns with full type safety
 - **Generic Children Prop**: Accepts any valid React node, providing maximum flexibility
 - **Named Export**: Enables tree-shaking and explicit imports for better bundling
@@ -828,6 +847,7 @@ const [isLoading, setIsLoading] = useState(true);
 ### Session Persistence Implementation
 
 #### User Loading Effect
+
 ```tsx
 useEffect(() => {
   const savedUser = localStorage.getItem("user");
@@ -861,6 +881,7 @@ useEffect(() => {
 5. **Error Handling**: Graceful degradation when localStorage is corrupted
 
 #### User Saving Effect
+
 ```tsx
 useEffect(() => {
   if (user) {
@@ -872,6 +893,7 @@ useEffect(() => {
 ```
 
 **Persistence Strategy:**
+
 - **Reactive Saves**: Automatic saving whenever user state changes
 - **Cleanup on Logout**: Removes data when user becomes null
 - **Serialization**: JSON format enables complex object storage
@@ -879,31 +901,35 @@ useEffect(() => {
 
 ## Next Steps
 
-Next, we'll implement the [Currency Provider](/ecommerce-platform/context-providers-and-hooks/currencyProvider). This provider will handle currency conversion and formatting, allowing users to view prices in their preferred currency. It will also integrate with the authentication provider to ensure that currency preferences are saved for each user.
+Next, we'll implement the [Currency Provider](/ecommerce-platform/context-and-hooks/creating-context/currencyProvider). This provider will handle currency conversion and formatting, allowing users to view prices in their preferred currency. It will also integrate with the authentication provider to ensure that currency preferences are saved for each user.
 
 ### What You've Mastered
 
 In this comprehensive authentication implementation, you've learned:
 
 #### Core Authentication Concepts
+
 - **Multi-source Authentication**: Local and external API integration patterns
 - **Session Management**: Persistent authentication across browser sessions
 - **State Synchronization**: Coordinating React state with localStorage
 - **Security Patterns**: Client-side security considerations and limitations
 
 #### Advanced React Patterns
+
 - **Complex State Management**: Multi-layered state with computed properties
 - **Error Boundary Patterns**: Graceful failure handling and recovery
 - **Performance Optimization**: Memoization and selective re-rendering
 - **Testing Strategies**: Comprehensive unit and integration testing approaches
 
 #### E-commerce Business Logic
+
 - **Membership Systems**: Tiered subscription models with benefits
 - **Customer Lifecycle**: Registration, authentication, and membership management
 - **Business Rules**: Cancellation policies and customer-friendly practices
 - **Revenue Optimization**: Strategic pricing and benefit distribution
 
 #### Enterprise Development Practices
+
 - **tsx Integration**: Advanced type safety and interface design
 - **Code Architecture**: Separation of concerns and modular design
 - **Error Handling**: Comprehensive error management strategies
@@ -914,24 +940,28 @@ In this comprehensive authentication implementation, you've learned:
 The Currency Provider will build upon these authentication concepts while introducing:
 
 #### Internationalization Patterns
+
 - **Locale Management**: Handling different regional formats and preferences
 - **Currency Conversion**: Real-time exchange rate integration and caching
 - **Number Formatting**: Culture-specific number and currency display
 - **Performance Optimization**: Efficient currency data management
 
 #### Advanced State Coordination
+
 - **Provider Integration**: Seamless communication between authentication and currency systems
 - **User Preferences**: Persistent currency settings tied to user accounts
 - **Dynamic Updates**: Real-time currency rate updates and cache invalidation
 - **Fallback Strategies**: Handling currency service failures gracefully
 
 #### API Integration Patterns
+
 - **External Service Integration**: Working with currency exchange APIs
 - **Caching Strategies**: Intelligent data caching for performance
 - **Rate Limiting**: Handling API quotas and request throttling
 - **Error Recovery**: Graceful degradation when services are unavailable
 
 #### Business Logic Implementation
+
 - **Pricing Strategies**: Dynamic pricing based on currency and membership
 - **Discount Calculations**: Complex pricing rules with multiple factors
 - **Tax Integration**: Handling regional tax calculations and display

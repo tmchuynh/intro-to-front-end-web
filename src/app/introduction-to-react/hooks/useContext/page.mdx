@@ -433,7 +433,7 @@ const CartProvider = ({ children }) => {
         return prev.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + quantity }
-            : item
+            : item,
         );
       }
       return [
@@ -453,7 +453,9 @@ const CartProvider = ({ children }) => {
       return;
     }
     setItems((prev) =>
-      prev.map((item) => (item.id === productId ? { ...item, quantity } : item))
+      prev.map((item) =>
+        item.id === productId ? { ...item, quantity } : item,
+      ),
     );
   };
 
@@ -717,7 +719,7 @@ const DiscountManager = () => {
       cart.applyDiscount(
         discountCode.toUpperCase(),
         discount.type,
-        discount.value
+        discount.value,
       );
       setDiscountCode("");
     } else {
@@ -942,7 +944,7 @@ const NotificationProvider = ({ children }) => {
 
       return id;
     },
-    [settings]
+    [settings],
   );
 
   const removeNotification = useCallback((id) => {
@@ -959,7 +961,7 @@ const NotificationProvider = ({ children }) => {
 
   const markAsRead = useCallback((id) => {
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
   }, []);
 
@@ -987,7 +989,7 @@ const NotificationProvider = ({ children }) => {
     (type) => {
       return notifications.filter((n) => n.type === type);
     },
-    [notifications]
+    [notifications],
   );
 
   const value = {

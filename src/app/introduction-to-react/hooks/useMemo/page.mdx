@@ -260,7 +260,7 @@ const SmartSearchComponent = ({
                 highlights[field] = highlightText(
                   String(item[field] || ""),
                   word,
-                  searchOptions.caseSensitive
+                  searchOptions.caseSensitive,
                 );
               }
             }
@@ -274,7 +274,7 @@ const SmartSearchComponent = ({
                 highlights[field] = highlightText(
                   String(item[field] || ""),
                   word,
-                  searchOptions.caseSensitive
+                  searchOptions.caseSensitive,
                 );
               }
             }
@@ -325,7 +325,7 @@ const SmartSearchComponent = ({
   const searchStats = useMemo(() => {
     const totalResults = searchResults.length;
     const hasHighScoreResults = searchResults.filter(
-      (item) => item.score > 10
+      (item) => item.score > 10,
     ).length;
     const averageScore =
       totalResults > 0
@@ -555,7 +555,7 @@ const AdvancedFormValidator = () => {
     // Calculate overall form strength
     const totalFields = Object.keys(formData).length;
     const validFields = Object.keys(formData).filter(
-      (field) => !errors[field]
+      (field) => !errors[field],
     ).length;
     const completedFields = Object.entries(formData).filter(([key, value]) => {
       if (typeof value === "boolean") return true;
@@ -612,8 +612,8 @@ const AdvancedFormValidator = () => {
     if (formData.interests.length > 0) {
       const techInterests = formData.interests.filter((interest) =>
         ["programming", "technology", "computers"].includes(
-          interest.toLowerCase()
-        )
+          interest.toLowerCase(),
+        ),
       );
       if (techInterests.length > 0) {
         suggestions.push({
@@ -729,7 +729,7 @@ const AdvancedFormValidator = () => {
                   {passed ? "✓" : "✗"}{" "}
                   {rule.replace(/([A-Z])/g, " $1").toLowerCase()}
                 </span>
-              )
+              ),
             )}
           </div>
         </div>
@@ -826,13 +826,13 @@ const DataVisualizationDashboard = ({ rawMetrics, timeRange = "24h" }) => {
 
     const cutoffTime = new Date(now.getTime() - timeRangeMs);
     const filteredData = rawMetrics.filter(
-      (metric) => new Date(metric.timestamp) >= cutoffTime
+      (metric) => new Date(metric.timestamp) >= cutoffTime,
     );
 
     // Aggregate data based on settings
     const aggregatedData = aggregateDataByInterval(
       filteredData,
-      visualizationSettings.aggregation
+      visualizationSettings.aggregation,
     );
 
     // Apply smoothing if enabled
@@ -840,7 +840,7 @@ const DataVisualizationDashboard = ({ rawMetrics, timeRange = "24h" }) => {
       visualizationSettings.smoothing > 0
         ? applySmoothingAlgorithm(
             aggregatedData,
-            visualizationSettings.smoothing
+            visualizationSettings.smoothing,
           )
         : aggregatedData;
 
@@ -860,7 +860,7 @@ const DataVisualizationDashboard = ({ rawMetrics, timeRange = "24h" }) => {
     // Format for chart library
     const datasets = formatForChart(
       smoothedData,
-      visualizationSettings.chartType
+      visualizationSettings.chartType,
     );
 
     return {
@@ -885,7 +885,7 @@ const DataVisualizationDashboard = ({ rawMetrics, timeRange = "24h" }) => {
 
     const renderingComplexity = calculateRenderingComplexity(
       processedChartData.datasets,
-      visualizationSettings
+      visualizationSettings,
     );
 
     return {
@@ -957,7 +957,7 @@ const DataVisualizationDashboard = ({ rawMetrics, timeRange = "24h" }) => {
       max: Math.max(...values).toFixed(2),
       standardDeviation: Math.sqrt(
         values.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) /
-          values.length
+          values.length,
       ).toFixed(2),
       variance: (
         values.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) /
@@ -1019,7 +1019,7 @@ const DataVisualizationDashboard = ({ rawMetrics, timeRange = "24h" }) => {
   const calculateRenderingComplexity = (datasets, settings) => {
     const dataPoints = datasets.reduce(
       (sum, dataset) => sum + dataset.data.length,
-      0
+      0,
     );
     const complexityFactors = {
       line: 1,

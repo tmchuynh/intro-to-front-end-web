@@ -34,6 +34,7 @@ import BackToTop from "@/components/BackToTop";
 #### Git Branch Naming Convention
 
 ```bash
+# Git branch examples
 # Feature branches
 feature/add-product-search
 feature/implement-payment-integration
@@ -69,6 +70,7 @@ refactor/modernize-api-layer
 ##### Examples
 
 ```bash
+# Git commit message examples
 feat(cart): add quantity update functionality
 fix(auth): resolve token expiration handling
 docs(api): update endpoint documentation
@@ -83,6 +85,7 @@ chore(deps): update dependencies to latest versions
 #### JSDoc Comments
 
 ````typescript
+// utils/cartUtils.ts
 /**
  * Calculates the total price of items in the cart including tax and shipping.
  *
@@ -211,13 +214,14 @@ function calculateCartTotal(
 ##### Route-based Splitting
 
 ```typescript
-
-// `app/products/[id]/page.tsx` - Product page
-
+// app/products/[id]/page.tsx
 
 // Lazy load pages
+// Dynamically import product page component for code splitting
 const ProductPage = lazy(() => import('@/app/products/[id]/page'));
+// Dynamically import checkout page component for code splitting
 const CheckoutPage = lazy(() => import('@/app/checkout/page'));
+// Dynamically import dashboard page component for code splitting
 const DashboardPage = lazy(() => import('@/app/dashboard/page'));
 
 // Use Suspense for loading states
@@ -230,10 +234,13 @@ const DashboardPage = lazy(() => import('@/app/dashboard/page'));
 
 ```typescript
 // Lazy load heavy components
+// Dynamically import product reviews component for performance
 const ProductReviews = lazy(() => import('@/components/ProductReviews'));
+// Dynamically import advanced filters component for performance
 const AdvancedFilters = lazy(() => import('@/components/AdvancedFilters'));
 
 // Use dynamic imports for conditional components
+// Dynamically import admin panel with SSR disabled for client-only features
 const AdminPanel = dynamic(() => import('@/components/AdminPanel'), {
   loading: () => <AdminPanelSkeleton />,
   ssr: false
@@ -290,6 +297,7 @@ type UpdateProductRequest = Partial<
 // lib/api.ts
 
 // Use descriptive parameter names and return types
+// Fetches products from a specific category with pagination and sorting options
 async function fetchProductsByCategory(
   categoryId: string,
   options: {
@@ -303,6 +311,7 @@ async function fetchProductsByCategory(
 }
 
 // Use proper error handling
+// Creates a new order with comprehensive error handling and validation
 async function createOrder(orderData: CreateOrderData): Promise<Order> {
   try {
     const response = await apiClient.post("/orders", orderData);
@@ -358,10 +367,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const { addToWishlist, isInWishlist } = useWishlist();
 
   // Event handlers
+  // Memoized handler for adding product to cart
   const handleAddToCart = useCallback(() => {
     addToCart(product);
   }, [addToCart, product]);
 
+  // Memoized handler for product click events
   const handleProductClick = useCallback(() => {
     onProductClick?.(product);
   }, [onProductClick, product]);
@@ -399,6 +410,15 @@ interface UseProductSearchReturn {
   clearResults: () => void;
 }
 
+/**
+ * Custom React hook for searching products.
+ *
+ * This hook provides functionality to search for products based on specific criteria.
+ * It may handle querying product data, managing loading and error states, and returning
+ * the search results to the consuming component.
+ *
+ * @returns {Object} An object containing search results, loading state, error information, and search handlers.
+ */
 export function useProductSearch(
   options: UseProductSearchOptions = {}
 ): UseProductSearchReturn {
@@ -418,6 +438,7 @@ export function useProductSearch(
   const debouncedQuery = useDebounce(query, debounceMs);
 
   // Search function
+  // Memoized search function that handles API calls and state updates
   const search = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
       setResults([]);
@@ -504,6 +525,7 @@ const dynamicStyles = {
 // Use the cn utility for conditional classes
 import { cn } from '@/lib/utils';
 
+// Reusable button component with variant and size styling
 const Button = ({ variant, size, className, ...props }) => {
   return (
     <button
@@ -742,6 +764,7 @@ describe('E2E Tests', () => {
 #### Adding Script to `package.json`
 
 ```json
+// package.json
 {
   "scripts": {
     "test": "jest",
@@ -770,16 +793,32 @@ npm run test:e2e
 ### React Performance
 
 ```typescript
-// Use React.memo for expensive components
+// components/ProductList.tsx
+
+/**
+ * Memoized React component that renders a product card.
+ *
+ * @param {Object} props - The component props.
+ * @param {Object} props.product - The product data to display in the card.
+ * @returns {JSX.Element} The rendered product card component.
+ */
 const ProductCard = React.memo(({ product }) => {
   // Component implementation
 }, (prevProps, nextProps) => {
-  // Custom comparison function
+  // Custom comparison function to optimize re-rendering
   return prevProps.product.id === nextProps.product.id;
 });
 
-// Use useMemo for expensive calculations
+
+/**
+ * Displays statistics related to a list of products.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {Array} props.products - An array of product objects to be analyzed and displayed.
+ */
 const ProductStats = ({ products }) => {
+  // Memoized calculation to prevent expensive recalculations on every render
   const stats = useMemo(() => {
     return {
       totalValue: products.reduce((sum, p) => sum + p.price, 0),
@@ -792,7 +831,9 @@ const ProductStats = ({ products }) => {
 };
 
 // Use useCallback for event handlers
+// Component with memoized event handlers to prevent child re-renders
 const ProductList = ({ products, onProductSelect }) => {
+  // Memoized click handler to prevent unnecessary re-renders of child components
   const handleProductClick = useCallback((product) => {
     onProductSelect(product);
   }, [onProductSelect]);

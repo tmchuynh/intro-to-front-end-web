@@ -87,7 +87,7 @@ function useLocalStorage(key, initialValue) {
         console.error(`Error setting localStorage key "${key}":`, error);
       }
     },
-    [key, storedValue]
+    [key, storedValue],
   );
 
   // Listen for changes to this key in other tabs/windows
@@ -101,7 +101,7 @@ function useLocalStorage(key, initialValue) {
         } catch (error) {
           console.error(
             `Error parsing localStorage value for key "${key}":`,
-            error
+            error,
           );
         }
       }
@@ -296,7 +296,7 @@ function useAdvancedFetch(url, options = {}) {
             () => {
               fetchData(true, attempt + 1);
             },
-            retryDelay * Math.pow(2, attempt - 1)
+            retryDelay * Math.pow(2, attempt - 1),
           );
           return;
         }
@@ -319,7 +319,7 @@ function useAdvancedFetch(url, options = {}) {
       onError,
       lastFetched,
       options.fetchOptions,
-    ]
+    ],
   );
 
   // Manual refetch function
@@ -445,7 +445,7 @@ function useShoppingCart() {
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
-    0
+    0,
   );
 
   // Add item to cart
@@ -453,31 +453,31 @@ function useShoppingCart() {
     (product, quantity = 1) => {
       setItems((currentItems) => {
         const existingItem = currentItems.find(
-          (item) => item.id === product.id
+          (item) => item.id === product.id,
         );
 
         if (existingItem) {
           return currentItems.map((item) =>
             item.id === product.id
               ? { ...item, quantity: item.quantity + quantity }
-              : item
+              : item,
           );
         }
 
         return [...currentItems, { ...product, quantity }];
       });
     },
-    [setItems]
+    [setItems],
   );
 
   // Remove item from cart
   const removeItem = useCallback(
     (productId) => {
       setItems((currentItems) =>
-        currentItems.filter((item) => item.id !== productId)
+        currentItems.filter((item) => item.id !== productId),
       );
     },
-    [setItems]
+    [setItems],
   );
 
   // Update item quantity
@@ -490,11 +490,11 @@ function useShoppingCart() {
 
       setItems((currentItems) =>
         currentItems.map((item) =>
-          item.id === productId ? { ...item, quantity } : item
-        )
+          item.id === productId ? { ...item, quantity } : item,
+        ),
       );
     },
-    [setItems, removeItem]
+    [setItems, removeItem],
   );
 
   // Clear entire cart
@@ -507,7 +507,7 @@ function useShoppingCart() {
     (productId) => {
       return items.some((item) => item.id === productId);
     },
-    [items]
+    [items],
   );
 
   // Get item quantity
@@ -516,7 +516,7 @@ function useShoppingCart() {
       const item = items.find((item) => item.id === productId);
       return item ? item.quantity : 0;
     },
-    [items]
+    [items],
   );
 
   return {
@@ -713,7 +713,7 @@ describe("useLocalStorage", () => {
     localStorage.setItem("test-key", "invalid json");
 
     const { result } = renderHook(() =>
-      useLocalStorage("test-key", "fallback")
+      useLocalStorage("test-key", "fallback"),
     );
     expect(result.current[0]).toBe("fallback");
   });

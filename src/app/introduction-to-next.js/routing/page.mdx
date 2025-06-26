@@ -14,7 +14,7 @@ Nested routes allow developers to create a hierarchy of pages within their appli
 
 For example, if you have a directory structure like this:
 
-```txt
+```txt title="File Structure"
 app/
 ├── about/
 │   └── page.js                     # About page at /about
@@ -37,7 +37,7 @@ Though, this also means, a route can only have one `page.js` file and is only ac
 
 For example, if you have a directory structure like this:
 
-```txt
+```txt title="File Structure"
 app/
 ├── products/
 │   ├── index.js                    # Products listing page
@@ -49,7 +49,7 @@ app/
 
 The `dashboard` and `settings` directories will not be accessible directly as routes. Instead, you would need to create a `page.js` file inside the `dashboard` directory to make it accessible as a route. The `settings` directory can be used for nested routes under the `dashboard` route, but it will not be accessible directly unless you create a `page.js` file inside it.
 
-```txt
+```txt title="File Structure"
 app/
 ├── products/
 │   ├── index.js                    # Products listing page
@@ -73,6 +73,7 @@ For example, if you have a file named `[id].js` in the `app/products` directory,
 For example:
 
 ```javascript
+// pages/products/[id].js or app/products/[id]/page.js
 import { useRouter } from "next/router";
 import React from "react";
 const ProductPage = () => {
@@ -100,8 +101,11 @@ For example, if you have a file named `[[...slug]].js` in the `app/blog` directo
 For example:
 
 ```javascript
+// pages/blog/[...slug].js or app/blog/[...slug]/page.js
 import { useRouter } from "next/router";
 import React from "react";
+
+// Component to handle catch-all blog routes with dynamic path segments
 const BlogPage = () => {
   const router = useRouter();
   const { slug } = router.query;
@@ -123,7 +127,7 @@ Route groups in Next.js allow developers to group related routes together withou
 
 For example, if you have a directory structure like this:
 
-```txt
+```txt title="File Structure"
 app/
 ├── (auth)/
 │   ├── login/

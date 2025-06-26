@@ -105,23 +105,24 @@ function SearchFilterExample() {
   const [isPending, startTransition] = useTransition();
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
-  
+
   // Mock data representing a large dataset
   const allItems = Array.from({ length: 10000 }, (_, i) => ({
     id: i,
     name: `Item ${i}`,
-    category: i % 3 === 0 ? 'Electronics' : i % 3 === 1 ? 'Clothing' : 'Books',
-    price: Math.floor(Math.random() * 100) + 1
+    category: i % 3 === 0 ? "Electronics" : i % 3 === 1 ? "Clothing" : "Books",
+    price: Math.floor(Math.random() * 100) + 1,
   }));
 
   const handleSearch = (term) => {
     setSearchTerm(term);
-    
+
     startTransition(() => {
       // Expensive filtering operation
-      const filtered = allItems.filter(item =>
-        item.name.toLowerCase().includes(term.toLowerCase()) ||
-        item.category.toLowerCase().includes(term.toLowerCase())
+      const filtered = allItems.filter(
+        (item) =>
+          item.name.toLowerCase().includes(term.toLowerCase()) ||
+          item.category.toLowerCase().includes(term.toLowerCase()),
       );
       setFilteredResults(filtered);
     });
@@ -134,16 +135,19 @@ function SearchFilterExample() {
         placeholder="Search items..."
         value={searchTerm}
         onChange={(e) => handleSearch(e.target.value)}
-        style={{ padding: '8px', marginBottom: '16px', width: '300px' }}
+        style={{ padding: "8px", marginBottom: "16px", width: "300px" }}
       />
-      
+
       {isPending && <p>Filtering results...</p>}
-      
+
       <div>
         <p>Found {filteredResults.length} results</p>
-        <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-          {filteredResults.slice(0, 20).map(item => (
-            <div key={item.id} style={{ padding: '4px', borderBottom: '1px solid #eee' }}>
+        <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+          {filteredResults.slice(0, 20).map((item) => (
+            <div
+              key={item.id}
+              style={{ padding: "4px", borderBottom: "1px solid #eee" }}
+            >
               {item.name} - {item.category} - ${item.price}
             </div>
           ))}
@@ -191,41 +195,43 @@ function TabSwitchingExample() {
     { id: "dashboard", label: "Dashboard" },
     { id: "analytics", label: "Analytics" },
     { id: "reports", label: "Reports" },
-    { id: "settings", label: "Settings" }
+    { id: "settings", label: "Settings" },
   ];
 
   return (
     <div>
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-        {tabs.map(tab => (
+      <div style={{ display: "flex", gap: "8px", marginBottom: "16px" }}>
+        {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => handleTabSwitch(tab.id)}
             style={{
-              padding: '8px 16px',
-              backgroundColor: activeTab === tab.id ? '#007bff' : '#f8f9fa',
-              color: activeTab === tab.id ? 'white' : 'black',
-              border: '1px solid #ddd',
-              cursor: 'pointer'
+              padding: "8px 16px",
+              backgroundColor: activeTab === tab.id ? "#007bff" : "#f8f9fa",
+              color: activeTab === tab.id ? "white" : "black",
+              border: "1px solid #ddd",
+              cursor: "pointer",
             }}
           >
             {tab.label}
           </button>
         ))}
       </div>
-      
+
       {isPending ? (
-        <div style={{ padding: '20px', textAlign: 'center' }}>
+        <div style={{ padding: "20px", textAlign: "center" }}>
           <p>Loading {activeTab} content...</p>
         </div>
       ) : (
-        <div style={{ 
-          height: '200px', 
-          overflowY: 'auto', 
-          padding: '16px', 
-          border: '1px solid #ddd',
-          whiteSpace: 'pre-line'
-        }}>
+        <div
+          style={{
+            height: "200px",
+            overflowY: "auto",
+            padding: "16px",
+            border: "1px solid #ddd",
+            whiteSpace: "pre-line",
+          }}
+        >
           {tabContent}
         </div>
       )}
@@ -250,25 +256,31 @@ function ImageGalleryExample() {
 
   // Mock image data
   const allImages = [
-    { id: 1, src: "nature1.jpg", category: "nature", alt: "Mountain landscape" },
+    {
+      id: 1,
+      src: "nature1.jpg",
+      category: "nature",
+      alt: "Mountain landscape",
+    },
     { id: 2, src: "city1.jpg", category: "urban", alt: "City skyline" },
     { id: 3, src: "nature2.jpg", category: "nature", alt: "Forest path" },
     { id: 4, src: "portrait1.jpg", category: "people", alt: "Portrait photo" },
     { id: 5, src: "city2.jpg", category: "urban", alt: "Street view" },
     { id: 6, src: "nature3.jpg", category: "nature", alt: "Ocean sunset" },
     { id: 7, src: "portrait2.jpg", category: "people", alt: "Group photo" },
-    { id: 8, src: "city3.jpg", category: "urban", alt: "Architecture" }
+    { id: 8, src: "city3.jpg", category: "urban", alt: "Architecture" },
   ];
 
   const filterImages = (category) => {
     startTransition(() => {
       setSelectedCategory(category);
-      
+
       // Simulate processing time for image filtering and loading
       setTimeout(() => {
-        const filtered = category === "all" 
-          ? allImages 
-          : allImages.filter(img => img.category === category);
+        const filtered =
+          category === "all"
+            ? allImages
+            : allImages.filter((img) => img.category === category);
         setImages(filtered);
       }, 300);
     });
@@ -282,24 +294,25 @@ function ImageGalleryExample() {
     { id: "all", label: "All Images" },
     { id: "nature", label: "Nature" },
     { id: "urban", label: "Urban" },
-    { id: "people", label: "People" }
+    { id: "people", label: "People" },
   ];
 
   return (
     <div>
-      <div style={{ marginBottom: '20px' }}>
-        {categories.map(category => (
+      <div style={{ marginBottom: "20px" }}>
+        {categories.map((category) => (
           <button
             key={category.id}
             onClick={() => filterImages(category.id)}
             style={{
-              margin: '0 8px 8px 0',
-              padding: '8px 16px',
-              backgroundColor: selectedCategory === category.id ? '#28a745' : '#6c757d',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
+              margin: "0 8px 8px 0",
+              padding: "8px 16px",
+              backgroundColor:
+                selectedCategory === category.id ? "#28a745" : "#6c757d",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
             }}
           >
             {category.label}
@@ -308,48 +321,59 @@ function ImageGalleryExample() {
       </div>
 
       {isPending ? (
-        <div style={{ textAlign: 'center', padding: '40px' }}>
+        <div style={{ textAlign: "center", padding: "40px" }}>
           <p>Loading images...</p>
-          <div style={{ 
-            width: '40px', 
-            height: '40px', 
-            border: '4px solid #f3f3f3',
-            borderTop: '4px solid #3498db',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto'
-          }}></div>
+          <div
+            style={{
+              width: "40px",
+              height: "40px",
+              border: "4px solid #f3f3f3",
+              borderTop: "4px solid #3498db",
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite",
+              margin: "0 auto",
+            }}
+          ></div>
         </div>
       ) : (
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-          gap: '16px'
-        }}>
-          {images.map(image => (
-            <div key={image.id} style={{
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              overflow: 'hidden',
-              backgroundColor: '#f8f9fa'
-            }}>
-              <div style={{
-                height: '150px',
-                backgroundColor: '#e9ecef',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#6c757d'
-              }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+            gap: "16px",
+          }}
+        >
+          {images.map((image) => (
+            <div
+              key={image.id}
+              style={{
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                overflow: "hidden",
+                backgroundColor: "#f8f9fa",
+              }}
+            >
+              <div
+                style={{
+                  height: "150px",
+                  backgroundColor: "#e9ecef",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#6c757d",
+                }}
+              >
                 {image.src}
               </div>
-              <div style={{ padding: '12px' }}>
-                <p style={{ margin: '0', fontSize: '14px' }}>{image.alt}</p>
-                <span style={{ 
-                  fontSize: '12px', 
-                  color: '#6c757d',
-                  textTransform: 'capitalize'
-                }}>
+              <div style={{ padding: "12px" }}>
+                <p style={{ margin: "0", fontSize: "14px" }}>{image.alt}</p>
+                <span
+                  style={{
+                    fontSize: "12px",
+                    color: "#6c757d",
+                    textTransform: "capitalize",
+                  }}
+                >
                   {image.category}
                 </span>
               </div>
@@ -383,7 +407,7 @@ function DataVisualizationExample() {
     return Array.from({ length: dataPoints }, (_, i) => ({
       label: `${period === "year" ? "Month" : "Day"} ${i + 1}`,
       value: Math.floor(Math.random() * 100) + 10,
-      color: `hsl(${(i * 360) / dataPoints}, 70%, 50%)`
+      color: `hsl(${(i * 360) / dataPoints}, 70%, 50%)`,
     }));
   };
 
@@ -391,7 +415,7 @@ function DataVisualizationExample() {
     startTransition(() => {
       setChartType(type);
       setSelectedPeriod(period);
-      
+
       // Simulate heavy computation for chart generation
       setTimeout(() => {
         const data = generateChartData(type, period);
@@ -407,18 +431,32 @@ function DataVisualizationExample() {
   const renderChart = () => {
     if (chartType === "bar") {
       return (
-        <div style={{ display: 'flex', alignItems: 'end', height: '200px', gap: '4px' }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "end",
+            height: "200px",
+            gap: "4px",
+          }}
+        >
           {chartData.map((item, index) => (
-            <div key={index} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div
+              key={index}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
               <div
                 style={{
-                  width: '20px',
+                  width: "20px",
                   height: `${item.value * 2}px`,
                   backgroundColor: item.color,
-                  marginBottom: '4px'
+                  marginBottom: "4px",
                 }}
               />
-              <span style={{ fontSize: '10px', transform: 'rotate(-45deg)' }}>
+              <span style={{ fontSize: "10px", transform: "rotate(-45deg)" }}>
                 {item.label}
               </span>
             </div>
@@ -428,23 +466,26 @@ function DataVisualizationExample() {
     } else {
       // Simple pie chart representation
       return (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
           {chartData.slice(0, 6).map((item, index) => (
-            <div key={index} style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '4px'
-            }}>
+            <div
+              key={index}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "4px",
+              }}
+            >
               <div
                 style={{
-                  width: '16px',
-                  height: '16px',
+                  width: "16px",
+                  height: "16px",
                   backgroundColor: item.color,
-                  borderRadius: '50%'
+                  borderRadius: "50%",
                 }}
               />
-              <span style={{ fontSize: '12px' }}>
+              <span style={{ fontSize: "12px" }}>
                 {item.label}: {item.value}
               </span>
             </div>
@@ -456,17 +497,17 @@ function DataVisualizationExample() {
 
   return (
     <div>
-      <div style={{ marginBottom: '20px' }}>
+      <div style={{ marginBottom: "20px" }}>
         <h4>Chart Type</h4>
         <button
           onClick={() => updateChart("bar", selectedPeriod)}
           style={{
-            marginRight: '8px',
-            padding: '6px 12px',
-            backgroundColor: chartType === "bar" ? '#007bff' : '#6c757d',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px'
+            marginRight: "8px",
+            padding: "6px 12px",
+            backgroundColor: chartType === "bar" ? "#007bff" : "#6c757d",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
           }}
         >
           Bar Chart
@@ -474,31 +515,32 @@ function DataVisualizationExample() {
         <button
           onClick={() => updateChart("pie", selectedPeriod)}
           style={{
-            padding: '6px 12px',
-            backgroundColor: chartType === "pie" ? '#007bff' : '#6c757d',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px'
+            padding: "6px 12px",
+            backgroundColor: chartType === "pie" ? "#007bff" : "#6c757d",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
           }}
         >
           Pie Chart
         </button>
       </div>
 
-      <div style={{ marginBottom: '20px' }}>
+      <div style={{ marginBottom: "20px" }}>
         <h4>Time Period</h4>
-        {["week", "month", "year"].map(period => (
+        {["week", "month", "year"].map((period) => (
           <button
             key={period}
             onClick={() => updateChart(chartType, period)}
             style={{
-              marginRight: '8px',
-              padding: '6px 12px',
-              backgroundColor: selectedPeriod === period ? '#28a745' : '#6c757d',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              textTransform: 'capitalize'
+              marginRight: "8px",
+              padding: "6px 12px",
+              backgroundColor:
+                selectedPeriod === period ? "#28a745" : "#6c757d",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              textTransform: "capitalize",
             }}
           >
             {period}
@@ -506,29 +548,35 @@ function DataVisualizationExample() {
         ))}
       </div>
 
-      <div style={{
-        border: '1px solid #ddd',
-        borderRadius: '8px',
-        padding: '20px',
-        minHeight: '250px',
-        backgroundColor: '#f8f9fa'
-      }}>
+      <div
+        style={{
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+          padding: "20px",
+          minHeight: "250px",
+          backgroundColor: "#f8f9fa",
+        }}
+      >
         {isPending ? (
-          <div style={{ textAlign: 'center', padding: '60px' }}>
+          <div style={{ textAlign: "center", padding: "60px" }}>
             <p>Generating chart...</p>
-            <div style={{ 
-              width: '30px', 
-              height: '30px', 
-              border: '3px solid #f3f3f3',
-              borderTop: '3px solid #007bff',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite',
-              margin: '0 auto'
-            }}></div>
+            <div
+              style={{
+                width: "30px",
+                height: "30px",
+                border: "3px solid #f3f3f3",
+                borderTop: "3px solid #007bff",
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite",
+                margin: "0 auto",
+              }}
+            ></div>
           </div>
         ) : (
           <>
-            <h4>{chartType === "bar" ? "Bar" : "Pie"} Chart - {selectedPeriod}</h4>
+            <h4>
+              {chartType === "bar" ? "Bar" : "Pie"} Chart - {selectedPeriod}
+            </h4>
             {renderChart()}
           </>
         )}
@@ -552,44 +600,46 @@ function ShoppingCartExample() {
   const [cart, setCart] = useState([
     { id: 1, name: "Laptop", price: 999, quantity: 1 },
     { id: 2, name: "Mouse", price: 25, quantity: 2 },
-    { id: 3, name: "Keyboard", price: 75, quantity: 1 }
+    { id: 3, name: "Keyboard", price: 75, quantity: 1 },
   ]);
   const [total, setTotal] = useState(0);
 
   // Simulate expensive calculation for cart totals, taxes, shipping, etc.
   const calculateCartTotals = (cartItems) => {
     let subtotal = 0;
-    
+
     // Simulate complex calculations
     for (let item of cartItems) {
       subtotal += item.price * item.quantity;
-      
+
       // Simulate heavy computation
       for (let i = 0; i < 100000; i++) {
         Math.random();
       }
     }
-    
+
     const tax = subtotal * 0.08;
     const shipping = subtotal > 100 ? 0 : 15;
     return {
       subtotal,
       tax: parseFloat(tax.toFixed(2)),
       shipping,
-      total: parseFloat((subtotal + tax + shipping).toFixed(2))
+      total: parseFloat((subtotal + tax + shipping).toFixed(2)),
     };
   };
 
   const updateQuantity = (itemId, newQuantity) => {
     if (newQuantity < 0) return;
-    
+
     startTransition(() => {
-      const updatedCart = cart.map(item =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
-      ).filter(item => item.quantity > 0);
-      
+      const updatedCart = cart
+        .map((item) =>
+          item.id === itemId ? { ...item, quantity: newQuantity } : item,
+        )
+        .filter((item) => item.quantity > 0);
+
       setCart(updatedCart);
-      
+
       // Simulate expensive total calculation
       setTimeout(() => {
         const totals = calculateCartTotals(updatedCart);
@@ -608,71 +658,76 @@ function ShoppingCartExample() {
   }, []);
 
   return (
-    <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+    <div style={{ maxWidth: "600px", margin: "0 auto" }}>
       <h3>Shopping Cart</h3>
-      
+
       {cart.length === 0 ? (
         <p>Your cart is empty</p>
       ) : (
         <>
-          <div style={{ marginBottom: '20px' }}>
-            {cart.map(item => (
-              <div key={item.id} style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                marginBottom: '8px',
-                backgroundColor: '#f8f9fa'
-              }}>
+          <div style={{ marginBottom: "20px" }}>
+            {cart.map((item) => (
+              <div
+                key={item.id}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "12px",
+                  border: "1px solid #ddd",
+                  borderRadius: "8px",
+                  marginBottom: "8px",
+                  backgroundColor: "#f8f9fa",
+                }}
+              >
                 <div>
-                  <h4 style={{ margin: '0 0 4px 0' }}>{item.name}</h4>
-                  <p style={{ margin: 0, color: '#6c757d' }}>${item.price}</p>
+                  <h4 style={{ margin: "0 0 4px 0" }}>{item.name}</h4>
+                  <p style={{ margin: 0, color: "#6c757d" }}>${item.price}</p>
                 </div>
-                
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
+                >
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
                     style={{
-                      width: '30px',
-                      height: '30px',
-                      border: '1px solid #ddd',
-                      backgroundColor: '#fff',
-                      cursor: 'pointer'
+                      width: "30px",
+                      height: "30px",
+                      border: "1px solid #ddd",
+                      backgroundColor: "#fff",
+                      cursor: "pointer",
                     }}
                   >
                     -
                   </button>
-                  
-                  <span style={{ minWidth: '20px', textAlign: 'center' }}>
+
+                  <span style={{ minWidth: "20px", textAlign: "center" }}>
                     {item.quantity}
                   </span>
-                  
+
                   <button
                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
                     style={{
-                      width: '30px',
-                      height: '30px',
-                      border: '1px solid #ddd',
-                      backgroundColor: '#fff',
-                      cursor: 'pointer'
+                      width: "30px",
+                      height: "30px",
+                      border: "1px solid #ddd",
+                      backgroundColor: "#fff",
+                      cursor: "pointer",
                     }}
                   >
                     +
                   </button>
-                  
+
                   <button
                     onClick={() => removeItem(item.id)}
                     style={{
-                      marginLeft: '12px',
-                      padding: '4px 8px',
-                      backgroundColor: '#dc3545',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer'
+                      marginLeft: "12px",
+                      padding: "4px 8px",
+                      backgroundColor: "#dc3545",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "4px",
+                      cursor: "pointer",
                     }}
                   >
                     Remove
@@ -682,41 +737,70 @@ function ShoppingCartExample() {
             ))}
           </div>
 
-          <div style={{
-            border: '2px solid #007bff',
-            borderRadius: '8px',
-            padding: '16px',
-            backgroundColor: '#e7f3ff'
-          }}>
+          <div
+            style={{
+              border: "2px solid #007bff",
+              borderRadius: "8px",
+              padding: "16px",
+              backgroundColor: "#e7f3ff",
+            }}
+          >
             {isPending ? (
-              <div style={{ textAlign: 'center' }}>
+              <div style={{ textAlign: "center" }}>
                 <p>Calculating totals...</p>
-                <div style={{ 
-                  width: '20px', 
-                  height: '20px', 
-                  border: '2px solid #f3f3f3',
-                  borderTop: '2px solid #007bff',
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                  margin: '0 auto'
-                }}></div>
+                <div
+                  style={{
+                    width: "20px",
+                    height: "20px",
+                    border: "2px solid #f3f3f3",
+                    borderTop: "2px solid #007bff",
+                    borderRadius: "50%",
+                    animation: "spin 1s linear infinite",
+                    margin: "0 auto",
+                  }}
+                ></div>
               </div>
             ) : (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: "4px",
+                  }}
+                >
                   <span>Subtotal:</span>
                   <span>${total.subtotal}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: "4px",
+                  }}
+                >
                   <span>Tax (8%):</span>
                   <span>${total.tax}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: "8px",
+                  }}
+                >
                   <span>Shipping:</span>
                   <span>${total.shipping}</span>
                 </div>
                 <hr />
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '18px' }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    fontWeight: "bold",
+                    fontSize: "18px",
+                  }}
+                >
                   <span>Total:</span>
                   <span>${total.total}</span>
                 </div>

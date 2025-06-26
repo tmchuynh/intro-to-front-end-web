@@ -23,7 +23,6 @@ In the context of React and Next.js, server APIs encompass both React's SSR stre
 - **Hydration**: The process where client-side React takes over server-rendered HTML, attaching event listeners and making the page interactive. React matches the server-rendered markup with client-side components.
 
 - **Data Fetching Strategies**: Server APIs enable various data fetching patterns including:
-
   - Static Generation (SSG) with `getStaticProps`
   - Server-Side Rendering with `getServerSideProps`
   - Incremental Static Regeneration (ISR)
@@ -86,6 +85,7 @@ Unlike traditional SSR that waits for the entire component tree to render, `rend
 ### Syntax
 
 ```javascript
+// server/render.js or server.js
 import { renderToPipeableStream } from "react-dom/server";
 
 const { pipe, abort } = renderToPipeableStream(element, {
@@ -133,10 +133,12 @@ An object containing:
 ### Example: E-commerce Product Page with Streaming
 
 ```javascript
+// server/routes/product.js
 import { renderToPipeableStream } from "react-dom/server";
 import express from "express";
 import { ProductPage } from "./components/ProductPage";
 
+// Initialize Express server for e-commerce application
 const app = express();
 
 app.get("/product/:id", async (req, res) => {
@@ -176,10 +178,11 @@ app.get("/product/:id", async (req, res) => {
       },
       bootstrapScripts: ["/static/js/client.js"],
       bootstrapModules: ["/static/js/app.mjs"],
-    }
+    },
   );
 
   // Set timeout to abort long-running renders
+  // Abort rendering after 10 seconds to prevent hanging requests
   setTimeout(() => abort("Request timeout"), 10000);
 });
 
@@ -212,6 +215,7 @@ This approach provides several performance benefits:
 #### Streaming Real-Time Dashboard Content
 
 ```javascript
+// server/routes/admin.js
 import { renderToPipeableStream } from "react-dom/server";
 import express from "express";
 import { AdminDashboard } from "./components/AdminDashboard";
@@ -237,7 +241,7 @@ app.get("/admin/dashboard", authenticateUser, (req, res) => {
       },
       bootstrapScripts: ["/static/js/dashboard.js"],
       bootstrapModules: ["/static/js/real-time-updates.mjs"],
-    }
+    },
   );
 
   // In this example, the dashboard shell loads immediately with:
@@ -267,6 +271,7 @@ function authenticateUser(req, res, next) {
 #### Using `renderToPipeableStream` with `<Suspense>` for Data Fetching
 
 ```javascript
+// server/routes/blog.js
 import { renderToPipeableStream } from "react-dom/server";
 import React, { Suspense } from "react";
 import express from "express";
@@ -331,7 +336,7 @@ app.get("/blog/:slug", (req, res) => {
       onError(error) {
         console.error(`Blog post error for ${postSlug}:`, error);
       },
-    }
+    },
   );
 
   // Handle request timeout
@@ -363,6 +368,7 @@ This function provides similar streaming capabilities to `renderToPipeableStream
 ### Syntax
 
 ```javascript
+// server/edge-render.js or worker.js
 import { renderToReadableStream } from "react-dom/server";
 
 const stream = await renderToReadableStream(element, {
@@ -392,6 +398,7 @@ A **Promise** that resolves to a `ReadableStream` containing the rendered HTML. 
 ### Example: Cloudflare Workers Edge SSR
 
 ```javascript
+// workers/product-worker.js (Cloudflare Worker)
 import { renderToReadableStream } from "react-dom/server";
 import { ProductCatalog } from "./components/ProductCatalog";
 
@@ -419,7 +426,7 @@ export default {
             },
             bootstrapScripts: ["/static/js/catalog-client.js"],
             bootstrapModules: ["/static/js/search-enhancement.mjs"],
-          }
+          },
         );
 
         return new Response(stream, {
@@ -509,7 +516,7 @@ Deno.serve(async (request) => {
             console.error(`News article ${articleId} error:`, error);
           },
           bootstrapModules: ["/js/article-enhancements.mjs"],
-        }
+        },
       );
 
       clearTimeout(timeoutId);
@@ -588,7 +595,7 @@ export default async function handler(request) {
         },
         bootstrapScripts: ["/js/dashboard-client.js"],
         identifierPrefix: `user-${userId}-`,
-      }
+      },
     );
 
     renderCompleted = true;
@@ -641,7 +648,7 @@ export default async function handler(request) {
           "Content-Type": "text/html; charset=utf-8",
           "Retry-After": "30",
         },
-      }
+      },
     );
   }
 }
@@ -771,7 +778,7 @@ app.post("/api/send-welcome-email", async (req, res) => {
         userName={userName}
         activationLink={activationLink}
         companyName="TechStart Inc"
-      />
+      />,
     );
 
     // Send email using your preferred service (SendGrid, AWS SES, etc.)
@@ -954,7 +961,7 @@ async function generateStaticDocs() {
   try {
     // Generate static HTML
     const staticHtml = renderToStaticMarkup(
-      <DocumentationPage {...docsData} />
+      <DocumentationPage {...docsData} />,
     );
 
     // Ensure output directory exists
@@ -1100,7 +1107,7 @@ app.get("/blog/:slug", async (req, res) => {
 
     // Render React component to string
     const reactHtml = renderToString(
-      <BlogPost post={post} comments={comments} />
+      <BlogPost post={post} comments={comments} />,
     );
 
     // Create complete HTML document
@@ -1201,6 +1208,7 @@ The `renderToString` function performs synchronous server-side rendering with hy
 5. **Hydration Preparation**: Creates markup that React can "hydrate" on the client side
 
 ##### Hydration Process
+
 When the HTML reaches the client, React can attach event listeners and restore interactivity through hydration:
 
 ```javascript
@@ -1223,6 +1231,7 @@ hydrateRoot(container, <BlogPost {...initialData} />);
 - **Modern Alternative**: Consider `renderToPipeableStream` for better performance
 
 ##### Migration Path
+
 For applications using `renderToString`, consider upgrading to streaming APIs:
 
 - Replace `renderToString` with `renderToPipeableStream` for Node.js

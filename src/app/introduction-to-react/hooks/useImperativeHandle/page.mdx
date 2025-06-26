@@ -590,7 +590,7 @@ import React, {
 const VirtualScrollList = forwardRef(
   (
     { items, itemHeight = 50, containerHeight = 400, renderItem, onItemClick },
-    ref
+    ref,
   ) => {
     const containerRef = useRef(null);
     const [scrollTop, setScrollTop] = useState(0);
@@ -599,7 +599,7 @@ const VirtualScrollList = forwardRef(
     const visibleStartIndex = Math.floor(scrollTop / itemHeight);
     const visibleEndIndex = Math.min(
       visibleStartIndex + Math.ceil(containerHeight / itemHeight) + 1,
-      items.length
+      items.length,
     );
 
     const visibleItems = items.slice(visibleStartIndex, visibleEndIndex);
@@ -657,7 +657,7 @@ const VirtualScrollList = forwardRef(
       scrollBy: (offset) => {
         const newScrollTop = Math.max(
           0,
-          Math.min(scrollTop + offset, totalHeight - containerHeight)
+          Math.min(scrollTop + offset, totalHeight - containerHeight),
         );
         containerRef.current.scrollTop = newScrollTop;
         setScrollTop(newScrollTop);
@@ -684,7 +684,7 @@ const VirtualScrollList = forwardRef(
       (item, index) => {
         onItemClick?.(item, index);
       },
-      [onItemClick]
+      [onItemClick],
     );
 
     return (
@@ -736,7 +736,7 @@ const VirtualScrollList = forwardRef(
         </div>
       </div>
     );
-  }
+  },
 );
 
 const DataExplorer = () => {
@@ -755,7 +755,7 @@ const DataExplorer = () => {
   const filteredItems = allItems.filter(
     (item) =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchTerm.toLowerCase())
+      item.category.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const renderItem = (item, index) => (
@@ -792,7 +792,7 @@ const DataExplorer = () => {
     const selectedItems = listRef.current?.getSelectedItems() || [];
 
     alert(
-      `Selected ${selectedCount} items: ${selectedItems.slice(0, 5).join(", ")}${selectedItems.length > 5 ? "..." : ""}`
+      `Selected ${selectedCount} items: ${selectedItems.slice(0, 5).join(", ")}${selectedItems.length > 5 ? "..." : ""}`,
     );
   };
 
@@ -966,7 +966,7 @@ const DrawingCanvas = forwardRef(
             break;
           case "circle":
             const radius = Math.sqrt(
-              (endX - startX) ** 2 + (endY - startY) ** 2
+              (endX - startX) ** 2 + (endY - startY) ** 2,
             );
             ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
             break;
@@ -1030,7 +1030,7 @@ const DrawingCanvas = forwardRef(
           ctx.moveTo(x, y);
         }
       },
-      [currentTool]
+      [currentTool],
     );
 
     const draw = useCallback(
@@ -1056,7 +1056,7 @@ const DrawingCanvas = forwardRef(
         ctx.lineTo(x, y);
         ctx.stroke();
       },
-      [isDrawing, currentTool, currentColor, lineWidth]
+      [isDrawing, currentTool, currentColor, lineWidth],
     );
 
     const stopDrawing = useCallback(() => {
@@ -1093,7 +1093,7 @@ const DrawingCanvas = forwardRef(
         />
       </div>
     );
-  }
+  },
 );
 
 const DrawingApp = () => {

@@ -31,7 +31,7 @@ const memoizedCallback = useCallback(
   () => {
     // Your callback logic here
   },
-  [dependency1, dependency2] // Dependencies that trigger a change in the callback
+  [dependency1, dependency2], // Dependencies that trigger a change in the callback
 );
 ```
 
@@ -139,7 +139,7 @@ const SearchableUserList = () => {
         department: "HR",
       },
     ],
-    []
+    [],
   );
 
   // Memoized search function that won't recreate on every render
@@ -160,7 +160,7 @@ const SearchableUserList = () => {
           user.name.toLowerCase().includes(term.toLowerCase()) ||
           user.email.toLowerCase().includes(term.toLowerCase()) ||
           user.role.toLowerCase().includes(term.toLowerCase()) ||
-          user.department.toLowerCase().includes(term.toLowerCase())
+          user.department.toLowerCase().includes(term.toLowerCase()),
       );
 
       setUsers(filtered);
@@ -172,7 +172,7 @@ const SearchableUserList = () => {
         return [term, ...newHistory].slice(0, 5); // Keep last 5 searches
       });
     },
-    [allUsers]
+    [allUsers],
   );
 
   // Debounced search effect
@@ -200,12 +200,12 @@ const SearchableUserList = () => {
   const filterByDepartment = useCallback(
     (department) => {
       const filtered = allUsers.filter(
-        (user) => user.department === department
+        (user) => user.department === department,
       );
       setUsers(filtered);
       setSearchTerm(`department:${department}`);
     },
-    [allUsers]
+    [allUsers],
   );
 
   const departments = useMemo(() => {
@@ -446,7 +446,7 @@ const DynamicFormBuilder = () => {
       { value: "radio", label: "Radio Button" },
       { value: "date", label: "Date" },
     ],
-    []
+    [],
   );
 
   // Memoized validation function
@@ -509,7 +509,7 @@ const DynamicFormBuilder = () => {
         }));
       }
     },
-    [formFields, validateField]
+    [formFields, validateField],
   );
 
   // Memoized add field function
@@ -549,8 +549,8 @@ const DynamicFormBuilder = () => {
   const updateFieldConfig = useCallback((fieldId, config) => {
     setFormFields((prev) =>
       prev.map((field) =>
-        field.id === fieldId ? { ...field, ...config } : field
-      )
+        field.id === fieldId ? { ...field, ...config } : field,
+      ),
     );
   }, []);
 
@@ -589,7 +589,7 @@ const DynamicFormBuilder = () => {
         alert("Form submitted successfully!");
       }
     },
-    [formFields, formData, validateField]
+    [formFields, formData, validateField],
   );
 
   // Memoized clear form function
@@ -744,7 +744,7 @@ const FieldBuilder = React.memo(({ field, fieldTypes, onUpdate, onRemove }) => {
     (key, value) => {
       onUpdate({ [key]: value });
     },
-    [onUpdate]
+    [onUpdate],
   );
 
   return (
@@ -846,7 +846,7 @@ const FormField = React.memo(({ field, value, error, onChange }) => {
         field.type === "checkbox" ? e.target.checked : e.target.value;
       onChange(newValue);
     },
-    [field.type, onChange]
+    [field.type, onChange],
   );
 
   const inputStyle = {
@@ -930,7 +930,7 @@ const ChatApplication = () => {
   const [currentUser, setCurrentUser] = useState("User1");
   const [typingUsers, setTypingUsers] = useState(new Set());
   const [onlineUsers, setOnlineUsers] = useState(
-    new Set(["User1", "User2", "Alice", "Bob"])
+    new Set(["User1", "User2", "Alice", "Bob"]),
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMessageId, setSelectedMessageId] = useState(null);
@@ -945,7 +945,7 @@ const ChatApplication = () => {
       Alice: { name: "Alice Johnson", avatar: "👩‍💼", color: "#dc3545" },
       Bob: { name: "Bob Wilson", avatar: "👨‍🔬", color: "#fd7e14" },
     }),
-    []
+    [],
   );
 
   // Simulate receiving messages
@@ -965,7 +965,7 @@ const ChatApplication = () => {
 
         addMessage(
           randomMessages[Math.floor(Math.random() * randomMessages.length)],
-          randomUser
+          randomUser,
         );
       }
     }, 8000);
@@ -993,7 +993,7 @@ const ChatApplication = () => {
 
       setMessages((prev) => [...prev, newMessage]);
     },
-    [currentUser]
+    [currentUser],
   );
 
   // Memoized send message function
@@ -1019,7 +1019,7 @@ const ChatApplication = () => {
         return updated;
       });
     },
-    [currentMessage, addMessage, currentUser]
+    [currentMessage, addMessage, currentUser],
   );
 
   // Memoized command handler
@@ -1036,7 +1036,7 @@ const ChatApplication = () => {
           addMessage(
             "Available commands: /clear, /help, /users, /nick [name]",
             currentUser,
-            "system"
+            "system",
           );
           break;
         case "users":
@@ -1051,7 +1051,7 @@ const ChatApplication = () => {
             addMessage(
               `${users[currentUser]?.name || currentUser} changed their name to ${newNick}`,
               currentUser,
-              "system"
+              "system",
             );
             // In a real app, you'd update the user's name
           }
@@ -1060,7 +1060,7 @@ const ChatApplication = () => {
           addMessage(`Unknown command: ${cmd}`, currentUser, "system");
       }
     },
-    [currentUser, onlineUsers, users, addMessage]
+    [currentUser, onlineUsers, users, addMessage],
   );
 
   // Memoized typing handler
@@ -1085,7 +1085,7 @@ const ChatApplication = () => {
         });
       }, 2000);
     },
-    [currentUser]
+    [currentUser],
   );
 
   // Memoized message editing
@@ -1099,8 +1099,8 @@ const ChatApplication = () => {
               edited: true,
               editedAt: new Date().toISOString(),
             }
-          : msg
-      )
+          : msg,
+      ),
     );
     setSelectedMessageId(null);
   }, []);
@@ -1121,7 +1121,7 @@ const ChatApplication = () => {
             if (reactions[emoji]) {
               if (reactions[emoji].includes(currentUser)) {
                 reactions[emoji] = reactions[emoji].filter(
-                  (u) => u !== currentUser
+                  (u) => u !== currentUser,
                 );
                 if (reactions[emoji].length === 0) {
                   delete reactions[emoji];
@@ -1135,10 +1135,10 @@ const ChatApplication = () => {
             return { ...msg, reactions };
           }
           return msg;
-        })
+        }),
       );
     },
-    [currentUser]
+    [currentUser],
   );
 
   // Memoized filtered messages
@@ -1147,7 +1147,9 @@ const ChatApplication = () => {
     return messages.filter(
       (msg) =>
         msg.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        users[msg.userId]?.name.toLowerCase().includes(searchTerm.toLowerCase())
+        users[msg.userId]?.name
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()),
     );
   }, [messages, searchTerm, users]);
 
@@ -1368,7 +1370,7 @@ const ChatMessage = React.memo(
         }
         setIsEditing(false);
       },
-      [editText, message.text, onEdit]
+      [editText, message.text, onEdit],
     );
 
     const reactions = ["👍", "❤️", "😂", "😮", "😢", "🎉"];
@@ -1527,7 +1529,7 @@ const ChatMessage = React.memo(
         )}
       </div>
     );
-  }
+  },
 );
 
 export default ChatApplication;

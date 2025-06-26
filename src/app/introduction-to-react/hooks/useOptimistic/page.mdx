@@ -252,7 +252,7 @@ const useOptimisticSocialPost = (initialPost) => {
         comments: prev.comments.map((comment) =>
           comment.id === tempComment.id
             ? { ...comment, isPending: false, id: `real-${Date.now()}` }
-            : comment
+            : comment,
         ),
       }));
       setErrors((prev) => ({ ...prev, comment: null }));
@@ -261,7 +261,7 @@ const useOptimisticSocialPost = (initialPost) => {
       setPost((prev) => ({
         ...prev,
         comments: prev.comments.filter(
-          (comment) => comment.id !== tempComment.id
+          (comment) => comment.id !== tempComment.id,
         ),
         commentCount: prev.commentCount - 1,
       }));
@@ -409,7 +409,7 @@ const useOptimisticCart = (initialCart) => {
   const createOperation = useCallback((type, productId) => {
     const operationId = `${type}-${productId}-${Date.now()}`;
     setPendingOperations(
-      (prev) => new Map([...prev, [operationId, { type, productId }]])
+      (prev) => new Map([...prev, [operationId, { type, productId }]]),
     );
     return operationId;
   }, []);
@@ -431,7 +431,7 @@ const useOptimisticCart = (initialCart) => {
     // Optimistic update
     setCart((prev) => {
       const existingItem = prev.items.find(
-        (item) => item.product.id === product.id
+        (item) => item.product.id === product.id,
       );
 
       if (existingItem) {
@@ -440,7 +440,7 @@ const useOptimisticCart = (initialCart) => {
           items: prev.items.map((item) =>
             item.product.id === product.id
               ? { ...item, quantity: item.quantity + quantity }
-              : item
+              : item,
           ),
           totalItems: prev.totalItems + quantity,
           totalPrice: prev.totalPrice + product.price * quantity,
@@ -508,7 +508,7 @@ const useOptimisticCart = (initialCart) => {
         items: prev.items.map((item) =>
           item.product.id === productId
             ? { ...item, quantity: newQuantity }
-            : item
+            : item,
         ),
         totalItems: prev.totalItems + quantityDiff,
         totalPrice: prev.totalPrice + item.product.price * quantityDiff,
@@ -582,7 +582,7 @@ const useOptimisticCart = (initialCart) => {
 
   const isOperationPending = (type, productId) => {
     return Array.from(pendingOperations.values()).some(
-      (op) => op.type === type && op.productId === productId
+      (op) => op.type === type && op.productId === productId,
     );
   };
 
@@ -810,7 +810,7 @@ const useOptimisticTodoList = (initialTodos, userId) => {
 
   const handleServerUpdate = (serverTodo) => {
     setTodos((prev) =>
-      prev.map((todo) => (todo.id === serverTodo.id ? serverTodo : todo))
+      prev.map((todo) => (todo.id === serverTodo.id ? serverTodo : todo)),
     );
 
     // Check for conflicts
@@ -827,7 +827,7 @@ const useOptimisticTodoList = (initialTodos, userId) => {
                 timestamp: Date.now(),
               },
             ],
-          ])
+          ]),
       );
     }
   };
@@ -871,8 +871,8 @@ const useOptimisticTodoList = (initialTodos, userId) => {
       const realId = `real-${Date.now()}`;
       setTodos((prev) =>
         prev.map((todo) =>
-          todo.id === tempId ? { ...todo, id: realId, isPending: false } : todo
-        )
+          todo.id === tempId ? { ...todo, id: realId, isPending: false } : todo,
+        ),
       );
 
       setPendingChanges((prev) => {
@@ -913,7 +913,7 @@ const useOptimisticTodoList = (initialTodos, userId) => {
 
     // Optimistic update
     setTodos((prev) =>
-      prev.map((todo) => (todo.id === todoId ? updatedTodo : todo))
+      prev.map((todo) => (todo.id === todoId ? updatedTodo : todo)),
     );
     setPendingChanges((prev) => new Map([...prev, [todoId, updatedTodo]]));
 
@@ -933,8 +933,8 @@ const useOptimisticTodoList = (initialTodos, userId) => {
       // Confirm update
       setTodos((prev) =>
         prev.map((todo) =>
-          todo.id === todoId ? { ...todo, isPending: false } : todo
-        )
+          todo.id === todoId ? { ...todo, isPending: false } : todo,
+        ),
       );
 
       setPendingChanges((prev) => {
@@ -947,7 +947,7 @@ const useOptimisticTodoList = (initialTodos, userId) => {
     } catch (error) {
       // Revert optimistic update
       setTodos((prev) =>
-        prev.map((todo) => (todo.id === todoId ? originalTodo : todo))
+        prev.map((todo) => (todo.id === todoId ? originalTodo : todo)),
       );
 
       setPendingChanges((prev) => {
@@ -968,8 +968,8 @@ const useOptimisticTodoList = (initialTodos, userId) => {
     // Optimistic update - hide the todo
     setTodos((prev) =>
       prev.map((todo) =>
-        todo.id === todoId ? { ...todo, isDeleting: true } : todo
-      )
+        todo.id === todoId ? { ...todo, isDeleting: true } : todo,
+      ),
     );
 
     try {
@@ -988,8 +988,8 @@ const useOptimisticTodoList = (initialTodos, userId) => {
       // Revert - show the todo again
       setTodos((prev) =>
         prev.map((todo) =>
-          todo.id === todoId ? { ...todo, isDeleting: false } : todo
-        )
+          todo.id === todoId ? { ...todo, isDeleting: false } : todo,
+        ),
       );
       setSyncStatus("error");
       setTimeout(() => setSyncStatus("idle"), 3000);
@@ -1005,8 +1005,8 @@ const useOptimisticTodoList = (initialTodos, userId) => {
 
     setTodos((prev) =>
       prev.map((todo) =>
-        todo.id === todoId ? { ...resolvedTodo, isPending: false } : todo
-      )
+        todo.id === todoId ? { ...resolvedTodo, isPending: false } : todo,
+      ),
     );
 
     setConflicts((prev) => {

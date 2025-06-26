@@ -99,7 +99,7 @@ function useStateMachine(config) {
       const stateHistory = history.slice(-3).join(" → ");
 
       return `🔄 State: ${currentState} | Context: {${contextKeys.join(", ")}} | Transitions: ${transitionCount} | History: ${stateHistory} | Uptime: ${uptime}s`;
-    }
+    },
   );
 
   const transition = useCallback(
@@ -107,7 +107,7 @@ function useStateMachine(config) {
       const stateConfig = config.states[currentState];
       if (!stateConfig || !stateConfig.on || !stateConfig.on[event]) {
         console.warn(
-          `No transition defined for event "${event}" in state "${currentState}"`
+          `No transition defined for event "${event}" in state "${currentState}"`,
         );
         return false;
       }
@@ -143,7 +143,7 @@ function useStateMachine(config) {
 
       return true;
     },
-    [currentState, context, config]
+    [currentState, context, config],
   );
 
   const reset = useCallback(() => {
@@ -160,7 +160,7 @@ function useStateMachine(config) {
       const stateConfig = config.states[currentState];
       return !!(stateConfig && stateConfig.on && stateConfig.on[event]);
     },
-    [currentState, config]
+    [currentState, config],
   );
 
   return {
@@ -231,7 +231,7 @@ function TrafficLightDemo() {
         () => {
           trafficLight.transition("TIMER");
         },
-        trafficLight.currentState === "yellow" ? 2000 : 3000
+        trafficLight.currentState === "yellow" ? 2000 : 3000,
       );
 
       return () => clearTimeout(timer);
@@ -363,14 +363,14 @@ function usePerformanceMonitor(componentName, options = {}) {
       const performanceGrade = getPerformanceGrade(
         averageRenderTime,
         slowRenders,
-        renderCount
+        renderCount,
       );
       const memoryInfo = memoryUsage
         ? ` | Memory: ${(memoryUsage.usedJSHeapSize / 1024 / 1024).toFixed(1)}MB`
         : "";
 
       return `⚡ ${componentName} | Renders: ${renderCount} | Avg: ${averageRenderTime.toFixed(1)}ms | Max: ${maxRenderTime.toFixed(1)}ms | Slow: ${slowRenders} | Grade: ${performanceGrade} | Uptime: ${(uptime / 1000).toFixed(1)}s${memoryInfo}`;
-    }
+    },
   );
 
   // Memory usage tracking
@@ -434,19 +434,19 @@ function usePerformanceMonitor(componentName, options = {}) {
     console.log(`Average Render Time: ${averageRenderTime.toFixed(2)}ms`);
     console.log(`Max Render Time: ${maxRenderTime.toFixed(2)}ms`);
     console.log(
-      `Slow Renders: ${slowRenders}/${renderCount.current} (${((slowRenders / renderCount.current) * 100).toFixed(1)}%)`
+      `Slow Renders: ${slowRenders}/${renderCount.current} (${((slowRenders / renderCount.current) * 100).toFixed(1)}%)`,
     );
     console.log(`Component Uptime: ${(uptime / 1000).toFixed(1)}s`);
 
     if (memoryUsage) {
       console.log(
-        `Memory Usage: ${(memoryUsage.usedJSHeapSize / 1024 / 1024).toFixed(1)}MB / ${(memoryUsage.totalJSHeapSize / 1024 / 1024).toFixed(1)}MB`
+        `Memory Usage: ${(memoryUsage.usedJSHeapSize / 1024 / 1024).toFixed(1)}MB / ${(memoryUsage.totalJSHeapSize / 1024 / 1024).toFixed(1)}MB`,
       );
     }
 
     if (observerRef.current) {
       console.log(
-        `DOM Mutations Observed: ${observerRef.current.domMutationCount.current}`
+        `DOM Mutations Observed: ${observerRef.current.domMutationCount.current}`,
       );
     }
 
@@ -473,7 +473,7 @@ function usePerformanceMonitor(componentName, options = {}) {
       performanceGrade: getPerformanceGrade(
         averageRenderTime,
         slowRenders,
-        renderCount.current
+        renderCount.current,
       ),
       domMutations: observerRef.current
         ? observerRef.current.domMutationCount.current
@@ -505,7 +505,7 @@ function PerformanceTestComponent() {
   });
 
   const filteredItems = items.filter((item) =>
-    item.toString().includes(filter)
+    item.toString().includes(filter),
   );
 
   // Simulate expensive operation
@@ -628,7 +628,7 @@ function useAdvancedAPICache(options = {}) {
           : 0;
 
       return `🗄️ Cache: ${cacheSize}/${maxCacheSize} | Hit Rate: ${hitRate}% | Active: ${activeCount} | Efficiency: ${efficiency} saved requests | Last: ${lastReq}`;
-    }
+    },
   );
 
   // Cache cleanup effect
@@ -694,14 +694,14 @@ function useAdvancedAPICache(options = {}) {
       } catch (error) {
         if (attempt < retryAttempts) {
           await new Promise((resolve) =>
-            setTimeout(resolve, retryDelay * attempt)
+            setTimeout(resolve, retryDelay * attempt),
           );
           return fetchWithRetry(url, options, attempt + 1);
         }
         throw error;
       }
     },
-    [retryAttempts, retryDelay]
+    [retryAttempts, retryDelay],
   );
 
   const request = useCallback(
@@ -773,7 +773,7 @@ function useAdvancedAPICache(options = {}) {
       evictOldEntries,
       fetchWithRetry,
       enableDeduplication,
-    ]
+    ],
   );
 
   const invalidateCache = useCallback((pattern) => {
@@ -821,13 +821,13 @@ function useAdvancedAPICache(options = {}) {
     async (urls, options = {}) => {
       const promises = urls.map((url) =>
         request(url, options, { ttl: options.ttl || defaultTTL }).catch(
-          (error) => ({ error, url })
-        )
+          (error) => ({ error, url }),
+        ),
       );
 
       return Promise.all(promises);
     },
-    [request, defaultTTL]
+    [request, defaultTTL],
   );
 
   return {
@@ -863,8 +863,8 @@ function APICacheDemo() {
         .fill()
         .map(() =>
           apiCache.request(
-            "https://jsonplaceholder.typicode.com/posts?_limit=5"
-          )
+            "https://jsonplaceholder.typicode.com/posts?_limit=5",
+          ),
         );
 
       const results = await Promise.all(promises);
@@ -879,7 +879,7 @@ function APICacheDemo() {
   const fetchSpecificPost = async (id) => {
     try {
       const result = await apiCache.request(
-        `https://jsonplaceholder.typicode.com/posts/${id}`
+        `https://jsonplaceholder.typicode.com/posts/${id}`,
       );
       console.log(`Post ${id}:`, result);
     } catch (err) {
@@ -890,7 +890,7 @@ function APICacheDemo() {
   const prefetchPosts = async () => {
     const urls = Array.from(
       { length: 5 },
-      (_, i) => `https://jsonplaceholder.typicode.com/posts/${i + 1}`
+      (_, i) => `https://jsonplaceholder.typicode.com/posts/${i + 1}`,
     );
 
     const results = await apiCache.prefetch(urls);

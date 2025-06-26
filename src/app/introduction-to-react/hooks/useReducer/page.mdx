@@ -536,7 +536,7 @@ const MultiStepFormWizard = () => {
                     />
                     {interest}
                   </label>
-                )
+                ),
               )}
               {validationErrors.interests && (
                 <span className="error-message">
@@ -744,7 +744,8 @@ const cartReducer = (state, action) => {
       const existingItemIndex = state.items.findIndex(
         (item) =>
           item.id === product.id &&
-          JSON.stringify(item.customizations) === JSON.stringify(customizations)
+          JSON.stringify(item.customizations) ===
+            JSON.stringify(customizations),
       );
 
       let newItems;
@@ -753,7 +754,7 @@ const cartReducer = (state, action) => {
         newItems = state.items.map((item, index) =>
           index === existingItemIndex
             ? { ...item, quantity: item.quantity + quantity }
-            : item
+            : item,
         );
       } else {
         // Add new item
@@ -779,7 +780,7 @@ const cartReducer = (state, action) => {
           itemCount: newItems.reduce((sum, item) => sum + item.quantity, 0),
           totalWeight: newItems.reduce(
             (sum, item) => sum + item.weight * item.quantity,
-            0
+            0,
           ),
         },
       };
@@ -787,7 +788,7 @@ const cartReducer = (state, action) => {
 
     case CART_ACTIONS.REMOVE_ITEM: {
       const newItems = state.items.filter(
-        (item) => item.id !== action.payload.itemId
+        (item) => item.id !== action.payload.itemId,
       );
       return {
         ...state,
@@ -798,7 +799,7 @@ const cartReducer = (state, action) => {
           itemCount: newItems.reduce((sum, item) => sum + item.quantity, 0),
           totalWeight: newItems.reduce(
             (sum, item) => sum + item.weight * item.quantity,
-            0
+            0,
           ),
         },
       };
@@ -816,7 +817,7 @@ const cartReducer = (state, action) => {
       }
 
       const newItems = state.items.map((item) =>
-        item.id === itemId ? { ...item, quantity } : item
+        item.id === itemId ? { ...item, quantity } : item,
       );
 
       return {
@@ -828,7 +829,7 @@ const cartReducer = (state, action) => {
           itemCount: newItems.reduce((sum, item) => sum + item.quantity, 0),
           totalWeight: newItems.reduce(
             (sum, item) => sum + item.weight * item.quantity,
-            0
+            0,
           ),
         },
       };
@@ -893,7 +894,7 @@ const cartReducer = (state, action) => {
 
       updates.forEach((update) => {
         const itemIndex = newItems.findIndex(
-          (item) => item.id === update.itemId
+          (item) => item.id === update.itemId,
         );
         if (itemIndex >= 0) {
           if (update.quantity <= 0) {
@@ -916,7 +917,7 @@ const cartReducer = (state, action) => {
           itemCount: newItems.reduce((sum, item) => sum + item.quantity, 0),
           totalWeight: newItems.reduce(
             (sum, item) => sum + item.weight * item.quantity,
-            0
+            0,
           ),
         },
       };
@@ -936,7 +937,7 @@ export const CartProvider = ({ children }) => {
   // Calculate derived values
   const subtotal = cartState.items.reduce(
     (sum, item) => sum + item.price * item.quantity,
-    0
+    0,
   );
 
   const discountAmount = cartState.coupon
@@ -1064,8 +1065,8 @@ const validateCoupon = async (code, orderAmount) => {
       } else if (orderAmount < coupon.minOrderAmount) {
         reject(
           new Error(
-            `Minimum order amount of $${coupon.minOrderAmount} required`
-          )
+            `Minimum order amount of $${coupon.minOrderAmount} required`,
+          ),
         );
       } else {
         resolve(coupon);
@@ -1156,7 +1157,7 @@ const ShoppingCartComponent = () => {
                           <span key={key} className="customization">
                             {key}: {value}
                           </span>
-                        )
+                        ),
                       )}
                     </div>
                   )}

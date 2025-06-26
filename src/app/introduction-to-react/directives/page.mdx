@@ -181,7 +181,7 @@ function LocationTracker() {
     const id = navigator.geolocation.watchPosition(
       success,
       errorCallback,
-      options
+      options,
     );
     setWatchId(id);
   };
@@ -860,7 +860,7 @@ export async function uploadFile(formData) {
     ];
     if (!allowedTypes.includes(file.type)) {
       throw new Error(
-        "Invalid file type. Only JPEG, PNG, WebP, and PDF files are allowed."
+        "Invalid file type. Only JPEG, PNG, WebP, and PDF files are allowed.",
       );
     }
 
@@ -1084,7 +1084,7 @@ export async function reorderTodos(todoIds) {
         userId: session.user.id,
       },
       data: { order: index },
-    })
+    }),
   );
 
   await Promise.all(updatePromises);
@@ -1391,7 +1391,7 @@ const getCachedStats = unstable_cache(
     return stats;
   },
   ["user-stats"],
-  { revalidate: 3600 } // Cache for 1 hour
+  { revalidate: 3600 }, // Cache for 1 hour
 );
 
 export async function getUserDashboard(userId) {
@@ -1644,7 +1644,7 @@ const stepSchemas = {
 export async function submitRegistrationStep(
   step,
   formData,
-  existingData = {}
+  existingData = {},
 ) {
   try {
     // Validate current step
@@ -1716,14 +1716,14 @@ export function OptimisticTodoList({ initialTodos }) {
           return state.map((todo) =>
             todo.id === newTodo.id
               ? { ...todo, completed: !todo.completed }
-              : todo
+              : todo,
           );
         case "delete":
           return state.filter((todo) => todo.id !== newTodo.id);
         default:
           return state;
       }
-    }
+    },
   );
 
   async function handleAddTodo(formData) {
@@ -2203,7 +2203,7 @@ const userSchema = z.object({
 });
 
 export async function createUser(
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult<User>> {
   try {
     const validatedData = userSchema.parse({

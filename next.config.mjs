@@ -41,6 +41,7 @@ const rehypeExpressiveCodeOptions = {
   useDarkModeMediaQuery: false,
 
   defaultProps: {
+    title: "Example Code Block", // Default title for code blocks
     // Enable word wrap by default for better mobile experience
     wrap: true,
     // Disable wrapped line indentation for terminal languages

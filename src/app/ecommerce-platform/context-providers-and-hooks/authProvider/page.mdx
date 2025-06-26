@@ -74,7 +74,7 @@ graph TD
 
 ## The `import` Statements and Interfaces
 
-```typescript {"1": 27-46}
+```tsx {"1": 27-46}
 // src/app/context/authContext.tsx
 "use client";
 
@@ -137,7 +137,7 @@ Take note of the sophisticated type system that drives our authentication archit
 ### Deep Dive into Interface Design
 
 #### User Interface Analysis
-```typescript
+```tsx
 export interface User {
   id: string;                           // Unique identifier for the user
   username: string;                     // Display name and login credential
@@ -162,7 +162,7 @@ export interface User {
 - **`joinedDate: Date`**: Business intelligence data for user lifecycle analytics
 
 #### MembershipTier Interface Analysis
-```typescript
+```tsx
 export interface MembershipTier {
   id: string;              // Unique tier identifier
   name: string;            // Human-readable tier name
@@ -182,7 +182,7 @@ export interface MembershipTier {
 - **`duration: number`**: Flexible subscription periods (monthly, annual, custom)
 
 #### AuthContextType Interface Analysis
-```typescript
+```tsx
 export interface AuthContextType {
   // State Properties
   user: User | null;                    // Current user or null for anonymous
@@ -213,7 +213,7 @@ export interface AuthContextType {
 - **Loading States**: Built-in loading indicators for better UX during async operations
 
 #### RegisterData Interface Analysis
-```typescript
+```tsx
 export interface RegisterData {
   username: string;
   phoneNumber: string;
@@ -228,7 +228,7 @@ export interface RegisterData {
 - **Optional Email**: Balances data collection with user convenience
 - **Phone Number Priority**: Ensures reliable contact method for account recovery
 
-### TypeScript Benefits in Authentication
+### tsx Benefits in Authentication
 
 1. **Compile-time Safety**: Catches authentication logic errors before runtime
 2. **IntelliSense Support**: Enhanced developer experience with autocomplete
@@ -238,7 +238,7 @@ export interface RegisterData {
 
 ## The `AuthContext` Component
 
-```typescript
+```tsx
 // src/app/context/authContext.tsx
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -257,7 +257,7 @@ This section establishes the foundational infrastructure for our authentication 
 
 ### Context Creation Deep Dive
 
-```typescript
+```tsx
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 ```
 
@@ -265,11 +265,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 - **Union Type with Undefined**: The `AuthContextType | undefined` pattern enables compile-time detection of context misuse
 - **Defensive Programming**: Starting with `undefined` forces proper provider wrapping
-- **Type Safety**: TypeScript will catch attempts to access context properties without null checks
+- **Type Safety**: tsx will catch attempts to access context properties without null checks
 
 ### Custom Hook Architecture
 
-```typescript
+```tsx
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -283,7 +283,7 @@ export const useAuth = () => {
 
 1. **Encapsulation**: Hides the complexity of context consumption from components
 2. **Error Boundary**: Provides clear, actionable error messages for developers
-3. **Type Narrowing**: After the null check, TypeScript knows context is never undefined
+3. **Type Narrowing**: After the null check, tsx knows context is never undefined
 4. **Consistent API**: All authentication operations go through a single interface
 5. **Development Experience**: Better IntelliSense and debugging capabilities
 
@@ -293,12 +293,12 @@ The custom hook implements a **fail-fast** approach:
 - **Runtime Validation**: Immediately detects improper usage
 - **Clear Error Messages**: Developers get specific guidance on fixing the issue
 - **Development vs Production**: Errors help during development but won't crash production apps
-- **Type System Integration**: Works with TypeScript to provide compile-time safety
+- **Type System Integration**: Works with tsx to provide compile-time safety
 
 ### Usage Pattern Comparison
 
 **Without Custom Hook (Complex)**:
-```typescript
+```tsx
 import { useContext } from 'react';
 import { AuthContext } from './AuthContext';
 
@@ -313,7 +313,7 @@ function MyComponent() {
 ```
 
 **With Custom Hook (Simple)**:
-```typescript
+```tsx
 import { useAuth } from './AuthContext';
 
 function MyComponent() {
@@ -333,7 +333,7 @@ This pattern enables:
 
 ## Predefined Membership Tiers
 
-```typescript
+```tsx
 // src/app/context/authContext.tsx
 export const membershipTiers: MembershipTier[] = [
   {
@@ -462,7 +462,7 @@ This tier structure enables:
 
 ## The `AuthProvider` Component Implementation
 
-```typescript
+```tsx
 // src/app/context/authContext.tsx
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -795,20 +795,20 @@ The AuthProvider implementation represents a sophisticated state management solu
 
 ### Component Architecture Analysis
 
-```typescript
+```tsx
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
 ```
 
 **Design Decisions:**
-- **Functional Component with TypeScript**: Modern React patterns with full type safety
+- **Functional Component with tsx**: Modern React patterns with full type safety
 - **Generic Children Prop**: Accepts any valid React node, providing maximum flexibility
 - **Named Export**: Enables tree-shaking and explicit imports for better bundling
 
 ### State Management Strategy
 
-```typescript
+```tsx
 const [user, setUser] = useState<User | null>(null);
 const [isLoading, setIsLoading] = useState(true);
 ```
@@ -828,7 +828,7 @@ const [isLoading, setIsLoading] = useState(true);
 ### Session Persistence Implementation
 
 #### User Loading Effect
-```typescript
+```tsx
 useEffect(() => {
   const savedUser = localStorage.getItem("user");
   if (savedUser) {
@@ -861,7 +861,7 @@ useEffect(() => {
 5. **Error Handling**: Graceful degradation when localStorage is corrupted
 
 #### User Saving Effect
-```typescript
+```tsx
 useEffect(() => {
   if (user) {
     localStorage.setItem("user", JSON.stringify(user));
@@ -904,7 +904,7 @@ In this comprehensive authentication implementation, you've learned:
 - **Revenue Optimization**: Strategic pricing and benefit distribution
 
 #### Enterprise Development Practices
-- **TypeScript Integration**: Advanced type safety and interface design
+- **tsx Integration**: Advanced type safety and interface design
 - **Code Architecture**: Separation of concerns and modular design
 - **Error Handling**: Comprehensive error management strategies
 - **Documentation**: Self-documenting code with clear interfaces

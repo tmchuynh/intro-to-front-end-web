@@ -6,11 +6,11 @@ import BackToTop from "@/components/BackToTop";
 
 ## Introduction
 
-Formatting utility functions are essential for ensuring that data is presented in a consistent and user-friendly manner across your e-commerce platform. These functions help format various types of data, such as dates, numbers, and strings, to meet the specific requirements of your application.
+Formatting utility functions are crucial components that ensure data consistency and enhance user experience across your e-commerce platform. These carefully crafted functions standardize the presentation of various data types including strings, dates, numbers, and locale-specific formats like postal codes and currency. By implementing these utilities, you maintain a professional appearance while reducing formatting inconsistencies that could confuse users or impact your application's credibility.
 
 ## String Formatting
 
-We will be defining the string formatting utility functions for our e-commerce platform. This section will cover the general string formatting utility functions that will be used across the e-commerce platform. These functions will help us maintain clean and consistent data, ensuring a smooth user experience. They will be used to format product names, descriptions, and other text elements.
+String formatting utilities form the backbone of text presentation in any e-commerce application. These functions ensure that product names, descriptions, categories, and user-generated content maintain consistent styling and readability standards. Whether you're displaying dynamic content from a database or processing user input, these utilities help create a polished and professional user interface.
 
 ### Capitalizing Strings
 
@@ -32,6 +32,30 @@ export function capitalize(str: string | string[]): string {
 }
 ```
 
+##### Explanation of the Code
+
+The `capitalize` function provides intelligent string capitalization that handles both single strings and arrays. It first checks if the input exists, then determines whether it's dealing with an array or a single string. For arrays, it recursively applies capitalization to each element and joins them with spaces. For single strings, it uses `charAt(0).toUpperCase()` to capitalize the first character and `slice(1).toLowerCase()` to ensure the rest of the string is lowercase, creating a proper sentence case format.
+
+##### Example Use
+
+```typescript
+// Basic string capitalization
+const productName = capitalize("wireless bluetooth headphones");
+// Result: "Wireless bluetooth headphones"
+
+// Array capitalization for multi-word categories
+const category = capitalize(["smart", "home", "devices"]);
+// Result: "Smart Home Devices"
+
+// Handling user input
+const userInput = capitalize("PREMIUM QUALITY LEATHER JACKET");
+// Result: "Premium quality leather jacket"
+
+// Product description formatting
+const description = capitalize("ultra-lightweight design with premium materials");
+// Result: "Ultra-lightweight design with premium materials"
+```
+
 ### Truncating Strings
 
 ```typescript
@@ -46,6 +70,34 @@ export function truncate(str: string, maxLength: number): string {
   if (!str || str.length <= maxLength) return str;
   return str.slice(0, maxLength).trim() + "...";
 }
+```
+
+##### Explanation of the Code
+
+The `truncate` function intelligently shortens strings while maintaining readability. It first validates that the string exists and checks if truncation is necessary by comparing the string length to the maximum allowed length. If truncation is needed, it uses `slice(0, maxLength)` to extract the desired portion, applies `trim()` to remove any trailing whitespace that might result from cutting mid-word, and appends ellipsis ("...") to indicate that the text continues beyond what's displayed.
+
+##### Example Use
+
+```typescript
+// Product title truncation for card displays
+const longTitle = "Ultra Premium Wireless Noise-Cancelling Bluetooth Headphones with 40-Hour Battery Life";
+const shortTitle = truncate(longTitle, 50);
+// Result: "Ultra Premium Wireless Noise-Cancelling Bluetooth..."
+
+// Product description for mobile view
+const description = "Experience superior sound quality with advanced noise cancellation technology and premium comfort padding.";
+const mobileDescription = truncate(description, 80);
+// Result: "Experience superior sound quality with advanced noise cancellation..."
+
+// Category name truncation
+const categoryName = "Professional Photography Equipment and Accessories";
+const truncatedCategory = truncate(categoryName, 25);
+// Result: "Professional Photography..."
+
+// Review text preview
+const review = "This product exceeded my expectations in every way possible. The build quality is outstanding and the features work perfectly.";
+const reviewPreview = truncate(review, 60);
+// Result: "This product exceeded my expectations in every way possible..."
 ```
 
 ### Converting to Title Case
@@ -67,6 +119,34 @@ export function toTitleCase(str: string): string {
     .map((word) => capitalize(word))
     .join(" ");
 }
+```
+
+##### Explanation of the Code
+
+The `toTitleCase` function converts various string formats into proper Title Case by handling multiple input scenarios. It first replaces hyphens and underscores with spaces using `replace(/[-_]/g, " ")`, then handles camelCase by inserting spaces before capital letters with `replace(/([a-z])([A-Z])/g, "$1 $2")`. After splitting the string into individual words, it applies the `capitalize` function to each word and rejoins them with spaces, ensuring consistent Title Case formatting regardless of the input format.
+
+##### Example Use
+
+```typescript
+// Converting kebab-case product categories
+const category = toTitleCase("wireless-bluetooth-speakers");
+// Result: "Wireless Bluetooth Speakers"
+
+// Converting camelCase API responses
+const productType = toTitleCase("smartHomeDevices");
+// Result: "Smart Home Devices"
+
+// Converting snake_case database fields
+const fieldName = toTitleCase("product_description_text");
+// Result: "Product Description Text"
+
+// Mixed format handling
+const mixedFormat = toTitleCase("premium_qualityWireless-headphones");
+// Result: "Premium Quality Wireless Headphones"
+
+// Navigation menu items
+const menuItem = toTitleCase("customerSupport");
+// Result: "Customer Support"
 ```
 
 ### Converting Kebab Case to Title Case
@@ -94,6 +174,34 @@ export function kebabToTitle(str: string): string {
 }
 ```
 
+##### Explanation of the Code
+
+The `kebabToTitle` function is specifically designed to convert kebab-case strings (words separated by hyphens) into Title Case format. It splits the input string at each hyphen using `split("-")`, creating an array of individual words. Each word is then processed through the `capitalize` function to ensure proper capitalization, and finally, the words are rejoined with spaces using `join(" ")`. This function is particularly useful for converting URL slugs, CSS class names, or API endpoints into human-readable titles.
+
+##### Example Use
+
+```typescript
+// Converting URL slugs to page titles
+const pageSlug = kebabToTitle("product-categories");
+// Result: "Product Categories"
+
+// Converting CSS class names to display labels
+const className = kebabToTitle("featured-products-grid");
+// Result: "Featured Products Grid"
+
+// Converting API endpoint names
+const endpoint = kebabToTitle("user-profile-settings");
+// Result: "User Profile Settings"
+
+// Converting product SKU parts
+const skuPart = kebabToTitle("wireless-noise-cancelling");
+// Result: "Wireless Noise Cancelling"
+
+// Converting filter options
+const filterOption = kebabToTitle("price-range-high");
+// Result: "Price Range High"
+```
+
 ### Formatting into Slug
 
 ```typescript
@@ -114,9 +222,41 @@ export function formatToSlug(str: string): string {
 }
 ```
 
+##### Explanation of the Code
+
+The `formatToSlug` function transforms any string into a URL-friendly slug format suitable for web addresses, file names, and identifiers. It starts by converting the string to lowercase and removing leading/trailing whitespace with `toLowerCase()` and `trim()`. The regex `/[\s\W-]+/g` replaces sequences of spaces, non-word characters, and existing hyphens with single hyphens. Finally, `/^-+|-+$/g` removes any leading or trailing hyphens that might result from the previous operations, ensuring a clean, professional slug format.
+
+##### Example Use
+
+```typescript
+// Converting product titles to URL slugs
+const productTitle = "Premium Wireless Bluetooth Headphones - Black Edition!";
+const productSlug = formatToSlug(productTitle);
+// Result: "premium-wireless-bluetooth-headphones-black-edition"
+
+// Creating category URLs
+const categoryName = "Smart Home & IoT Devices";
+const categorySlug = formatToSlug(categoryName);
+// Result: "smart-home-iot-devices"
+
+// Converting blog post titles
+const blogTitle = "10 Tips for Better E-commerce UX/UI Design";
+const blogSlug = formatToSlug(blogTitle);
+// Result: "10-tips-for-better-e-commerce-ux-ui-design"
+
+// Creating unique identifiers
+const identifier = formatToSlug("User Profile Settings (Advanced)");
+// Result: "user-profile-settings-advanced"
+
+// Converting search queries to URL parameters
+const searchQuery = "Wireless Gaming Accessories & Peripherals";
+const querySlug = formatToSlug(searchQuery);
+// Result: "wireless-gaming-accessories-peripherals"
+```
+
 ## Currency Formatting
 
-We will be defining the currency formatting utility functions for our e-commerce platform. This will help us ensure that prices are displayed in a consistent format throughout the application.
+Accurate currency formatting is essential for any e-commerce platform, as it directly impacts user trust and purchasing decisions. This utility ensures that monetary values are displayed according to international standards and user locale preferences, providing a professional shopping experience that customers expect from modern e-commerce applications.
 
 ```typescript
 // src/lib/utils/format.ts
@@ -139,9 +279,41 @@ export function formatCurrency(
 }
 ```
 
+##### Explanation of the Code
+
+The `formatCurrency` function leverages the browser's built-in `Intl.NumberFormat` API to provide internationalized currency formatting. It accepts an amount (number), currency code (defaulting to "USD"), and locale (defaulting to "en-US"). The function creates a NumberFormat object with currency style formatting and applies it to the provided amount. This approach automatically handles currency symbols, decimal places, thousand separators, and locale-specific formatting rules, ensuring accurate display across different regions and currencies.
+
+##### Example Use
+
+```typescript
+// Basic USD formatting
+const price = formatCurrency(29.99);
+// Result: "$29.99"
+
+// European Euro formatting
+const euroPrice = formatCurrency(45.50, "EUR", "de-DE");
+// Result: "45,50 €"
+
+// Japanese Yen formatting (no decimal places)
+const yenPrice = formatCurrency(1500, "JPY", "ja-JP");
+// Result: "¥1,500"
+
+// British Pound formatting
+const gbpPrice = formatCurrency(125.75, "GBP", "en-GB");
+// Result: "£125.75"
+
+// Large amount formatting with thousands separators
+const expensiveItem = formatCurrency(2999.99, "USD", "en-US");
+// Result: "$2,999.99"
+
+// Product pricing in shopping cart
+const cartTotal = formatCurrency(156.47, "CAD", "en-CA");
+// Result: "CA$156.47"
+```
+
 ## Converting 24-Hour Time to 12-Hour Format
 
-We will be defining the time formatting utility functions for our e-commerce platform. This will help us ensure that times are displayed in a consistent format throughout the application.
+Time formatting consistency enhances user experience by presenting time information in familiar, readable formats. This utility converts 24-hour military time to the more commonly used 12-hour format with AM/PM indicators, making it easier for users to understand delivery times, store hours, and scheduling information throughout your e-commerce platform.
 
 ```typescript
 // src/lib/utils/format.ts
@@ -163,9 +335,45 @@ export function convertTo12HourFormat(time: string): string {
 }
 ```
 
+##### Explanation of the Code
+
+The `convertTo12HourFormat` function transforms 24-hour time strings into user-friendly 12-hour format with AM/PM indicators. It splits the input time string at the colon and converts the parts to numbers using `map(Number)`. The function determines the appropriate period (AM/PM) by checking if hours are 12 or greater. The `hours % 12 || 12` expression handles the conversion: it uses modulo to convert hours 13-23 to 1-11, and the `|| 12` ensures that hour 0 (midnight) becomes 12. Finally, it formats the minutes with `padStart(2, "0")` to maintain two-digit formatting.
+
+##### Example Use
+
+```typescript
+// Store opening hours
+const openingTime = convertTo12HourFormat("09:00");
+// Result: "9:00 AM"
+
+// Delivery time slots
+const deliverySlot = convertTo12HourFormat("14:30");
+// Result: "2:30 PM"
+
+// Customer service hours
+const serviceHours = convertTo12HourFormat("17:45");
+// Result: "5:45 PM"
+
+// Midnight handling
+const midnight = convertTo12HourFormat("00:00");
+// Result: "12:00 AM"
+
+// Noon handling
+const noon = convertTo12HourFormat("12:00");
+// Result: "12:00 PM"
+
+// Late evening time
+const lateEvening = convertTo12HourFormat("23:15");
+// Result: "11:15 PM"
+
+// Order processing times
+const processingTime = convertTo12HourFormat("08:30:00");
+// Result: "8:30 AM"
+```
+
 ## Date Formatting
 
-We will be defining the date formatting utility functions for our e-commerce platform. This will help us ensure that dates are displayed in a consistent format throughout the application.
+Consistent date presentation is vital for creating a professional user experience in e-commerce applications. This utility standardizes how dates appear across your platform, whether displaying order history, product availability, shipping estimates, or promotional periods. By using locale-aware formatting, you ensure dates are presented in formats familiar to your users regardless of their geographic location.
 
 ```typescript
 // src/lib/utils/format.ts
@@ -188,9 +396,45 @@ export function formatDate(
 }
 ```
 
+##### Explanation of the Code
+
+The `formatDate` function provides flexible date formatting that accepts both string and Date object inputs. It first determines the input type and converts string dates to Date objects using `new Date(date)` when necessary. The function then utilizes the `toLocaleDateString()` method with specific formatting options: `year: "numeric"` displays the full four-digit year, `month: "long"` shows the complete month name, and `day: "numeric"` presents the day without leading zeros. This creates human-readable dates like "January 15, 2024" that are ideal for customer-facing interfaces.
+
+##### Example Use
+
+```typescript
+// Order date formatting
+const orderDate = formatDate("2024-01-15");
+// Result: "January 15, 2024"
+
+// Product launch date with Date object
+const launchDate = formatDate(new Date("2024-03-22"));
+// Result: "March 22, 2024"
+
+// German locale formatting
+const germanDate = formatDate("2024-12-25", "de-DE");
+// Result: "25. Dezember 2024"
+
+// French locale formatting
+const frenchDate = formatDate("2024-07-14", "fr-FR");
+// Result: "14 juillet 2024"
+
+// Shipping estimate
+const shippingDate = formatDate("2024-06-30");
+// Result: "June 30, 2024"
+
+// Promotion end date
+const promotionEnd = formatDate(new Date("2024-11-11"));
+// Result: "November 11, 2024"
+
+// Review date display
+const reviewDate = formatDate("2024-02-29");
+// Result: "February 29, 2024"
+```
+
 ## Formatting Postal Codes
 
-We will be defining the postal code formatting utility functions for our e-commerce platform. This will help us ensure that postal codes are displayed in a consistent format throughout the application.
+Proper postal code formatting is essential for international e-commerce operations, ensuring accurate shipping and enhancing customer trust. This utility automatically formats postal codes according to each country's specific standards, preventing shipping errors and creating a polished checkout experience. By standardizing postal code presentation, you reduce customer confusion and improve the overall professionalism of your platform.
 
 ```typescript
 // src/lib/utils/format.ts
@@ -236,8 +480,50 @@ export function formatPostalCode(postalCode: string, country: string): string {
 }
 ```
 
+##### Explanation of the Code
+
+The `formatPostalCode` function intelligently formats postal codes according to country-specific standards using a switch statement. It first normalizes the input by trimming whitespace and converting to uppercase. For Canadian postal codes, it uses regex `/^[A-Z]\d[A-Z]\d[A-Z]\d$/` to validate the A1A1A1 pattern and formats it as "A1A 1A1" with a space in the middle. US ZIP codes are detected with `/^\d{9}$/` for 9-digit codes and formatted as "12345-6789". UK postcodes use a more complex regex to handle various formats (like "SW1A 1AA" or "M1 1AA") and apply proper spacing. The function gracefully handles invalid formats by returning the trimmed input unchanged.
+
+##### Example Use
+
+```typescript
+// Canadian postal code formatting
+const canadianCode = formatPostalCode("K1A0A6", "CA");
+// Result: "K1A 0A6"
+
+// US ZIP+4 code formatting
+const usZipPlus4 = formatPostalCode("123456789", "US");
+// Result: "12345-6789"
+
+// Regular US ZIP code (no change needed)
+const usZip = formatPostalCode("90210", "US");
+// Result: "90210"
+
+// UK postcode formatting - London
+const ukLondon = formatPostalCode("SW1A1AA", "GB");
+// Result: "SW1A 1AA"
+
+// UK postcode formatting - Manchester
+const ukManchester = formatPostalCode("M11AA", "GB");
+// Result: "M1 1AA"
+
+// Invalid format handling
+const invalidCode = formatPostalCode("INVALID", "CA");
+// Result: "INVALID" (returned as-is)
+
+// Mixed case input normalization
+const mixedCase = formatPostalCode("k1a0a6", "CA");
+// Result: "K1A 0A6"
+
+// Unknown country handling
+const unknownCountry = formatPostalCode("12345", "XY");
+// Result: "12345" (returned trimmed and uppercase)
+```
+
 ## Next Steps
 
-Next, we'll work on the [Validation Utility Functions](/ecommerce-platform/utility-functions-and-validation-constants/validattion-utility-functions) to ensure that our data is clean and consistent across the e-commerce platform. This will help us maintain a high standard of data integrity and user experience.
+Having established these essential formatting utilities, we've created a solid foundation for consistent data presentation across your e-commerce platform. These functions will serve as building blocks for creating professional, user-friendly interfaces that enhance customer experience and maintain brand consistency.
+
+Next, we'll explore the [Validation Utility Functions](/ecommerce-platform/utility-functions-and-validation-constants/validattion-utility-functions) to complement these formatting tools. Validation utilities will ensure data integrity and quality by checking user inputs, API responses, and database entries before they're processed or displayed. Together, formatting and validation utilities create a robust system for maintaining clean, reliable data throughout your e-commerce application.
 
 <BackToTop />

@@ -1,0 +1,442 @@
+import BackToTop from "@/components/BackToTop";
+
+# Defining Interfaces for APIs
+
+## Table of Contents
+
+## Overview
+
+In this section, we will define the interfaces and utility functions that form the foundation of our e-commerce platform's type safety and data consistency. These TypeScript interfaces serve as contracts that define the shape and structure of our data objects, ensuring compile-time type checking and preventing runtime errors.
+
+### Why Interfaces Matter
+
+- **Type Safety**: Interfaces provide compile-time type checking, catching errors before they reach production
+- **Code Documentation**: They serve as living documentation, making code self-explanatory
+- **IDE Support**: Enable better IntelliSense, auto-completion, and refactoring capabilities
+- **Maintainability**: Changes to data structures are automatically validated across the entire codebase
+- **Team Collaboration**: Establish clear contracts between different parts of the application
+
+### Utility Functions Purpose
+
+Our utility functions encapsulate complex business logic and validation rules, promoting code reusability and maintaining separation of concerns. They handle common operations like data validation, formatting, and transformation, ensuring consistent behavior across the application.
+
+### File Structure
+
+We are organizing our types and interfaces in a dedicated `lib` directory within the `src` folder. This architectural decision follows industry best practices for maintaining a clean, scalable codebase.
+
+#### Directory Structure Benefits:
+
+- **Separation of Concerns**: Types, utilities, and constants are logically grouped
+- **Reusability**: Centralized location makes functions and types easily importable
+- **Testing**: Dedicated test directory alongside implementation files
+- **Scalability**: Structure can grow with the application without becoming unwieldy
+- **Developer Experience**: Clear navigation and predictable file locations
+
+```txt title="File Structure"
+src/
+└── lib/
+    ├── interfaces/
+    │   ├── address.ts
+    │   ├── cart.ts
+    │   ├── contact.ts
+    │   ├── payment.ts
+    │   ├── product.ts
+    │   └── user.ts
+    │
+```
+
+## Defining Interfaces
+
+### Product Interface
+
+The `Product` interface represents the comprehensive data structure for products in our e-commerce platform. This interface is designed to handle the full spectrum of product information that might be returned from modern e-commerce APIs, particularly the DummyJSON API we're integrating with.
+
+##### Key Design Considerations:
+
+- **Optional Properties**: Most fields are optional to accommodate varying API responses and partial data scenarios
+- **Nested Objects**: Complex data like dimensions and reviews are properly structured
+- **Type Safety**: Specific types ensure data integrity (numbers for prices, arrays for images, etc.)
+- **Extensibility**: Structure allows for future enhancements without breaking existing code
+
+##### Property Explanations:
+
+- **`id`**: Unique identifier, essential for database operations and React keys
+- **`discountPercentage`**: Enables dynamic pricing and promotional features
+- **`rating`**: Supports product review and recommendation systems
+- **`dimensions`**: Critical for shipping calculations and product display
+- **`reviews[]`**: Structured review system supporting user feedback
+- **`meta`**: Administrative data for inventory management and tracking
+
+```typescript
+// src/lib/interfaces/product.ts
+
+export interface ProductItem {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  price: number;
+  discountPercentage?: number;
+  rating?: number;
+  stock?: number;
+  tags?: string[];
+  brand?: string;
+  sku?: string;
+  weight?: number;
+  dimensions?: {
+    width?: number;
+    height?: number;
+    depth?: number;
+  };
+  warrantyInformation?: string;
+  shippingInformation?: string;
+  availabilityStatus?: string;
+  reviews?: {
+    rating?: number;
+    comment?: string;
+    date?: string;
+    reviewerName?: string;
+    reviewerEmail?: string;
+  }[];
+  returnPolicy?: string;
+  minimumOrderQuantity?: number;
+  meta?: {
+    createdAt?: string;
+    updatedAt?: string;
+    barcode?: string;
+    qrCode?: string;
+  };
+  thumbnail?: string;
+  images?: string[];
+}
+
+export interface DummyJSONProductsResponse {
+  products: ProductItem[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+```
+
+### User Interface
+
+The `DummyUser` interface defines a comprehensive user profile structure that encompasses personal information, banking details, and professional data. This interface is specifically designed to work with the DummyJSON API's user endpoints while providing flexibility for real-world applications.
+
+##### Interface Design Philosophy:
+
+- **Comprehensive Coverage**: Includes personal, financial, and professional information
+- **Privacy Considerations**: Structured to support data access controls and privacy settings
+- **Nested Data Structures**: Organized related information into logical groupings
+- **API Compatibility**: Matches external API response formats for seamless integration
+
+##### Critical Properties:
+
+- **Authentication Fields**: `username`, `password`, `email` for user authentication
+- **Personal Information**: `firstName`, `lastName`, `birthDate`, `gender` for user profiles
+- **Address Structure**: Nested object supporting international address formats
+- **Banking Information**: Secure storage structure for payment methods
+- **Company Data**: Professional information for B2B scenarios
+- **Role-Based Access**: `role` property enables permission-based features
+
+##### Security Considerations:
+
+- Sensitive fields like `password` should be handled with appropriate encryption
+- Banking information requires PCI compliance measures
+- Personal data must comply with GDPR and similar privacy regulations
+
+```typescript
+// src/lib/interfaces/user.ts
+export interface DummyUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  maidenName?: string;
+  age: number;
+  email: string;
+  phone: string;
+  username: string;
+  password: string;
+  image: string;
+  role: string; // Added from DummyJSON /auth/me
+  birthDate: string;
+  gender: string;
+  address: {
+    address: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  bank: {
+    cardNumber: string;
+    cardType: string;
+    cardExpire: string;
+    iban: string;
+  };
+  university: string;
+  company: {
+    department: string;
+    name: string;
+    title: string;
+    address: {
+      address: string;
+      city: string;
+      state: string;
+      stateCode: string;
+      postalCode: string;
+      country: string;
+      coordinates: {
+        lat: number;
+        lng: number;
+      };
+    };
+  };
+}
+
+export interface DummyUsersResponse {
+  users: DummyUser[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+```
+
+### Cart Interface
+
+The cart interfaces represent the complex data structures involved in e-commerce shopping cart functionality. These interfaces handle the transition from individual products to cart items, applying discounts, calculating totals, and managing quantities.
+
+##### Interface Hierarchy:
+
+1. **`CartItem`**: Represents a product as it appears in the cart with additional cart-specific properties
+2. **`CartProduct`**: API-specific structure with calculated totals and discounts
+3. **`Cart`**: Complete cart structure with aggregated totals and metadata
+
+##### Key Features:
+
+- **Quantity Management**: Tracks individual item quantities and total quantities
+- **Price Calculations**: Supports original prices, discounts, and final totals
+- **Product Linking**: Maintains connection to original product data via `productId`
+- **User Association**: Links carts to specific users via `userId`
+- **Flexibility**: Supports both local storage and API-based cart management
+
+##### Business Logic Considerations:
+
+- **Discount Application**: Separate tracking of original and discounted prices
+- **Inventory Validation**: Product information enables stock checking
+- **Tax Calculations**: Structure supports future tax calculation features
+- **Multi-cart Support**: User can potentially have multiple carts (saved for later, etc.)
+
+```typescript
+// src/lib/interfaces/cart.ts
+
+export interface CartItem {
+  id: number;
+  productId: number;
+  title: string;
+  price: number;
+  quantity: number;
+  image?: string;
+  category: string;
+  thumbnail?: string;
+  discountPercentage?: number;
+  brand?: string;
+}
+
+export interface CartProduct {
+  id: number;
+  title: string;
+  price: number;
+  quantity: number;
+  total: number;
+  discountPercentage: number;
+  discountedTotal: number;
+  thumbnail: string;
+}
+
+export interface Cart {
+  id: number;
+  products: CartProduct[];
+  total: number;
+  discountedTotal: number;
+  userId: number;
+  totalProducts: number;
+  totalQuantity: number;
+}
+
+export interface UserCartsResponse {
+  carts: Cart[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+```
+
+### Address Interface
+
+The address interfaces provide a robust foundation for handling international shipping and billing addresses. These interfaces emphasize validation, error handling, and standardization across different address formats worldwide.
+
+##### Validation-First Design:
+
+- **Error Handling**: `AddressValidationError` provides detailed feedback for form validation
+- **Result Structures**: `AddressValidationResult` aggregates validation status and errors
+- **Standardization**: `ValidatedAddress` ensures consistent address format post-validation
+
+##### International Considerations:
+
+- **Flexible Fields**: Structure accommodates different international address formats
+- **Postal Code Variations**: Supports various postal code systems (ZIP, postal codes, etc.)
+- **State/Province Handling**: Flexible state field for different governmental structures
+- **Country Standardization**: Enables country code validation and standardization
+
+##### Use Cases:
+
+- **Shipping Calculations**: Validated addresses enable accurate shipping cost calculations
+- **Tax Compliance**: Address information supports location-based tax calculations
+- **Fraud Prevention**: Address validation helps prevent fraudulent transactions
+- **User Experience**: Real-time validation provides immediate feedback to users
+
+```typescript
+// src/lib/interfaces/address.ts
+
+export interface AddressValidationError {
+  field: string;
+  message: string;
+}
+
+export interface AddressValidationResult {
+  isValid: boolean;
+  errors: AddressValidationError[];
+}
+
+export interface ValidatedAddress {
+  address: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+}
+```
+
+### Payment Interface
+
+The payment interfaces form a comprehensive system for handling secure payment processing in e-commerce applications. These interfaces prioritize security, validation, and compliance with industry standards while providing flexibility for different payment scenarios.
+
+##### Security-Focused Architecture:
+
+- **Validation Layers**: Multiple validation interfaces ensure data integrity at every step
+- **Card Detection**: `CardDetectionResult` provides real-time card type identification
+- **Expiry Handling**: Specialized validation for expiration date formats and business rules
+- **CVV Management**: Separate handling for different CVV lengths based on card types
+
+##### Key Interface Purposes:
+
+**`ValidatedPaymentMethod`**: Core payment data structure after validation
+
+- Stores essential payment information in a standardized format
+- Includes optional CVV for security flexibility
+- Links to billing address for comprehensive fraud prevention
+
+**`CardDetectionResult`**: Real-time card analysis
+
+- Determines card brand and type from number patterns
+- Provides validation status and formatting requirements
+- Specifies CVV length requirements for different card types
+
+**`ExpiryValidationResult`**: Comprehensive expiration validation
+
+- Checks format validity and expiration status
+- Prevents unrealistic future dates
+- Extracts month/year for further processing
+
+**`PaymentMethodWithValidation`**: Enhanced structure for user interfaces
+
+- Includes UI-specific properties like default status
+- Supports multiple payment method management
+- Provides masked display information for security
+
+##### PCI Compliance Considerations:
+
+- Interfaces designed to support tokenization strategies
+- Sensitive data handling patterns built into structure
+- Validation ensures compliance with payment industry standards
+
+```typescript
+// src/lib/interfaces/payment.ts
+
+// Payment validation interfaces and types
+
+export interface PaymentValidationError {
+  field: string;
+  message: string;
+}
+
+export interface PaymentValidationResult {
+  isValid: boolean;
+  errors: PaymentValidationError[];
+}
+
+export interface ValidatedPaymentMethod {
+  cardNumber: string;
+  cardType: string;
+  cardExpire: string;
+  cardHolderName: string;
+  cvv?: string;
+  billingAddress?: {
+    address: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+}
+
+export interface CardDetectionResult {
+  type: string;
+  isValid: boolean;
+  brand: string;
+  maxLength: number;
+  cvvLength: number;
+}
+
+export interface ExpiryValidationResult {
+  isValid: boolean;
+  isExpired: boolean;
+  isTooFarFuture: boolean;
+  month?: number;
+  year?: number;
+}
+
+// Enhanced payment method interface for the settings page
+export interface PaymentMethodWithValidation extends ValidatedPaymentMethod {
+  id: string;
+  isDefault: boolean;
+  isFromAPI: boolean;
+  lastFourDigits?: string;
+  maskedNumber?: string;
+}
+```
+
+### Contact Interface
+
+The `Contact` interface is designed to handle user contact information, particularly for customer support and communication purposes. This interface is structured to accommodate various contact methods while ensuring data integrity and validation.
+
+```typescript
+// src/lib/interfaces/contact.ts
+export interface ContactFormData {
+  name: string;
+  email: string;
+  subject: string;
+  category: string;
+  message: string;
+}
+
+export interface ContactValidationError {
+  field: keyof ContactFormData;
+  message: string;
+}
+
+export interface ContactValidationResult {
+  isValid: boolean;
+  errors: ContactValidationError[];
+}
+```

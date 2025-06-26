@@ -31,8 +31,15 @@ interface Props {
 
 export function CustomHeading({ children, level, id, className }: Props) {
   const Component = `h${level}` as keyof JSX.IntrinsicElements;
+
+  // Don't apply custom classes if this is the table-of-contents heading
+  const finalClassName =
+    id === "table-of-contents"
+      ? "scroll-mt-24 text-accent"
+      : `scroll-mt-24 ${className}`;
+
   return (
-    <Component id={id} className={`scroll-mt-24 ${className}`}>
+    <Component id={id} className={finalClassName}>
       {children}
     </Component>
   );
@@ -53,7 +60,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <CustomHeading
         level={2}
         id={props.id}
-        className="my-4 font-[IbarraRealNova] font-black text-3xl tracking-tighter"
+        className="my-4 font-[IbarraRealNova] font-black text-3xl text-primary tracking-tighter"
       >
         {children}
       </CustomHeading>
@@ -62,7 +69,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <CustomHeading
         level={3}
         id={props.id}
-        className="my-4 font-[IbarraRealNova] font-light text-2xl tracking-wide"
+        className="my-4 font-[IbarraRealNova] font-light text-2xl text-secondary tracking-wide"
       >
         <br />
         {children}
@@ -72,7 +79,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <CustomHeading
         level={4}
         id={props.id}
-        className="my-4 font-[DMSerifText] text-xl"
+        className="my-4 font-[DMSerifText] text-sidebar-active-text text-xl"
       >
         <br />
         <br />
@@ -83,7 +90,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <CustomHeading
         level={5}
         id={props.id}
-        className="mt-6 decoration-border font-[DMSerifText] text-lg"
+        className="mt-6 decoration-border font-[DMSerifText] text-lg text-tertiary"
       >
         {children}
       </CustomHeading>
@@ -92,7 +99,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       <CustomHeading
         level={6}
         id={props.id}
-        className="mb-1 font-[BodoniModaSC] font-light"
+        className="mb-1 font-[BodoniModaSC] font-light text-accent text-sm tracking-wider"
       >
         {children}
       </CustomHeading>
@@ -118,7 +125,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ),
     li: ({ children }) => <li className="mb-1 ml-9">{children}</li>,
     code: ({ children }) => (
-      <code className="my-5 py-1 font-[CascadiaCode] font-semibold text-sm">
+      <code className="my-5 py-1 font-[CascadiaCode] font-semibold text-code text-sm">
         {children}
       </code>
     ),
@@ -158,9 +165,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       </th>
     ),
     td: ({ children }) => (
-      <td className="px-6 py-4 border-b-1 border-table-hover text-sm">
-        {children}
-      </td>
+      <td className="px-6 py-4 border-b-1 border-border text-sm">{children}</td>
     ),
     img: ({ src, alt, ...props }) => (
       <img src={src} alt={alt} className="mx-auto my-6 rounded-lg" {...props} />

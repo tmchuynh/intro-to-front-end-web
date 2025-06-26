@@ -1,0 +1,181 @@
+import BackToTop from "@/components/BackToTop";
+
+# Display Rating Stars
+
+## Table of Contents
+
+## The `import` Statements and Interface
+
+```typescript
+// src/lib/displayRatingStars.tsx
+import { Star } from "lucide-react";
+import { cn } from "./utils";
+
+interface DisplayRatingStarsOptions {
+  size?: "sm" | "md" | "lg"; // Size of stars
+  showRatingNumber?: boolean; // Whether to display the numeric rating
+  containerClassName?: string; // Additional className for the container
+  align?: "left" | "center" | "right"; // Alignment of stars
+}
+```
+
+##### Explanation of the Code
+
+- The `import` statement imports the `Star` icon from the `lucide-react` library and a utility function `cn` for conditional class names.
+- `DisplayRatingStarsOptions` allows customization of the star display:
+  - `size`: Controls the size of the stars.
+  - `showRatingNumber`: Determines if the numeric rating should be displayed.
+  - `containerClassName`: Allows additional styling for the container.
+  - `align`: Specifies the alignment of the stars within the container.
+
+## The `displayRatingStars` Function
+
+```typescript
+// src/lib/displayRatingStars.tsx
+/**
+ * Displays rating as stars
+ *
+ * @param rating - Rating value (1-5)
+ * @param maxRating - Maximum rating value (default: 5)
+ * @param options - Display options
+ * @returns JSX element with rating stars
+ */
+export function displayRatingStars(
+  rating: number,
+  maxRating: number = 5,
+  options?: DisplayRatingStarsOptions
+) {
+  // Default options
+  const {
+    size = "md",
+    showRatingNumber = false,
+    containerClassName = "",
+    align = "center",
+  } = options || {};
+
+  // Determine size classes
+  const sizeClasses = {
+    sm: "w-3 h-3",
+    md: "w-4 h-4",
+    lg: "w-5 h-5",
+  };
+
+  // Determine alignment classes
+  const alignClasses = {
+    left: "justify-start",
+    center: "justify-center",
+    right: "justify-end",
+  };
+
+  // Generate stars
+  const stars = [];
+  for (let i = 1; i <= maxRating; i++) {
+    stars.push(
+      <Star
+        key={i}
+        className={cn(
+          sizeClasses[size],
+          i <= rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300",
+          "inline"
+        )}
+      />
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-1",
+        alignClasses[align],
+        containerClassName
+      )}
+    >
+      {stars}
+      {showRatingNumber && (
+        <span className="ml-1 font-medium text-sm">{rating.toFixed(1)}</span>
+      )}
+    </div>
+  );
+}
+```
+
+##### Explanation of the Code
+
+- The `displayRatingStars` function generates a visual representation of a rating using stars.
+- It accepts:
+  - `rating`: The current rating value (1-5).
+  - `maxRating`: The maximum rating value, defaulting to 5.
+  - `options`: An optional object for customization.
+- The function uses default values for options and determines the size and alignment classes based on the provided options.
+- It generates an array of `Star` components, filling them based on the rating value.
+- Finally, it returns a JSX element containing the stars and, if specified, the numeric rating.
+
+## Examples
+
+### Usage in a Product Rating Component
+
+```tsx
+// src/app/ecommerce-platform/components/ProductRating.tsx
+import { displayRatingStars } from "@/lib/displayRatingStars";
+
+export default function ProductRating({ rating }: { rating: number }) {
+  return (
+    <div className="flex items-center">
+      {displayRatingStars(rating, 5, {
+        size: "md",
+        showRatingNumber: true,
+        align: "left",
+      })}
+    </div>
+  );
+}
+```
+
+##### Explanation of the Code
+
+- The `ProductRating` component uses the `displayRatingStars` function to render the rating stars for a product.
+- It passes the `rating` prop to the function, along with options for size, display of the numeric rating, and alignment.
+- The component can be used in product listings or detail pages to visually represent product ratings.
+
+### Usage in a Review Section
+
+```tsx
+// src/app/ecommerce-platform/components/ReviewSection.tsx
+import { displayRatingStars } from "@/lib/displayRatingStars";
+
+export default function ReviewSection({
+  reviews,
+}: {
+  reviews: { rating: number; comment: string }[];
+}) {
+  return (
+    <div className="space-y-4">
+      {reviews.map((review, index) => (
+        <div key={index} className="p-4 border rounded-lg">
+          {displayRatingStars(review.rating, 5, {
+            size: "sm",
+            showRatingNumber: true,
+            align: "center",
+          })}
+          <p className="mt-2 text-sm text-gray-700">{review.comment}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+```
+
+##### Explanation of the Code
+
+- The `ReviewSection` component displays a list of reviews, each with a rating represented by stars.
+- It maps over the `reviews` array, rendering the `displayRatingStars` function for each review's rating.
+- The stars are displayed in a smaller size, centered, and the numeric rating is shown alongside the review comment.
+- This component can be used in product detail pages to showcase customer reviews and ratings.
+
+## Next Steps
+
+We are ready to start creating our home page! First, let's implement the pieces that will go into the home page, such as the product grid and the featured products section. This will help us create a dynamic and engaging home page that showcases our products effectively.
+
+Let's head on over to [Creating the Product Grid](/ecommerce-platform/creating-components/creating-the-product-grid).
+
+<BackToTop />

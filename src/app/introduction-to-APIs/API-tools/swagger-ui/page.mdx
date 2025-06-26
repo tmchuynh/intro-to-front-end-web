@@ -94,6 +94,7 @@ Swagger UI offers multiple deployment options to suit different use cases, from 
 The fastest way to get Swagger UI running is through CDN links:
 
 ```html
+<!-- File: public/index.html -->
 <!DOCTYPE html>
 <html>
   <head>
@@ -145,6 +146,7 @@ The fastest way to get Swagger UI running is through CDN links:
 For Node.js projects and modern build tools:
 
 ```bash
+# File: package.json install commands
 # Install via npm
 npm install swagger-ui-dist
 
@@ -155,6 +157,7 @@ npm install swagger-ui-react
 ##### React Integration Example
 
 ```jsx
+// File: src/components/ApiDocs.jsx
 import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
 
@@ -176,6 +179,7 @@ function MyApiDocs() {
 For containerized environments:
 
 ```bash
+# File: docker-compose.yml or terminal commands
 # Pull and run official Swagger UI Docker image
 docker run -p 8080:8080 -e SWAGGER_JSON=/openapi.json -v $(pwd)/openapi.json:/openapi.json swaggerapi/swagger-ui
 
@@ -228,6 +232,7 @@ For complete control over the deployment:
 #### Basic Configuration Options
 
 ```javascript
+// File: src/js/swagger-config.js
 const ui = SwaggerUIBundle({
   // Required
   url: "path/to/your/openapi.json", // OpenAPI spec URL
@@ -275,6 +280,7 @@ const ui = SwaggerUIBundle({
 ##### Development Environment
 
 ```javascript
+// File: src/js/development-config.js
 {
   url: 'http://localhost:3001/api-docs',
   tryItOutEnabled: true,
@@ -288,6 +294,7 @@ const ui = SwaggerUIBundle({
 ##### Production Environment
 
 ```javascript
+// File: src/js/production-config.js
 {
   url: 'https://api.production.com/openapi.json',
   supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
@@ -388,6 +395,7 @@ const ui = SwaggerUIBundle({
 ##### Step 1: Import Existing Specifications
 
 ```bash
+# File: terminal or ci/cd script
 # Export from local Swagger UI
 curl -o my-api.json http://localhost:8080/api-docs
 
@@ -404,6 +412,7 @@ swaggerhub api:create my-org/my-api/1.0.0 --file my-api.json
 ##### Step 3: Enable CI/CD Integration
 
 ```yaml
+# File: .github/workflows/swaggerhub.yml
 # GitHub Actions example
 name: SwaggerHub Integration
 on:
@@ -459,6 +468,7 @@ Each API operation in Swagger UI provides comprehensive information:
 ##### Operation Summary
 
 ```yaml
+# File: api-spec/openapi.yaml
 # Example OpenAPI operation
 /users/{userId}:
   get:
@@ -515,6 +525,7 @@ Each API operation in Swagger UI provides comprehensive information:
 Swagger UI provides expandable views of data schemas:
 
 ```json
+// File: examples/user-schema.json
 {
   "User": {
     "type": "object",
@@ -562,6 +573,7 @@ Swagger UI provides expandable views of data schemas:
 ##### Authentication Testing
 
 ```javascript
+// File: src/js/oauth-config.js
 // OAuth 2.0 Configuration Example
 {
   "securitySchemes": {
@@ -587,6 +599,7 @@ Swagger UI provides expandable views of data schemas:
 Testing APIs with complex nested objects:
 
 ```json
+// File: examples/complex-request.json
 {
   "user": {
     "personalInfo": {
@@ -618,6 +631,7 @@ Testing APIs with complex nested objects:
 For endpoints that accept file uploads:
 
 ```yaml
+# File: api-spec/file-upload.yaml
 requestBody:
   content:
     multipart/form-data:
@@ -653,6 +667,7 @@ requestBody:
 Swagger UI automatically generates cURL commands for every test:
 
 ```bash
+# File: examples/curl-command.sh
 curl -X POST "https://api.example.com/v1/users" \
   -H "accept: application/json" \
   -H "Content-Type: application/json" \
@@ -682,6 +697,7 @@ Common error scenarios and solutions:
 Swagger UI supports deep linking to specific operations:
 
 ```javascript
+// File: src/js/deep-linking.js
 // Configuration for deep linking
 const ui = SwaggerUIBundle({
   url: "openapi.json",
@@ -703,6 +719,7 @@ const ui = SwaggerUIBundle({
 Customize behavior with interceptors:
 
 ```javascript
+// File: src/js/interceptors.js
 const ui = SwaggerUIBundle({
   requestInterceptor: (request) => {
     // Add custom headers
@@ -734,6 +751,7 @@ const ui = SwaggerUIBundle({
 Extend functionality with custom plugins:
 
 ```javascript
+// File: src/js/custom-plugin.js
 const MyCustomPlugin = () => {
   return {
     components: {
@@ -770,7 +788,8 @@ Swagger UI's flexibility allows for extensive customization to match brand requi
 
 ##### Basic Theme Override
 
-```css
+```css title="custom-swagger-theme.css"
+/* File: assets/css/custom-swagger-theme.css */
 /* Custom CSS for Swagger UI */
 .swagger-ui {
   font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;
@@ -822,6 +841,7 @@ Swagger UI's flexibility allows for extensive customization to match brand requi
 ##### Dark Theme Implementation
 
 ```css
+/* File: assets/css/dark-theme.css */
 /* Dark theme for Swagger UI */
 .swagger-ui.dark-theme {
   background-color: #1a1a1a;
@@ -856,6 +876,7 @@ Swagger UI's flexibility allows for extensive customization to match brand requi
 #### JavaScript Theme Configuration
 
 ```javascript
+// File: src/js/theme-config.js
 const ui = SwaggerUIBundle({
   url: "openapi.json",
   dom_id: "#swagger-ui",
@@ -885,6 +906,7 @@ const ui = SwaggerUIBundle({
 ##### Using swagger-ui-react
 
 ```jsx
+// File: src/components/ApiDocumentation.jsx
 import React, { useState, useEffect } from "react";
 import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
@@ -969,6 +991,7 @@ export default ApiDocumentation;
 #### Vue.js Integration
 
 ```vue
+<!-- File: src/components/SwaggerUIComponent.vue -->
 <template>
   <div id="swagger-ui-container">
     <div ref="swaggerContainer"></div>
@@ -1038,6 +1061,7 @@ export default {
 #### Angular Integration
 
 ```typescript
+// File: src/components/swagger-ui.component.ts
 // swagger-ui.component.ts
 import { Component, OnInit, Input, ElementRef, ViewChild } from "@angular/core";
 import SwaggerUIBundle from "swagger-ui-dist/swagger-ui-bundle.js";
@@ -1081,6 +1105,7 @@ export class SwaggerUIComponent implements OnInit {
 #### Single Sign-On (SSO) Integration
 
 ```javascript
+// File: src/js/sso-integration.js
 // SSO integration example
 const ui = SwaggerUIBundle({
   url: "openapi.json",
@@ -1120,6 +1145,7 @@ const ui = SwaggerUIBundle({
 #### API Gateway Integration
 
 ```javascript
+// File: src/js/api-gateway.js
 // API Gateway integration with request routing
 const ui = SwaggerUIBundle({
   url: "openapi.json",
@@ -1147,6 +1173,7 @@ const ui = SwaggerUIBundle({
 #### Content Security Policy (CSP) Compliance
 
 ```html
+<!-- File: public/index.html -->
 <!-- CSP-compliant Swagger UI setup -->
 <!DOCTYPE html>
 <html>

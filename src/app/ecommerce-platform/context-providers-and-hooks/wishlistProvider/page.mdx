@@ -1,0 +1,291 @@
+import BackToTop from "@/components/BackToTop";
+
+# Creating the Wishlist Provider
+
+## Table of Contents
+
+## Introduction
+
+The Wishlist Provider is a crucial component of our e-commerce platform, allowing users to save products for later purchase. This provider will manage the wishlist state, including adding and removing items, and will integrate with the authentication provider to ensure that wishlists are user-specific.
+
+## The `import` Statements and Interfaces
+
+```typescript
+// src/lib/context-providers/wishlistProvider.tsx
+"use client";
+
+import { ProductItem } from "@/lib/interfaces/product";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "./authContext";
+
+export interface WishlistItem {
+  id: number;
+  product: ProductItem;
+  addedAt: Date;
+  isPurchased?: boolean;
+  purchasedAt?: Date;
+}
+
+export interface WishlistContextType {
+  wishlistItems: WishlistItem[];
+  isLoading: boolean;
+  addToWishlist: (
+    product: ProductItem
+  ) => Promise<{ success: boolean; message: string }>;
+  removeFromWishlist: (
+    productId: number
+  ) => Promise<{ success: boolean; message: string }>;
+  moveToCart: (
+    productId: number
+  ) => Promise<{ success: boolean; message: string }>;
+  markAsPurchased: (productIds: number[]) => void;
+  isInWishlist: (productId: number) => boolean;
+  clearWishlist: () => void;
+  wishlistCount: number;
+  purchasedItems: WishlistItem[];
+  activeWishlistItems: WishlistItem[];
+}
+```
+
+##### Explanation of the Code
+
+- **Imports**: We import necessary modules and types, including `ProductItem` for product details, React hooks for state management, and the authentication context for user-specific operations.
+- **Interfaces**: We define `WishlistItem` to represent items in the wishlist, including properties like `id`, `product`, `addedAt`, and optional properties for purchase status. The `WishlistContextType` interface defines the structure of our wishlist context, including methods for managing wishlist items.
+
+## The `WishlistContext` Component
+
+```typescript
+// src/lib/context-providers/wishlistProvider.tsx
+const WishlistContext = createContext<WishlistContextType | undefined>(
+  undefined
+);
+
+export const useWishlist = () => {
+  const context = useContext(WishlistContext);
+  if (!context) {
+    throw new Error("useWishlist must be used within a WishlistProvider");
+  }
+  return context;
+};
+```
+
+##### Explanation of the Code
+
+- **Context Creation**: We create a context for the wishlist using `createContext`, initializing it with `undefined` to indicate that it will be provided later.
+- **Custom Hook**: The `useWishlist` hook allows components to access the wishlist context. It throws an error if used outside of a `WishlistProvider`, ensuring that the context is always available.
+
+## The `WishlistProvider` Component
+
+```typescript
+// src/lib/context-providers/wishlistProvider.tsx
+interface WishlistProviderProps {
+  children: React.ReactNode;
+}
+
+export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) => {
+  const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { user, isLoggedIn } = useAuth();
+
+  // Load wishlist from localStorage when user logs in
+  useEffect(() => {
+    if (isLoggedIn && user) {
+      loadWishlistFromStorage();
+    } else {
+      // Clear wishlist when user logs out
+      setWishlistItems([]);
+    }
+  }, [isLoggedIn, user?.id]);
+
+  // Save to localStorage whenever wishlist changes
+  useEffect(() => {
+    if (isLoggedIn && user && wishlistItems.length >= 0) {
+      saveWishlistToStorage();
+    }
+  }, [wishlistItems, isLoggedIn, user?.id]);
+
+  const markAsPurchased = (productIds: number[]) => {
+    if (!isLoggedIn) return;
+
+    setWishlistItems(prev =>
+      prev.map(item =>
+        productIds.includes(item.id)
+          ? { ...item, isPurchased: true, purchasedAt: new Date() }
+          : item
+      )
+    );
+  };
+
+  // Listen for checkout events to mark wishlist items as purchased
+  useEffect(() => {
+    const handleCheckout = (event: CustomEvent) => {
+      const { productIds } = event.detail;
+      if (productIds && Array.isArray(productIds)) {
+        markAsPurchased(productIds);
+      }
+    };
+
+    window.addEventListener("cart-checkout", handleCheckout as EventListener);
+
+    return () => {
+      window.removeEventListener("cart-checkout", handleCheckout as EventListener);
+    };
+  }, [isLoggedIn]); // Add isLoggedIn as dependency
+
+  const getStorageKey = () => {
+    return user ? `wishlist_${user.id}` : null;
+  };
+
+  const loadWishlistFromStorage = () => {
+    const storageKey = getStorageKey();
+    if (!storageKey) return;
+
+    try {
+      const storedWishlist = localStorage.getItem(storageKey);
+      if (storedWishlist) {
+        const parsedWishlist = JSON.parse(storedWishlist);
+        // Convert date strings back to Date objects
+        const wishlistWithDates = parsedWishlist.map((item: any) => ({
+          ...item,
+          addedAt: new Date(item.addedAt),
+          purchasedAt: item.purchasedAt ? new Date(item.purchasedAt) : undefined,
+        }));
+        setWishlistItems(wishlistWithDates);
+      }
+    } catch (error) {
+      console.error("Error loading wishlist from storage:", error);
+    }
+  };
+
+  const saveWishlistToStorage = () => {
+    const storageKey = getStorageKey();
+    if (!storageKey) return;
+
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(wishlistItems));
+    } catch (error) {
+      console.error("Error saving wishlist to storage:", error);
+    }
+  };
+
+  const addToWishlist = async (product: ProductItem): Promise<{ success: boolean; message: string }> => {
+    if (!isLoggedIn) {
+      return { success: false, message: "Please log in to add items to your wishlist" };
+    }
+
+    if (isInWishlist(product.id)) {
+      return { success: false, message: "Item is already in your wishlist" };
+    }
+
+    setIsLoading(true);
+    try {
+      const newWishlistItem: WishlistItem = {
+        id: product.id,
+        product,
+        addedAt: new Date(),
+        isPurchased: false,
+      };
+
+      setWishlistItems(prev => [...prev, newWishlistItem]);
+      return { success: true, message: "Item added to wishlist" };
+    } catch (error) {
+      console.error("Error adding to wishlist:", error);
+      return { success: false, message: "Failed to add item to wishlist" };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const removeFromWishlist = async (productId: number): Promise<{ success: boolean; message: string }> => {
+    if (!isLoggedIn) {
+      return { success: false, message: "Please log in to manage your wishlist" };
+    }
+
+    setIsLoading(true);
+    try {
+      setWishlistItems(prev => prev.filter(item => item.id !== productId));
+      return { success: true, message: "Item removed from wishlist" };
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
+      return { success: false, message: "Failed to remove item from wishlist" };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const moveToCart = async (productId: number): Promise<{ success: boolean; message: string }> => {
+    if (!isLoggedIn) {
+      return { success: false, message: "Please log in to move items to cart" };
+    }
+
+    const wishlistItem = wishlistItems.find(item => item.id === productId);
+    if (!wishlistItem) {
+      return { success: false, message: "Item not found in wishlist" };
+    }
+
+    try {
+      // Import cart context dynamically to avoid circular dependency
+      const { useCart } = await import("./cartContext");
+      // Note: We'll need to handle this in the component level
+      return { success: true, message: "Ready to move to cart" };
+    } catch (error) {
+      console.error("Error moving to cart:", error);
+      return { success: false, message: "Failed to move item to cart" };
+    }
+  };
+
+  const isInWishlist = (productId: number): boolean => {
+    return wishlistItems.some(item => item.id === productId);
+  };
+
+  const clearWishlist = () => {
+    setWishlistItems([]);
+  };
+
+  // Computed values
+  const activeWishlistItems = wishlistItems.filter(item => !item.isPurchased);
+  const purchasedItems = wishlistItems.filter(item => item.isPurchased);
+  const wishlistCount = activeWishlistItems.length;
+
+  const value: WishlistContextType = {
+    wishlistItems,
+    isLoading,
+    addToWishlist,
+    removeFromWishlist,
+    moveToCart,
+    markAsPurchased,
+    isInWishlist,
+    clearWishlist,
+    wishlistCount,
+    purchasedItems,
+    activeWishlistItems,
+  };
+
+  return (
+    <WishlistContext.Provider value={value}>
+      {children}
+    </WishlistContext.Provider>
+  );
+};
+```
+
+##### Explanation of the Code
+
+- **State Management**: We use `useState` to manage the wishlist items and loading state. The `wishlistItems` state holds the current items in the wishlist.
+- **Authentication Integration**: We use the `useAuth` hook to access the current user and their login status.
+- **Effects**: We use `useEffect` to load the wishlist from localStorage when the user logs in and to save the wishlist whenever it changes. This ensures that the wishlist persists across sessions.
+- **Wishlist Management Methods**: We define methods for adding, removing, and moving items to the cart, as well as marking items as purchased. Each method handles loading states and returns appropriate success messages.
+- **Utility Functions**: We define utility functions to get the storage key based on the user ID, load and save the wishlist to localStorage, and check if an item is in the wishlist.
+
+## Next Steps
+
+Last, but not least, we will implement the [Order Provider](/ecommerce-platform/context-providers-and-hooks/orderProvider). This provider will manage the order processing functionality, including order creation, status tracking, and history management. It will integrate with the authentication provider to ensure that orders are user-specific and persist across sessions.
+
+The Order Provider will introduce you to:
+
+- Order management patterns and best practices
+- Integration with the cart and authentication providers
+- Performance optimization techniques for order processing
+- Testing strategies for order functionality
+
+<BackToTop />

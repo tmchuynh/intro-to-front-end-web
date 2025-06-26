@@ -81,7 +81,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <aside
         id="sidebar"
         className={`
-        bg-sidebar-bg border-sidebar-border text-sidebar-text fixed top-0 left-0 z-50 w-96 h-full border-r
+        bg-sidebar-bg border-border text-sidebar-text fixed top-0 left-0 z-50 w-96 h-full border-r
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0 lg:static lg:z-auto
@@ -89,7 +89,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-between p-4 border-sidebar-border border-b h-16">
+          <div className="flex items-center justify-between p-4 border-b border-border h-16">
             <Link href="/" className="flex items-center space-x-2">
               <div className="flex items-center justify-center bg-primary rounded-lg h-8 w-8">
                 <span className="font-bold text-lg text-white">W</span>
@@ -119,7 +119,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           </div>
 
           {/* Home Button */}
-          <div className="pb-2 pt-4 px-4 border-sidebar-border">
+          <div className="pb-2 pt-4 px-4 border-border">
             <Link
               href="/"
               onClick={onClose}

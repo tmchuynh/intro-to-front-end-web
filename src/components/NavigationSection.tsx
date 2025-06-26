@@ -112,7 +112,9 @@ function NavigationItem({
         <button
           onClick={onToggle}
           className={`flex justify-between items-center px-3 py-2 ml-1 max-w-full w-[95%] font-medium text-left text-sm transition-colors rounded-md ${
-            isExpanded ? "bg-primary/50 " : "hover:bg-sidebar-border "
+            isExpanded
+              ? "bg-sidebar-active-bg text-sidebar-active-text"
+              : "hover:bg-nav-item-hover hover:text-nav-text-hover"
           } `}
         >
           {item.title}
@@ -167,7 +169,7 @@ function NavigationItem({
     <li>
       <Link
         href={item.href}
-        className="block ml-1 px-3 py-2 hover:bg-sidebar-border rounded-md max-w-full w-[95%] text-sm transition-colors"
+        className="block hover:bg-nav-item-hover ml-1 px-3 py-2 rounded-md max-w-full w-[95%] text-sm hover:text-nav-text-hover transition-colors"
       >
         {item.title}
       </Link>

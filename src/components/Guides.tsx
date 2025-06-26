@@ -10,7 +10,7 @@ export default function Guides() {
       href: "/intro-to-html",
       icon: (
         <svg
-          className="w-6 h-6"
+          className="h-6 w-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -31,7 +31,7 @@ export default function Guides() {
       href: "/intro-to-css",
       icon: (
         <svg
-          className="w-6 h-6"
+          className="h-6 w-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -52,7 +52,7 @@ export default function Guides() {
       href: "/intro-to-javascript",
       icon: (
         <svg
-          className="w-6 h-6"
+          className="h-6 w-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -73,7 +73,7 @@ export default function Guides() {
       href: "/developer-tools-and-resources",
       icon: (
         <svg
-          className="w-6 h-6"
+          className="h-6 w-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -100,7 +100,7 @@ export default function Guides() {
       href: "/quiz-app",
       icon: (
         <svg
-          className="w-6 h-6"
+          className="h-6 w-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -121,7 +121,7 @@ export default function Guides() {
       href: "/react",
       icon: (
         <svg
-          className="w-6 h-6"
+          className="h-6 w-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -145,22 +145,26 @@ export default function Guides() {
         </h2>
         <div className="gap-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {guides.map((guide) => (
-            <Link key={guide.href} href={guide.href} className="group relative">
-              <div className="relative flex flex-col space-y-6 bg-white p-6 rounded-xl ring-1 ring-gray-900/5 w-full h-full leading-none">
+            <Link
+              key={guide.href}
+              href={guide.href}
+              className="group relative no-underline"
+            >
+              <div className="relative flex flex-col space-y-6 bg-white p-6 ring-1 ring-gray-900/5 rounded-xl h-full w-full leading-none">
                 <div className="flex items-center space-x-4">
-                  <div className="flex justify-center items-center bg-blue-50 p-2 rounded-lg w-12 h-12">
+                  <div className="flex items-center justify-center bg-blue-50 p-2 rounded-lg h-12 w-12">
                     <div className="text-blue-600">{guide.icon}</div>
                   </div>
                   <div className="space-y-2">
                     <p className="font-medium text-slate-800">{guide.title}</p>
                   </div>
                 </div>
-                <p className="text-slate-600 text-sm leading-6">
+                <p className="leading-6 text-slate-600 text-sm">
                   {guide.description}
                 </p>
                 <p className="font-medium text-blue-600 text-sm">
                   Start learning{" "}
-                  <FaChevronRight className="inline group-hover:translate-x-2 duration-300 ease-in-out" />
+                  <FaChevronRight className="inline duration-300 group-hover:translate-x-2 ease-in-out" />
                 </p>
               </div>
             </Link>

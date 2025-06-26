@@ -64,10 +64,9 @@ export default function Resources() {
             <Link
               key={resource.href}
               href={resource.href}
-              className="group relative"
+              className="group relative no-underline"
             >
-              <div className="absolute -inset-2 bg-gradient-to-r from-green-50 to-blue-50 opacity-25 group-hover:opacity-100 blur rounded-xl transition duration-1000 group-hover:duration-200"></div>
-              <div className="relative bg-white p-6 rounded-xl ring-1 ring-gray-900/5 w-full h-full">
+              <div className="relative bg-white shadow p-6 border rounded-xl h-full w-full">
                 <div>
                   <span className="inline-flex items-center space-x-1">
                     <h3 className="font-medium text-gray-900 text-lg">
@@ -75,7 +74,7 @@ export default function Resources() {
                     </h3>
                     {resource.external && (
                       <svg
-                        className="w-4 h-4 text-gray-400"
+                        className="h-4 w-4 text-gray-400"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"

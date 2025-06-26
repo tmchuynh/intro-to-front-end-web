@@ -8,7 +8,6 @@ import createMDX from "@next/mdx";
 // Rehype plugins for HTML processing (runs after markdown -> HTML conversion)
 import rehypeAutolinkHeadings from "rehype-autolink-headings"; // Adds anchor links to headings
 import rehypeExpressiveCode from "rehype-expressive-code"; // Enhanced code block styling and features
-import rehypeHighlight from "rehype-highlight"; // Syntax highlighting for code blocks
 import rehypeSlug from "rehype-slug"; // Generates URL-friendly slugs for headings
 
 // Remark plugins for markdown processing (runs before HTML conversion)
@@ -44,6 +43,10 @@ const rehypeExpressiveCodeOptions = {
   defaultProps: {
     // Enable word wrap by default for better mobile experience
     wrap: true,
+    // Disable wrapped line indentation for terminal languages
+    overridesByLang: {
+      "bash,ps,sh": { preserveIndent: false, frame: "none" },
+    },
     // Allows re-collapsing sections
     collapseStyle: "collapsible-start",
   },
@@ -88,21 +91,12 @@ const withMDX = createMDX({
     // Rehype plugins process the HTML after markdown conversion
     rehypePlugins: [
       rehypeSlug, // Generate URL-friendly slugs for headings (must come before autolink)
-      // Enhanced code blocks with themes and features
       [rehypeExpressiveCode, rehypeExpressiveCodeOptions],
-      [
-        rehypeHighlight, // Basic syntax highlighting fallback
-        {
-          // Don't throw errors for code blocks without language specified
-          ignoreMissing: true,
-        },
-      ],
       [
         // Add clickable anchor links to headings
         rehypeAutolinkHeadings,
         {
           // Wrap the entire heading content with the link
-          behavior: "wrap",
           properties: {
             className: ["anchor"], // Add 'anchor' CSS class for styling
           },

@@ -34,10 +34,10 @@ export default function NavigationSection({
     <div>
       <button
         onClick={onToggle}
-        className={`flex justify-between items-center mb-3 w-full font-extrabold text-left text-md uppercase tracking-wider transition-colors ${
+        className={`flex justify-between items-center mb-3 w-full font-extrabold text-left text-md uppercase tracking-wider  transition-colors ${
           isOpen
             ? "text-sidebar-active-text"
-            : "text-sidebar-text hover:text-sidebar-text-secondary "
+            : "text-sidebar-text hover:text-sidebar-active-text"
         }`}
       >
         {title}
@@ -129,6 +129,7 @@ function NavigationItem({
             "flex justify-between items-center px-3 py-2 ml-1 max-w-full hover:bg-nav-item-hover hover:text-nav-text-hover w-[95%] font-medium text-left text-sm transition-colors rounded-md": true,
             "bg-nav-item-active": hasActiveChild || isActiveItem,
             "bg-sidebar-active-bg text-sidebar-active-text": isExpanded,
+            "text-foreground": depth >= 0,
           })}
         >
           {item.title}

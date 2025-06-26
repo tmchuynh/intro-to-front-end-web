@@ -124,7 +124,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               href="/"
               onClick={onClose}
               className={`
-                flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors duration-200
+                flex items-center space-x-3 uppercase py-2 rounded-lg transition-colors duration-200
                 ${
                   pathname === "/"
                     ? "bg-primary text-white"
@@ -132,7 +132,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 }
               `}
             >
-              <span className="font-medium">Home</span>
+              Home
             </Link>
           </div>
 

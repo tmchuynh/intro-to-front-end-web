@@ -125,15 +125,17 @@ export function validateAddressField(
 
 The `validateAddressField` function serves as a real-time validation engine for individual address components within form inputs. This function is designed to provide immediate feedback to users as they fill out address forms, enhancing the user experience by catching errors before form submission.
 
-**Function Parameters and Architecture:**
+##### Function Parameters and Architecture:
+
 - `field`: A type-safe key that corresponds to address properties (address, city, state, postalCode, country)
 - `value`: The user input string that needs validation
 - `address`: An optional partial address object used for context-aware validation (e.g., validating state codes against specific countries)
 
-**Core Validation Strategy:**
+##### Core Validation Strategy:
+
 The function employs a switch statement architecture to handle field-specific validation rules. This approach ensures maintainability and allows for easy extension of validation logic for new address fields.
 
-**Field-Specific Validation Rules:**
+##### Field-Specific Validation Rules:
 
 1. **Street Address Validation:**
    - **Required Field Check**: Ensures the address field is not empty after trimming whitespace
@@ -210,23 +212,27 @@ export function validateAddressEnhanced(
 
 The `validateAddressEnhanced` function represents a sophisticated, enterprise-grade validation system designed to perform exhaustive verification of complete address objects. Unlike field-by-field validation, this function analyzes the entire address as a cohesive unit, enabling complex cross-field validation and relationship checks.
 
-**Architecture and Design Philosophy:**
+##### Architecture and Design Philosophy:
+
 This function follows a comprehensive error-collection pattern, where all validation issues are identified and reported simultaneously rather than stopping at the first error. This approach provides users with complete feedback about all address problems, improving the user experience and reducing form submission attempts.
 
-**Error Collection Strategy:**
+##### Error Collection Strategy:
+
 The function utilizes an array-based error collection system (`AddressValidationError[]`) that accumulates all validation failures. Each error object contains:
+
 - `field`: The specific address component that failed validation
 - `message`: A user-friendly error description that can be displayed in the UI
 
-**Street Address Deep Validation:**
+##### Street Address Deep Validation:
+
 The street address validation implements multiple layers of security and quality checks:
 
 1. **Existence Verification**: Confirms the address field is provided and contains non-whitespace content
 2. **Length Boundary Checks**: Enforces realistic address length constraints (5-100 characters) to prevent both insufficient detail and excessive input
-3. **Suspicious Pattern Detection**: 
+3. **Suspicious Pattern Detection**:
    - Identifies purely numeric addresses (e.g., "12345") which are likely invalid or incomplete
    - This prevents common user errors where only house numbers are entered
-4. **Character Security Validation**: 
+4. **Character Security Validation**:
    - Uses regex `/^[a-zA-Z0-9\s\-'.,#\/]+$/` to prevent injection attacks and ensure only legitimate address characters
    - Allows common address components like apartment numbers (#), unit designators (/), and punctuation
 
@@ -255,11 +261,12 @@ if (!address.city?.trim()) {
 }
 ```
 
-**City Name Validation Deep Dive:**
+##### City Name Validation Deep Dive:
+
 The city validation logic implements geographically-aware validation rules:
 
 1. **Presence Verification**: Ensures the city field contains meaningful content after whitespace trimming
-2. **Realistic Length Constraints**: 
+2. **Realistic Length Constraints**:
    - Minimum 2 characters prevents single-letter entries (which are invalid for city names)
    - Maximum 50 characters accommodates even the longest legitimate city names while preventing abuse
 3. **Geographic Character Set Validation**:
@@ -286,7 +293,8 @@ if (!address.state?.trim()) {
 }
 ```
 
-**State/Province Validation Framework:**
+##### State/Province Validation Framework:
+
 The state validation system implements a flexible, jurisdiction-aware approach:
 
 1. **Universal Requirements**: Establishes basic length constraints (2-50 characters) that work across different governmental systems
@@ -315,7 +323,8 @@ if (!address.postalCode?.trim()) {
 }
 ```
 
-**Postal Code Foundation Validation:**
+##### Postal Code Foundation Validation:
+
 This section establishes universal postal code requirements that serve as a foundation for more specific country-based validation:
 
 1. **Universal Length Standards**: The 3-10 character range accommodates the vast majority of international postal code systems
@@ -338,7 +347,8 @@ if (!address.country?.trim()) {
 }
 ```
 
-**Country Code Standardization and Validation:**
+##### Country Code Standardization and Validation:
+
 The country validation implements strict ISO 3166-1 alpha-2 compliance:
 
 1. **ISO Standard Enforcement**: Requires exactly 2-character country codes, ensuring consistency with international addressing standards
@@ -362,7 +372,8 @@ if (address.country && address.postalCode) {
 }
 ```
 
-**Advanced Country-Specific Postal Code Validation:**
+##### Advanced Country-Specific Postal Code Validation:
+
 This sophisticated validation layer implements geographically-aware postal code format verification:
 
 1. **Dynamic Pattern Retrieval**: Accesses country-specific regex patterns from the `POSTAL_CODE_PATTERNS` constant, enabling precise format validation for different nations
@@ -389,7 +400,8 @@ if (address.country && address.state) {
 }
 ```
 
-**Sophisticated State/Province Cross-Validation:**
+##### Sophisticated State/Province Cross-Validation:
+
 This advanced validation mechanism implements jurisdiction-specific state validation:
 
 1. **Conditional Cross-Validation**: Activates only when both country and state information are available, enabling intelligent geographic verification
@@ -409,7 +421,8 @@ This advanced validation mechanism implements jurisdiction-specific state valida
 }
 ```
 
-**Validation Result Assembly and Return Strategy:**
+##### Validation Result Assembly and Return Strategy:
+
 The function concludes with a comprehensive result compilation:
 
 1. **Validation Success Determination**: Uses the absence of errors (`errors.length === 0`) as the success criterion, ensuring all validation rules have passed
@@ -543,48 +556,59 @@ export function validateAddress(
 
 The `validateAddress` function implements a more streamlined approach to address validation, designed for scenarios where comprehensive error collection is needed but with a more direct, performance-optimized validation flow. This function serves as an alternative to the enhanced validation method, providing the same thoroughness with a more concise implementation.
 
-**Architectural Design Philosophy:**
+##### Architectural Design Philosophy:
+
 This function follows a linear validation approach, systematically checking each address component in sequence. Unlike the enhanced version, it uses immediate conditional checks with `else if` chains, creating a more predictable execution path and potentially better performance for large-scale validation operations.
 
-**Comprehensive Field-by-Field Analysis:**
+##### Comprehensive Field-by-Field Analysis:
 
-**Street Address Validation Logic:**
+##### Street Address Validation Logic:
+
 - **Existence and Trimming**: Verifies address presence and removes extraneous whitespace
 - **Length Boundary Enforcement**: Implements the same 5-100 character constraints as the enhanced version
 - **Simplified Error Handling**: Uses direct conditional statements for more straightforward debugging and maintenance
 
-**City Validation Implementation:**
+##### City Validation Implementation:
+
 - **Multi-Layered Length Validation**: Enforces 2-50 character constraints through sequential checks
 - **Advanced Character Set Validation**: Implements the same geographic character restrictions using `/^[a-zA-Z\s\-'\.]+$/`
 - **International Name Support**: Accommodates complex city names across different linguistic and cultural contexts
 
-**State/Province Processing:**
+##### State/Province Processing:
+
 - **Basic Constraint Enforcement**: Applies universal 2-50 character length requirements
 - **Preparation for Geographic Validation**: Sets foundation for country-specific state validation logic implemented later in the function
 
-**Postal Code Framework:**
+##### Postal Code Framework:
+
 - **Universal Standards Application**: Enforces the internationally-compatible 3-10 character range
 - **Format Validation Preparation**: Establishes groundwork for country-specific pattern matching
 
-**Country Code Verification:**
+##### Country Code Verification:
+
 - **ISO 3166-1 Alpha-2 Compliance**: Strictly enforces 2-character country code format
 - **Authority Verification Preparation**: Sets up for validation against the authoritative country registry
 
-**Advanced Cross-Validation Features:**
+##### Advanced Cross-Validation Features:
 
-**Geographic Postal Code Validation:**
+##### Geographic Postal Code Validation:
+
 The function implements the same sophisticated country-specific postal code validation as the enhanced version:
+
 - **Dynamic Pattern Application**: Retrieves and applies country-specific regex patterns
 - **Multi-National Format Support**: Handles diverse postal code formats from different countries
 - **Intelligent Error Messaging**: Provides country-specific error messages for better user understanding
 
-**Jurisdiction-Aware State Validation:**
+##### Jurisdiction-Aware State Validation:
+
 Implements comprehensive state/province validation with geographic intelligence:
+
 - **Cross-Reference Validation**: Verifies state codes against country-specific registries
 - **Case-Insensitive Processing**: Normalizes input for reliable comparison
 - **Administrative Division Support**: Accommodates different governmental organizational structures
 
-**Return Value and Integration:**
+##### Return Value and Integration:
+
 The function returns the same `AddressValidationResult` structure, ensuring API consistency across different validation approaches while providing complete error reporting and validation status information.
 
 <BackToTop />
@@ -629,47 +653,58 @@ export function validateAndNormalizeAddress(
 
 The `validateAndNormalizeAddress` function represents a sophisticated two-phase address processing system that combines comprehensive validation with intelligent data normalization. This function is essential for maintaining consistent address data across your e-commerce platform while ensuring data quality and standardization.
 
-**Two-Phase Processing Architecture:**
+##### Two-Phase Processing Architecture:
 
-**Phase 1: Comprehensive Validation**
+##### Phase 1: Comprehensive Validation
+
 The function begins by leveraging the robust `validateAddress` function to perform exhaustive address verification. This approach follows the single-responsibility principle by delegating validation logic to the specialized validation function while focusing on the normalization workflow.
 
-**Early Return Strategy:**
+##### Early Return Strategy:
+
 If validation fails, the function implements an early return pattern, immediately providing validation results without attempting normalization. This prevents processing of invalid data and ensures that only verified addresses proceed to the normalization phase.
 
-**Phase 2: Intelligent Data Normalization**
+##### Phase 2: Intelligent Data Normalization
+
 When validation succeeds, the function performs sophisticated data standardization:
 
-**Address Field Processing:**
+##### Address Field Processing:
+
 - **Whitespace Normalization**: Removes leading and trailing whitespace while preserving internal spacing
 - **Content Preservation**: Maintains the original address structure and casing to preserve user intent and readability
 
-**City Name Standardization:**
+##### City Name Standardization:
+
 - **Title Case Transformation**: Implements intelligent capitalization using the regex replacement `/\b\w/g` with the callback `(l) => l.toUpperCase()`
 - **Word Boundary Recognition**: The `\b` boundary ensures only the first letter of each word is capitalized
 - **International Compatibility**: Handles complex city names with multiple words, hyphens, and apostrophes correctly
 - **Examples**: "new york" becomes "New York", "san francisco" becomes "San Francisco"
 
-**State/Province Standardization:**
+##### State/Province Standardization:
+
 - **Uppercase Conversion**: Ensures consistent state representation for database storage and comparison
 - **Code Standardization**: Normalizes state abbreviations (e.g., "ca" becomes "CA", "ny" becomes "NY")
 
-**Postal Code Normalization:**
+##### Postal Code Normalization:
+
 - **Format Standardization**: Converts postal codes to uppercase for consistent formatting
 - **International Compatibility**: Handles various postal code formats while maintaining their structure
 
-**Country Code Standardization:**
+##### Country Code Standardization:
+
 - **ISO Compliance**: Ensures country codes conform to ISO 3166-1 alpha-2 standards in uppercase format
 - **Consistency Guarantee**: Normalizes country representation for reliable database operations and international shipping
 
-**Return Structure and Type Safety:**
+##### Return Structure and Type Safety:
+
 The function returns an extended result object that includes:
+
 - **Validation Status**: Boolean indicator of address validity
 - **Error Collection**: Empty array when successful, maintaining interface consistency
 - **Normalized Address**: Complete `ValidatedAddress` object with standardized formatting
 - **Optional Property Handling**: Uses the non-null assertion operator (`!`) safely after validation confirmation
 
-**Integration Benefits:**
+##### Integration Benefits:
+
 - **Database Consistency**: Normalized addresses ensure consistent data storage and retrieval
 - **Search Optimization**: Standardized formatting improves address matching and search functionality
 - **User Experience**: Provides cleaned, properly formatted addresses back to users
@@ -699,10 +734,12 @@ export function isValidPostalCode(
 
 The `isValidPostalCode` function serves as a lightweight, high-performance validation utility specifically designed for rapid postal code verification. This function is optimized for scenarios requiring fast validation responses, such as real-time form validation, API endpoint verification, or bulk address processing operations.
 
-**Performance-Optimized Architecture:**
+##### Performance-Optimized Architecture:
+
 Unlike comprehensive validation functions, this utility focuses exclusively on postal code format verification, eliminating unnecessary overhead and providing sub-millisecond response times for most validation operations.
 
-**Dynamic Pattern Matching System:**
+##### Dynamic Pattern Matching System:
+
 The function implements an intelligent pattern retrieval mechanism:
 
 1. **Country-Specific Pattern Access**: Dynamically retrieves regex patterns from the `POSTAL_CODE_PATTERNS` constant using type-safe key lookup
@@ -713,24 +750,29 @@ The function implements an intelligent pattern retrieval mechanism:
    - **United Kingdom**: Handles variable-length postcodes (M1 1AA, SW1A 1AA, B33 8TH)
    - **Germany**: Validates 5-digit numeric codes (10115, 80331)
 
-**Graceful Fallback Strategy:**
+##### Graceful Fallback Strategy:
+
 When country-specific patterns are unavailable, the function implements an intelligent fallback mechanism:
+
 - **Universal Length Validation**: Applies the minimum 3-character requirement as a basic validity check
 - **Broad Compatibility**: Ensures functionality even for countries without defined postal code patterns
 - **Future-Proof Design**: Accommodates new countries as postal code patterns are added to the system
 
-**Input Processing and Security:**
+##### Input Processing and Security:
+
 - **Whitespace Normalization**: Automatically trims input to handle user formatting variations
 - **Case-Insensitive Processing**: Works with postal codes in any case format
 - **Injection Protection**: Regex patterns provide inherent protection against malicious input
 
-**Integration Use Cases:**
+##### Integration Use Cases:
+
 - **Real-Time Form Validation**: Provides immediate feedback as users type postal codes
 - **API Gateway Validation**: Serves as a fast pre-check for address API endpoints
 - **Batch Processing**: Efficiently validates large datasets of postal codes
 - **Mobile Application Support**: Lightweight enough for mobile app integration
 
-**Return Value Semantics:**
+##### Return Value Semantics:
+
 The boolean return value provides clear, unambiguous validation results that integrate seamlessly with conditional logic and form validation frameworks.
 
 ## Retrieving Valid States
@@ -750,13 +792,16 @@ export function getValidStates(country: string): string[] | null {
 
 The `getValidStates` function provides centralized access to country-specific administrative division registries, serving as a critical component for geographic validation and user interface population. This function abstracts the complexity of international governmental structures while providing reliable access to valid state, province, and territorial data.
 
-**Centralized Registry Architecture:**
+##### Centralized Registry Architecture:
+
 The function leverages the `VALID_STATES` constant as a comprehensive geographic database containing:
+
 - **Hierarchical Organization**: Country codes serve as primary keys, with arrays of valid administrative divisions as values
 - **Standardized Format**: All country codes are normalized to uppercase for consistent access
 - **Type Safety**: TypeScript key constraints ensure compile-time verification of country code validity
 
-**Multi-National Administrative Support:**
+##### Multi-National Administrative Support:
+
 The registry accommodates diverse governmental structures:
 
 1. **Federal Systems**: Countries like the United States, Canada, and Australia with state/provincial divisions
@@ -764,17 +809,20 @@ The registry accommodates diverse governmental structures:
 3. **Special Administrative Regions**: Handling of unique governmental structures like Hong Kong and Macau
 4. **Territorial Inclusions**: Support for territories, districts, and other administrative subdivisions
 
-**Defensive Programming Implementation:**
+##### Defensive Programming Implementation:
+
 - **Null Return Strategy**: Returns `null` for countries without defined state lists, enabling graceful handling of edge cases
 - **Fallback Logic Support**: The null return allows calling functions to implement appropriate fallback behavior
 - **Error Prevention**: Prevents runtime exceptions when accessing undefined country keys
 
-**Data Integrity and Consistency:**
+##### Data Integrity and Consistency:
+
 - **Immutable Reference**: Returns direct reference to the state array (consider returning a copy for complete immutability in production)
 - **Centralized Maintenance**: Single source of truth for state data reduces inconsistencies
 - **Version Control Friendly**: Registry updates can be tracked and validated through code review processes
 
-**Integration Applications:**
+##### Integration Applications:
+
 - **Dynamic Form Population**: Populates state/province dropdown menus based on selected country
 - **Validation Pipeline Integration**: Provides reference data for state validation functions
 - **Geographic Analysis**: Supports shipping cost calculations and regional feature availability
@@ -796,43 +844,51 @@ export function isValidState(state: string, country: string): boolean {
 
 The `isValidState` function implements sophisticated geographic validation logic that adapts to different international governmental structures while maintaining robust validation standards. This function demonstrates advanced defensive programming principles and intelligent fallback strategies.
 
-**Adaptive Validation Strategy:**
+##### Adaptive Validation Strategy:
+
 The function employs a context-aware validation approach that adjusts its behavior based on available geographic data:
 
 1. **Registry-Based Validation**: When state registries exist for a country, performs strict validation against official administrative divisions
 2. **Permissive Fallback**: For countries without defined state lists, adopts a permissive approach that accepts any state input
 3. **Future-Proof Design**: Accommodates new countries as state registries are added to the system
 
-**Geographic Intelligence Implementation:**
+##### Geographic Intelligence Implementation:
+
 - **Delegation Pattern**: Leverages the `getValidStates` function for registry access, promoting code reuse and maintainability
 - **Case-Insensitive Comparison**: Normalizes input to uppercase for reliable comparison regardless of user input formatting
 - **Null-Safe Processing**: Handles null registry returns gracefully without throwing exceptions
 
-**International Governmental Structure Support:**
+##### International Governmental Structure Support:
+
 The function's adaptive logic accommodates various administrative systems:
 
-**Federal Systems with Defined States:**
+##### Federal Systems with Defined States:
+
 - **United States**: Validates against 50 states plus DC and territories
 - **Canada**: Verifies provincial and territorial codes (AB, BC, ON, QC, etc.)
 - **Australia**: Checks state and territory abbreviations (NSW, VIC, QLD, WA, etc.)
 
-**Countries Without State Registries:**
+##### Countries Without State Registries:
+
 - **Unitary States**: Countries with regional divisions not tracked in the system
 - **City-States**: Small nations where state validation isn't applicable
 - **Developing Registry**: Countries whose administrative data hasn't been implemented yet
 
-**Defensive Programming Excellence:**
+##### Defensive Programming Excellence:
+
 - **Exception Prevention**: Null checks prevent runtime errors from undefined registries
 - **Graceful Degradation**: Maintains functionality even when complete geographic data isn't available
 - **User Experience Preservation**: Avoids blocking user input in countries with incomplete data
 
-**Logical Flow Analysis:**
+##### Logical Flow Analysis:
+
 1. **Registry Retrieval**: Attempts to fetch valid states for the specified country
 2. **Existence Check**: Determines if state validation data is available
 3. **Conditional Validation**: Applies strict validation when data exists, permissive validation otherwise
 4. **Boolean Return**: Provides clear validation results for integration with form validation systems
 
-**Integration Benefits:**
+##### Integration Benefits:
+
 - **Form Validation Integration**: Seamlessly integrates with address form validation workflows
 - **API Endpoint Support**: Provides validation for address submission endpoints
 - **User Experience Optimization**: Prevents false negatives that could frustrate users from less-supported countries
@@ -853,43 +909,53 @@ export function isValidCountry(country: string): boolean {
 
 The `isValidCountry` function serves as the authoritative gatekeeper for country code validation, implementing strict adherence to international standards while providing high-performance validation for global e-commerce operations.
 
-**ISO 3166-1 Alpha-2 Compliance:**
+##### ISO 3166-1 Alpha-2 Compliance:
+
 This function enforces compliance with the internationally recognized ISO 3166-1 alpha-2 standard, which defines two-letter country codes used globally for:
+
 - **International Shipping**: Standardized country identification for logistics systems
 - **Financial Transactions**: Country validation for payment processing and fraud prevention
 - **Regulatory Compliance**: Meeting international trade and tax reporting requirements
 - **Data Exchange**: Ensuring consistent country representation across systems and APIs
 
-**Authoritative Registry Validation:**
+##### Authoritative Registry Validation:
+
 The function validates against the `VALID_COUNTRIES` constant, which serves as:
+
 - **Single Source of Truth**: Centralized repository of recognized country codes
 - **Maintenance Control**: Allows for updates to reflect geopolitical changes
 - **Consistency Guarantee**: Ensures uniform country validation across the entire application
 - **Security Boundary**: Prevents acceptance of invalid or potentially malicious country codes
 
-**Case-Insensitive Processing with Standardization:**
+##### Case-Insensitive Processing with Standardization:
+
 - **Input Normalization**: Converts input to uppercase using `toUpperCase()` for consistent comparison
 - **User-Friendly Input**: Accepts country codes in any case (us, US, Us, uS all validate as US)
 - **Internal Standardization**: Maintains uppercase format for database storage and API communication
 
-**High-Performance Architecture:**
+##### High-Performance Architecture:
+
 - **Array Inclusion Check**: Uses efficient array `.includes()` method for O(n) lookup performance
 - **Memory Efficient**: Leverages existing country registry without creating additional data structures
 - **Minimal Processing**: Direct validation without complex parsing or transformation logic
 
-**Security and Data Integrity:**
+##### Security and Data Integrity:
+
 - **Injection Prevention**: Array-based validation prevents SQL injection and other attacks
 - **Boundary Enforcement**: Rejects invalid country codes that could cause downstream processing errors
 - **Audit Trail Support**: Boolean return enables logging of validation attempts for security monitoring
 
-**Global Commerce Integration:**
+##### Global Commerce Integration:
+
 The validation supports international e-commerce requirements:
+
 - **Shipping Calculations**: Valid country codes enable accurate shipping cost determination
 - **Tax Compliance**: Ensures proper tax calculation based on delivery destination
 - **Payment Processing**: Validates country for payment method availability and fraud detection
 - **Regulatory Compliance**: Supports export control and trade restriction enforcement
 
-**Error Handling and User Experience:**
+##### Error Handling and User Experience:
+
 - **Clear Boolean Response**: Unambiguous true/false return for straightforward integration
 - **Immediate Feedback**: Fast validation enables real-time form validation
 - **No Exception Throwing**: Graceful failure that doesn't disrupt user workflow
@@ -910,57 +976,69 @@ export function getValidCountries(): string[] {
 
 The `getValidCountries` function provides controlled access to the complete registry of supported country codes, serving as a foundational utility for user interface components and system integration throughout your e-commerce platform.
 
-**Immutable Data Access Pattern:**
+##### Immutable Data Access Pattern:
+
 The function implements a defensive copying strategy using the spread operator (`[...VALID_COUNTRIES]`) to ensure data integrity:
+
 - **Reference Protection**: Prevents external code from modifying the master country registry
 - **Immutability Guarantee**: Returns a new array instance, protecting against accidental mutations
 - **Data Consistency**: Ensures the authoritative country list remains unchanged regardless of how the returned data is used
 
-**User Interface Integration Applications:**
+##### User Interface Integration Applications:
+
 This function serves as the data source for various UI components:
 
-**Dropdown Menu Population:**
+##### Dropdown Menu Population:
+
 ```typescript
 // Example usage in a React component
 const countries = getValidCountries();
-const countryOptions = countries.map(code => ({
+const countryOptions = countries.map((code) => ({
   value: code,
-  label: getCountryName(code) // Hypothetical function to get full country names
+  label: getCountryName(code), // Hypothetical function to get full country names
 }));
 ```
 
-**Form Validation Support:**
+##### Form Validation Support:
+
 - **Client-Side Validation**: Provides reference data for JavaScript validation libraries
 - **Real-Time Feedback**: Enables dynamic validation as users select countries
 - **Autocomplete Systems**: Powers country code suggestions and auto-completion features
 
-**API Integration and Data Exchange:**
+##### API Integration and Data Exchange:
+
 - **Request Validation**: Validates incoming API requests containing country codes
 - **Response Generation**: Provides country options for API endpoints
 - **Documentation Generation**: Supports automatic API documentation with valid country examples
 
-**System Administration and Configuration:**
+##### System Administration and Configuration:
+
 - **Shipping Configuration**: Lists countries for shipping rule configuration
 - **Payment Gateway Setup**: Provides country lists for payment method configuration
 - **Compliance Monitoring**: Supports audit logs and compliance reporting systems
 
-**Performance and Scalability Considerations:**
+##### Performance and Scalability Considerations:
+
 - **Memory Efficiency**: Spread operation creates shallow copy, maintaining performance
 - **Caching Compatibility**: Returned array can be cached by calling systems for performance optimization
 - **Network Optimization**: Enables client-side caching of country data to reduce API calls
 
-**International Business Support:**
+##### International Business Support:
+
 The function supports global e-commerce operations by providing:
+
 - **Market Expansion**: Easy identification of supported countries for business development
 - **Localization Planning**: Country list for implementing region-specific features
 - **Compliance Verification**: Comprehensive country coverage for regulatory requirements
 
-**Development and Testing Benefits:**
+##### Development and Testing Benefits:
+
 - **Test Data Generation**: Provides valid country codes for automated testing
 - **Mock Data Creation**: Supports development environments with realistic country data
 - **Integration Testing**: Enables comprehensive testing of country-dependent features
 
-**Future-Proof Architecture:**
+##### Future-Proof Architecture:
+
 - **Extensibility**: Easy to add new countries by updating the source constant
 - **Backward Compatibility**: New countries won't break existing integrations
 - **Version Control**: Changes to country list are tracked through code versioning
@@ -969,16 +1047,20 @@ The function supports global e-commerce operations by providing:
 
 The comprehensive validation utility functions we have implemented form the backbone of a robust, internationally-compatible address validation system for your e-commerce platform. These functions work together to create a seamless user experience while maintaining the highest standards of data integrity and security.
 
-**Enterprise-Grade Data Quality Assurance:**
+##### Enterprise-Grade Data Quality Assurance:
+
 Our validation system ensures that every address entered into your platform meets stringent quality standards, reducing shipping errors, improving customer satisfaction, and minimizing operational costs associated with failed deliveries and customer service inquiries.
 
-**Global Market Readiness:**
+##### Global Market Readiness:
+
 The international validation capabilities position your platform for worldwide expansion, supporting diverse addressing systems and governmental structures while maintaining consistency across all markets.
 
-**Performance and Scalability:**
+##### Performance and Scalability:
+
 The modular design allows for high-performance validation operations that can scale with your business growth, from startup validation needs to enterprise-level transaction volumes.
 
-**Security and Compliance Foundation:**
+##### Security and Compliance Foundation:
+
 Built-in security measures protect against malicious input while ensuring compliance with international addressing standards and data protection regulations.
 
 ## Integration Pathway and Next Steps

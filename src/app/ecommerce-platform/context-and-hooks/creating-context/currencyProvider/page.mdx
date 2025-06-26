@@ -129,14 +129,14 @@ export interface CurrencyRates {
 }
 ```
 
-**Design Philosophy:**
+##### Design Philosophy:
 
 - **Dynamic Key Structure**: Allows support for any currency code without interface modifications
 - **Numeric Precision**: Uses JavaScript numbers for exchange rates (sufficient for most e-commerce use cases)
 - **Extensibility**: New currencies can be added without code changes
 - **Type Safety**: Ensures rate values are always numeric
 
-**Real-world Considerations:**
+##### Real-world Considerations:
 
 - Exchange rates are typically provided with 4-6 decimal places
 - JavaScript's number precision is sufficient for currency calculations up to ~15 significant digits
@@ -152,7 +152,7 @@ export interface CurrencyData {
 }
 ```
 
-**Standards Compliance:**
+##### Standards Compliance:
 
 - **ISO 4217**: International standard for currency codes
 - **Unicode Support**: Symbols support international characters (₹, ¥, €)
@@ -177,14 +177,14 @@ export interface CurrencyContextType {
 }
 ```
 
-**Method Design Patterns:**
+##### Method Design Patterns:
 
 1. **`setCurrency`**: Synchronous operation for immediate UI updates
 2. **`convertPrice`**: Pure function for mathematical conversion only
 3. **`formatPrice`**: Combines conversion with locale-aware formatting
 4. **`refreshRates`**: Async operation with promise-based error handling
 
-**Optional Parameters Strategy:**
+##### Optional Parameters Strategy:
 
 ```tsx
 convertPrice: (price: number, fromCurrency?: string) => number;
@@ -202,7 +202,7 @@ convertPrice: (price: number, fromCurrency?: string) => number;
 error: string | null;
 ```
 
-**Benefits:**
+##### Benefits:
 
 - **Explicit Null Handling**: tsx enforces null checks
 - **Clear State**: Distinguishes between "no error" (null) and "error message" (string)
@@ -214,7 +214,7 @@ error: string | null;
 formatPrice: (price: number, fromCurrency?: string) => string;
 ```
 
-**Considerations:**
+##### Considerations:
 
 - **Return Type Specificity**: Always returns formatted string for display
 - **Parameter Ordering**: Most common parameter (price) comes first
@@ -324,7 +324,7 @@ const defaultCurrency: CurrencyData = {
 };
 ```
 
-**Strategic Rationale:**
+##### Strategic Rationale:
 
 - **USD as Base**: Most international commerce is priced in USD
 - **Exchange Rate Standard**: USD serves as the common conversion base
@@ -335,26 +335,26 @@ const defaultCurrency: CurrencyData = {
 
 Our currency selection covers **major economic regions**:
 
-**Tier 1 - Global Reserve Currencies:**
+##### Tier 1 - Global Reserve Currencies:
 
 - USD (United States) - World's primary reserve currency
 - EUR (European Union) - Second largest reserve currency
 - GBP (United Kingdom) - Historic global currency
 - JPY (Japan) - Major Asian reserve currency
 
-**Tier 2 - Major Trading Currencies:**
+##### Tier 2 - Major Trading Currencies:
 
 - AUD, CAD - Resource-rich developed economies
 - CNY - World's second-largest economy
 - CHF - Safe-haven currency
 
-**Tier 3 - Regional Powers:**
+##### Tier 3 - Regional Powers:
 
 - INR (India) - Large emerging market
 - BRL (Brazil) - Latin America's largest economy
 - RUB (Russia) - Major commodity exporter
 
-**Tier 4 - Strategic Markets:**
+##### Tier 4 - Strategic Markets:
 
 - Emerging markets and specialized economies
 - Tourism-dependent economies (AED, THB)
@@ -371,7 +371,7 @@ Our currency selection covers **major economic regions**:
 { code: "INR", name: "Indian Rupee", symbol: "₹" },
 ```
 
-**Technical Implementation:**
+##### Technical Implementation:
 
 - **Unicode Compatibility**: All symbols use proper Unicode characters
 - **Font Support**: Symbols are widely supported across device fonts
@@ -389,7 +389,7 @@ Notice how we handle symbol conflicts:
 { code: "MXN", name: "Mexican Peso", symbol: "$" },
 ```
 
-**Disambiguation Strategy:**
+##### Disambiguation Strategy:
 
 - **Regional Prefixes**: C$, A$, HK$ for clarity
 - **Context-Aware Display**: Different symbols based on user location
@@ -549,7 +549,7 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(
 );
 ```
 
-**Advanced Design Patterns:**
+##### Advanced Design Patterns:
 
 1. **Undefined Initial Value**: Forces proper provider wrapping and prevents silent failures
 2. **Type Union Strategy**: `CurrencyContextType | undefined` enables compile-time safety
@@ -568,7 +568,7 @@ export const useCurrency = () => {
 };
 ```
 
-**Hook Design Benefits:**
+##### Hook Design Benefits:
 
 1. **Encapsulation**: Hides React Context complexity from consumers
 2. **Error Boundary**: Clear, actionable error messages for developers
@@ -584,7 +584,7 @@ export const useCurrency = () => {
 throw new Error("useCurrency must be used within a CurrencyProvider");
 ```
 
-**Error Design Philosophy:**
+##### Error Design Philosophy:
 
 - **Specific**: Clearly identifies the required provider
 - **Actionable**: Tells developers exactly what to do
@@ -969,7 +969,7 @@ const [isLoading, setIsLoading] = useState(true);
 const [error, setError] = useState<string | null>(null);
 ```
 
-**State Design Philosophy:**
+##### State Design Philosophy:
 
 1. **`currentCurrency`**: User's selected currency preference
    - Initialized with USD for global compatibility
@@ -1024,7 +1024,7 @@ const fetchExchangeRates = async () => {
 };
 ```
 
-**API Integration Best Practices:**
+##### API Integration Best Practices:
 
 1. **Environment Variable Security**: API keys are not hardcoded
 2. **Graceful Degradation**: Fallback system ensures functionality continues
@@ -1075,7 +1075,7 @@ const setFallbackRates = () => {
 };
 ```
 
-**Fallback Strategy Benefits:**
+##### Fallback Strategy Benefits:
 
 1. **Offline Functionality**: App works without internet connectivity
 2. **API Reliability**: Continues working when external APIs fail
@@ -1098,7 +1098,7 @@ useEffect(() => {
 }, []);
 ```
 
-**Refresh Strategy Analysis:**
+##### Refresh Strategy Analysis:
 
 1. **Initial Load**: Fetches rates immediately on provider mount
 2. **Hourly Updates**: Balances freshness with API usage limits
@@ -1113,7 +1113,7 @@ const refreshRates = async () => {
 };
 ```
 
-**Manual Refresh Benefits:**
+##### Manual Refresh Benefits:
 
 - User control over rate freshness
 - Recovery mechanism for failed automatic updates
@@ -1146,7 +1146,7 @@ const setCurrency = (currency: CurrencyData) => {
 };
 ```
 
-**Persistence Strategy Benefits:**
+##### Persistence Strategy Benefits:
 
 1. **User Experience**: Preferences remembered across sessions
 2. **Data Validation**: Ensures saved currency is still supported
@@ -1176,7 +1176,7 @@ const convertPrice = (price: number, fromCurrency: string = "USD"): number => {
 };
 ```
 
-**Algorithm Benefits:**
+##### Algorithm Benefits:
 
 1. **USD Base Standard**: Aligns with international financial practices
 2. **Accuracy**: Two-step process maintains precision
@@ -1225,7 +1225,7 @@ const formatPrice = (price: number, fromCurrency: string = "USD"): string => {
 };
 ```
 
-**Internationalization Features:**
+##### Internationalization Features:
 
 1. **Native Browser API**: Uses Intl.NumberFormat for accuracy
 2. **Currency-specific Rules**: Different decimal places per currency

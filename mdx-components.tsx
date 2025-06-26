@@ -71,7 +71,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         id={props.id}
         className="my-4 font-[IbarraRealNova] font-light text-2xl text-secondary tracking-wide"
       >
-        <br />
         {children}
       </CustomHeading>
     ),

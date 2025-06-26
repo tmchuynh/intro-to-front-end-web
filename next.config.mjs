@@ -84,7 +84,7 @@ const withMDX = createMDX({
       [
         remarkToc, // Generate table of contents
         {
-          maxDepth: 4, // Allow up to h4
+          maxDepth: 2, // Allow up to h4
           tight: true, // Compile list items tightly
         },
       ],

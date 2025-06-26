@@ -25,7 +25,7 @@ In an e-commerce platform, users might encounter non-existent pages for various 
 
 ## The `import` Statements
 
-```typescript
+```tsx
 // src/app/context/NotFoundContext.tsx
 "use client";
 
@@ -39,9 +39,9 @@ import { createContext, JSX, ReactNode, useContext, useState } from "react";
 - **`createContext`**: Creates a new React context that can be used to share data between components without prop drilling
 - **`useContext`**: A React hook that allows components to consume context values
 - **`useState`**: A React hook for managing local component state
-- **`JSX`**: TypeScript type for JSX elements, ensuring type safety in our component returns
-- **`ReactNode`**: TypeScript type that represents any valid React child (elements, strings, numbers, etc.)
-- **`NotFoundContextType`**: Custom TypeScript interface that defines the shape of our context data
+- **`JSX`**: tsx type for JSX elements, ensuring type safety in our component returns
+- **`ReactNode`**: tsx type that represents any valid React child (elements, strings, numbers, etc.)
+- **`NotFoundContextType`**: Custom tsx interface that defines the shape of our context data
 
 ### Understanding React Context
 
@@ -49,7 +49,7 @@ React Context is a powerful feature that allows you to share state across your e
 
 ## Using `createContext`
 
-```typescript
+```tsx
 // src/app/context/NotFoundContext.tsx
 /**
  * Context for managing the state of a "not found" condition.
@@ -66,15 +66,15 @@ const NotFoundContext = createContext<NotFoundContextType | undefined>(
 
 This code creates a new React context with the following characteristics:
 
-- **Type Safety**: The context is typed as `NotFoundContextType | undefined`, ensuring TypeScript will catch any type mismatches
+- **Type Safety**: The context is typed as `NotFoundContextType | undefined`, ensuring tsx will catch any type mismatches
 - **Initial Value**: We initialize the context with `undefined` to detect when the context is accessed outside of a provider
-- **Generic Type**: The `<NotFoundContextType | undefined>` syntax tells TypeScript what shape the context data should have
+- **Generic Type**: The `<NotFoundContextType | undefined>` syntax tells tsx what shape the context data should have
 
 The `undefined` initial value is a defensive programming practice. It allows us to throw meaningful errors when developers try to use the context outside of a provider component.
 
 ## NotFoundProvider
 
-```typescript
+```tsx
 // src/app/context/NotFoundContext.tsx
 
 /**
@@ -106,18 +106,18 @@ export const NotFoundProvider = ({
 
 Let's examine each part of this provider component:
 
-#### 1. Component Props and TypeScript
-```typescript
+#### 1. Component Props and tsx
+```tsx
 {
   children,
 }: {
   children: ReactNode;
 }
 ```
-This uses TypeScript's inline type annotation to specify that the component expects a `children` prop of type `ReactNode`. The destructuring assignment extracts `children` directly from the props object.
+This uses tsx's inline type annotation to specify that the component expects a `children` prop of type `ReactNode`. The destructuring assignment extracts `children` directly from the props object.
 
 #### 2. State Management
-```typescript
+```tsx
 const [isNotFound, setIsNotFound] = useState(false);
 ```
 We use React's `useState` hook to create a boolean state variable:
@@ -125,7 +125,7 @@ We use React's `useState` hook to create a boolean state variable:
 - `setIsNotFound`: The function to update the state
 
 #### 3. Context Value Object
-```typescript
+```tsx
 value={{ isNotFound, setNotFound: setIsNotFound }}
 ```
 The provider passes an object containing:
@@ -139,7 +139,7 @@ The component wraps its children with `NotFoundContext.Provider`, making the con
 
 ## `useNotFound` Hook
 
-```typescript
+```tsx
 /**
  * Custom hook to access the NotFoundContext.
  *
@@ -164,13 +164,13 @@ export const useNotFound = (): any => {
 This custom hook follows a common React pattern for consuming context safely:
 
 #### 1. Context Consumption
-```typescript
+```tsx
 const context = useContext(NotFoundContext);
 ```
 The `useContext` hook retrieves the current context value. If the component is not wrapped by a `NotFoundProvider`, this will return `undefined`.
 
 #### 2. Error Boundary Pattern
-```typescript
+```tsx
 if (!context) {
   throw new Error("useNotFound must be used within a NotFoundProvider");
 }
@@ -181,7 +181,7 @@ This defensive check ensures that:
 - Runtime errors are caught early during development
 
 #### 3. Type Safety Benefits
-By throwing an error when context is `undefined`, TypeScript knows that the return value will always be a valid `NotFoundContextType` object, providing better intellisense and compile-time checking.
+By throwing an error when context is `undefined`, tsx knows that the return value will always be a valid `NotFoundContextType` object, providing better intellisense and compile-time checking.
 
 ### Custom Hook Benefits
 
@@ -189,7 +189,7 @@ Creating custom hooks for context consumption provides several advantages:
 - **Simplified API**: Components don't need to import both `useContext` and the context object
 - **Built-in Error Handling**: Automatic validation that the hook is used correctly
 - **Consistent Usage**: All context consumption follows the same pattern
-- **Better Developer Experience**: Clear error messages and TypeScript support
+- **Better Developer Experience**: Clear error messages and tsx support
 
 ## Updating the `providers.tsx` File
 
@@ -391,7 +391,7 @@ Head over to [Creating the Authentication Provider](/ecommerce-platform/context-
 In this chapter, you've mastered several key concepts:
 
 - **React Context API**: How to create and consume context for global state management
-- **TypeScript Integration**: Proper typing for context providers and custom hooks
+- **tsx Integration**: Proper typing for context providers and custom hooks
 - **Error Handling Patterns**: Defensive programming with meaningful error messages
 - **Provider Composition**: How to nest multiple providers for modular architecture
 - **Custom Hook Design**: Creating reusable hooks with built-in validation

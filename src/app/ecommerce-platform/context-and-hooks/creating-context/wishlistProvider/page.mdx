@@ -76,6 +76,15 @@ export const useWishlist = () => {
 
 ## The `WishlistProvider` Component
 
+This component will manage the wishlist state, handle user interactions, and persist the wishlist across sessions using `localStorage`.
+
+`localStorage` is a web storage API that allows us to store data in the user's browser. It provides a simple key-value store that persists even when the user closes the browser or navigates away from the page. In our case, we will use `localStorage` to save the wishlist items so that they remain available across user sessions. The wishlist will be loaded from `localStorage` when the user logs in and saved whenever it changes.
+
+
+
+##### NOTE
+> Take note of the line numbers in the code blocks, as they will help you navigate through the code and understand how each part fits together.
+
 ```tsx
 // src/app/context/wishlistContext.tsx
 interface WishlistProviderProps {
@@ -105,196 +114,235 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({
       saveWishlistToStorage();
     }
   }, [wishlistItems, isLoggedIn, user?.id]);
+```
 
-  const markAsPurchased = (productIds: number[]) => {
-    if (!isLoggedIn) return;
+##### Explanation of the Code
 
-    setWishlistItems((prev) =>
-      prev.map((item) =>
-        productIds.includes(item.id)
-          ? { ...item, isPurchased: true, purchasedAt: new Date() }
-          : item
-      )
+
+```tsx startLineNumber=28
+// src/app/context/wishlistContext.tsx
+
+const markAsPurchased = (productIds: number[]) => {
+  if (!isLoggedIn) return;
+
+  setWishlistItems((prev) =>
+    prev.map((item) =>
+      productIds.includes(item.id)
+        ? { ...item, isPurchased: true, purchasedAt: new Date() }
+        : item
+    )
+  );
+};
+
+// Listen for checkout events to mark wishlist items as purchased
+useEffect(() => {
+  const handleCheckout = (event: CustomEvent) => {
+    const { productIds } = event.detail;
+    if (productIds && Array.isArray(productIds)) {
+      markAsPurchased(productIds);
+    }
+  };
+
+  window.addEventListener("cart-checkout", handleCheckout as EventListener);
+
+  return () => {
+    window.removeEventListener(
+      "cart-checkout",
+      handleCheckout as EventListener
     );
   };
+}, [isLoggedIn]); // Add isLoggedIn as dependency
 
-  // Listen for checkout events to mark wishlist items as purchased
-  useEffect(() => {
-    const handleCheckout = (event: CustomEvent) => {
-      const { productIds } = event.detail;
-      if (productIds && Array.isArray(productIds)) {
-        markAsPurchased(productIds);
-      }
-    };
-
-    window.addEventListener("cart-checkout", handleCheckout as EventListener);
-
-    return () => {
-      window.removeEventListener(
-        "cart-checkout",
-        handleCheckout as EventListener
-      );
-    };
-  }, [isLoggedIn]); // Add isLoggedIn as dependency
-
-  const getStorageKey = () => {
-    return user ? `wishlist_${user.id}` : null;
-  };
-
-  const loadWishlistFromStorage = () => {
-    const storageKey = getStorageKey();
-    if (!storageKey) return;
-
-    try {
-      const storedWishlist = localStorage.getItem(storageKey);
-      if (storedWishlist) {
-        const parsedWishlist = JSON.parse(storedWishlist);
-        // Convert date strings back to Date objects
-        const wishlistWithDates = parsedWishlist.map((item: any) => ({
-          ...item,
-          addedAt: new Date(item.addedAt),
-          purchasedAt: item.purchasedAt
-            ? new Date(item.purchasedAt)
-            : undefined,
-        }));
-        setWishlistItems(wishlistWithDates);
-      }
-    } catch (error) {
-      console.error("Error loading wishlist from storage:", error);
-    }
-  };
-
-  const saveWishlistToStorage = () => {
-    const storageKey = getStorageKey();
-    if (!storageKey) return;
-
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(wishlistItems));
-    } catch (error) {
-      console.error("Error saving wishlist to storage:", error);
-    }
-  };
-
-  const addToWishlist = async (
-    product: ProductItem
-  ): Promise<{ success: boolean; message: string }> => {
-    if (!isLoggedIn) {
-      return {
-        success: false,
-        message: "Please log in to add items to your wishlist",
-      };
-    }
-
-    if (isInWishlist(product.id)) {
-      return { success: false, message: "Item is already in your wishlist" };
-    }
-
-    setIsLoading(true);
-    try {
-      const newWishlistItem: WishlistItem = {
-        id: product.id,
-        product,
-        addedAt: new Date(),
-        isPurchased: false,
-      };
-
-      setWishlistItems((prev) => [...prev, newWishlistItem]);
-      return { success: true, message: "Item added to wishlist" };
-    } catch (error) {
-      console.error("Error adding to wishlist:", error);
-      return { success: false, message: "Failed to add item to wishlist" };
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const removeFromWishlist = async (
-    productId: number
-  ): Promise<{ success: boolean; message: string }> => {
-    if (!isLoggedIn) {
-      return {
-        success: false,
-        message: "Please log in to manage your wishlist",
-      };
-    }
-
-    setIsLoading(true);
-    try {
-      setWishlistItems((prev) => prev.filter((item) => item.id !== productId));
-      return { success: true, message: "Item removed from wishlist" };
-    } catch (error) {
-      console.error("Error removing from wishlist:", error);
-      return { success: false, message: "Failed to remove item from wishlist" };
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const moveToCart = async (
-    productId: number
-  ): Promise<{ success: boolean; message: string }> => {
-    if (!isLoggedIn) {
-      return { success: false, message: "Please log in to move items to cart" };
-    }
-
-    const wishlistItem = wishlistItems.find((item) => item.id === productId);
-    if (!wishlistItem) {
-      return { success: false, message: "Item not found in wishlist" };
-    }
-
-    try {
-      // Import cart context dynamically to avoid circular dependency
-      const { useCart } = await import("./cartContext");
-      // Note: We'll need to handle this in the component level
-      return { success: true, message: "Ready to move to cart" };
-    } catch (error) {
-      console.error("Error moving to cart:", error);
-      return { success: false, message: "Failed to move item to cart" };
-    }
-  };
-
-  const isInWishlist = (productId: number): boolean => {
-    return wishlistItems.some((item) => item.id === productId);
-  };
-
-  const clearWishlist = () => {
-    setWishlistItems([]);
-  };
-
-  // Computed values
-  const activeWishlistItems = wishlistItems.filter((item) => !item.isPurchased);
-  const purchasedItems = wishlistItems.filter((item) => item.isPurchased);
-  const wishlistCount = activeWishlistItems.length;
-
-  const value: WishlistContextType = {
-    wishlistItems,
-    isLoading,
-    addToWishlist,
-    removeFromWishlist,
-    moveToCart,
-    markAsPurchased,
-    isInWishlist,
-    clearWishlist,
-    wishlistCount,
-    purchasedItems,
-    activeWishlistItems,
-  };
-
-  return (
-    <WishlistContext.Provider value={value}>
-      {children}
-    </WishlistContext.Provider>
-  );
+const getStorageKey = () => {
+  return user ? `wishlist_${user.id}` : null;
 };
 ```
 
 ##### Explanation of the Code
 
-- **State Management**: We use `useState` to manage the wishlist items and loading state. The `wishlistItems` state holds the current items in the wishlist.
-- **Authentication Integration**: We use the `useAuth` hook to access the current user and their login status.
-- **Effects**: We use `useEffect` to load the wishlist from localStorage when the user logs in and to save the wishlist whenever it changes. This ensures that the wishlist persists across sessions.
-- **Wishlist Management Methods**: We define methods for adding, removing, and moving items to the cart, as well as marking items as purchased. Each method handles loading states and returns appropriate success messages.
-- **Utility Functions**: We define utility functions to get the storage key based on the user ID, load and save the wishlist to localStorage, and check if an item is in the wishlist.
+
+```tsx startLineNumber=62
+// src/app/context/wishlistContext.tsx
+
+const loadWishlistFromStorage = () => {
+  const storageKey = getStorageKey();
+  if (!storageKey) return;
+
+  try {
+    const storedWishlist = localStorage.getItem(storageKey);
+    if (storedWishlist) {
+      const parsedWishlist = JSON.parse(storedWishlist);
+      // Convert date strings back to Date objects
+      const wishlistWithDates = parsedWishlist.map((item: any) => ({
+        ...item,
+        addedAt: new Date(item.addedAt),
+        purchasedAt: item.purchasedAt
+          ? new Date(item.purchasedAt)
+          : undefined,
+      }));
+      setWishlistItems(wishlistWithDates);
+    }
+  } catch (error) {
+    console.error("Error loading wishlist from storage:", error);
+  }
+};
+
+const saveWishlistToStorage = () => {
+  const storageKey = getStorageKey();
+  if (!storageKey) return;
+
+  try {
+    localStorage.setItem(storageKey, JSON.stringify(wishlistItems));
+  } catch (error) {
+    console.error("Error saving wishlist to storage:", error);
+  }
+};
+
+```
+
+##### Explanation of the Code
+
+
+```tsx startLineNumber=95
+// src/app/context/wishlistContext.tsx
+
+const addToWishlist = async (
+  product: ProductItem
+): Promise<{ success: boolean; message: string }> => {
+  if (!isLoggedIn) {
+    return {
+      success: false,
+      message: "Please log in to add items to your wishlist",
+    };
+  }
+
+  if (isInWishlist(product.id)) {
+    return { success: false, message: "Item is already in your wishlist" };
+  }
+
+  setIsLoading(true);
+  try {
+    const newWishlistItem: WishlistItem = {
+      id: product.id,
+      product,
+      addedAt: new Date(),
+      isPurchased: false,
+    };
+
+    setWishlistItems((prev) => [...prev, newWishlistItem]);
+    return { success: true, message: "Item added to wishlist" };
+  } catch (error) {
+    console.error("Error adding to wishlist:", error);
+    return { success: false, message: "Failed to add item to wishlist" };
+  } finally {
+    setIsLoading(false);
+  }
+};
+```
+
+##### Explanation of the Code
+
+
+```tsx startLineNumber=127
+// src/app/context/wishlistContext.tsx
+
+const removeFromWishlist = async (
+  productId: number
+): Promise<{ success: boolean; message: string }> => {
+  if (!isLoggedIn) {
+    return {
+      success: false,
+      message: "Please log in to manage your wishlist",
+    };
+  }
+
+  setIsLoading(true);
+  try {
+    setWishlistItems((prev) => prev.filter((item) => item.id !== productId));
+    return { success: true, message: "Item removed from wishlist" };
+  } catch (error) {
+    console.error("Error removing from wishlist:", error);
+    return { success: false, message: "Failed to remove item from wishlist" };
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+```
+
+##### Explanation of the Code
+
+
+```tsx startLineNumber=148
+// src/app/context/wishlistContext.tsx
+
+const moveToCart = async (
+  productId: number
+): Promise<{ success: boolean; message: string }> => {
+  if (!isLoggedIn) {
+    return { success: false, message: "Please log in to move items to cart" };
+  }
+
+  const wishlistItem = wishlistItems.find((item) => item.id === productId);
+  if (!wishlistItem) {
+    return { success: false, message: "Item not found in wishlist" };
+  }
+
+  try {
+    // Import cart context dynamically to avoid circular dependency
+    const { useCart } = await import("./cartContext");
+    // Note: We'll need to handle this in the component level
+    return { success: true, message: "Ready to move to cart" };
+  } catch (error) {
+    console.error("Error moving to cart:", error);
+    return { success: false, message: "Failed to move item to cart" };
+  }
+};
+```
+
+##### Explanation of the Code
+
+
+```tsx startLineNumber=170
+// src/app/context/wishlistContext.tsx
+
+const isInWishlist = (productId: number): boolean => {
+  return wishlistItems.some((item) => item.id === productId);
+};
+
+const clearWishlist = () => {
+  setWishlistItems([]);
+};
+
+// Computed values
+const activeWishlistItems = wishlistItems.filter((item) => !item.isPurchased);
+const purchasedItems = wishlistItems.filter((item) => item.isPurchased);
+const wishlistCount = activeWishlistItems.length;
+
+const value: WishlistContextType = {
+  wishlistItems,
+  isLoading,
+  addToWishlist,
+  removeFromWishlist,
+  moveToCart,
+  markAsPurchased,
+  isInWishlist,
+  clearWishlist,
+  wishlistCount,
+  purchasedItems,
+  activeWishlistItems,
+};
+
+return (
+  <WishlistContext.Provider value={value}>
+    {children}
+  </WishlistContext.Provider>
+);
+};
+```
+
+##### Explanation of the Code
+
 
 ## Next Steps
 

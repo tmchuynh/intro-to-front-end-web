@@ -4,176 +4,3386 @@ import BackToTop from "@/components/BackToTop";
 
 ## Table of Contents
 
-## Next Steps
+## Introduction
+
+Congratulations on completing the frontend development fundamentals! You now have a solid foundation in HTML, CSS, and JavaScript. This guide will help you explore the next steps in your web development journey, covering modern frameworks, tools, and technologies that will elevate your skills.
 
 ##### NOTE
 
-> This is not an exhaustive list of languages, frameworks, and libraries. There are many more available, and the choice of which to use depends on your specific project requirements and preferences.
+> This is a curated selection of popular technologies. The web development ecosystem is vast and constantly evolving. Choose tools based on your project needs, career goals, and personal interests.
 
-## Frameworks and Libraries
+## Frontend Frameworks & Libraries
 
-As you can imagine, there are multiple frameworks, libraries, and languages that can be used to help you build your websites.
+### Vue.js - The Progressive Framework
 
-### React
+**Vue.js** is an open-source JavaScript framework for building user interfaces and single-page applications, created by Evan You.
 
-React is a JavaScript library for building user interfaces. It allows you to create reusable UI components and manage the state of your application efficiently. React's component-based architecture makes it easy to build complex UIs by breaking them down into smaller, manageable pieces.
+#### Core Philosophy:
 
-#### Next.js
+- Progressive: Can be adopted incrementally
+- Approachable: Easy learning curve for beginners
+- Versatile: Scales from library to full framework
+- Performant: Small bundle size with excellent performance
 
-Next.js is a React framework that enables you to build server-rendered applications with ease. It provides features like static site generation, server-side rendering, and API routes, making it a powerful tool for building modern web applications. Next.js simplifies the development process by providing a set of conventions and best practices, allowing you to focus on building your application rather than worrying about configuration and setup. With Next.js, you can create fast, scalable, and SEO-friendly applications that deliver an exceptional user experience.
+#### Key Features:
 
-##### Vue.js
+##### Template Syntax:
 
-Vue.js is a progressive JavaScript framework for building user interfaces. It provides a flexible and approachable way to create interactive web applications. Vue.js allows you to build components that can be easily reused and composed, making it a powerful tool for building modern web applications. It offers features like reactive data binding, a virtual DOM for efficient rendering, and a simple syntax that makes it easy to learn and use. Vue.js is known for its gentle learning curve and excellent documentation, making it a popular choice for developers looking to build dynamic and responsive user interfaces. Whether you're building a small project or a large-scale application, Vue.js provides the tools and flexibility you need to create engaging user experiences.
+```vue
+<template>
+  <div class="user-card">
+    <h2>{{ user.name }}</h2>
+    <p v-if="user.email">Email: {{ user.email }}</p>
+    <button @click="toggleDetails">
+      {{ showDetails ? "Hide" : "Show" }} Details
+    </button>
+    <div v-show="showDetails" class="details">
+      <p>Age: {{ user.age }}</p>
+      <p>Location: {{ user.location }}</p>
+    </div>
+  </div>
+</template>
 
-##### Angular
+<script>
+export default {
+  data() {
+    return {
+      showDetails: false,
+      user: {
+        name: "John Doe",
+        email: "john@example.com",
+        age: 30,
+        location: "New York",
+      },
+    };
+  },
+  methods: {
+    toggleDetails() {
+      this.showDetails = !this.showDetails;
+    },
+  },
+};
+</script>
 
-Angular is a platform for building web applications using TypeScript. It provides a set of tools and features for building scalable and maintainable applications. Angular's component-based architecture allows you to create reusable UI components, while its powerful dependency injection system makes it easy to manage application state and services. Angular also includes features like routing, forms, and HTTP client, making it a complete solution for building modern web applications. With Angular, you can create dynamic and interactive user interfaces that are responsive and performant.
+<style scoped>
+.user-card {
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+}
+</style>
+```
 
-## Languages
+#### Composition API (Vue 3):
 
-### HTML
+```vue
+<script setup>
+import { ref, computed } from "vue";
 
-HTML (HyperText Markup Language) is the standard markup language for creating web pages. It provides the structure and content of a webpage, allowing you to define elements like headings, paragraphs, links, and images.
+const count = ref(0);
+const doubled = computed(() => count.value * 2);
 
-#### CSS & SASS/SCSS
+function increment() {
+  count.value++;
+}
+</script>
 
-CSS (Cascading Style Sheets) is a stylesheet language used to describe the presentation of a document written in HTML. It allows you to control the layout, colors, fonts, and overall appearance of your web pages, making them visually appealing and user-friendly.
+<template>
+  <div>
+    <p>Count: {{ count }}</p>
+    <p>Doubled: {{ doubled }}</p>
+    <button @click="increment">Increment</button>
+  </div>
+</template>
+```
 
-SASS (Syntactically Awesome Style Sheets) and SCSS (Sassy CSS) are preprocessor languages that extend CSS with additional features like variables, nesting, and mixins. They allow you to write more maintainable and modular stylesheets, making it easier to manage complex styles in large projects. SASS/SCSS provides a powerful way to enhance your CSS workflow, enabling you to create reusable styles and improve the overall organization of your stylesheets.
+#### Vue Ecosystem:
 
-##### JavaScript & TypeScript
+- Vue Router: Official routing library
+- Vuex/Pinia: State management (Pinia is the new recommended solution)
+- Vue CLI/Vite: Build tools and project scaffolding
+- Nuxt.js: Full-stack framework (like Next.js for React)
 
-JavaScript is a programming language that enables you to create dynamic and interactive web applications. It allows you to manipulate the Document Object Model (DOM), handle events, and perform asynchronous operations, making it an essential part of modern web development.
+#### When to Choose Vue:
 
-TypeScript is a superset of JavaScript that adds static typing to the language. It allows you to catch errors at compile time, making your code more robust and maintainable. TypeScript provides features like interfaces, enums, and type annotations, enabling you to write cleaner and more structured code. It is widely used in large-scale applications and frameworks like Angular and React, providing a better development experience and improved code quality.
+- Rapid prototyping and development
+- Integrating into existing projects gradually
+- Teams preferring template-based syntax
+- Small to medium-sized applications
+- When you want a gentler learning curve than React
+  <BackToTop />
 
-##### JSX & TSX
+### Angular - Enterprise-Grade Platform
 
-JSX (JavaScript XML) is a syntax extension for JavaScript that allows you to write HTML-like code within your JavaScript files. It is commonly used with React to define the structure of UI components. TSX is the TypeScript version of JSX, which allows you to use TypeScript's static typing features while writing JSX code. Both JSX and TSX enable you to create dynamic and interactive user interfaces in a more readable and maintainable way.
+**Angular** is a comprehensive platform developed by Google for building scalable web applications.
 
-TSX (TypeScript XML) is a syntax extension for TypeScript that allows you to write HTML-like code within your TypeScript files. It is commonly used with React to define the structure of UI components while leveraging TypeScript's static typing features. TSX enables you to create dynamic and interactive user interfaces in a more readable and maintainable way, providing the benefits of both TypeScript's type safety and React's component-based architecture.
+#### Architecture Concepts:
 
-##### NOTE
+##### Components and Services:
 
-> There is another website for Backend development, which is not covered in this course. However, you can find more information about backend development on the [Backend Development](https://backend-development.vercel.app/) website. It will cover various backend technologies, frameworks, and best practices to help you build robust and scalable server-side applications such as databases (SQL, NoSQL, Redis, MongoDB, etc.) and server-side languages (Node.js, Python, Ruby, etc.). The Backend development website will provide you with the knowledge and skills needed to create efficient and secure backend systems that can support your web applications.
+```typescript
+// Component
+import { Component, OnInit } from "@angular/core";
+import { UserService } from "./user.service";
 
-## CSS Frameworks and Libraries
+@Component({
+  selector: "app-user-list",
+  template: `
+    <div class="user-list">
+      <h2>Users</h2>
+      <div *ngFor="let user of users" class="user-item">
+        <h3>{{ user.name }}</h3>
+        <p>{{ user.email }}</p>
+        <button (click)="deleteUser(user.id)">Delete</button>
+      </div>
+    </div>
+  `,
+  styleUrls: ["./user-list.component.scss"],
+})
+export class UserListComponent implements OnInit {
+  users: User[] = [];
 
-### Tailwind CSS
+  constructor(private userService: UserService) {}
 
-Tailwind CSS is a utility-first CSS framework that provides a set of pre-defined classes to help you style your application quickly. It promotes a consistent design system and allows for rapid prototyping.
+  ngOnInit() {
+    this.loadUsers();
+  }
 
-#### Emotion
+  loadUsers() {
+    this.userService.getUsers().subscribe((users) => {
+      this.users = users;
+    });
+  }
 
-Emotion is a CSS-in-JS library that allows you to style your React components with ease. It provides a powerful and flexible way to write styles, enabling you to create dynamic and responsive designs.
+  deleteUser(id: number) {
+    this.userService.deleteUser(id).subscribe(() => {
+      this.loadUsers();
+    });
+  }
+}
+```
 
-##### Ant Design
+##### Service with Dependency Injection:
 
-Ant Design is a design system and React UI library that provides a set of high-quality components and design guidelines. It helps you build enterprise-level applications with a consistent and modern look and feel.
+```typescript
+import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Observable } from "rxjs";
 
-##### Chakra UI
+@Injectable({
+  providedIn: "root",
+})
+export class UserService {
+  private apiUrl = "https://api.example.com/users";
 
-Chakra UI is a component library for React that provides a set of accessible and customizable components. It helps you build responsive and visually appealing user interfaces with ease.
+  constructor(private http: HttpClient) {}
 
-##### Framer Motion
+  getUsers(): Observable<User[]> {
+    return this.http.get<User[]>(this.apiUrl);
+  }
 
-Framer Motion is a library for creating animations in React applications. It provides a simple API for animating components and creating smooth transitions, enhancing the user experience.
+  deleteUser(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+}
+```
 
-## State Management Libraries
+#### Angular Features:
 
-### Zustand
+- TypeScript First: Built with TypeScript from the ground up
+- Dependency Injection: Powerful DI system for services
+- RxJS: Reactive programming with observables
+- Angular CLI: Comprehensive command-line interface
+- Testing: Built-in testing utilities (Jasmine, Karma, Protractor)
+- Forms: Reactive and template-driven forms
+- HTTP Client: Built-in HTTP client with interceptors
 
-Zustand is a small, fast, and scalable state management library for React applications. It allows you to manage global state with minimal boilerplate code, making it easy to share state across components
+#### Angular Ecosystem:
 
-#### Redux
+- Angular Material: Official Material Design components
+- Angular Universal: Server-side rendering
+- Ionic: Mobile app development
+- NativeScript: Native mobile apps
 
-Redux is a state management library for JavaScript applications. It helps you manage the global state of your application in a predictable way, making it easier to debug and test.
+#### When to Choose Angular:
 
-## Security Libraries
+- Large enterprise applications
+- Teams familiar with object-oriented programming
+- Need for strict structure and conventions
+- Applications requiring extensive testing
+- Long-term maintainability is crucial
 
-### Helmet
+<BackToTop />
 
-Helmet is a security library for Node.js applications that helps you set various HTTP headers to protect your application from common security vulnerabilities. It provides a simple way to enhance the security of your web applications by setting security-related HTTP headers.
+## Advanced Styling Technologies
 
-#### CORS
+### CSS Preprocessors
 
-CORS (Cross-Origin Resource Sharing) is a security feature implemented in web browsers that allows or restricts web applications running at one origin to make requests to resources from another origin. It helps prevent cross-site request forgery (CSRF) attacks and ensures that only trusted domains can access your resources.
+#### Sass/SCSS - CSS with Superpowers
 
-## Authentication Libraries
+**Sass** (Syntactically Awesome Style Sheets) comes in two syntaxes: **Sass** (indented) and **SCSS** (CSS-like).
 
-### NextAuth.js
+##### Variables and Data Types:
 
-NextAuth.js is an authentication library for Next.js applications. It provides a simple and flexible way to implement authentication and authorization in your applications, supporting various providers like Google, Facebook, and GitHub.
+```scss
+// Variables
+$primary-color: #3498db;
+$secondary-color: #e74c3c;
+$font-stack: "Helvetica Neue", Arial, sans-serif;
+$base-font-size: 16px;
 
-#### Auth0
+// Maps
+$breakpoints: (
+  "mobile": 480px,
+  "tablet": 768px,
+  "desktop": 1024px,
+  "large": 1200px,
+);
 
-Auth0 is an authentication and authorization platform that provides a secure and scalable way to manage user identities. It supports various authentication methods, including social logins, email/password, and multi-factor authentication, making it easy to implement secure authentication in your applications.
+// Lists
+$font-weights: normal, bold, 100, 200, 300, 400, 500, 600, 700, 800, 900;
+```
 
-##### Firebase Authentication
+##### Mixins and Functions:
 
-Firebase Authentication is a service provided by Firebase that allows you to authenticate users in your web and mobile applications. It supports various authentication methods, including email/password, phone authentication, and social logins, making it easy to implement secure user authentication in your applications.
+```scss
+// Mixins
+@mixin button-style($bg-color, $text-color: white, $border-radius: 4px) {
+  background-color: $bg-color;
+  color: $text-color;
+  border-radius: $border-radius;
+  padding: 12px 24px;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darken($bg-color, 10%);
+  }
+}
+
+// Responsive mixin
+@mixin respond-to($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (min-width: map-get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  }
+}
+
+// Usage
+.btn-primary {
+  @include button-style($primary-color);
+
+  @include respond-to("tablet") {
+    font-size: 18px;
+  }
+}
+```
+
+##### Advanced Nesting and Selectors:
+
+```scss
+.navigation {
+  background: $primary-color;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    display: inline-block;
+
+    &:hover {
+      background: darken($primary-color, 5%);
+    }
+
+    &.active {
+      background: $secondary-color;
+    }
+  }
+
+  a {
+    color: white;
+    text-decoration: none;
+    padding: 15px 20px;
+    display: block;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+```
+
+##### Control Directives:
+
+```scss
+// Loops and conditionals
+@for $i from 1 through 12 {
+  .col-#{$i} {
+    width: (100% / 12) * $i;
+  }
+}
+
+@each $color-name, $color-value in $colors {
+  .text-#{$color-name} {
+    color: $color-value;
+  }
+
+  .bg-#{$color-name} {
+    background-color: $color-value;
+  }
+}
+
+// Functions
+@function calculate-rem($size) {
+  @return $size / $base-font-size * 1rem;
+}
+
+.title {
+  font-size: calculate-rem(24px); // Output: 1.5rem
+}
+```
+
+<BackToTop />
+
+### CSS Frameworks
+
+#### Tailwind CSS - Utility-First Framework
+
+##### Custom Configuration:
+
+```javascript
+// tailwind.config.js
+module.exports = {
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  theme: {
+    extend: {
+      colors: {
+        brand: {
+          50: "#eff6ff",
+          500: "#3b82f6",
+          900: "#1e3a8a",
+        },
+      },
+      fontFamily: {
+        sans: ["Inter var", ...defaultTheme.fontFamily.sans],
+      },
+      spacing: {
+        18: "4.5rem",
+        88: "22rem",
+      },
+    },
+  },
+  plugins: [require("@tailwindcss/forms"), require("@tailwindcss/typography")],
+};
+```
+
+##### Component Patterns:
+
+```html
+<!-- Card Component Pattern -->
+<div
+  class="max-w-sm mx-auto bg-white rounded-xl shadow-lg overflow-hidden md:max-w-2xl"
+>
+  <div class="md:flex">
+    <div class="md:shrink-0">
+      <img
+        class="h-48 w-full object-cover md:h-full md:w-48"
+        src="..."
+        alt="..."
+      />
+    </div>
+    <div class="p-8">
+      <div
+        class="uppercase tracking-wide text-sm text-indigo-500 font-semibold"
+      >
+        Company
+      </div>
+      <a
+        href="#"
+        class="block mt-1 text-lg leading-tight font-medium text-black hover:underline"
+        >Title</a
+      >
+      <p class="mt-2 text-slate-500">Description text here...</p>
+    </div>
+  </div>
+</div>
+```
+
+<BackToTop />
+
+#### Bootstrap 5 - Component-Based Framework
+
+##### Grid System:
+
+```html
+<div class="container-fluid">
+  <div class="row g-4">
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100">
+        <img src="..." class="card-img-top" alt="..." />
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">Card title</h5>
+          <p class="card-text flex-grow-1">Some quick example text.</p>
+          <a href="#" class="btn btn-primary mt-auto">Go somewhere</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+##### Custom SCSS with Bootstrap:
+
+```scss
+// Import Bootstrap functions and variables
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+
+// Override variables
+$primary: #007bff;
+$secondary: #6c757d;
+$border-radius: 0.5rem;
+
+// Import Bootstrap
+@import "~bootstrap/scss/bootstrap";
+
+// Custom utilities
+.text-shadow {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+```
+
+<BackToTop />
+
+#### Bulma - Modern CSS Framework
+
+##### Bulma Philosophy:
+
+- CSS-only (no JavaScript dependencies)
+- Flexbox-based
+- Mobile-first responsive design
+- Modern and clean syntax
+
+```html
+<!-- Bulma Hero Section -->
+<section class="hero is-primary is-fullheight">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <p class="title is-1">Hello World</p>
+      <p class="subtitle is-3">This is a Bulma hero</p>
+      <div class="buttons is-centered">
+        <button class="button is-light is-large">
+          <span class="icon">
+            <i class="fas fa-download"></i>
+          </span>
+          <span>Download</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Bulma Columns -->
+<div class="columns is-multiline">
+  <div class="column is-one-third">
+    <div class="card">
+      <div class="card-content">
+        <div class="media">
+          <div class="media-content">
+            <p class="title is-4">John Smith</p>
+            <p class="subtitle is-6">@johnsmith</p>
+          </div>
+        </div>
+        <div class="content">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+<BackToTop />
+
+#### Materialize - Material Design Framework
+
+##### Material Design Components:
+
+```html
+<!-- Material Cards -->
+<div class="row">
+  <div class="col s12 m6">
+    <div class="card blue-grey darken-1">
+      <div class="card-content white-text">
+        <span class="card-title">Card Title</span>
+        <p>
+          I am a very simple card. I am good at containing small bits of
+          information.
+        </p>
+      </div>
+      <div class="card-action">
+        <a href="#" class="waves-effect waves-light btn">Action</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Material Forms -->
+<div class="row">
+  <form class="col s12">
+    <div class="row">
+      <div class="input-field col s6">
+        <input
+          placeholder="Placeholder"
+          id="first_name"
+          type="text"
+          class="validate"
+        />
+        <label for="first_name">First Name</label>
+      </div>
+      <div class="input-field col s6">
+        <input id="last_name" type="text" class="validate" />
+        <label for="last_name">Last Name</label>
+      </div>
+    </div>
+  </form>
+</div>
+```
+
+##### Materialize JavaScript Components:
+
+```javascript
+// Initialize components
+document.addEventListener("DOMContentLoaded", function () {
+  // Sidenav
+  var elems = document.querySelectorAll(".sidenav");
+  var instances = M.Sidenav.init(elems);
+
+  // Modal
+  var modal = document.querySelectorAll(".modal");
+  var modalInstances = M.Modal.init(modal);
+
+  // Dropdown
+  var dropdown = document.querySelectorAll(".dropdown-trigger");
+  var dropdownInstances = M.Dropdown.init(dropdown);
+});
+```
+
+<BackToTop />
+
+## State Management Solutions
+
+### Lightweight State Management
+
+#### Zustand - Minimal State Management
+
+**Philosophy**: Simple, small, and unopinionated state management.
+
+```javascript
+import { create } from "zustand";
+import { persist, createJSONStorage } from "zustand/middleware";
+
+// Basic store
+const useStore = create((set, get) => ({
+  count: 0,
+  user: null,
+  increment: () => set((state) => ({ count: state.count + 1 })),
+  decrement: () => set((state) => ({ count: state.count - 1 })),
+  setUser: (user) => set({ user }),
+  reset: () => set({ count: 0, user: null }),
+
+  // Computed values
+  get isPositive() {
+    return get().count > 0;
+  },
+}));
+
+// With middleware (persistence)
+const usePersistedStore = create(
+  persist(
+    (set) => ({
+      theme: "light",
+      toggleTheme: () =>
+        set((state) => ({
+          theme: state.theme === "light" ? "dark" : "light",
+        })),
+    }),
+    {
+      name: "app-storage",
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+);
+
+// Usage in components
+function Counter() {
+  const { count, increment, decrement, isPositive } = useStore();
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <p>Is Positive: {isPositive ? "Yes" : "No"}</p>
+      <button onClick={increment}>+</button>
+      <button onClick={decrement}>-</button>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+#### Jotai - Atomic State Management
+
+**Philosophy**: Bottom-up approach with atomic state management.
+
+```javascript
+import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
+
+// Primitive atoms
+const countAtom = atom(0);
+const nameAtom = atom("");
+
+// Derived atoms
+const doubleCountAtom = atom((get) => get(countAtom) * 2);
+const greetingAtom = atom((get) => `Hello, ${get(nameAtom)}!`);
+
+// Write-only atoms
+const incrementAtom = atom(null, (get, set) => {
+  set(countAtom, get(countAtom) + 1);
+});
+
+// Async atoms
+const userAtom = atom(async (get) => {
+  const userId = get(userIdAtom);
+  const response = await fetch(`/api/users/${userId}`);
+  return response.json();
+});
+
+// Usage
+function App() {
+  const [count, setCount] = useAtom(countAtom);
+  const doubleCount = useAtomValue(doubleCountAtom);
+  const increment = useSetAtom(incrementAtom);
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <p>Double: {doubleCount}</p>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+### Enterprise State Management
+
+#### Redux Toolkit - Modern Redux
+
+```javascript
+import {
+  createSlice,
+  configureStore,
+  createAsyncThunk,
+} from "@reduxjs/toolkit";
+
+// Async thunk
+export const fetchUser = createAsyncThunk(
+  "user/fetchUser",
+  async (userId, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`/api/users/${userId}`);
+      if (!response.ok) throw new Error("Failed to fetch");
+      return response.json();
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Slice
+const userSlice = createSlice({
+  name: "user",
+  initialState: {
+    data: null,
+    loading: false,
+    error: null,
+    preferences: {
+      theme: "light",
+      notifications: true,
+    },
+  },
+  reducers: {
+    updatePreferences: (state, action) => {
+      state.preferences = { ...state.preferences, ...action.payload };
+    },
+    clearError: (state) => {
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.data = action.payload;
+      })
+      .addCase(fetchUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
+});
+
+// Store Configuration
+const store = configureStore({
+  reducer: {
+    user: userSlice.reducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ["persist/PERSIST"],
+      },
+    }),
+});
+```
+
+<BackToTop />
+
+#### MobX - Reactive State Management
+
+```javascript
+import { makeAutoObservable, runInAction } from "mobx";
+import { observer } from "mobx-react-lite";
+
+class TodoStore {
+  todos = [];
+  filter = "all";
+  loading = false;
+
+  constructor() {
+    makeAutoObservable(this);
+  }
+
+  get filteredTodos() {
+    switch (this.filter) {
+      case "completed":
+        return this.todos.filter((todo) => todo.completed);
+      case "active":
+        return this.todos.filter((todo) => !todo.completed);
+      default:
+        return this.todos;
+    }
+  }
+
+  get completedCount() {
+    return this.todos.filter((todo) => todo.completed).length;
+  }
+
+  addTodo = async (text) => {
+    this.loading = true;
+    try {
+      const response = await fetch("/api/todos", {
+        method: "POST",
+        body: JSON.stringify({ text }),
+        headers: { "Content-Type": "application/json" },
+      });
+      const todo = await response.json();
+
+      runInAction(() => {
+        this.todos.push(todo);
+        this.loading = false;
+      });
+    } catch (error) {
+      runInAction(() => {
+        this.loading = false;
+      });
+    }
+  };
+
+  toggleTodo = (id) => {
+    const todo = this.todos.find((t) => t.id === id);
+    if (todo) {
+      todo.completed = !todo.completed;
+    }
+  };
+
+  setFilter = (filter) => {
+    this.filter = filter;
+  };
+}
+
+// Usage with observer
+const TodoList = observer(({ store }) => {
+  return (
+    <div>
+      <h1>
+        Todos ({store.completedCount}/{store.todos.length})
+      </h1>
+      {store.filteredTodos.map((todo) => (
+        <div key={todo.id}>
+          <input
+            type="checkbox"
+            checked={todo.completed}
+            onChange={() => store.toggleTodo(todo.id)}
+          />
+          {todo.text}
+        </div>
+      ))}
+    </div>
+  );
+});
+```
+
+<BackToTop />
 
 ## Data Fetching Libraries
 
-### Axios
+### Modern Data Fetching
 
-Axios is a promise-based HTTP client for JavaScript. It allows you to make HTTP requests from the browser or Node.js, making it easy to interact with APIs and handle responses.
+#### TanStack Query (React Query) - Server State Management
 
-#### React Query
+```javascript
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 
-React Query is a data-fetching library for React applications. It simplifies data fetching, caching, and synchronization, allowing you to focus on building your application without worrying about the complexities of data management.
+// Custom hooks for data fetching
+function useUser(userId) {
+  return useQuery({
+    queryKey: ["user", userId],
+    queryFn: async () => {
+      const response = await fetch(`/api/users/${userId}`);
+      if (!response.ok) throw new Error("Failed to fetch user");
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+  });
+}
 
-##### Fetch API
+// Mutations with optimistic updates
+function useUpdateUser() {
+  const queryClient = useQueryClient();
 
-The Fetch API is a built-in JavaScript API for making HTTP requests. It provides a simple and flexible way to fetch resources from the network, allowing you to handle responses and errors easily.
+  return useMutation({
+    mutationFn: async ({ userId, userData }) => {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: "PUT",
+        body: JSON.stringify(userData),
+        headers: { "Content-Type": "application/json" },
+      });
+      return response.json();
+    },
+    onMutate: async ({ userId, userData }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries(["user", userId]);
 
-## Testing Libraries
+      // Snapshot previous value
+      const previousUser = queryClient.getQueryData(["user", userId]);
 
-### Jest
+      // Optimistically update
+      queryClient.setQueryData(["user", userId], (old) => ({
+        ...old,
+        ...userData,
+      }));
 
-Jest is a JavaScript testing framework that provides a simple and powerful way to write and run tests. It supports unit testing, integration testing, and snapshot testing, making it a versatile tool for testing your applications.
+      return { previousUser };
+    },
+    onError: (err, variables, context) => {
+      // Rollback on error
+      queryClient.setQueryData(
+        ["user", variables.userId],
+        context.previousUser
+      );
+    },
+    onSettled: (data, error, variables) => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries(["user", variables.userId]);
+    },
+  });
+}
 
-#### React Testing Library
+// Infinite queries for pagination
+function useInfiniteUsers() {
+  return useInfiniteQuery({
+    queryKey: ["users", "infinite"],
+    queryFn: async ({ pageParam = 1 }) => {
+      const response = await fetch(`/api/users?page=${pageParam}&limit=10`);
+      return response.json();
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.hasNextPage ? allPages.length + 1 : undefined;
+    },
+    staleTime: 60 * 1000,
+  });
+}
+```
 
-React Testing Library is a testing utility for React applications that focuses on testing components from the user's perspective. It encourages writing tests that resemble how users interact with your application, making your tests more reliable and maintainable.
+<BackToTop />
 
-##### Cypress
+#### SWR - Data Fetching with Built-in Cache
 
-Cypress is an end-to-end testing framework for web applications. It provides a powerful and easy-to-use API for writing tests that simulate user interactions, allowing you to test your application in a real browser environment.
+```javascript
+import useSWR, { useSWRConfig } from "swr";
+import useSWRMutation from "swr/mutation";
 
-## Build Tools
+// Custom fetcher
+const fetcher = async (url) => {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error("API Error");
+  return response.json();
+};
 
-### Webpack
+// Basic usage
+function Profile({ userId }) {
+  const { data, error, isLoading, mutate } = useSWR(
+    `/api/users/${userId}`,
+    fetcher,
+    {
+      refreshInterval: 30000, // Revalidate every 30 seconds
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
+      dedupingInterval: 2000,
+    }
+  );
 
-Webpack is a module bundler for JavaScript applications. It takes your application code and its dependencies and bundles them into a single file or multiple files, optimizing your application for production. It supports features like code splitting, tree shaking, and hot module replacement, making it a powerful tool for building modern web applications.
+  if (error) return <div>Failed to load</div>;
+  if (isLoading) return <div>Loading...</div>;
 
-#### Babel
+  return <div>Hello {data.name}!</div>;
+}
 
-Babel is a JavaScript compiler that allows you to use the latest JavaScript features while ensuring compatibility with older browsers. It transforms your modern JavaScript code into a version that can run in a wider range of environments, enabling you to write code using the latest language features without worrying about browser support.
+// Mutations with SWR
+function updateUser(url, { arg }) {
+  return fetch(url, {
+    method: "PUT",
+    body: JSON.stringify(arg),
+    headers: { "Content-Type": "application/json" },
+  }).then((res) => res.json());
+}
 
-##### Vite
+function UserForm({ userId }) {
+  const { data: user } = useSWR(`/api/users/${userId}`, fetcher);
+  const { trigger, isMutating } = useSWRMutation(
+    `/api/users/${userId}`,
+    updateUser
+  );
 
-Vite is a fast build tool and development server for modern web applications. It provides a lightning-fast development experience with features like hot module replacement and instant server start. Vite supports various frameworks and libraries, making it a versatile choice for building web applications.
+  const handleSubmit = async (formData) => {
+    try {
+      await trigger(formData);
+      // SWR will automatically revalidate the data
+    } catch (error) {
+      console.error("Update failed:", error);
+    }
+  };
 
-##### Parcel
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* form fields */}
+      <button type="submit" disabled={isMutating}>
+        {isMutating ? "Updating..." : "Update"}
+      </button>
+    </form>
+  );
+}
+```
 
-Parcel is a zero-configuration web application bundler that automatically handles dependencies and optimizes your application for production. It provides a simple and efficient way to bundle your application without the need for complex configuration files. Parcel supports features like code splitting, tree shaking, and hot module replacement, making it a powerful tool for building modern web applications.
+<BackToTop />
 
-## Deployment Platforms
+#### Apollo Client - GraphQL Client
 
-### Vercel
+```javascript
+import {
+  ApolloClient,
+  InMemoryCache,
+  gql,
+  useQuery,
+  useMutation,
+} from "@apollo/client";
 
-Vercel is a cloud platform for deploying and hosting web applications. It provides a simple and efficient way to deploy your applications with features like automatic scaling, serverless functions, and global CDN.
+// Client setup
+const client = new ApolloClient({
+  uri: "https://api.example.com/graphql",
+  cache: new InMemoryCache({
+    typePolicies: {
+      User: {
+        fields: {
+          posts: {
+            merge(existing = [], incoming) {
+              return [...existing, ...incoming];
+            },
+          },
+        },
+      },
+    },
+  }),
+});
 
-#### Netlify
+// Queries
+const GET_USERS = gql`
+  query GetUsers($limit: Int, $offset: Int) {
+    users(limit: $limit, offset: $offset) {
+      id
+      name
+      email
+      posts {
+        id
+        title
+        createdAt
+      }
+    }
+  }
+`;
 
-Netlify is a platform for deploying and hosting static websites and web applications. It offers features like continuous deployment, serverless functions, and form handling, making it easy to build and deploy modern web applications.
+const CREATE_USER = gql`
+  mutation CreateUser($input: CreateUserInput!) {
+    createUser(input: $input) {
+      id
+      name
+      email
+    }
+  }
+`;
 
-##### AWS Amplify
+// Component usage
+function UserList() {
+  const { loading, error, data, fetchMore } = useQuery(GET_USERS, {
+    variables: { limit: 10, offset: 0 },
+    notifyOnNetworkStatusChange: true,
+  });
 
-AWS Amplify is a set of tools and services for building and deploying web and mobile applications on Amazon Web Services (AWS). It provides features like authentication, storage, and APIs, making it easy to build scalable and secure applications on the AWS cloud.
+  const [createUser] = useMutation(CREATE_USER, {
+    update(cache, { data: { createUser } }) {
+      cache.modify({
+        fields: {
+          users(existingUsers = []) {
+            const newUserRef = cache.writeFragment({
+              data: createUser,
+              fragment: gql`
+                fragment NewUser on User {
+                  id
+                  name
+                  email
+                }
+              `,
+            });
+            return [newUserRef, ...existingUsers];
+          },
+        },
+      });
+    },
+  });
 
-##### Firebase
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
-Firebase is a platform for building web and mobile applications that provides features like real-time databases, authentication, and hosting. It simplifies the development process by providing a set of tools and services that help you build and deploy your applications quickly and efficiently.
+  return (
+    <div>
+      {data.users.map((user) => (
+        <div key={user.id}>
+          <h3>{user.name}</h3>
+          <p>{user.email}</p>
+        </div>
+      ))}
+      <button
+        onClick={() =>
+          fetchMore({
+            variables: { offset: data.users.length },
+          })
+        }
+      >
+        Load More
+      </button>
+    </div>
+  );
+}
+```
+
+<BackToTop />
+
+## Build Tools & Development Environment
+
+### Modern Build Tools
+
+#### Vite - Next Generation Tooling
+
+```javascript
+// vite.config.js
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { resolve } from "path";
+
+export default defineConfig({
+  plugins: [
+    react({
+      // React Fast Refresh options
+      fastRefresh: true,
+      // Babel Configuration
+      babel: {
+        plugins: ["babel-plugin-styled-components"],
+      },
+    }),
+  ],
+
+  // Path resolution
+  resolve: {
+    alias: {
+      "@": resolve(__dirname, "src"),
+      "@components": resolve(__dirname, "src/components"),
+      "@utils": resolve(__dirname, "src/utils"),
+      "@assets": resolve(__dirname, "src/assets"),
+    },
+  },
+
+  // Build optimization
+  build: {
+    target: "esnext",
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ["react", "react-dom"],
+          ui: ["@mui/material", "@emotion/react"],
+        },
+      },
+    },
+    sourcemap: true,
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+  },
+
+  // Development server
+  server: {
+    port: 3000,
+    host: true,
+    proxy: {
+      "/api": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+    },
+  },
+
+  // Environment variables
+  define: {
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+  },
+});
+```
+
+<BackToTop />
+
+#### Webpack - Comprehensive Module Bundler
+
+```javascript
+// webpack.config.js
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
+
+module.exports = (env, argv) => {
+  const isProduction = argv.mode === "production";
+
+  return {
+    entry: {
+      app: "./src/index.js",
+      vendor: ["react", "react-dom"],
+    },
+
+    output: {
+      path: path.resolve(__dirname, "dist"),
+      filename: isProduction ? "[name].[contenthash].js" : "[name].js",
+      chunkFilename: "[name].[contenthash].chunk.js",
+      clean: true,
+    },
+
+    optimization: {
+      splitChunks: {
+        chunks: "all",
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: "vendors",
+            chunks: "all",
+          },
+          common: {
+            minChunks: 2,
+            chunks: "all",
+            enforce: true,
+          },
+        },
+      },
+    },
+
+    module: {
+      rules: [
+        {
+          test: /\.(js|jsx|ts|tsx)$/,
+          exclude: /node_modules/,
+          use: {
+            loader: "babel-loader",
+            options: {
+              presets: [
+                "@babel/preset-env",
+                "@babel/preset-react",
+                "@babel/preset-typescript",
+              ],
+              plugins: [
+                "@babel/plugin-transform-runtime",
+                "babel-plugin-styled-components",
+              ],
+            },
+          },
+        },
+        {
+          test: /\.css$/,
+          use: [
+            isProduction ? MiniCssExtractPlugin.loader : "style-loader",
+            "css-loader",
+            "postcss-loader",
+          ],
+        },
+        {
+          test: /\.scss$/,
+          use: [
+            isProduction ? MiniCssExtractPlugin.loader : "style-loader",
+            "css-loader",
+            "postcss-loader",
+            "sass-loader",
+          ],
+        },
+        {
+          test: /\.(png|svg|jpg|jpeg|gif)$/i,
+          type: "asset/resource",
+          generator: {
+            filename: "images/[name].[hash][ext]",
+          },
+        },
+      ],
+    },
+
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: "./public/index.html",
+        minify: isProduction,
+      }),
+
+      ...(isProduction
+        ? [
+            new MiniCssExtractPlugin({
+              filename: "[name].[contenthash].css",
+            }),
+            new BundleAnalyzerPlugin({
+              analyzerMode: "static",
+              openAnalyzer: false,
+            }),
+          ]
+        : []),
+    ],
+
+    devServer: {
+      contentBase: path.join(__dirname, "dist"),
+      compress: true,
+      port: 3000,
+      hot: true,
+      historyApiFallback: true,
+    },
+  };
+};
+```
+
+<BackToTop />
+
+#### Parcel - Zero Configuration Build Tool
+
+```json
+// package.json
+{
+  "name": "my-app",
+  "scripts": {
+    "start": "parcel src/index.html",
+    "build": "parcel build src/index.html",
+    "clean": "rm -rf dist .parcel-cache"
+  },
+  "devDependencies": {
+    "parcel": "^2.9.0",
+    "@parcel/transformer-sass": "^2.9.0",
+    "@parcel/transformer-typescript": "^2.9.0"
+  }
+}
+```
+
+##### Parcel features out of the box:
+
+- Hot module replacement
+- Code splitting
+- Tree shaking
+- Image optimization
+- TypeScript support
+- SCSS/Sass preprocessing
+
+#### Rollup - ES Module Bundler
+
+```javascript
+// rollup.config.js
+import resolve from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import typescript from "@rollup/plugin-typescript";
+import { terser } from "rollup-plugin-terser";
+import babel from "@rollup/plugin-babel";
+
+export default {
+  input: "src/index.ts",
+  output: [
+    {
+      file: "dist/bundle.cjs.js",
+      format: "cjs",
+      sourcemap: true,
+    },
+    {
+      file: "dist/bundle.esm.js",
+      format: "esm",
+      sourcemap: true,
+    },
+    {
+      file: "dist/bundle.umd.js",
+      format: "umd",
+      name: "MyLibrary",
+      sourcemap: true,
+    },
+  ],
+  plugins: [
+    resolve({
+      browser: true,
+      preferBuiltins: false,
+    }),
+    commonjs(),
+    typescript({
+      tsconfig: "./tsconfig.json",
+    }),
+    babel({
+      babelHelpers: "bundled",
+      exclude: "node_modules/**",
+      presets: [["@babel/preset-env", { modules: false }]],
+    }),
+    terser({
+      compress: {
+        drop_console: true,
+      },
+    }),
+  ],
+  external: ["react", "react-dom"],
+};
+```
+
+<BackToTop />
+
+### Development Environment Tools
+
+#### ESLint - Code Quality
+
+```javascript
+// .eslintrc.js
+module.exports = {
+  env: {
+    browser: true,
+    es2021: true,
+    node: true,
+    jest: true,
+  },
+  extends: [
+    "eslint:recommended",
+    "@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+  ],
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+    },
+    ecmaVersion: "latest",
+    sourceType: "module",
+    project: "./tsconfig.json",
+  },
+  plugins: ["react", "@typescript-eslint", "react-hooks", "jsx-a11y", "import"],
+  rules: {
+    // TypeScript specific
+    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "warn",
+
+    // React specific
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+
+    // Import rules
+    "import/order": [
+      "error",
+      {
+        groups: [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling",
+          "index",
+        ],
+        "newlines-between": "always",
+      },
+    ],
+
+    // General rules
+    "no-console": "warn",
+    "no-debugger": "error",
+    "prefer-const": "error",
+    "no-var": "error",
+  },
+  settings: {
+    react: {
+      version: "detect",
+    },
+    "import/resolver": {
+      typescript: {},
+    },
+  },
+};
+```
+
+<BackToTop />
+
+#### Prettier - Code Formatting
+
+```javascript
+// .prettierrc.js
+module.exports = {
+  semi: true,
+  trailingComma: "es5",
+  singleQuote: true,
+  printWidth: 80,
+  tabWidth: 2,
+  useTabs: false,
+  bracketSpacing: true,
+  bracketSameLine: false,
+  arrowParens: "always",
+  endOfLine: "lf",
+
+  // Plugin-specific options
+  plugins: ["prettier-plugin-organize-imports"],
+
+  // File-specific overrides
+  overrides: [
+    {
+      files: "*.md",
+      options: {
+        printWidth: 100,
+        proseWrap: "always",
+      },
+    },
+    {
+      files: "*.json",
+      options: {
+        printWidth: 120,
+      },
+    },
+  ],
+};
+```
+
+<BackToTop />
+
+#### Husky & lint-staged - Git Hooks
+
+```json
+// package.json
+{
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": ["eslint --fix", "prettier --write", "git add"],
+    "*.{css,scss,md}": ["prettier --write", "git add"]
+  }
+}
+```
+
+<BackToTop />
+
+## Testing Frameworks & Strategies
+
+### Unit Testing Frameworks
+
+#### Jest - Comprehensive Testing Framework
+
+```javascript
+// jest.config.js
+module.exports = {
+  testEnvironment: "jsdom",
+  setupFilesAfterEnv: ["<rootDir>/src/setupTests.js"],
+  moduleNameMapping: {
+    "^@/(.*)$": "<rootDir>/src/$1",
+    "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+    "\\.(jpg|jpeg|png|gif|svg)$": "<rootDir>/__mocks__/fileMock.js",
+  },
+  collectCoverageFrom: [
+    "src/**/*.{js,jsx,ts,tsx}",
+    "!src/**/*.d.ts",
+    "!src/index.tsx",
+    "!src/reportWebVitals.ts",
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
+  },
+  testMatch: [
+    "<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}",
+    "<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}",
+  ],
+};
+
+// Advanced test patterns
+describe("UserService", () => {
+  // Mocking modules
+  jest.mock("./api", () => ({
+    fetchUsers: jest.fn(),
+    createUser: jest.fn(),
+  }));
+
+  // Setup and teardown
+  beforeEach(() => {
+    jest.clearAllMocks();
+    localStorage.clear();
+  });
+
+  // Parameterized tests
+  describe.each([
+    ["admin", true],
+    ["user", false],
+    ["guest", false],
+  ])("User permissions for %s", (role, canDelete) => {
+    test(`${role} ${canDelete ? "can" : "cannot"} delete users`, () => {
+      const user = createUser(role);
+      expect(user.canDelete()).toBe(canDelete);
+    });
+  });
+
+  // Async testing
+  test("should fetch users successfully", async () => {
+    const mockUsers = [{ id: 1, name: "John" }];
+    api.fetchUsers.mockResolvedValue(mockUsers);
+
+    const result = await userService.getUsers();
+
+    expect(api.fetchUsers).toHaveBeenCalledTimes(1);
+    expect(result).toEqual(mockUsers);
+  });
+
+  // Error handling
+  test("should handle fetch errors", async () => {
+    const error = new Error("Network error");
+    api.fetchUsers.mockRejectedValue(error);
+
+    await expect(userService.getUsers()).rejects.toThrow("Network error");
+  });
+
+  // Timer mocking
+  test("should debounce search requests", () => {
+    jest.useFakeTimers();
+
+    const searchFn = jest.fn();
+    const debouncedSearch = debounce(searchFn, 300);
+
+    debouncedSearch("test");
+    debouncedSearch("test2");
+    debouncedSearch("test3");
+
+    jest.advanceTimersByTime(300);
+
+    expect(searchFn).toHaveBeenCalledTimes(1);
+    expect(searchFn).toHaveBeenCalledWith("test3");
+
+    jest.useRealTimers();
+  });
+});
+```
+
+<BackToTop />
+
+#### Vitest - Vite-Native Testing
+
+```javascript
+// vitest.config.ts
+import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: ["./src/setupTests.ts"],
+    css: true,
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html", "lcov"],
+      exclude: ["node_modules/", "src/setupTests.ts", "**/*.d.ts"],
+    },
+  },
+});
+
+// Example test with Vitest
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { UserProfile } from "./UserProfile";
+
+describe("UserProfile", () => {
+  const mockUser = {
+    id: 1,
+    name: "John Doe",
+    email: "john@example.com",
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should display user information", () => {
+    render(<UserProfile user={mockUser} />);
+
+    expect(screen.getByText("John Doe")).toBeInTheDocument();
+    expect(screen.getByText("john@example.com")).toBeInTheDocument();
+  });
+
+  it("should handle edit mode", async () => {
+    const onUpdate = vi.fn();
+    render(<UserProfile user={mockUser} onUpdate={onUpdate} />);
+
+    fireEvent.click(screen.getByText("Edit"));
+
+    const nameInput = screen.getByDisplayValue("John Doe");
+    fireEvent.change(nameInput, { target: { value: "Jane Doe" } });
+
+    fireEvent.click(screen.getByText("Save"));
+
+    await waitFor(() => {
+      expect(onUpdate).toHaveBeenCalledWith({
+        ...mockUser,
+        name: "Jane Doe",
+      });
+    });
+  });
+});
+```
+
+<BackToTop />
+
+### Component Testing
+
+#### React Testing Library - User-Centric Testing
+
+```javascript
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+} from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter } from "react-router-dom";
+import { ThemeProvider } from "styled-components";
+
+// Custom render with providers
+function renderWithProviders(
+  ui,
+  {
+    preloadedState = {},
+    store = setupStore(preloadedState),
+    ...renderOptions
+  } = {}
+) {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
+  function Wrapper({ children }) {
+    return (
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider theme={defaultTheme}>
+            <Provider store={store}>{children}</Provider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
+    );
+  }
+
+  return {
+    store,
+    queryClient,
+    ...render(ui, { wrapper: Wrapper, ...renderOptions }),
+  };
+}
+
+// Complex component testing
+describe("TodoApp", () => {
+  test("should manage todo lifecycle", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<TodoApp />);
+
+    // Add a todo
+    const input = screen.getByPlaceholderText("Add new todo...");
+    await user.type(input, "Learn React Testing");
+    await user.click(screen.getByText("Add"));
+
+    // Verify todo was added
+    expect(screen.getByText("Learn React Testing")).toBeInTheDocument();
+    expect(screen.getByRole("checkbox")).not.toBeChecked();
+
+    // Complete the todo
+    await user.click(screen.getByRole("checkbox"));
+    expect(screen.getByRole("checkbox")).toBeChecked();
+
+    // Delete the todo
+    await user.click(screen.getByLabelText("Delete todo"));
+    expect(screen.queryByText("Learn React Testing")).not.toBeInTheDocument();
+  });
+
+  test("should filter todos correctly", async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<TodoApp />, {
+      preloadedState: {
+        todos: [
+          { id: 1, text: "Active todo", completed: false },
+          { id: 2, text: "Completed todo", completed: true },
+        ],
+      },
+    });
+
+    // Test all filter
+    expect(screen.getByText("Active todo")).toBeInTheDocument();
+    expect(screen.getByText("Completed todo")).toBeInTheDocument();
+
+    // Test active filter
+    await user.click(screen.getByText("Active"));
+    expect(screen.getByText("Active todo")).toBeInTheDocument();
+    expect(screen.queryByText("Completed todo")).not.toBeInTheDocument();
+
+    // Test completed filter
+    await user.click(screen.getByText("Completed"));
+    expect(screen.queryByText("Active todo")).not.toBeInTheDocument();
+    expect(screen.getByText("Completed todo")).toBeInTheDocument();
+  });
+});
+```
+
+<BackToTop />
+
+### End-to-End Testing
+
+#### Cypress - Modern E2E Testing
+
+```javascript
+// cypress.config.js
+import { defineConfig } from "cypress";
+
+export default defineConfig({
+  e2e: {
+    baseUrl: "http://localhost:3000",
+    viewportWidth: 1280,
+    viewportHeight: 720,
+    video: true,
+    screenshotOnRunFailure: true,
+    setupNodeEvents(on, config) {
+      // Custom tasks
+      on("task", {
+        seedDatabase(data) {
+          // Seed database for testing
+          return database.seed(data);
+        },
+        clearDatabase() {
+          return database.clear();
+        },
+      });
+    },
+  },
+  component: {
+    devServer: {
+      framework: "react",
+      bundler: "vite",
+    },
+  },
+});
+
+// Advanced Cypress commands
+Cypress.Commands.add("login", (username, password) => {
+  cy.session([username, password], () => {
+    cy.visit("/login");
+    cy.get("[data-cy=username]").type(username);
+    cy.get("[data-cy=password]").type(password);
+    cy.get("[data-cy=login-button]").click();
+    cy.url().should("contain", "/dashboard");
+    cy.get("[data-cy=user-menu]").should("be.visible");
+  });
+});
+
+Cypress.Commands.add("createTodo", (text) => {
+  cy.get("[data-cy=todo-input]").type(text);
+  cy.get("[data-cy=add-button]").click();
+  cy.get("[data-cy=todo-list]").should("contain", text);
+});
+
+// E2E test examples
+describe("Todo Application", () => {
+  beforeEach(() => {
+    cy.task("clearDatabase");
+    cy.task("seedDatabase", { users: [testUser] });
+    cy.login("testuser@example.com", "password123");
+  });
+
+  it("should manage todos end-to-end", () => {
+    cy.visit("/todos");
+
+    // Create multiple todos
+    cy.createTodo("Buy groceries");
+    cy.createTodo("Walk the dog");
+    cy.createTodo("Finish project");
+
+    // Complete a todo
+    cy.get("[data-cy=todo-item]")
+      .contains("Buy groceries")
+      .parent()
+      .find("[data-cy=complete-checkbox]")
+      .click();
+
+    // Verify completion
+    cy.get("[data-cy=todo-item]")
+      .contains("Buy groceries")
+      .parent()
+      .should("have.class", "completed");
+
+    // Filter completed todos
+    cy.get("[data-cy=filter-completed]").click();
+    cy.get("[data-cy=todo-list]").should("contain", "Buy groceries");
+    cy.get("[data-cy=todo-list]").should("not.contain", "Walk the dog");
+
+    // Delete a todo
+    cy.get("[data-cy=filter-all]").click();
+    cy.get("[data-cy=todo-item]")
+      .contains("Walk the dog")
+      .parent()
+      .find("[data-cy=delete-button]")
+      .click();
+
+    cy.get("[data-cy=todo-list]").should("not.contain", "Walk the dog");
+  });
+
+  it("should handle real-time updates", () => {
+    cy.visit("/todos");
+
+    // Simulate another user adding a todo
+    cy.window().its("socket").invoke("emit", "todo:created", {
+      id: 999,
+      text: "Todo from another user",
+      completed: false,
+    });
+
+    // Verify real-time update
+    cy.get("[data-cy=todo-list]").should("contain", "Todo from another user");
+  });
+});
+```
+
+<BackToTop />
+
+#### Playwright - Cross-Browser Testing
+
+```javascript
+// playwright.config.ts
+import { defineConfig, devices } from "@playwright/test";
+
+export default defineConfig({
+  testDir: "./e2e",
+  fullyParallel: true,
+  reporter: [["html"], ["json", { outputFile: "test-results.json" }]],
+  use: {
+    baseURL: "http://localhost:3000",
+    trace: "on-first-retry",
+    screenshot: "only-on-failure",
+  },
+  projects: [
+    {
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"] },
+    },
+    {
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
+    },
+    {
+      name: "Mobile Chrome",
+      use: { ...devices["Pixel 5"] },
+    },
+  ],
+});
+
+// Playwright test example
+import { test, expect } from "@playwright/test";
+
+test.describe("User Authentication", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/login");
+  });
+
+  test("should login successfully", async ({ page }) => {
+    await page.fill("[data-testid=email]", "user@example.com");
+    await page.fill("[data-testid=password]", "password123");
+    await page.click("[data-testid=login-button]");
+
+    await expect(page).toHaveURL("/dashboard");
+    await expect(page.locator("[data-testid=welcome-message]")).toBeVisible();
+  });
+
+  test("should show error for invalid credentials", async ({ page }) => {
+    await page.fill("[data-testid=email]", "user@example.com");
+    await page.fill("[data-testid=password]", "wrongpassword");
+    await page.click("[data-testid=login-button]");
+
+    await expect(page.locator("[data-testid=error-message]")).toContainText(
+      "Invalid credentials"
+    );
+  });
+
+  test("should handle network errors gracefully", async ({ page }) => {
+    // Intercept and fail the login request
+    await page.route("/api/auth/login", (route) => route.abort());
+
+    await page.fill("[data-testid=email]", "user@example.com");
+    await page.fill("[data-testid=password]", "password123");
+    await page.click("[data-testid=login-button]");
+
+    await expect(page.locator("[data-testid=error-message]")).toContainText(
+      "Network error"
+    );
+  });
+});
+```
+
+<BackToTop />
+
+## Authentication Solutions
+
+### Modern Authentication Strategies
+
+#### NextAuth.js - Full-Stack Authentication
+
+##### Comprehensive AuthenticationSet-Up:
+
+```javascript
+// pages/api/auth/[...nextauth].js
+import NextAuth from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "next-auth/providers/github";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { prisma } from "../../../lib/prisma";
+import bcrypt from "bcryptjs";
+
+export default NextAuth({
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET,
+    }),
+    CredentialsProvider({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
+
+        if (!user || !user.hashedPassword) {
+          return null;
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password,
+          user.hashedPassword
+        );
+
+        if (!isPasswordValid) {
+          return null;
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        };
+      },
+    }),
+  ],
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  callbacks: {
+    async jwt({ token, user, account }) {
+      if (account && user) {
+        token.accessToken = account.access_token;
+        token.role = user.role;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.accessToken = token.accessToken;
+      session.user.role = token.role;
+      return session;
+    },
+    async redirect({ url, baseUrl }) {
+      // Redirect to dashboard after successful login
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      if (new URL(url).origin === baseUrl) return url;
+      return `${baseUrl}/dashboard`;
+    },
+  },
+  pages: {
+    signIn: "/auth/signin",
+    signUp: "/auth/signup",
+    error: "/auth/error",
+  },
+  events: {
+    async signIn({ user, account, profile }) {
+      console.log("User signed in:", user.email);
+    },
+    async signOut({ session }) {
+      console.log("User signed out:", session.user.email);
+    },
+  },
+});
+
+// Custom hook for Authentication
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+
+export function useAuth(requireAuth = true) {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (requireAuth && status === "unauthenticated") {
+      router.push("/auth/signin");
+    }
+  }, [status, requireAuth, router]);
+
+  return {
+    session,
+    status,
+    user: session?.user,
+    isLoading: status === "loading",
+    isAuthenticated: status === "authenticated",
+  };
+}
+
+// Protected route component
+export function ProtectedRoute({ children, requiredRole = null }) {
+  const { session, status } = useAuth();
+
+  if (status === "loading") {
+    return <LoadingSpinner />;
+  }
+
+  if (status === "unauthenticated") {
+    return <SignInPage />;
+  }
+
+  if (requiredRole && session?.user?.role !== requiredRole) {
+    return <UnauthorizedPage />;
+  }
+
+  return children;
+}
+```
+
+<BackToTop />
+
+#### Auth0 - Enterprise Authentication Platform
+
+##### Auth0 Implementation with React:
+
+```javascript
+// auth0-provider.js
+import { Auth0Provider } from "@auth0/auth0-react";
+import { useNavigate } from "react-router-dom";
+
+const Auth0ProviderWithHistory = ({ children }) => {
+  const navigate = useNavigate();
+
+  const domain = process.env.REACT_APP_AUTH0_DOMAIN;
+  const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID;
+  const audience = process.env.REACT_APP_AUTH0_AUDIENCE;
+
+  const onRedirectCallback = (appState) => {
+    navigate(appState?.returnTo || window.location.pathname);
+  };
+
+  return (
+    <Auth0Provider
+      domain={domain}
+      clientId={clientId}
+      audience={audience}
+      redirectUri={window.location.origin}
+      onRedirectCallback={onRedirectCallback}
+      scope="read:current_user update:current_user_metadata"
+    >
+      {children}
+    </Auth0Provider>
+  );
+};
+
+// Custom Auth0 hooks
+import { useAuth0 } from "@auth0/auth0-react";
+import { useState, useEffect } from "react";
+
+export const useAuthenticatedUser = () => {
+  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const [accessToken, setAccessToken] = useState(null);
+
+  useEffect(() => {
+    const getToken = async () => {
+      if (isAuthenticated) {
+        try {
+          const token = await getAccessTokenSilently();
+          setAccessToken(token);
+        } catch (error) {
+          console.error("Error getting access token:", error);
+        }
+      }
+    };
+    getToken();
+  }, [isAuthenticated, getAccessTokenSilently]);
+
+  return {
+    user,
+    isAuthenticated,
+    accessToken,
+    isLoading: !isAuthenticated && !user,
+  };
+};
+
+// API service with Auth0 token
+export class ApiService {
+  constructor(getAccessTokenSilently) {
+    this.getAccessTokenSilently = getAccessTokenSilently;
+  }
+
+  async request(endpoint, options = {}) {
+    const token = await this.getAccessTokenSilently();
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+      ...options,
+    };
+
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}${endpoint}`,
+      config
+    );
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`);
+    }
+
+    return response.json();
+  }
+
+  async getUser(userId) {
+    return this.request(`/users/${userId}`);
+  }
+
+  async updateUser(userId, userData) {
+    return this.request(`/users/${userId}`, {
+      method: "PUT",
+      body: JSON.stringify(userData),
+    });
+  }
+}
+```
+
+<BackToTop />
+
+#### Firebase Authentication
+
+##### Complete Firebase Auth Implementation:
+
+```javascript
+// firebase.js
+import { initializeApp } from "firebase/app";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  signOut,
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+  updateProfile,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+  updatePassword,
+} from "firebase/auth";
+
+const firebaseConfig = {
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+};
+
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+
+// Auth service
+export class AuthService {
+  constructor() {
+    this.googleProvider = new GoogleAuthProvider();
+    this.facebookProvider = new FacebookAuthProvider();
+  }
+
+  // Email/Password Authentication
+  async signUp(email, password, displayName) {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      await updateProfile(userCredential.user, { displayName });
+      return userCredential.user;
+    } catch (error) {
+      throw this.handleAuthError(error);
+    }
+  }
+
+  async signIn(email, password) {
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      return userCredential.user;
+    } catch (error) {
+      throw this.handleAuthError(error);
+    }
+  }
+
+  // Social Authentication
+  async signInWithGoogle() {
+    try {
+      const result = await signInWithPopup(auth, this.googleProvider);
+      return result.user;
+    } catch (error) {
+      throw this.handleAuthError(error);
+    }
+  }
+
+  async signInWithFacebook() {
+    try {
+      const result = await signInWithPopup(auth, this.facebookProvider);
+      return result.user;
+    } catch (error) {
+      throw this.handleAuthError(error);
+    }
+  }
+
+  // Password Reset
+  async resetPassword(email) {
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } catch (error) {
+      throw this.handleAuthError(error);
+    }
+  }
+
+  // Update Password
+  async updateUserPassword(currentPassword, newPassword) {
+    try {
+      const user = auth.currentUser;
+      const credential = EmailAuthProvider.credential(
+        user.email,
+        currentPassword
+      );
+
+      await reauthenticateWithCredential(user, credential);
+      await updatePassword(user, newPassword);
+    } catch (error) {
+      throw this.handleAuthError(error);
+    }
+  }
+
+  // Sign Out
+  async signOut() {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      throw this.handleAuthError(error);
+    }
+  }
+
+  // Auth State Observer
+  onAuthStateChange(callback) {
+    return onAuthStateChanged(auth, callback);
+  }
+
+  // Error Handler
+  handleAuthError(error) {
+    const errorMessages = {
+      "auth/user-not-found": "No user found with this email.",
+      "auth/wrong-password": "Incorrect password.",
+      "auth/email-already-in-use": "An account already exists with this email.",
+      "auth/weak-password": "Password should be at least 6 characters.",
+      "auth/invalid-email": "Invalid email address.",
+      "auth/user-disabled": "This account has been disabled.",
+      "auth/too-many-requests": "Too many failed attempts. Try again later.",
+      "auth/requires-recent-login":
+        "Please log in again to perform this action.",
+    };
+
+    return new Error(errorMessages[error.code] || error.message);
+  }
+}
+
+// React context for Firebase Auth
+import { createContext, useContext, useEffect, useState } from "react";
+
+const AuthContext = createContext();
+
+export const useFirebaseAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useFirebaseAuth must be used within an AuthProvider");
+  }
+  return context;
+};
+
+export const FirebaseAuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const authService = new AuthService();
+
+  useEffect(() => {
+    const unsubscribe = authService.onAuthStateChange((user) => {
+      setUser(user);
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const value = {
+    user,
+    loading,
+    signUp: authService.signUp.bind(authService),
+    signIn: authService.signIn.bind(authService),
+    signInWithGoogle: authService.signInWithGoogle.bind(authService),
+    signInWithFacebook: authService.signInWithFacebook.bind(authService),
+    signOut: authService.signOut.bind(authService),
+    resetPassword: authService.resetPassword.bind(authService),
+    updatePassword: authService.updateUserPassword.bind(authService),
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+```
+
+<BackToTop />
+
+#### Supabase Auth - Open Source Alternative
+
+##### Supabase Authentication Implementation:
+
+```javascript
+// supabase.js
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Auth hooks and utilities
+import { useEffect, useState } from "react";
+import { supabase } from "./supabase";
+
+export const useSupabaseAuth = () => {
+  const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription?.unsubscribe();
+  }, []);
+
+  const signUp = async (email, password, metadata = {}) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: metadata,
+      },
+    });
+    if (error) throw error;
+    return data;
+  };
+
+  const signIn = async (email, password) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw error;
+    return data;
+  };
+
+  const signInWithOAuth = async (provider) => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) throw error;
+    return data;
+  };
+
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+  };
+
+  const resetPassword = async (email) => {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
+    });
+    if (error) throw error;
+    return data;
+  };
+
+  const updatePassword = async (newPassword) => {
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+    if (error) throw error;
+    return data;
+  };
+
+  return {
+    user,
+    session,
+    loading,
+    signUp,
+    signIn,
+    signInWithOAuth,
+    signOut,
+    resetPassword,
+    updatePassword,
+  };
+};
+
+// Row Level Security (RLS) with Supabase
+export const createUserProfile = async (userId, profileData) => {
+  const { data, error } = await supabase
+    .from("profiles")
+    .insert([{ id: userId, ...profileData }]);
+
+  if (error) throw error;
+  return data;
+};
+
+export const getUserProfile = async (userId) => {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+```
+
+<BackToTop />
+
+## Deployment & Hosting Platforms
+
+### Frontend-Focused Platforms
+
+#### Vercel - The Frontend Cloud
+
+```javascript
+// vercel.json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "functions": {
+    "pages/api/users.js": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "DATABASE_URL": "@database-url",
+    "API_SECRET": "@api-secret"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_API_URL": "https://api.example.com"
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/old-page",
+      "destination": "/new-page",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/proxy/:path*",
+      "destination": "https://external-api.com/:path*"
+    }
+  ]
+}
+
+// Advanced Deployment with GitHub Actions
+name: Deploy to Vercel
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build project
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.API_URL }}
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.ORG_ID }}
+          vercel-project-id: ${{ secrets.PROJECT_ID }}
+          vercel-args: '--prod'
+```
+
+##### Vercel Edge Functions:
+
+```javascript
+// api/edge/location.js
+export const config = {
+  runtime: "edge",
+};
+
+export default async function handler(request) {
+  const { nextUrl, geo } = request;
+  const country = geo.country || "US";
+  const city = geo.city || "Unknown";
+
+  return new Response(
+    JSON.stringify({
+      country,
+      city,
+      region: geo.region,
+      timestamp: new Date().toISOString(),
+    }),
+    {
+      status: 200,
+      headers: {
+        "content-type": "application/json",
+        "cache-control": "s-maxage=60",
+      },
+    }
+  );
+}
+```
+
+<BackToTop />
+
+#### Netlify - All-in-One Development Platform
+
+##### Comprehensive Netlify Configuration:
+
+```toml
+# netlify.toml
+[build]
+  publish = "dist"
+  command = "npm run build"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_VERSION = "8"
+
+# Branch-specific builds
+[context.production]
+  command = "npm run build:prod"
+
+[context.deploy-preview]
+  command = "npm run build:preview"
+
+[context.branch-deploy]
+  command = "npm run build:dev"
+
+# Headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+
+# Redirects and rewrites
+[[redirects]]
+  from = "/old-path/*"
+  to = "/new-path/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/api/proxy/*"
+  to = "https://external-api.com/:splat"
+  status = 200
+
+# SPA fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Form handling
+[[forms]]
+  name = "contact"
+  action = "/thank-you"
+
+# Edge functions
+[[edge_functions]]
+  function = "geolocation"
+  path = "/api/geo"
+
+# Split testing
+[context.production.environment]
+  FEATURE_FLAG_NEW_UI = "50%"
+```
+
+##### Netlify Functions:
+
+```javascript
+// netlify/functions/users.js
+exports.handler = async (event, context) => {
+  const { httpMethod, path, queryStringParameters, body } = event;
+
+  // CORS headers
+  const headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  };
+
+  // Handle preflight requests
+  if (httpMethod === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers,
+    };
+  }
+
+  try {
+    switch (httpMethod) {
+      case "GET":
+        const users = await getUsers(queryStringParameters);
+        return {
+          statusCode: 200,
+          headers: { ...headers, "Content-Type": "application/json" },
+          body: JSON.stringify(users),
+        };
+
+      case "POST":
+        const newUser = await createUser(JSON.parse(body));
+        return {
+          statusCode: 201,
+          headers: { ...headers, "Content-Type": "application/json" },
+          body: JSON.stringify(newUser),
+        };
+
+      default:
+        return {
+          statusCode: 405,
+          headers,
+          body: JSON.stringify({ error: "Method not allowed" }),
+        };
+    }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: error.message }),
+    };
+  }
+};
+```
+
+<BackToTop />
+
+### Cloud Platform Solutions
+
+#### AWS Amplify - Full-Stack Development Platform
+
+##### Amplify CLI Set-Up and Configuration:
+
+```bash
+# Initialize Amplify project
+amplify init
+
+# Add Authentication
+amplify add auth
+
+# Add API (GraphQL or REST)
+amplify add api
+
+# Add storage
+amplify add storage
+
+# Add hosting
+amplify add hosting
+
+# Deploy all resources
+amplify push
+
+# Deploy to production
+amplify publish
+```
+
+##### Amplify Configuration:
+
+```yaml
+# amplify.yml
+version: 1
+applications:
+  - frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm ci
+        build:
+          commands:
+            - npm run build
+      artifacts:
+        baseDirectory: build
+        files:
+          - "**/*"
+      cache:
+        paths:
+          - node_modules/**/*
+    appRoot: web
+  - backend:
+      phases:
+        build:
+          commands:
+            - "# Execute Amplify CLI with the helper script"
+            - amplifyPush --simple
+      appRoot: amplify
+```
+
+##### Amplify with React:
+
+```javascript
+// amplify/backend/api/schema.graphql
+type Todo @model @auth(rules: [{ allow: private }]) {
+  id: ID!
+  name: String!
+  description: String
+  completed: Boolean!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+// React component with Amplify
+import { API, graphqlOperation } from 'aws-amplify'
+import { listTodos, createTodo } from './graphql/queries'
+
+function TodoApp() {
+  const [todos, setTodos] = useState([])
+
+  useEffect(() => {
+    fetchTodos()
+  }, [])
+
+  async function fetchTodos() {
+    try {
+      const todoData = await API.graphql(graphqlOperation(listTodos))
+      const todos = todoData.data.listTodos.items
+      setTodos(todos)
+    } catch (error) {
+      console.error('Error fetching todos:', error)
+    }
+  }
+
+  async function addTodo(todoData) {
+    try {
+      const todo = { ...todoData, completed: false }
+      const newTodo = await API.graphql(graphqlOperation(createTodo, { input: todo }))
+      setTodos([...todos, newTodo.data.createTodo])
+    } catch (error) {
+      console.error('Error creating todo:', error)
+    }
+  }
+
+  return (
+    <div>
+      <TodoForm onSubmit={addTodo} />
+      <TodoList todos={todos} />
+    </div>
+  )
+}
+```
+
+<BackToTop />
+
+#### Firebase Hosting - Google's Web Hosting
+
+```json
+// firebase.json
+{
+  "hosting": {
+    "public": "build",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(jpg|jpeg|gif|png|svg|webp)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000"
+          }
+        ]
+      }
+    ],
+    "redirects": [
+      {
+        "source": "/old-page",
+        "destination": "/new-page",
+        "type": 301
+      }
+    ]
+  },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs18"
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}
+```
+
+```javascript
+// functions/index.js
+// Firebase Cloud Functions
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+
+admin.initializeApp();
+
+exports.processSignup = functions.auth.user().onCreate(async (user) => {
+  const { uid, email, displayName } = user;
+
+  // Create user profile in Firestore
+  await admin.firestore().collection("users").doc(uid).set({
+    email,
+    displayName,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    role: "user",
+  });
+
+  // Send welcome email
+  await sendWelcomeEmail(email, displayName);
+});
+
+exports.api = functions.https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+
+  if (req.method === "OPTIONS") {
+    res.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.status(204).send("");
+    return;
+  }
+
+  try {
+    const token = req.headers.authorization?.split("Bearer ")[1];
+    const decodedToken = await admin.auth().verifyIdToken(token);
+
+    // Handle authenticated requests
+    switch (req.method) {
+      case "GET":
+        const data = await getUserData(decodedToken.uid);
+        res.json(data);
+        break;
+      default:
+        res.status(405).json({ error: "Method not allowed" });
+    }
+  } catch (error) {
+    res.status(401).json({ error: "Unauthorized" });
+  }
+});
+```
+
+<BackToTop />
+
+### Traditional Cloud Providers
+
+#### DigitalOcean App Platform
+
+```yaml
+# .do/app.yaml
+name: my-web-app
+services:
+  - name: web
+    source_dir: /
+    github:
+      repo: your-username/your-repo
+      branch: main
+      deploy_on_push: true
+    run_command: npm start
+    environment_slug: node-js
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    routes:
+      - path: /
+    health_check:
+      http_path: /health
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: API_URL
+        value: https://api.example.com
+        type: SECRET
+
+  - name: api
+    source_dir: /api
+    run_command: node server.js
+    environment_slug: node-js
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    routes:
+      - path: /api
+    envs:
+      - key: DATABASE_URL
+        value: ${db.DATABASE_URL}
+
+databases:
+  - name: db
+    engine: PG
+    version: "13"
+    size: db-s-1vcpu-1gb
+```
+
+<BackToTop />
+#### Heroku - Cloud Application Platform
+
+```json
+// app.json
+{
+  "name": "my-web-app",
+  "description": "A modern web application",
+  "scripts": {
+    "postdeploy": "npm run migrate"
+  },
+  "env": {
+    "NODE_ENV": {
+      "description": "The environment to run the app in",
+      "value": "production"
+    },
+    "DATABASE_URL": {
+      "description": "Database connection URL",
+      "value": "postgres://user:password@localhost:5432/mydb"
+    },
+    "API_URL": {
+      "description": "API base URL",
+      "value": "https://api.example.com"
+    }
+  },
+  "addons": [
+    {
+      "plan": "heroku-postgresql",
+      "as": "DATABASE"
+    },
+    {
+      "plan": "heroku-redis",
+      "as": "REDIS"
+    }
+  ],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "standard-1x"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "scripts": {
+    "start": "node server.js",
+    "build": "npm run build",
+    "test": "npm test"
+  },
+  "keywords": ["web", "nodejs", "react"],
+  "repository": "your-github-repo-url",
+  "logo": "https://example.com/logo.png",
+  "website": "https://example.com",
+  "license": "MIT"
+}
+```
+
+```javascript
+// Procfile
+web: npm start
+worker: npm run worker
+release: npm run migrate
+```
+
+<BackToTop />
+
+#### Railway - Modern Deployment Platform
+
+```json
+// railway.json
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "npm start",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 100,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  }
+}
+
+// Dockerfile for custom builds
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY . .
+RUN npm run build
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
+```
+
+<BackToTop />
+
+### Content Delivery Networks (CDN)
+
+#### Cloudflare Pages
+
+##### Cloudflare Pages Configuration:
+
+```toml
+# _redirects
+/old-path/* /new-path/:splat 301
+/api/* https://api.example.com/:splat 200
+
+# _headers
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/assets/*
+  Cache-Control: max-age=31536000
+```
+
+##### Cloudflare Workers:
+
+```javascript
+export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+
+    // Geolocation-based routing
+    const country = request.cf.country;
+    if (country === "CN") {
+      return fetch("https://cn.example.com" + url.pathname);
+    }
+
+    // A/B testing
+    const shouldTest = Math.random() < 0.5;
+    if (shouldTest && url.pathname === "/") {
+      const response = await fetch(request);
+      return new HTMLRewriter()
+        .on("title", new ElementHandler("New Feature Test"))
+        .transform(response);
+    }
+
+    return fetch(request);
+  },
+};
+
+class ElementHandler {
+  constructor(content) {
+    this.content = content;
+  }
+
+  element(element) {
+    element.setInnerContent(this.content);
+  }
+}
+```
+
+<BackToTop />
+
+## Staying Current in Web Development
+
+### Essential Resources
+
+#### Documentation and Learning:
+
+- [MDN Web Docs](https://developer.mozilla.org/) - Comprehensive web development reference
+- [React Documentation](https://react.dev/) - Official React learning resources
+- [JavaScript.info](https://javascript.info/) - Modern JavaScript tutorial
+
+#### Community and News:
+
+- [Dev.to](https://dev.to/) - Developer community and articles
+- [Frontend Focus Newsletter](https://frontendfoc.us/) - Weekly frontend news
+- [JavaScript Weekly](https://javascriptweekly.com/) - JavaScript news and articles
+
+#### Practice Platforms:
+
+- [Frontend Mentor](https://www.frontendmentor.io/) - Real-world frontend challenges
+- [CodePen](https://codepen.io/) - Frontend playground and inspiration
+- [LeetCode](https://leetcode.com/) - Algorithm and coding practice
+
+### Building Your Portfolio
+
+#### Project Ideas for Your Portfolio:
+
+1. Personal Portfolio Website
+   - Showcase your skills and projects
+   - Use modern frameworks and tools
+   - Implement responsive design and animations
+
+2. E-commerce Product Page
+   - Product listings with filtering and search
+   - Shopping cart functionality
+   - User Authentication
+
+3. Dashboard/Admin Panel
+   - Data visualization with charts
+   - CRUD operations
+   - User management
+
+4. Real-time Application
+   - Chat application
+   - Live collaboration tool
+   - Social media feed
+
+5. API Integration Project
+   - Weather app with external API
+   - News aggregator
+   - Movie/book search application
+
+## Final Thoughts
+
+Web development is a journey of continuous learning. The technologies and best practices evolve rapidly, but the fundamentals you've learned in this course will serve as a solid foundation throughout your career.
+
+The last page of this guide is not the end, but rather a starting point for your web development journey. Whether you choose to specialize in frontend, backend, or full-stack development, remember that the key to success is practice, persistence, and a passion for building great applications.
+
+Take a look at the resources provided, engage with the community, and start building projects that excite you. The more you build, the more you'll learn, and the closer you'll get to becoming a proficient web developer.
+
+The last page is not the end, but rather a new beginning in your web development journey, and is located at [Continuing The Journey] Embrace the challenges, celebrate your successes, and keep pushing the boundaries of what you can create.
+
+### Key Takeaways:
+
+- Start with the basics: Master HTML, CSS, and JavaScript before moving to frameworks
+- Build projects: Practical experience is more valuable than theoretical knowledge
+- Join the community: Engage with other developers, ask questions, and share your work
+- Stay curious: Experiment with new technologies and keep learning
+- Focus on solving problems: Technology is just a tool; focus on building useful applications
+
+Remember, every expert was once a beginner. Take your time, practice consistently, and don't be afraid to make mistakes—they're an essential part of the learning process.
+
+**Ready to take the next step?** Choose one framework from this guide and start building your first project today!
+
+<BackToTop />

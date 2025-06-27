@@ -43,6 +43,10 @@ export function toSmartTitleCase(str: string): string {
     "v.",
   ]);
 
+  if (str.startsWith("use")) {
+    return str;
+  }
+
   if (str === "jQuery") {
     return "jQuery"; // Keep jQuery as is
   }

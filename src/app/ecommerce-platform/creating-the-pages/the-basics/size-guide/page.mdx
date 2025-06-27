@@ -232,13 +232,17 @@ const fitTips = [
 
 ### Explanation of the Code
 
-The code above defines the structure and content for the Size Guide page in a Next.js application. It includes:
+These structured data arrays form the core content architecture for the size guide page, organizing sizing information in a scalable and maintainable format that serves diverse customer needs. Each constant serves specific customer education and conversion optimization objectives:
 
-- **Categories**: An array of categories for different types of clothing.
-- **Garment Types**: An object that maps each category to its specific garment types.
-- **Sizing Data**: An object that contains size charts for different garment types, including headers and rows of data.
-- **Measurement Tips**: An array of tips for measuring different body parts, each with a title, description, and icon.
-- **Fit Tips**: An array of tips for ensuring a good fit, with each tip containing a title and content.
+**Category and garment type organization**: The hierarchical structure with categories (women's, men's, kids) and their associated garment types creates intuitive navigation that mirrors how customers think about shopping. The emoji icons provide immediate visual recognition while the nested garment types ensure users can quickly find relevant sizing information without scrolling through irrelevant categories.
+
+**Detailed sizing data structure**: The `sizingData` object provides accurate measurements for different garment types, with headers and rows formatted for clear table presentation. The inclusion of multiple measurement points (bust, waist, hips, length) ensures customers can make informed decisions based on their specific body measurements. Size ranges and specific measurements help reduce returns caused by poor fit.
+
+**Educational measurement tips**: The `measurementTips` array transforms abstract measurement requirements into actionable guidance with visual icons. Each tip includes both the measurement name and detailed instructions, helping customers understand not just what to measure but how to measure accurately. This educational approach builds customer confidence in their size selections.
+
+**Practical fit guidance**: The `fitTips` array addresses common sizing concerns and decision-making challenges that customers face when shopping online. These tips bridge the gap between measurements and real-world fit expectations, incorporating brand-specific guidance and general best practices that reduce sizing uncertainty.
+
+**Scalable content management**: By separating sizing data from presentation logic, this structure enables easy updates to size charts, addition of new product categories, or modification of measurement guidance without requiring code changes. New brands or product lines can be accommodated by extending the data structures while maintaining consistent user experience.
 
 ## Storing the Data
 
@@ -251,7 +255,13 @@ export default function SizeGuidePage() {
 
 ### Explanation of the Code
 
-The `SizeGuidePage` component initializes two pieces of state: `selectedCategory` and `selectedGarment`. These states will be used to dynamically display the appropriate size chart based on user selections.
+This section establishes the state management system that drives the interactive sizing experience, implementing a user-centric approach to size chart navigation. The state design includes several strategic considerations:
+
+**Default selection strategy**: The component initializes with "women" and "tops" as default selections, representing the most commonly searched sizing information based on typical e-commerce traffic patterns. This intelligent defaulting reduces clicks for the majority of users while ensuring the page displays meaningful content immediately upon load.
+
+**Controlled component pattern**: Both state variables use React's controlled component pattern through `useState`, ensuring the UI accurately reflects the current selection state and enabling predictable user interactions. This approach prevents interface inconsistencies that could confuse users during size chart exploration.
+
+**State synchronization**: The two-state system creates a dependent relationship where garment types update based on category selection. This hierarchical state management ensures users only see relevant garment options and prevents invalid category-garment combinations that could display empty or incorrect size charts.
 
 ## Getting the Category Data
 
@@ -269,7 +279,13 @@ const currentSizeData = getCurrentSizeData();
 
 ### Explanation of the Code
 
-The `getCurrentSizeData` function retrieves the size data for the currently selected category and garment type. It checks if the category exists in the `sizingData` object and returns the corresponding size chart data. If no data is found, it returns `null`.
+This function implements robust data retrieval logic that safely accesses nested sizing information while providing graceful fallbacks for edge cases. The implementation includes several important safety and user experience considerations:
+
+**Type-safe data access**: The function uses TypeScript's `keyof` operator to ensure type safety when accessing the deeply nested `sizingData` structure. This prevents runtime errors that could occur from invalid category or garment type combinations while maintaining code reliability.
+
+**Performance optimization**: The function performs direct object property access rather than array searching, ensuring consistent O(1) lookup performance regardless of the size of the data structure. This efficiency becomes important as the product catalog and sizing data grow.
+
+**Dynamic content delivery**: The function creates a reactive data pipeline where size chart content automatically updates whenever user selections change, providing immediate feedback without requiring page reloads or additional user actions.
 
 ## Rendering the Information
 
@@ -580,14 +596,21 @@ The `getCurrentSizeData` function retrieves the size data for the currently sele
 
 ### Explanation of the Code
 
-The `SizeGuidePage` component renders the entire Size Guide page. It includes:
+This section creates a multi-layered sizing resource that strategically reduces purchase hesitation and return rates through educational content and interactive tools. The page architecture encompasses several interconnected components designed to optimize customer confidence and conversion rates:
 
-- **Header**: A section with the title and description of the Size Guide.
-- **Size Selection**: A section with dropdowns for selecting the category and garment type.
-- **Size Chart**: A table displaying the size chart for the selected category and garment type.
-- **Measurement Tips**: A section with tips on how to measure different body parts.
-- **Fit Tips**: A section with tips for ensuring a good fit.
-- **Quick Reference**: A card with general sizing information and measurement tips.
+**Header section with clear value proposition**: The opening section immediately communicates the page's purpose through descriptive text that emphasizes finding "perfect fit" and "accurate sizing." This messaging reduces anxiety about online sizing while establishing the page as a trusted resource for purchase decisions.
+
+**Interactive category selection system**: The dual-dropdown interface enables users to narrow down sizing information to their specific needs without overwhelming them with irrelevant data. The category-first approach mirrors natural shopping behavior, while the dependent garment selection ensures users only see applicable options for their chosen category.
+
+**Dynamic size chart presentation**: The table component adapts to different garment types while maintaining consistent formatting and visual hierarchy. Size badges in the first column create visual distinction, while hover effects improve table readability. The responsive overflow handling ensures charts remain usable on mobile devices without losing essential information.
+
+**Educational measurement guidance**: The measurement tips section transforms complex sizing requirements into digestible, actionable guidance through icon-supported cards. Each tip addresses common measurement challenges while the visual layout makes information easy to scan and remember during actual measuring.
+
+**Practical fit consultation**: The fit tips section bridges the gap between measurements and real-world fit expectations, addressing psychological barriers to online clothing purchases. The card-based layout creates digestible content chunks while addressing common customer concerns like sizing between brands and fit preferences.
+
+**Support ecosystem integration**: The sidebar cards strategically place support options, exchange policies, and additional tools at key decision points. This integrated approach provides customers with confidence-building resources exactly when they need them most, reducing abandonment and increasing purchase completion rates.
+
+**Quick reference accessibility**: The final reference section provides at-a-glance sizing information that customers can bookmark or reference during future shopping sessions, creating lasting value that encourages return visits and brand loyalty.
 
 ## Next Steps
 

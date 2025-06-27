@@ -43,7 +43,7 @@ export function toSmartTitleCase(str: string): string {
     "v.",
   ]);
 
-  if (str.startsWith("use")) {
+  if (str.startsWith("use") && !str.startsWith("user")) {
     return str;
   }
 
@@ -417,6 +417,7 @@ function getPriority(title: string): number {
     normalizedTitle.includes("setting up") ||
     normalizedTitle.includes("set up") ||
     normalizedTitle.includes("getting started") ||
+    normalizedTitle.includes("main") ||
     normalizedTitle.includes("setup")
   )
     return 2;

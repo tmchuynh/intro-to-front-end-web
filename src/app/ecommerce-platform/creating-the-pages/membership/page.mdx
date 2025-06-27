@@ -30,7 +30,16 @@ export default function MembershipPage() {
 
 ### Explanation of the Code
 
-This code imports necessary modules and components for the Membership page, including authentication context, currency formatting, UI components, and utility functions. It sets up the page to display membership tiers and handle user interactions related to purchasing memberships.
+This section establishes the foundation for the membership page by importing all required dependencies and setting up the core functionality. The imports include several key elements:
+
+- **Authentication management**: The `useAuth` hook provides access to user login status, membership details, and purchase functions, while `membershipTiers` contains the available subscription options
+- **Currency handling**: The `useCurrency` hook ensures prices are displayed in the user's preferred format and locale
+- **UI components**: Material design elements like `Badge`, `Button`, and `Card` create a consistent visual experience throughout the page
+- **Navigation**: The `useRouter` hook enables programmatic navigation between pages when users need to log in or complete purchases
+- **State management**: The `useState` hook tracks which membership tier is currently being purchased to provide loading feedback
+- **User feedback**: The `toast` notifications inform users about the success or failure of their actions
+
+The component initializes by extracting user authentication data, currency formatting functions, and navigation capabilities. It also creates a local state variable to track purchase operations, ensuring users receive immediate feedback when they click purchase buttons.
 
 ## Handling Purchase
 
@@ -59,7 +68,17 @@ const handlePurchase = async (tierName: string) => {
 
 ### Explanation of the Code
 
-This function handles the purchase of a membership tier. It checks if the user is logged in, prompts them to log in if not, and then attempts to purchase the selected membership tier. It provides feedback to the user based on the success or failure of the purchase operation.
+This function manages the entire membership purchase workflow, implementing several layers of validation and user experience enhancements:
+
+**Authentication validation**: Before processing any purchase, the function verifies that the user is currently logged in. If authentication is missing, it displays an error message and redirects the user to the login page, preventing unauthorized purchase attempts.
+
+**Purchase state management**: The function updates the `purchasingTier` state to indicate which membership is being processed. This enables the UI to show loading indicators and disable buttons during the transaction, preventing duplicate purchases from accidental double-clicks.
+
+**Transaction processing**: The core purchase logic calls the `purchaseMembership` function from the authentication context, which handles the actual payment processing and membership activation. This separation of concerns keeps the UI logic focused on user interaction while delegating business logic to the appropriate context.
+
+**User feedback and navigation**: Based on the transaction result, the function provides immediate feedback through toast notifications. Successful purchases redirect users to their dashboard where they can see their new membership status, while failed transactions display error messages to help users understand what went wrong.
+
+**Cleanup**: Regardless of the outcome, the function resets the `purchasingTier` state to null, ensuring the UI returns to its normal state and buttons become clickable again.
 
 ## Displaying Membership Information
 
@@ -244,7 +263,19 @@ This function handles the purchase of a membership tier. It checks if the user i
 
 ### Explanation of the Code
 
-This code renders the Membership page, displaying available membership tiers with their benefits, prices, and a purchase button. It includes a section for logged-in users to see their current membership status and a list of benefits associated with each tier. The page is designed to be visually appealing and user-friendly, encouraging users to choose a membership that suits their needs.
+This section creates the complete visual layout and interactive elements for the membership page, implementing a multi-layered user interface that adapts to different user states and membership tiers:
+
+**Page structure and layout**: The component uses a full-screen container with responsive padding and maximum width constraints to ensure optimal viewing across all device sizes. The centered layout creates a professional appearance that guides users' attention to the membership options.
+
+**Dynamic user messaging**: The page intelligently displays different messages based on the user's authentication and membership status. Non-logged-in users see prompts to sign in or register, while existing members see confirmation of their current tier. This contextual messaging reduces confusion and provides clear next steps.
+
+**Membership tier cards**: Each membership option is rendered as an individual card component with distinctive visual indicators. The Premium tier receives special highlighting with scaling and border effects, while the user's current tier (if any) gets a prominent green border and status badge. This visual hierarchy helps users quickly identify recommended options and their current status.
+
+**Interactive elements**: Purchase buttons dynamically change their appearance and functionality based on user state - showing loading indicators during transactions, disable states for current plans, and sign-in prompts for unauthenticated users. This prevents user errors and provides clear feedback about available actions.
+
+**Benefits showcase**: The bottom section uses a grid layout to display membership benefits with consistent iconography and descriptions. Each benefit is represented by a colored icon circle and explanatory text, making the value proposition clear and scannable for potential subscribers.
+
+**Responsive design**: The entire layout adapts seamlessly from single-column mobile displays to multi-column desktop layouts, ensuring accessibility and usability across all devices and screen sizes.
 
 ## Next Steps
 

@@ -1,0 +1,461 @@
+import BackToTop from "@/components/BackToTop";
+
+# The Home Page
+
+## Table of Contents
+
+## Overview
+
+Finally! We have set up our e-commerce platform with Next.js, TypeScript, and Tailwind CSS. Now, we will create the home page of our e-commerce platform, which will serve as the landing page for users to explore products.
+
+##### TIP
+
+> The number lines within the code blocks will guide you through the code. They are accurate and will help you make sure you are editing the right parts of the code. The line numbers will be updated as you add more code, so they will always point to the correct lines.
+
+## Home Page Structure
+
+The home page will include the following sections:
+
+- **Header**: Contains the site logo, navigation links, and a search bar.
+- **Hero Section**: A large banner showcasing featured products or promotions.
+- **Product Categories**: A grid of product categories for easy navigation.
+- **Featured Products**: A section displaying featured products with images, titles, and prices.
+
+## Getting Set Up
+
+Per the section for [Introduction to Nextjs](/introduction-to-next.js/overview), this is going to be the skeleton of the page:
+
+```tsx title="HomePage.tsx"
+// src/app/page.tsx
+
+"use client";
+import { useEffect, useState } from "react";
+
+export default function HomePage() {
+  return <div>{/* Content of the page */}</div>;
+}
+```
+
+## The `import` Statements
+
+We will start by creating a new file for the home page at `src/app/ecommerce-platform/creating-the-pages/home-page/page.tsx`. In this file, we will import the necessary components and styles.
+
+```tsx
+// src/app/page.tsx
+"use client";
+import { getAllProducts } from "@/api/products";
+import ProductGrid from "@/components/products/ProductGrid";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { ProductItem } from "@/lib/interfaces/product";
+import { Package, ShoppingBag, Tag, TrendingUp } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+```
+
+##### Explanation of the Code
+
+## Fetching Products
+
+Right after the declaration of the `HomePage` component, we will fetch the products using the `getAllProducts` function. We will use the `useEffect` hook to fetch the products when the component mounts and store them in the state.
+
+```tsx startLineNumber=12
+// src/app/page.tsx
+
+export default function HomePage() {
+  // State to hold featured products
+  const [featuredProducts, setFeaturedProducts] = useState<ProductItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch featured products on component mount
+  useEffect(() => {
+    // Function to load featured products
+    const loadFeaturedProducts = async () => {
+      try {
+        // Set loading state to true while fetching
+        setLoading(true);
+
+        // Fetch all products from the API
+        const allProducts = await getAllProducts();
+
+        // Get a selection of featured products (first 8 products with good ratings)
+        const featured = allProducts
+          .filter((product) => product.price > 100)
+          .filter((product) => (product.rating || 0) >= 4.5)
+          .filter(
+            (product) =>
+              product.discountPercentage && product.discountPercentage > 2
+          )
+          .slice(0, 8);
+
+        // Update the state with featured products
+        setFeaturedProducts(featured);
+      } catch (error) {
+        // Handle any errors that occur during the fetch
+        setFeaturedProducts([]);
+        // Optionally log the error or show a notification
+        // For example, you can use console.error or a toast notification
+        // from a library like Sonner or react-toastify
+        // sonner.error("Failed to load featured products");
+        // or
+        // reactToastify.error("Failed to load featured products");
+        // For now, we will just log the error to the console
+        // You can replace this with a more user-friendly error handling
+        // mechanism later
+        console.error("Failed to load featured products:", error);
+      } finally {
+        // Set loading state to false after fetching
+        setLoading(false);
+      }
+    };
+
+    // Call the function to load featured products
+    loadFeaturedProducts();
+  }, []);
+}
+```
+
+##### Explanation of the Code
+
+<BackToTop />
+
+Now that we have fetched the featured products, we can render the home page. We will create a simple layout with a header, hero section, and product grid.
+
+## The Hero Section
+
+We will create a hero section that includes a title, subtitle, and a call-to-action button. This section will be visually appealing and encourage users to explore the products.
+
+```tsx startLineNumber=63 {"2":9-15} ins={"3":7}
+// src/app/page.tsx
+
+return (
+  <div>
+    {/* New Hero Section */}
+    <section className="relative -mt-15 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 h-[50em]  z-10 flex justify-center items-center px-6 min-h-[50em] text-center text-white" />
+      <div className="absolute inset-0">
+        <Image
+          src="https://plus.unsplash.com/premium_photo-1681488262364-8aeb1b6aac56?w=1920&auto=format&fit=crop&q=80&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fG9ubGluZSUyMHNob3BwaW5nfGVufDB8fDB8fHww"
+          alt="Hero background"
+          fill
+          className="opacity-20 h-[50em] object-cover object-center scale-105"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+      </div>
+    </section>
+  </div>
+);
+```
+
+##### Explanation of the Hero Section Code
+
+###### First Section
+
+1. First Section
+   - **Section Element**: We create a section with a relative position and negative top margin to overlap with the header.
+   - **Background Gradient**: We use Tailwind CSS classes to create a gradient background that transitions from purple to blue to indigo.
+2. The `Image` Component
+   - We use the `Image` component from Next.js to display a background image for the hero section. We use the `Image` component instead of a regular `<img>` tag for better performance and optimization.
+   - The `fill` prop allows the image to cover the entire section, and we apply styles to ensure it is centered and scaled appropriately.
+   - The `priority` prop indicates that this image should be loaded eagerly for better performance.
+3. Third Section
+   - **Overlay**: We add an overlay with a gradient to darken the background image, making the text more readable. This is done using another `div` with a gradient background that transitions from black to transparent.
+
+## The Call to Action Buttons
+
+Next, we will add a call-to-action button that encourages users to explore products. This button will be placed in the hero section.
+
+These buttons will link to the shopping page and the sales page, allowing users to easily navigate to these sections.
+
+```tsx startLineNumber=78 {"1":12-18} ins={"2":19-26}
+<div className="relative z-10 flex justify-center items-center px-6 min-h-[50em] text-center text-white">
+  <div className="mx-auto max-w-4xl">
+    <h1 className="mb-6 font-extrabold text-5xl md:text-7xl leading-tight">
+      Discover Your Next
+      <span className="block text-yellow-300">Favorite</span>
+    </h1>
+    <p className="opacity-90 mx-auto mb-10 max-w-2xl text-xl md:text-2xl leading-relaxed">
+      Explore our curated collection of high-quality products, designed to
+      inspire and delight.
+    </p>
+    <div className="flex sm:flex-row flex-col justify-center items-center gap-4">
+      <Button
+        asChild
+        size="lg"
+        className="bg-white hover:bg-gray-100 px-8 py-4 font-semibold text-lg text-purple-700"
+      >
+        <Link href="/shopping">Shop Now</Link>
+      </Button>
+      <Button
+        asChild
+        variant="outline"
+        size="lg"
+        className="hover:bg-white px-8 py-4 border-white font-semibold text-lg text-white hover:text-purple-700"
+      >
+        <Link href="/shopping/sale-items">View Sales</Link>
+      </Button>
+    </div>
+  </div>
+</div>
+```
+
+##### Explanation of the Call to Action Buttons Code
+
+- **Container**: We create a container with `flex` and `justify-center` to center the content horizontally and vertically.
+- **Heading**: The main heading uses Tailwind CSS classes for styling, including a large font size and bold weight. The text is split into two lines for emphasis.
+- **Paragraph**: A paragraph below the heading provides a brief description of the platform, using a slightly smaller font size and reduced opacity for a softer look.
+- **Buttons**: We create two buttons using the `Button` component:
+  - The first button links to the shopping page and has a white background with purple text. It uses the `asChild` prop to render a `Link` component inside the button.
+  - The second button links to the sales page and has an outline style with a white background and purple text on hover. It also uses the `asChild` prop to render a `Link` component inside the button.
+
+<BackToTop />
+
+## Setting Up the Main Content Area
+
+Right after the hero section, we will set up the main content area where we will display the featured products. This area will be styled to match the overall theme of the home page.
+
+```tsx startLineNumber=109
+// src/app/page.tsx
+
+<main className="mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-7xl container">
+  // Main Content goes here
+</main>
+```
+
+## Displaying Featured Products
+
+Now that we have the hero section and call-to-action buttons, we will display the featured products below the hero section. We will use the `ProductGrid` component to render the products in a grid layout.
+
+This portion of the code will conditionally render a loading state while the products are being fetched and display the products once they are available. It will be places right under the `section` element we created earlier, inside our new `main` element.
+
+```tsx startLineNumber=110 ins={"1":19-28} {"2": 30}
+// src/app/page.tsx
+
+<section aria-labelledby="featured-products-heading" className="py-16">
+  <div className="mb-12 text-center">
+    <h2
+      id="featured-products-heading"
+      className="font-bold text-3xl sm:text-4xl tracking-tight"
+    >
+      Featured Products
+    </h2>
+    <p className="mt-4 text-lg">Check out some of our most popular items.</p>
+  </div>
+  {/* Featured Products */}
+  {loading ? (
+    <div className="gap-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <Card key={i} className="animate-pulse">
+          <CardContent className="p-4">
+            <div className="bg-gray-200 mb-4 rounded h-48"></div>
+            <div className="bg-gray-200 mb-2 rounded h-4"></div>
+            <div className="bg-gray-200 rounded h-4 w-3/4"></div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  ) : (
+    <ProductGrid products={featuredProducts} />
+  )}
+</section>
+```
+
+##### Explanation of the Code
+
+## Displaying Categories
+
+We will also display product categories below the featured products. This section will help users navigate to different product categories easily.
+
+```tsx startLineNumber=137
+// src/app/page.tsx
+
+<section aria-labelledby="category-showcase-heading" className="py-16">
+  <div className="mb-12 text-center">
+    <h2
+      id="category-showcase-heading"
+      className="font-bold text-3xl sm:text-4xl tracking-tight"
+    >
+      Shop by Category
+    </h2>
+    <p className="mt-4 text-lg">Find what you're looking for with ease.</p>
+  </div>
+  <div className="gap-6 grid grid-cols-1 md:grid-cols-3">
+    {/* Featured large category card */}
+    <div className="md:col-span-2">
+      <Link
+        href="/shopping"
+        className="block group relative shadow-lg rounded-2xl h-96 overflow-hidden"
+      >
+        <Image
+          src="https://plus.unsplash.com/premium_photo-1699973055451-c2061752297b?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDE4fHx8ZW58MHx8fHx8%3D"
+          alt="All Products"
+          fill
+          className="duration-500 transition-transform object-cover group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent via-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+          <h3 className="mb-2 font-bold text-3xl">All Products</h3>
+          <p className="opacity-90 text-lg">Browse our complete collection</p>
+        </div>
+      </Link>
+    </div>
+
+    {/* Smaller category cards */}
+    <div className="space-y-6">
+      <Link
+        href="/shopping/sale-items"
+        className="block group relative shadow-lg rounded-2xl h-44 overflow-hidden"
+      >
+        <Image
+          src="https://plus.unsplash.com/premium_photo-1683121041726-3b192f629fa5?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDV8fHxlbnwwfHx8fHw%3D"
+          alt="Sale Items"
+          fill
+          className="duration-500 transition-transform object-cover group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent via-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+          <h3 className="mb-1 font-bold text-xl">Sale Items</h3>
+          <p className="opacity-90 text-sm">Great deals and discounts</p>
+        </div>
+      </Link>
+
+      <Link
+        href="/shopping/categories"
+        className="block group relative shadow-lg rounded-2xl h-44 overflow-hidden"
+      >
+        <Image
+          src="https://plus.unsplash.com/premium_photo-1700056213493-d2a2747c76be?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fHNhbGVzJTIwc2hvcHBpbmd8ZW58MHx8MHx8fDA%3D"
+          alt="Categories"
+          fill
+          className="duration-500 transition-transform object-cover group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent via-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+          <h3 className="mb-1 font-bold text-xl">Categories</h3>
+          <p className="opacity-90 text-sm">Shop by product category</p>
+        </div>
+      </Link>
+    </div>
+  </div>
+</section>
+```
+
+##### Explanation of the Code
+
+## Why Shop with Us?
+
+Finally, we will add a section that highlights the benefits of shopping with us. This section will include icons and brief descriptions of our key features.
+
+```tsx startLineNumber=179
+// src/app/page.tsx
+<section className="py-16">
+  <div className="mb-12 text-center">
+    <h2 className="font-bold text-3xl sm:text-4xl tracking-tight">
+      Why Shop With Us
+    </h2>
+    <p className="mt-4 text-lg">
+      Experience the best in online shopping with these benefits.
+    </p>
+  </div>
+  <div className="gap-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+    <Card className="p-6 text-center">
+      <CardContent className="p-0">
+        <div className="flex justify-center mb-4">
+          <ShoppingBag className="h-12 w-12 text-purple-600" />
+        </div>
+        <h3 className="mb-2 font-semibold text-lg">Free Shipping</h3>
+        <p className="">Free shipping on orders over $50</p>
+      </CardContent>
+    </Card>
+    <Card className="p-6 text-center">
+      <CardContent className="p-0">
+        <div className="flex justify-center mb-4">
+          <Package className="h-12 w-12 text-purple-600" />
+        </div>
+        <h3 className="mb-2 font-semibold text-lg">Fast Delivery</h3>
+        <p className="">2-3 day delivery nationwide</p>
+      </CardContent>
+    </Card>
+    <Card className="p-6 text-center">
+      <CardContent className="p-0">
+        <div className="flex justify-center mb-4">
+          <Tag className="h-12 w-12 text-purple-600" />
+        </div>
+        <h3 className="mb-2 font-semibold text-lg">Best Prices</h3>
+        <p className="">Competitive prices with regular sales</p>
+      </CardContent>
+    </Card>
+    <Card className="p-6 text-center">
+      <CardContent className="p-0">
+        <div className="flex justify-center mb-4">
+          <TrendingUp className="h-12 w-12 text-purple-600" />
+        </div>
+        <h3 className="mb-2 font-semibold text-lg">Quality Products</h3>
+        <p className="">Curated selection of high-quality items</p>
+      </CardContent>
+    </Card>
+  </div>
+</section>
+```
+
+##### Explanation of the Code
+
+## Call to Action
+
+Finally, we will add a call-to-action section at the bottom of the home page to encourage users to start shopping or explore more products.
+
+```tsx startLineNumber=227
+// src/app/page.tsx
+<section className="py-16 text-center">
+  <h2 className="mb-6 font-bold text-3xl sm:text-4xl tracking-tight">
+    Join Our Community
+  </h2>
+  <p className="mb-8 mx-auto max-w-xl text-lg">
+    Sign up for our newsletter to get the latest updates on new arrivals,
+    special offers, and more.
+  </p>
+  <form className="sm:flex items-center mx-auto max-w-md">
+    <label htmlFor="email-address" className="sr-only">
+      Email address
+    </label>
+    <Input
+      id="email-address"
+      name="email"
+      type="email"
+      autoComplete="email"
+      required
+      placeholder="Enter your email"
+    />
+    <div className="sm:flex-shrink-0 sm:ml-3 md:mt-2">
+      <Button type="submit" variant={"modern"} className="m-0 w-full">
+        Subscribe
+      </Button>
+    </div>
+  </form>
+</section>
+```
+
+##### Explanation of the Code
+
+## Don't forget to Close the Elements
+
+Finally, we will close the `main` element and the `HomePage` component.
+
+```tsx startLineNumber=254
+// src/app/page.tsx
+      </main>
+    </div>
+  );
+}
+```
+
+## Next Steps
+
+Next, we will implement the product listing and detail pages using the API functions we just created. This will involve creating components to display products, categories, and product details, as well as integrating the API calls into our React components.
+
+Go to [The Shopping Page](/ecommerce-platform/creating-the-pages/shopping) to continue building out your e-commerce platform.
+
+<BackToTop />

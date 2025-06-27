@@ -1,0 +1,1261 @@
+import BackToTop from "@/components/BackToTop";
+
+# The Checkout Page
+
+## Table of Contents
+
+## Page Structure
+
+## The `import` Statements
+
+```tsx startLineNumber=1
+// src/app/checkout/page.tsx
+"use client";
+
+import { fetchRandomUser } from "@/api/users";
+import { useAuth } from "@/app/context/authContext";
+import { useCart } from "@/app/context/cartContext";
+import { useCurrency } from "@/app/context/currencyContext";
+import { useOrder } from "@/app/context/orderContext";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  ArrowLeft,
+  CreditCard,
+  Lock,
+  MapPin,
+  Package,
+  Shuffle,
+  Truck,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+```
+
+## Using the Hooks
+
+```tsx startLineNumber=37
+// src/app/checkout/page.tsx
+export default function CheckoutPage() {
+  const router = useRouter();
+  const {
+    items,
+    grandTotal,
+    totalPrice,
+    discountAmount,
+    shippingFee,
+    membershipDiscount,
+    appliedDiscount,
+    clearCart,
+  } = useCart();
+  const { formatPrice } = useCurrency();
+  const { user } = useAuth();
+  const { createOrder } = useOrder();
+```
+
+##### Explanation of the Code
+
+The `CheckoutPage` component is the main entry point for the checkout process. It imports necessary hooks and components, such as `useCart`, `useAuth`, and `useOrder`, to manage the cart, user authentication, and order creation respectively. The `router` from Next.js is used for navigation.
+
+## Storing the Data
+
+```tsx startLineNumber=52
+// src/app/checkout/page.tsx
+const [isProcessing, setIsProcessing] = useState(false);
+const [currentStep, setCurrentStep] = useState(1);
+const [sameAsBilling, setSameAsBilling] = useState(false);
+const [paymentMethod, setPaymentMethod] = useState("card");
+const [selectedShippingTier, setSelectedShippingTier] = useState("standard");
+
+// Shipping information
+const [shippingInfo, setShippingInfo] = useState({
+  fullName: user?.username || "",
+  email: user?.email || "",
+  phone: user?.phoneNumber || "",
+  address: "",
+  city: "",
+  state: "",
+  zipCode: "",
+  country: "United States",
+});
+
+// Billing information
+const [billingInfo, setBillingInfo] = useState({
+  fullName: user?.username || "",
+  email: user?.email || "",
+  address: "",
+  city: "",
+  state: "",
+  zipCode: "",
+  country: "United States",
+  cardNumber: "",
+  expiryDate: "",
+  cvv: "",
+  nameOnCard: "",
+});
+
+const [specialInstructions, setSpecialInstructions] = useState("");
+const [isLoadingAutofill, setIsLoadingAutofill] = useState(false);
+```
+
+##### Explanation of the Code
+
+This section initializes various state variables using the `useState` hook. These states include:
+
+- `isProcessing`: Indicates if the checkout process is currently being processed.
+- `currentStep`: Tracks the current step in the checkout process.
+- `sameAsBilling`: A boolean to determine if the shipping address is the same as the billing address.
+- `paymentMethod`: Stores the selected payment method (e.g., card, PayPal).
+- `selectedShippingTier`: Stores the selected shipping tier (e.g., standard, express).
+- `shippingInfo` and `billingInfo`: Objects to hold the user's shipping and billing information.
+- `specialInstructions`: Holds any special instructions provided by the user.
+
+## The Shipping Tiers
+
+```tsx startLineNumber=87
+// src/app/checkout/page.tsx
+const shippingTiers = [
+  {
+    id: "standard",
+    name: "Standard Shipping",
+    price: 5.99,
+    deliveryTime: "5-7 business days",
+    description: "Free on orders over $50",
+  },
+  {
+    id: "express",
+    name: "Express Shipping",
+    price: 12.99,
+    deliveryTime: "2-3 business days",
+    description: "Faster delivery",
+  },
+  {
+    id: "next-day",
+    name: "Next Day Delivery",
+    price: 19.99,
+    deliveryTime: "1 business day",
+    description: "Order by 2 PM for next day delivery",
+    premiumFree: true, // Free for Premium and VIP members
+  },
+  {
+    id: "overnight",
+    name: "Overnight Express",
+    price: 29.99,
+    deliveryTime: "Next morning by 10 AM",
+    description: "Premium overnight service",
+    vipFree: true, // Free for VIP members on select items
+    vipOnly: false, // Available to all, but free for VIP
+  },
+];
+```
+
+## Getting Data from the Logged in User
+
+```tsx startLineNumber=120
+// src/app/checkout/page.tsx
+const userMembershipTier = user?.membershipTier?.name?.toLowerCase() || "none";
+const isPremiumOrVip = ["premium", "vip"].includes(userMembershipTier);
+const isVip = userMembershipTier === "vip";
+
+// Check if any items qualify for VIP free overnight shipping
+const hasVipEligibleItems = items.some(
+  (item) =>
+    // You can customize this logic based on your business rules
+    // For example: electronics, premium brands, or high-value items
+    item.price > 100 || item.category?.toLowerCase().includes("electronics")
+);
+```
+
+##### Explanation of the Code
+
+## Auto Filling the Form
+
+This data will be coming from the API.
+
+### Shipping Information
+
+```tsx startLineNumber=131
+// src/app/checkout/page.tsx
+const autofillShippingInfo = async () => {
+  setIsLoadingAutofill(true);
+  try {
+    let shippingData;
+
+    if (user) {
+      // Use logged-in user's data
+      shippingData = {
+        fullName: user.username || "John Doe",
+        email: user.email || "user@example.com",
+        phone: user.phoneNumber || "555-123-4567",
+        address: "123 Main Street",
+        city: "Sample City",
+        state: "CA",
+        zipCode: "90210",
+        country: "United States",
+      };
+    } else {
+      // Fall back to random user if no user is logged in
+      const randomUser = await fetchRandomUser();
+      shippingData = {
+        fullName: `${randomUser.firstName} ${randomUser.lastName}`,
+        email: randomUser.email,
+        phone: randomUser.phone,
+        address: randomUser.address.address,
+        city: randomUser.address.city,
+        state: randomUser.address.state,
+        zipCode: randomUser.address.postalCode,
+        country: "United States",
+      };
+    }
+
+    setShippingInfo(shippingData);
+
+    // Auto-fill billing if same as shipping
+    if (sameAsBilling) {
+      setBillingInfo((prev) => ({
+        ...prev,
+        fullName: shippingData.fullName,
+        address: shippingData.address,
+        city: shippingData.city,
+        state: shippingData.state,
+        zipCode: shippingData.zipCode,
+        country: shippingData.country,
+      }));
+    }
+
+    toast.success(
+      user
+        ? "User shipping info filled!"
+        : "Demo shipping info filled! (Note: This is fake data for testing purposes)"
+    );
+  } catch (error) {
+    toast.error("Failed to load demo data");
+  } finally {
+    setIsLoadingAutofill(false);
+  }
+};
+```
+
+##### Explanation of the Code
+
+### Payment Information
+
+```tsx startLineNumber=189
+// src/app/checkout/page.tsx
+const autofillPaymentInfo = async () => {
+  setIsLoadingAutofill(true);
+  try {
+    let paymentData;
+
+    if (user) {
+      // Use consistent demo payment data for logged-in user
+      const currentYear = new Date().getFullYear();
+      const expiryYear = currentYear + 2; // Always 2 years from now for consistency
+      const expiryDate = `12/${expiryYear.toString().slice(-2)}`;
+
+      paymentData = {
+        cardNumber: "4532 1234 5678 9012", // Demo Visa card
+        expiryDate: expiryDate,
+        cvv: "123",
+        nameOnCard: user.username || "John Doe",
+      };
+    } else {
+      // Fall back to random user if no user is logged in
+      const randomUser = await fetchRandomUser();
+
+      // Generate a random expiry date (future date)
+      const currentYear = new Date().getFullYear();
+      const expiryYear = currentYear + Math.floor(Math.random() * 5) + 1;
+      const expiryMonth = Math.floor(Math.random() * 12) + 1;
+      const expiryDate = `${expiryMonth
+        .toString()
+        .padStart(2, "0")}/${expiryYear.toString().slice(-2)}`;
+
+      // Generate a random CVV
+      const cvv = Math.floor(Math.random() * 900) + 100;
+
+      paymentData = {
+        cardNumber: randomUser.bank.cardNumber,
+        expiryDate: expiryDate,
+        cvv: cvv.toString(),
+        nameOnCard: `${randomUser.firstName} ${randomUser.lastName}`,
+      };
+    }
+
+    setBillingInfo((prev) => ({
+      ...prev,
+      ...paymentData,
+    }));
+
+    toast.success(
+      user
+        ? "User payment info filled!"
+        : "Demo payment info filled! (Note: This is fake data for testing purposes)"
+    );
+  } catch (error) {
+    toast.error("Failed to load demo data");
+  } finally {
+    setIsLoadingAutofill(false);
+  }
+};
+```
+
+##### Explanation of the Code
+
+## Handle Billing Information Same as Shipping
+
+```tsx startLineNumber=245
+// src/app/checkout/page.tsx
+const handleSameAsBillingChange = (checked: boolean) => {
+  setSameAsBilling(checked);
+  if (checked) {
+    setBillingInfo((prev) => ({
+      ...prev,
+      fullName: shippingInfo.fullName,
+      address: shippingInfo.address,
+      city: shippingInfo.city,
+      state: shippingInfo.state,
+      zipCode: shippingInfo.zipCode,
+      country: shippingInfo.country,
+    }));
+  }
+};
+```
+
+##### Explanation of the Code
+
+## Validating the Form
+
+### Shipping Information Validation
+
+```tsx startLineNumber=259
+// src/app/checkout/page.tsx
+const validateShipping = () => {
+  const required = [
+    "fullName",
+    "email",
+    "phone",
+    "address",
+    "city",
+    "state",
+    "zipCode",
+  ];
+  return required.every((field) =>
+    shippingInfo[field as keyof typeof shippingInfo]?.trim()
+  );
+};
+```
+
+##### Explanation of the Code
+
+### Billing Information Validation
+
+```tsx startLineNumber=273
+// src/app/checkout/page.tsx
+const validateBilling = () => {
+  const required = ["fullName", "address", "city", "state", "zipCode"];
+  const billingValid =
+    sameAsBilling ||
+    required.every((field) =>
+      billingInfo[field as keyof typeof billingInfo]?.trim()
+    );
+
+  // Always require card details since card is the only payment method
+  return (
+    billingValid &&
+    billingInfo.cardNumber &&
+    billingInfo.expiryDate &&
+    billingInfo.cvv &&
+    billingInfo.nameOnCard
+  );
+};
+```
+
+##### Explanation of the Code
+
+## Handling Form Change
+
+### Shipping Information Change
+
+```tsx startLineNumber=290
+// src/app/checkout/page.tsx
+const handleShippingChange = (field: string, value: string) => {
+  setShippingInfo((prev) => ({ ...prev, [field]: value }));
+
+  // Auto-fill billing if same as shipping
+  if (
+    sameAsBilling &&
+    ["fullName", "address", "city", "state", "zipCode", "country"].includes(
+      field
+    )
+  ) {
+    setBillingInfo((prev) => ({ ...prev, [field]: value }));
+  }
+};
+```
+
+##### Explanation of the Code
+
+### Billing Information Change
+
+```tsx startLineNumber=303
+const handleBillingChange = (field: string, value: string) => {
+  setBillingInfo((prev) => ({ ...prev, [field]: value }));
+};
+```
+
+## Running The Tests
+
+### Payment Validation Test
+
+### Address Validation Test
+
+### Contact Validation Test
+
+## Calculating Shipping Cost
+
+##### Explanation of the Code
+
+## Implementing Navigation Buttons
+
+### Handling Next and Back
+
+```tsx startLineNumber=306
+// src/app/checkout/page.tsx
+const handleNext = () => {
+  if (currentStep === 1 && !validateShipping()) {
+    toast.error("Please fill in all shipping information");
+    return;
+  }
+  if (currentStep === 2 && !validateBilling()) {
+    toast.error("Please fill in all billing and payment information");
+    return;
+  }
+  setCurrentStep((prev) => prev + 1);
+};
+
+const handleBack = () => {
+  setCurrentStep((prev) => prev - 1);
+};
+```
+
+##### Explanation of the Code
+
+### Handle Place Order
+
+```tsx startLineNumber=321
+// src/app/checkout/page.tsx
+const handlePlaceOrder = async () => {
+  if (!validateShipping() || !validateBilling()) {
+    toast.error("Please complete all required information");
+    return;
+  }
+
+  setIsProcessing(true);
+
+  try {
+    const finalGrandTotal =
+      totalPrice - discountAmount - membershipDiscount + dynamicShippingFee;
+    const selectedTier = shippingTiers.find(
+      (t) => t.id === selectedShippingTier
+    );
+
+    const result = await createOrder(
+      items,
+      {
+        totalAmount: totalPrice,
+        discountAmount,
+        membershipDiscount,
+        shippingFee: dynamicShippingFee,
+        grandTotal: finalGrandTotal,
+        discountCode: appliedDiscount?.rule.code,
+        shippingTier: selectedTier?.name || "Standard Shipping",
+      },
+      shippingInfo,
+      billingInfo,
+      paymentMethod
+    );
+
+    if (result.success) {
+      clearCart();
+      toast.success("Order placed successfully!");
+      router.push(`/checkout/confirmation?orderId=${result.orderId}`);
+    } else {
+      toast.error(result.message);
+    }
+  } catch (error) {
+    toast.error("Something went wrong. Please try again.");
+  } finally {
+    setIsProcessing(false);
+  }
+};
+```
+
+##### Explanation of the Code
+
+## Checking the Cart State
+
+```tsx startLineNumber=365
+// src/app/checkout/page.tsx
+if (items.length === 0) {
+  return (
+    <div className="min-h-screen">
+      <div className="mx-auto px-6 lg:px-8 py-12 max-w-7xl">
+        <div className="py-16 text-center">
+          <Package className="mx-auto mb-4 w-16 h-16 text-muted-foreground" />
+          <h1 className="mb-2 font-bold text-2xl">Your cart is empty</h1>
+          <p className="mb-6 text-muted-foreground">
+            Add some items to your cart before checkout
+          </p>
+          <Button asChild>
+            <Link href="/shopping">Continue Shopping</Link>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+##### Explanation of the Code
+
+## Rendering the Checkout Form
+
+```tsx startLineNumber=383
+// src/app/checkout/page.tsx
+  return (
+    <div className="min-h-screen">
+      <div className="mx-auto px-6 lg:px-8 py-12 max-w-7xl">
+        {/* Header */}
+        <div className="mb-8">
+          <Button variant="ghost" asChild className="mb-4">
+            <Link href="/cart">
+              <ArrowLeft className="mr-2 w-4 h-4" />
+              Back to Cart
+            </Link>
+          </Button>
+          <h1 className="font-bold text-3xl">Checkout</h1>
+          <p className="text-muted-foreground">Complete your order</p>
+        </div>
+
+        {/* Progress Steps */}
+        <div className="mb-8">
+          <div className="flex justify-center items-center space-x-4">
+            {[
+              { step: 1, title: "Shipping", icon: Truck },
+              { step: 2, title: "Payment", icon: CreditCard },
+              { step: 3, title: "Review", icon: Package },
+            ].map(({ step, title, icon: Icon }) => (
+              <div key={step} className="flex items-center">
+                <div
+                  className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                    currentStep >= step
+                      ? " border-primary"
+                      : "bg-background text-muted-foreground border-muted"
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                </div>
+                <span
+                  className={`ml-2 text-sm font-medium ${
+                    currentStep >= step
+                      ? "text-foreground"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  {title}
+                </span>
+                {step < 3 && <div className="bg-muted mx-4 w-8 h-px" />}
+              </div>
+            ))}
+          </div>
+        </div>
+```
+
+##### Explanation of the Code
+
+```tsx startLineNumber=430
+// src/app/checkout/page.tsx
+        <div className="gap-8 grid grid-cols-1 lg:grid-cols-3">
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            {/* Step 1: Shipping Information */}
+            {currentStep === 1 && (
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="flex items-center">
+                      <Truck className="mr-2 w-5 h-5" />
+                      Shipping Information
+                    </CardTitle>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={autofillShippingInfo}
+                      disabled={isLoadingAutofill}
+                      className="text-xs"
+                    >
+                      <Shuffle className="mr-1 w-3 h-3" />
+                      {isLoadingAutofill
+                        ? "Loading..."
+                        : user
+                        ? "Fill My Info"
+                        : "Fill Demo Data"}
+                    </Button>
+                  </div>
+                  <p className="text-muted-foreground text-xs">
+                    {user
+                      ? "Autofill uses your account information with sample address data"
+                      : "Demo autofill uses fake data from DummyJSON for testing purposes only"}
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
+                    <div>
+                      <Label htmlFor="fullName">Full Name *</Label>
+                      <Input
+                        id="fullName"
+                        value={shippingInfo.fullName}
+                        onChange={(e) =>
+                          handleShippingChange("fullName", e.target.value)
+                        }
+                        placeholder="Enter your full name"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="email">Email *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={shippingInfo.email}
+                        onChange={(e) =>
+                          handleShippingChange("email", e.target.value)
+                        }
+                        placeholder="Enter your email"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="phone">Phone Number *</Label>
+                    <Input
+                      id="phone"
+                      value={shippingInfo.phone}
+                      onChange={(e) =>
+                        handleShippingChange("phone", e.target.value)
+                      }
+                      placeholder="Enter your phone number"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="address">Address *</Label>
+                    <Input
+                      id="address"
+                      value={shippingInfo.address}
+                      onChange={(e) =>
+                        handleShippingChange("address", e.target.value)
+                      }
+                      placeholder="Enter your street address"
+                    />
+                  </div>
+
+                  <div className="gap-4 grid grid-cols-1 md:grid-cols-3">
+                    <div>
+                      <Label htmlFor="city">City *</Label>
+                      <Input
+                        id="city"
+                        value={shippingInfo.city}
+                        onChange={(e) =>
+                          handleShippingChange("city", e.target.value)
+                        }
+                        placeholder="City"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="state">State *</Label>
+                      <Input
+                        id="state"
+                        value={shippingInfo.state}
+                        onChange={(e) =>
+                          handleShippingChange("state", e.target.value)
+                        }
+                        placeholder="State"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="zipCode">ZIP Code *</Label>
+                      <Input
+                        id="zipCode"
+                        value={shippingInfo.zipCode}
+                        onChange={(e) =>
+                          handleShippingChange("zipCode", e.target.value)
+                        }
+                        placeholder="ZIP Code"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="country">Country *</Label>
+                    <Select
+                      value={shippingInfo.country}
+                      onValueChange={(value) =>
+                        handleShippingChange("country", value)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="United States">
+                          United States
+                        </SelectItem>
+                        <SelectItem value="Canada">Canada</SelectItem>
+                        <SelectItem value="United Kingdom">
+                          United Kingdom
+                        </SelectItem>
+                        <SelectItem value="Australia">Australia</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+```
+
+##### Explanation of the Code
+
+```tsx startLineNumber=573
+// src/app/checkout/page.tsx
+                  {/* Shipping Tier Selection */}
+                  <div className="space-y-4">
+                    <div>
+                      <Label>Shipping Options</Label>
+                      <div className="space-y-3 mt-2">
+                        {shippingTiers.map((tier) => {
+                          const isFree =
+                            (tier.id === "standard" && totalPrice >= 50) ||
+                            (tier.id === "next-day" && isPremiumOrVip) ||
+                            (tier.id === "overnight" &&
+                              isVip &&
+                              hasVipEligibleItems);
+
+                          const price = isFree ? 0 : tier.price;
+                          const isRecommended =
+                            tier.id === "next-day" && isPremiumOrVip;
+
+                          return (
+                            <div
+                              key={tier.id}
+                              className={`border rounded-lg p-4 cursor-pointer transition-colors ${
+                                selectedShippingTier === tier.id
+                                  ? "border-primary bg-primary/5"
+                                  : "border-border hover:border-primary/50"
+                              } ${
+                                isRecommended ? "ring-2 ring-primary/20" : ""
+                              }`}
+                              onClick={() => setSelectedShippingTier(tier.id)}
+                            >
+                              <div className="flex justify-between items-center">
+                                <div className="flex items-center space-x-3">
+                                  <input
+                                    type="radio"
+                                    name="shipping"
+                                    value={tier.id}
+                                    checked={selectedShippingTier === tier.id}
+                                    onChange={() =>
+                                      setSelectedShippingTier(tier.id)
+                                    }
+                                    className="text-primary"
+                                  />
+                                  <div>
+                                    <div className="flex items-center gap-2">
+                                      <p className="font-medium">{tier.name}</p>
+                                      {isRecommended && (
+                                        <span className="bg-primary px-2 py-1 rounded-full text-primary-foreground text-xs">
+                                          Recommended
+                                        </span>
+                                      )}
+                                      {isFree && (
+                                        <span className="bg-green-100 px-2 py-1 rounded-full text-green-800 text-xs">
+                                          FREE
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-muted-foreground text-sm">
+                                      {tier.deliveryTime} • {tier.description}
+                                    </p>
+                                    {tier.id === "next-day" &&
+                                      isPremiumOrVip && (
+                                        <p className="mt-1 text-blue-600 text-xs">
+                                          ✨ Free with {userMembershipTier}{" "}
+                                          membership
+                                        </p>
+                                      )}
+                                    {tier.id === "overnight" &&
+                                      isVip &&
+                                      hasVipEligibleItems && (
+                                        <p className="mt-1 text-purple-600 text-xs">
+                                          👑 Free VIP overnight on eligible
+                                          items
+                                        </p>
+                                      )}
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <p
+                                    className={`font-semibold ${
+                                      isFree ? "text-green-600" : ""
+                                    }`}
+                                  >
+                                    {price === 0 ? "FREE" : formatPrice(price)}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-4">
+                    <Button onClick={handleNext} disabled={!validateShipping()}>
+                      Continue to Payment
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+```
+
+##### Explanation of the Code
+
+```tsx startLineNumber=673
+// src/app/checkout/page.tsx
+            {/* Step 2: Payment Information */}
+            {currentStep === 2 && (
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <div className="flex justify-between items-center">
+                      <CardTitle className="flex items-center">
+                        <CreditCard className="mr-2 w-5 h-5" />
+                        Payment Method
+                      </CardTitle>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={autofillPaymentInfo}
+                        disabled={isLoadingAutofill}
+                        className="text-xs"
+                      >
+                        <Shuffle className="mr-1 w-3 h-3" />
+                        {isLoadingAutofill
+                          ? "Loading..."
+                          : user
+                          ? "Fill My Info"
+                          : "Fill Demo Data"}
+                      </Button>
+                    </div>
+                    <p className="text-muted-foreground text-xs">
+                      {user
+                        ? "Autofill uses your account name with demo payment data for testing"
+                        : "Demo autofill uses fake payment data for testing purposes only"}
+                    </p>
+                  </CardHeader>
+                  <CardContent>
+                    <RadioGroup
+                      value={paymentMethod}
+                      onValueChange={setPaymentMethod}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="card" id="card" />
+                        <Label htmlFor="card">Credit/Debit Card</Label>
+                      </div>
+                    </RadioGroup>
+
+                    <div className="space-y-4 mt-6">
+                      <div>
+                        <Label htmlFor="nameOnCard">Name on Card *</Label>
+                        <Input
+                          id="nameOnCard"
+                          value={billingInfo.nameOnCard}
+                          onChange={(e) =>
+                            handleBillingChange("nameOnCard", e.target.value)
+                          }
+                          placeholder="Enter name as it appears on card"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="cardNumber">Card Number *</Label>
+                        <Input
+                          id="cardNumber"
+                          value={billingInfo.cardNumber}
+                          onChange={(e) =>
+                            handleBillingChange("cardNumber", e.target.value)
+                          }
+                          placeholder="1234 5678 9012 3456"
+                        />
+                      </div>
+                      <div className="gap-4 grid grid-cols-2">
+                        <div>
+                          <Label htmlFor="expiryDate">Expiry Date *</Label>
+                          <Input
+                            id="expiryDate"
+                            value={billingInfo.expiryDate}
+                            onChange={(e) =>
+                              handleBillingChange("expiryDate", e.target.value)
+                            }
+                            placeholder="MM/YY"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="cvv">CVV *</Label>
+                          <Input
+                            id="cvv"
+                            value={billingInfo.cvv}
+                            onChange={(e) =>
+                              handleBillingChange("cvv", e.target.value)
+                            }
+                            placeholder="123"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+```
+
+##### Explanation of the Code
+
+```tsx startLineNumber=765
+// src/app/checkout/page.tsx
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <MapPin className="mr-2 w-5 h-5" />
+                      Billing Address
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="sameAsBilling"
+                        checked={sameAsBilling}
+                        onCheckedChange={handleSameAsBillingChange}
+                      />
+                      <Label htmlFor="sameAsBilling">
+                        Same as shipping address
+                      </Label>
+                    </div>
+
+                    {!sameAsBilling && (
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="billingName">Full Name *</Label>
+                          <Input
+                            id="billingName"
+                            value={billingInfo.fullName}
+                            onChange={(e) =>
+                              handleBillingChange("fullName", e.target.value)
+                            }
+                            placeholder="Enter billing name"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="billingAddress">Address *</Label>
+                          <Input
+                            id="billingAddress"
+                            value={billingInfo.address}
+                            onChange={(e) =>
+                              handleBillingChange("address", e.target.value)
+                            }
+                            placeholder="Enter billing address"
+                          />
+                        </div>
+                        <div className="gap-4 grid grid-cols-1 md:grid-cols-3">
+                          <div>
+                            <Label htmlFor="billingCity">City *</Label>
+                            <Input
+                              id="billingCity"
+                              value={billingInfo.city}
+                              onChange={(e) =>
+                                handleBillingChange("city", e.target.value)
+                              }
+                              placeholder="City"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="billingState">State *</Label>
+                            <Input
+                              id="billingState"
+                              value={billingInfo.state}
+                              onChange={(e) =>
+                                handleBillingChange("state", e.target.value)
+                              }
+                              placeholder="State"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="billingZip">ZIP Code *</Label>
+                            <Input
+                              id="billingZip"
+                              value={billingInfo.zipCode}
+                              onChange={(e) =>
+                                handleBillingChange("zipCode", e.target.value)
+                              }
+                              placeholder="ZIP Code"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex justify-between pt-4">
+                      <Button variant="outline" onClick={handleBack}>
+                        Back to Shipping
+                      </Button>
+                      <Button
+                        onClick={handleNext}
+                        disabled={!validateBilling()}
+                      >
+                        Review Order
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+```
+
+##### Explanation of the Code
+
+```tsx startLineNumber=861
+// src/app/checkout/page.tsx
+            {/* Step 3: Order Review */}
+            {currentStep === 3 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Package className="mr-2 w-5 h-5" />
+                    Order Review
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Order Items */}
+                  <div>
+                    <h3 className="mb-4 font-semibold">Order Items</h3>
+                    <div className="space-y-3">
+                      {items.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center space-x-4 p-3 border rounded-lg"
+                        >
+                          <div className="flex justify-center items-center bg-muted rounded-lg w-16 h-16">
+                            {item.thumbnail ? (
+                              <Image
+                                src={item.thumbnail}
+                                alt={item.title}
+                                className="rounded-lg w-full h-full object-cover"
+                                width={64}
+                                height={64}
+                                loading="lazy"
+                              />
+                            ) : (
+                              <Package className="w-8 h-8 text-muted-foreground" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-medium">{item.title}</h4>
+                            <p className="text-muted-foreground text-sm">
+                              Quantity: {item.quantity}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-semibold">
+                              {formatPrice(item.price * item.quantity)}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Shipping & Billing Info */}
+                  <div className="gap-6 grid grid-cols-1 md:grid-cols-2">
+                    <div>
+                      <h3 className="mb-2 font-semibold">Shipping Address</h3>
+                      <div className="text-muted-foreground text-sm">
+                        <p>{shippingInfo.fullName}</p>
+                        <p>{shippingInfo.address}</p>
+                        <p>
+                          {shippingInfo.city}, {shippingInfo.state}{" "}
+                          {shippingInfo.zipCode}
+                        </p>
+                        <p>{shippingInfo.country}</p>
+                        <p>{shippingInfo.phone}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="mb-2 font-semibold">Payment Method</h3>
+                      <div className="text-muted-foreground text-sm">
+                        <p>Credit/Debit Card</p>
+                        {billingInfo.cardNumber && (
+                          <p>
+                            **** **** **** {billingInfo.cardNumber.slice(-4)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Special Instructions */}
+                  <div>
+                    <Label htmlFor="instructions">
+                      Special Instructions (Optional)
+                    </Label>
+                    <Textarea
+                      id="instructions"
+                      value={specialInstructions}
+                      onChange={(e) => setSpecialInstructions(e.target.value)}
+                      placeholder="Any special delivery instructions..."
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div className="flex justify-between pt-4">
+                    <Button variant="outline" onClick={handleBack}>
+                      Back to Payment
+                    </Button>
+                    <Button
+                      onClick={handlePlaceOrder}
+                      disabled={isProcessing}
+                      className="min-w-32"
+                    >
+                      {isProcessing ? (
+                        <>
+                          <Lock className="mr-2 w-4 h-4 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="mr-2 w-4 h-4" />
+                          Place Order
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+```
+
+##### Explanation of the Code
+
+```tsx startLineNumber=982
+// src/app/checkout/page.tsx
+          {/* Order Summary Sidebar */}
+          <div className="lg:col-span-1">
+            <Card className="top-4 sticky">
+              <CardHeader>
+                <CardTitle>Order Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between">
+                  <span>Subtotal</span>
+                  <span>{formatPrice(totalPrice)}</span>
+                </div>
+
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Discount ({appliedDiscount?.rule.code})</span>
+                    <span>-{formatPrice(discountAmount)}</span>
+                  </div>
+                )}
+
+                {membershipDiscount > 0 && (
+                  <div className="flex justify-between text-blue-600">
+                    <span>Membership Discount</span>
+                    <span>-{formatPrice(membershipDiscount)}</span>
+                  </div>
+                )}
+
+                <div className="flex justify-between">
+                  <div>
+                    <span>Shipping</span>
+                    {currentStep >= 1 && selectedShippingTier && (
+                      <p className="text-muted-foreground text-xs">
+                        {
+                          shippingTiers.find(
+                            (t) => t.id === selectedShippingTier
+                          )?.name
+                        }
+                      </p>
+                    )}
+                  </div>
+                  <span>
+                    {dynamicShippingFee > 0
+                      ? formatPrice(dynamicShippingFee)
+                      : "FREE"}
+                  </span>
+                </div>
+
+                <Separator />
+
+                <div className="flex justify-between font-semibold text-lg">
+                  <span>Total</span>
+                  <span>
+                    {formatPrice(
+                      totalPrice -
+                        discountAmount -
+                        membershipDiscount +
+                        dynamicShippingFee
+                    )}
+                  </span>
+                </div>
+
+                <div className="mt-4 text-muted-foreground text-xs">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <Lock className="w-3 h-3" />
+                    <span>Secure SSL encrypted checkout</span>
+                  </div>
+                  <p>
+                    Your payment information is processed securely. We do not
+                    store credit card details.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+##### Explanation of the Code
+
+## Next Steps
+
+Now that our visitors have shopped until they've dropped and paid up, they need to [view their order confirmation](/ecommerce-platform/creating-the-pages/cart/checkout-confirmation).

@@ -60,268 +60,67 @@ Summarize key takeaways and provide next steps.
 <BackToTop />
 ```
 
-## Frontmatter: the Metadata Foundation
-
-Frontmatter is the YAML section at the beginning of your MDX file that contains metadata about your blog post. This information is used for SEO, sorting, categorization, and display purposes.
-
-### Basic Frontmatter Structure
-
-```yaml
----
-title: "Your Amazing Blog Post Title"
-description: "A compelling description that summarizes your post content"
-date: "2024-12-15"
-author: "Your Name"
-category: "Web Development"
-tags: ["React", "TypeScript", "Next.js"]
-featured: false
-published: true
-image: "/images/blog/your-post-image.jpg"
-imageAlt: "Descriptive alt text for your image"
-readingTime: 8
----
-```
-
-### Essential Frontmatter Fields
-
-| Field         | Type    | Description                                      | Required |
-| ------------- | ------- | ------------------------------------------------ | -------- |
-| `title`       | string  | The main title of your blog post                 |          |
-| `description` | string  | Meta description for SEO and previews            |          |
-| `date`        | string  | Publication date (YYYY-MM-DD format)             |          |
-| `author`      | string  | Author name                                      |          |
-| `category`    | string  | Primary category for organization                |          |
-| `tags`        | array   | Array of relevant tags for filtering             |          |
-| `published`   | boolean | Whether the post is published (draft if false)   |          |
-| `featured`    | boolean | Mark as featured post                            |          |
-| `image`       | string  | Path to featured image                           |          |
-| `imageAlt`    | string  | Alt text for featured image                      |          |
-| `readingTime` | number  | Estimated reading time in minutes                |          |
-| `updatedAt`   | string  | Last update date                                 |          |
-| `slug`        | string  | Custom URL slug (auto-generated if not provided) |          |
-| `canonical`   | string  | Canonical URL if republished content             |          |
-
-### Advanced Frontmatter Example
-
-```yaml
----
-title: "Building Scalable React Applications with TypeScript"
-description: "Learn how to structure and build maintainable React applications using TypeScript, exploring advanced patterns and best practices."
-date: "2024-12-15"
-updatedAt: "2024-12-20"
-author: "Jane Developer"
-authorBio: "Senior Frontend Engineer with 8+ years of experience"
-authorImage: "/images/authors/jane-developer.jpg"
-authorSocial:
-  twitter: "@janedev"
-  github: "janedev"
-  linkedin: "jane-developer"
-category: "Advanced Tutorials"
-tags: ["React", "TypeScript", "Architecture", "Best Practices", "Scalability"]
-featured: true
-published: true
-image: "/images/blog/react-typescript-architecture.jpg"
-imageAlt: "React and TypeScript logos with architectural diagrams"
-readingTime: 12
-difficulty: "Intermediate"
-prerequisites: ["Basic React knowledge", "TypeScript fundamentals"]
-tableOfContents: true
-relatedPosts: ["typescript-advanced-types", "react-performance-optimization"]
-series: "React Architecture"
-seriesOrder: 2
-slug: "scalable-react-typescript-applications"
-canonical: "https://yourblog.com/blog/scalable-react-typescript-applications"
----
-```
-
-<BackToTop />
-
 ## Writing Compelling Content
 
-### Structuring Your Blog Post
+### 1. Start with a Strong Introduction
 
-A well-structured blog post enhances readability and engagement. Here's a recommended structure:
+Your introduction should immediately grab attention and clearly state the value proposition:
 
-#### 1. Compelling Introduction
+```mdx title="Example Introduction"
+# Building Your First React Component
 
-Start with a hook that grabs attention and clearly states what the reader will learn:
-
-```mdx showLineNumbers=false
-## Building Your First React Component
-
-Have you ever wondered how to create reusable UI elements that can be used across your entire application? React components are the building blocks of modern web applications, and mastering them is essential for any frontend developer.
+Ever wondered how Netflix creates those smooth, interactive user interfaces? The secret is React components - reusable pieces of code that make modern web development both powerful and maintainable.
 
 In this guide, you'll learn:
-
-- How to create functional components
+- How to create your first React component
 - Best practices for component design
-- Common patterns and pitfalls to avoid
-- Real-world examples you can use immediately
+- Common patterns used by industry professionals
+- Real examples you can implement today
 ```
 
-#### 2. Clear Section Headers
+### 2. Structure Content for Readability
 
-Use descriptive headers that make your content scannable:
+Break content into scannable sections:
 
-```mdx showLineNumbers=false
-## Understanding Component Basics
+- **Use descriptive headings** that tell a story
+- **Include code examples** with proper context
+- **Add visual elements** like callouts and images
+- **Provide actionable takeaways** in each section
 
-### Functional VS Class Components
+### 3. Write Effective Code Examples
 
-### Props and State Management
+Always provide complete, working examples with context:
 
-## Building Your First Component
-
-### Setting Up the Environment
-
-### Writing the Component Logic
-
-## Advanced Patterns
-
-### Custom Hooks Integration
-
-### Performance Optimization
-```
-
-#### 3. Code Examples with Context
-
-Always provide context for your code examples:
-
-Let's create a simple `Button` component that accepts different variants:
-
-```tsx
-// components/Button.tsx
-import React from "react";
-import { cn } from "@/lib/utils";
-
+```tsx title="components/Button.tsx"
 interface ButtonProps {
-  variant?: "primary" | "secondary" | "outline";
-  size?: "sm" | "md" | "lg";
+  variant?: "primary" | "secondary";
   children: React.ReactNode;
   onClick?: () => void;
-  disabled?: boolean;
 }
 
-export const Button: React.FC<ButtonProps> = ({
-  variant = "primary",
-  size = "md",
-  children,
-  onClick,
-  disabled = false,
-}) => {
-  const baseClasses = "font-medium rounded-lg transition-colors";
-
-  const variantClasses = {
+export function Button({ variant = "primary", children, onClick }: ButtonProps) {
+  const baseStyles = "px-4 py-2 rounded font-medium transition-colors";
+  const variantStyles = {
     primary: "bg-blue-600 text-white hover:bg-blue-700",
-    secondary: "bg-gray-600 text-white hover:bg-gray-700",
-    outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-50",
-  };
-
-  const sizeClasses = {
-    sm: "px-3 py-1.5 text-sm",
-    md: "px-4 py-2 text-base",
-    lg: "px-6 py-3 text-lg",
+    secondary: "bg-gray-200 text-gray-900 hover:bg-gray-300"
   };
 
   return (
-    <button
-      className={cn(
-        baseClasses,
-        variantClasses[variant],
-        sizeClasses[size],
-        disabled && "opacity-50 cursor-not-allowed"
-      )}
+    <button 
+      className={`${baseStyles} ${variantStyles[variant]}`}
       onClick={onClick}
-      disabled={disabled}
     >
       {children}
     </button>
   );
-};
+}
 ```
 
-This component demonstrates several React best practices:
-
+This example demonstrates:
 - TypeScript interfaces for type safety
-- Default parameter values for better developer experience
-- Conditional styling using utility classes
-- Props destructuring for cleaner code
-
-#### 4. Visual Elements
-
-Enhance your content with images, diagrams, and interactive elements:
-
-```mdx showLineNumbers=false
-![Component Architecture Diagram](/images/blog/component-architecture.png)
-
-> **Pro Tip**: Always consider the component's single responsibility principle. Each component should have one clear purpose and do it well.
-
-<ComponentDemo>
-  <Button variant="primary">Primary Button</Button>
-  <Button variant="secondary">Secondary Button</Button>
-  <Button variant="outline">Outline Button</Button>
-</ComponentDemo>
-```
-
-#### 5. Actionable Takeaways
-
-End with clear next steps or summary points:
-
-```mdx showLineNumbers=false
-## Key Takeaways
-
-- Start Simple: Begin with functional components and add complexity as needed
-- Type Everything: Use TypeScript to catch errors early and improve developer experience
-- Think Reusability: Design components that can be used in multiple contexts
-- Test Early: Write tests as you build to ensure reliability
-
-## What's Next?
-
-Now that you understand component basics, try building a more complex component like a data table or form. Check out our [Advanced Component Patterns](/blog/advanced-component-patterns) guide for more techniques.
-```
-
-<BackToTop />
-
-## Writing Best Practices
-
-### Content Guidelines
-
-#### 1. Write for Your Audience
-
-- Beginner-friendly: Explain concepts clearly and avoid jargon
-- Provide context: Don't assume prior knowledge
-- Use examples: Show, don't just tell
-
-````mdx showLineNumbers=false
-// Bad: Assumes knowledge
-Use useCallback to memoize functions.
-
-// Good: Provides context and examples
-The `useCallback` hook helps optimize performance by memoizing functions, preventing unnecessary re-renders of child components.
-
-```tsx
-// Without useCallback - function recreated on every render
-const handleClick = () => {
-  console.log("Button clicked");
-};
-
-// With useCallback - function memoized
-const handleClick = useCallback(() => {
-  console.log("Button clicked");
-}, []); // Empty dependency array means function never changes
-```
-````
-
-#### 2. Be Concise but Comprehensive
-
-- Get to the point quickly
-- Provide enough detail to be useful
-- Use bullet points and lists for clarity
-
-#### 3. Include Real-World Examples
-
-- Show how concepts apply in practice
-- Use relatable scenarios
+- Default parameters for better developer experience
+- Conditional styling using template literals
+- Clear, descriptive variable names
 - Demonstrate with complete code snippets
 
 ##### Real-World Example: Building a Shopping Cart

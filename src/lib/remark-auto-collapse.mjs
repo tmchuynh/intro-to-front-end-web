@@ -125,7 +125,7 @@ export function remarkAutoCollapseFunctions() {
           // Detect function declarations, React components, variable assignments, constants, hooks, and interfaces
           if (
             trimmedLine.match(
-              /^(function\s+\w+|const\s+\w+\s*=\s*\([^)]*\)\s*[=:].*=>|async\s+function\s+\w+|export\s+function\s+\w+|export\s+const\s+\w+\s*=|function\s+[A-Z]\w*|const\s+[A-Z]\w*\s*=|export\s+default\s+function|const\s+\w+\s*=\s*.*\.map\(|const\s+\w+\s*=\s*.*\.filter\(|const\s+\w+\s*=\s*.*\.reduce\(|const\s+\w+\s*=\s*files\.map\(|const\s+[A-Z_][A-Z0-9_]*\s*=|const\s+\w+\s*=\s*\{|const\s+\w+\s*=\s*\[|const\s+\w+\s*=\s*React\.|const\s+\w+\s*:\s*React\.FC|export\s+const\s+\w+\s*:\s*React\.FC|useEffect\(|useMemo\(|useCallback\(|export\s+interface\s+\w+|interface\s+\w+|type\s+\w+\s*=|export\s+type\s+\w+\s*=)/
+              /^(function\s+\w+|const\s+\w+\s*=\s*\([^)]*\)\s*[=:].*=>|async\s+function\s+\w+|export\s+function\s+\w+|export\s+const\s+\w+\s*=|function\s+[A-Z]\w*|const\s+[A-Z]\w*\s*=|export\s+default\s+function|const\s+\w+\s*=\s*.*\.map\(|const\s+\w+\s*=\s*.*\.filter\(|const\s+\w+\s*=\s*.*\.reduce\(|const\s+\w+\s*=\s*files\.map\(|const\s+[A-Z_][A-Z0-9_]*\s*=|const\s+\w+\s*=\s*\{|const\s+\w+\s*=\s*\[|const\s+\w+\s*=\s*React\.|const\s+\w+\s*:\s*React\.FC|export\s+const\s+\w+\s*:\s*React\.FC|useEffect\(|useMemo\(|useCallback\(|export\s+interface\s+\w+|interface\s+\w+|type\s+\w+\s*=|export\s+type\s+\w+\s*=)/,
             )
           ) {
             // Check if this function/component/variable should be collapsed (mark with @collapse)
@@ -202,7 +202,7 @@ export function remarkAutoCollapseFunctions() {
 
             if (isEndOfBlock) {
               collapseRanges.push(
-                `${currentFunction.start}-${filteredLines.length}`
+                `${currentFunction.start}-${filteredLines.length}`,
               );
               currentFunction = null;
             }

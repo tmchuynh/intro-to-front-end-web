@@ -6,28 +6,32 @@ import BackToTop from "@/components/BackToTop";
 
 ## Introduction
 
-Custom hooks encapsulate reusable logic and provide a clean way to share stateful logic between components. Our application uses custom hooks for responsive design, authentication guards, order management, clipboard operations, and various utility functions.
+Custom hooks serve as the backbone of reusable logic in React applications, offering an elegant solution for sharing stateful behavior across components. In our e-commerce platform, we leverage custom hooks to handle responsive design patterns, authentication protection, order management workflows, clipboard functionality, and essential utility operations.
 
-Custom hooks are a powerful feature in React that allow you to encapsulate and reuse stateful logic across components. They enable you to create reusable functions that can manage state, handle side effects, and provide a clean API for your components.
+React's custom hooks represent one of the framework's most powerful features, enabling developers to extract and encapsulate complex stateful logic into reusable functions. These hooks provide a clean abstraction layer that manages state transitions, handles side effects, and delivers consistent APIs for component interaction.
 
-## What are Custom Hooks?
+## Understanding Custom Hooks
 
-Custom hooks are JavaScript functions that start with the prefix `use` and can call other hooks. They allow you to extract component logic into reusable functions, making your code cleaner and more maintainable. Custom hooks can manage state, handle side effects, and provide a consistent API for your components.
+Custom hooks are JavaScript functions that follow a specific naming convention—they must begin with the prefix `use`—and can utilize other React hooks internally. They serve as a mechanism to extract and share component logic, transforming complex stateful operations into reusable, maintainable functions.
 
-## Why Use Custom Hooks?
+The primary purpose of custom hooks is to provide a clean abstraction layer that manages state, handles side effects, and offers a consistent interface for components to interact with shared functionality.
 
-Custom hooks help you avoid code duplication, improve code organization, and make your components more readable. They allow you to encapsulate complex logic in a single function, making it easier to test and maintain. By using custom hooks, you can share logic between components without having to lift state up or pass props down through multiple levels of the component tree.
+## The Value of Custom Hooks
 
-## Benefits of Custom Hooks
+Custom hooks address several common development challenges by eliminating code duplication, improving organization, and enhancing component readability. They enable you to encapsulate complex logic within dedicated functions, making testing and maintenance significantly easier. 
+
+By utilizing custom hooks, you can share logic between components without the complexity of lifting state up or passing props through multiple component hierarchy levels.
+
+## Key Advantages
 
 - **Reusability**: Custom hooks allow you to encapsulate logic that can be reused across multiple components, reducing code duplication.
 - **Separation of Concerns**: Custom hooks help you separate logic from UI, making your components cleaner and easier to understand.
 - **Testability**: Custom hooks can be tested independently, allowing you to write unit tests for your logic without involving the UI.
 - **Consistency**: Custom hooks provide a consistent API for your components, making it easier to use and understand the logic they encapsulate.
 
-## Pre-Built Hooks
+## Hook Implementations
 
-We will be creating several custom hooks to handle various functionalities in our e-commerce platform. These hooks will include:
+We will be implementing several custom hooks to handle various functionalities throughout our e-commerce platform. These specialized hooks will include:
 
 - **useOrderManagement**: A hook to manage order-related operations, such as fetching orders, updating order status, and handling order history.
 - **useAuthGuard**: A hook to protect routes and ensure that only authenticated users can access certain pages.
@@ -35,7 +39,7 @@ We will be creating several custom hooks to handle various functionalities in ou
 - **useProtectedAction**: A hook to handle protected actions that require user authentication, such as placing an order or updating user profile information.
 - **usePurchaseHistory**: A hook to manage the user's purchase history, allowing users to view their past orders and details.
 
-We also have `useIsMobile` from `shadcn/ui`, which is a utility hook that helps you determine if a component is mounted. This can be useful for avoiding memory leaks and ensuring that state updates only occur when the component is still mounted. Our `Sidebar` component uses this hook to manage its state and ensure that it only updates when the component is mounted.
+We also have `useIsMobile` from `shadcn/ui`, which is a utility hook that helps you determine if the viewport is considered mobile. This is essential for responsive design implementations, ensuring that components can adapt their behavior and layout based on screen size. Our `Sidebar` component utilizes this hook to provide an optimal user experience across different devices.
 
 Let's examine the `useIsMobile` hook from `shadcn/ui`:
 
@@ -72,7 +76,7 @@ export function useIsMobile(): boolean {
 }
 ```
 
-##### Explanation of the `useMounted` Hook
+##### Explanation of the `useIsMobile` Hook
 
 The `useIsMobile` hook uses the `window.matchMedia` API to listen for changes in the viewport width. It sets the initial state based on the current viewport width and updates it whenever the viewport width changes. The hook returns a boolean value indicating whether the current viewport width is considered mobile (less than 768 pixels).
 
@@ -194,12 +198,42 @@ const SidebarProvider = React.forwardRef<
 
 ##### Explanation of the `SidebarProvider`
 
-The `SidebarProvider` component uses the `useIsMobile` hook to determine if the current device is mobile. It manages the sidebar's open state and provides a context for the sidebar's state and actions. The component also listens for keyboard shortcuts to toggle the sidebar, making it accessible and user-friendly.
+The `SidebarProvider` component serves as a comprehensive sidebar management solution that demonstrates the power of custom hooks in creating responsive, accessible UI components. Here's a detailed breakdown of its functionality:
 
-This approach allows the sidebar to adapt its behavior based on the device being used, providing a better user experience across different screen sizes. This is particularly useful for responsive designs where the sidebar may need to collapse or expand based on the viewport size.
+**Responsive Behavior Management**
+The component leverages the `useIsMobile` hook to determine the current device type and adapt its behavior accordingly. It maintains separate state management for desktop and mobile experiences:
+- **Desktop Mode**: Uses `open` state for persistent sidebar visibility
+- **Mobile Mode**: Uses `openMobile` state for overlay-style sidebar behavior
+
+**State Management Architecture**
+The provider implements a sophisticated state management pattern that supports both controlled and uncontrolled component behavior:
+- **Internal State**: Manages its own state with `_open` and `_setOpen` for uncontrolled usage
+- **External Control**: Accepts `openProp` and `setOpenProp` for controlled usage from parent components
+- **State Persistence**: Automatically saves sidebar state to cookies for user preference retention across sessions
+
+**Accessibility and User Experience**
+The component prioritizes accessibility through multiple interaction methods:
+- **Keyboard Shortcuts**: Implements Cmd/Ctrl + key combinations for quick sidebar toggling
+- **Event Management**: Properly handles event listeners with cleanup to prevent memory leaks
+- **Focus Management**: Uses `TooltipProvider` for enhanced tooltip behavior and accessibility
+
+**Context-Based Architecture**
+The provider creates a comprehensive context that exposes:
+- Current sidebar state (`expanded` or `collapsed`)
+- State setters for both mobile and desktop modes
+- Device detection information
+- Toggle functionality for programmatic control
+
+**CSS Custom Properties Integration**
+The component demonstrates modern CSS-in-JS patterns by:
+- Setting CSS custom properties (`--sidebar-width`, `--sidebar-width-icon`) for dynamic styling
+- Using `data-state` attributes for Tailwind CSS styling hooks
+- Providing flexible styling through the `style` prop merge
+
+This adaptive approach ensures the sidebar provides optimal functionality across different screen sizes, particularly valuable in responsive designs where the sidebar behavior must dynamically adjust based on viewport dimensions. The component showcases how custom hooks can be integrated into complex UI components to create maintainable, accessible, and highly functional user interfaces.
 
 ## Next Steps
 
-Now that we have an overview of custom hooks and their benefits, we will start implementing our custom hooks for the e-commerce platform starting with the [useAuthGuard hook](/ecommerce-platform/context-and-hooks/creating-the-hooks/useAuthGuard). These hooks will encapsulate the logic for managing orders, authentication, notifications, and other functionalities, making our codebase cleaner and more maintainable.
+With a solid understanding of custom hooks and their advantages, we'll proceed to implement our specialized hooks for the e-commerce platform, beginning with the [useAuthGuard hook](/ecommerce-platform/context-and-hooks/creating-the-hooks/useAuthGuard). These custom hooks will encapsulate essential logic for order management, authentication, notifications, and other core functionalities, resulting in a cleaner, more maintainable codebase.
 
 <BackToTop />

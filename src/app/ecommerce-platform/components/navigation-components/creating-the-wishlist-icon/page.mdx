@@ -1,3 +1,55 @@
 import BackToTop from "@/components/BackToTop";
 
 # The Wishlist Icon
+
+## Table of Contents
+
+## Introduction
+
+The `WishlistIcon` component is an essential part of the navigation menu in our e-commerce platform. It allows users to quickly access their wishlist, where they can view and manage products they are interested in purchasing later. This component enhances the user experience by providing a convenient way to keep track of favorite items without cluttering the shopping cart.
+
+It is designed to be visually appealing and functional, integrating seamlessly with the overall design of the navigation menu. The icon will update dynamically to reflect the current number of items in the wishlist, providing real-time feedback to the user.
+
+The `WishlistIcon` will display the number of items in the wishlist and provide a link to the wishlist page. It is designed to be visually appealing and functional, integrating seamlessly with the overall design of the navigation menu. The icon will update dynamically to reflect the current number of items in the wishlist, providing real-time feedback to the user.
+
+## The `WishlistIcon` Component
+
+```tsx
+// src/components/navigation/WishlistIcon.tsx
+import { useAuth } from "@/app/context/authContext";
+import { useWishlist } from "@/app/context/wishlistContext";
+import { Button } from "@/components/ui/button";
+import { Heart } from "lucide-react";
+import Link from "next/link";
+
+export default function WishlistIcon() {
+  const { wishlistCount } = useWishlist();
+  const { isLoggedIn } = useAuth();
+
+  if (!isLoggedIn) {
+    return null;
+  }
+
+  return (
+    <Link href="/wishlist">
+      <Button variant="ghost" size="sm" className="relative p-2">
+        <Heart className="w-5 h-5" />
+        {wishlistCount > 0 && (
+          <span className="-top-1 -right-1 absolute flex justify-center items-center bg-red-500 rounded-full w-5 min-w-[20px] h-5 text-white text-xs">
+            {wishlistCount > 99 ? "99+" : wishlistCount}
+          </span>
+        )}
+        <span className="sr-only">Wishlist</span>
+      </Button>
+    </Link>
+  );
+}
+```
+
+##### Explanation of the Code
+
+## Next Steps
+
+Since we will be having users sign in and out of our e-commerce platform, let's also create a [`UserMenu` component](/ecommerce-platform/components/navigation-components/creating-the-user-menu) they can access with quick links to their account settings, order history, and other relevant information. This will enhance the user experience by providing easy access to account-related features.
+
+<BackToTop />

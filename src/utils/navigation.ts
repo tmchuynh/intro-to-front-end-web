@@ -16,23 +16,75 @@ export interface NavigationSection {
   items: NavigationItem[];
 }
 
-// Function to convert file/folder names to display titles
-export function formatTitle(name: string): string {
-  if (name === "jQuery") {
+export function toSmartTitleCase(str: string): string {
+  // Define words to be lowercased (articles, conjunctions, short prepositions)
+  const minorWords = new Set([
+    "a",
+    "an",
+    "and",
+    "the",
+    "and",
+    "but",
+    "or",
+    "nor",
+    "as",
+    "at",
+    "by",
+    "for",
+    "in",
+    "of",
+    "on",
+    "per",
+    "to",
+    "via",
+    "vs",
+    "v",
+    "vs.",
+    "v.",
+  ]);
+
+  if (str === "jQuery") {
     return "jQuery"; // Keep jQuery as is
   }
-  if (name === "UX-UI-Design") {
+  if (str === "UX-UI-Design") {
     return "UX/UI Design"; // Format UX-UI-Design to UX/UI Design
   }
-  return name
+
+  return str
     .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word, index, array) => {
+      // Always capitalize the first word of the title
+      if (index === 0) {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }
+
+      // Always capitalize the last word of the title
+      if (index === array.length - 1) {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      }
+
+      // Handle hyphenated words (capitalize both parts)
+      if (word.includes("-")) {
+        return word
+          .split("-")
+          .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+          .join("-");
+      }
+
+      // Lowercase minor words unless they are the first or last word
+      if (minorWords.has(word)) {
+        return word;
+      }
+
+      // Capitalize the first letter of other words
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
     .join(" ");
 }
 
 // Function to read metadata from MDX files
 export async function readMDXMetadata(
-  filePath: string,
+  filePath: string
 ): Promise<{ title?: string; order?: number }> {
   try {
     if (typeof window !== "undefined") {
@@ -56,13 +108,8 @@ export async function readMDXMetadata(
       if (orderMatch) metadata.order = parseInt(orderMatch[1]);
     }
 
-    // If no title in frontmatter, look for first h1
-    if (!metadata.title) {
-      const h1Match = content.match(/^#\s+(.+)$/m);
-      if (h1Match) {
-        metadata.title = h1Match[1];
-      }
-    }
+    // Note: Removed H1 fallback - will now rely on pathname formatting instead
+    // This makes the sidebar use pathname-based titles rather than H1 content
 
     return metadata;
   } catch {
@@ -72,7 +119,7 @@ export async function readMDXMetadata(
 
 // Function to categorize pages into logical sections
 function categorizeNavigationItems(
-  items: NavigationItem[],
+  items: NavigationItem[]
 ): NavigationSection[] {
   const categories = {
     fundamentals: [] as NavigationItem[],
@@ -420,7 +467,7 @@ function sortNavigationItems(items: NavigationItem[]): NavigationItem[] {
 
 async function scanDirectory(
   dirPath: string,
-  basePath: string,
+  basePath: string
 ): Promise<NavigationItem[]> {
   const items: NavigationItem[] = [];
 
@@ -444,19 +491,19 @@ async function scanDirectory(
         // Check if directory has a page file
         const pageFiles = ["page.tsx", "page.mdx", "page.js"];
         const hasPage = pageFiles.some((file) =>
-          fs.existsSync(path.join(fullPath, file)),
+          fs.existsSync(path.join(fullPath, file))
         );
 
         if (hasPage) {
           // Directory with a page file
           const pageFile = pageFiles.find((file) =>
-            fs.existsSync(path.join(fullPath, file)),
+            fs.existsSync(path.join(fullPath, file))
           );
           const pagePath = path.join(fullPath, pageFile!);
           const metadata = await readMDXMetadata(pagePath);
 
           const item: NavigationItem = {
-            title: metadata.title || formatTitle(entry.name),
+            title: metadata.title || toSmartTitleCase(entry.name),
             href: routePath === "/page" ? "/" : routePath,
             order: metadata.order,
           };
@@ -473,7 +520,7 @@ async function scanDirectory(
           const children = await scanDirectory(fullPath, routePath);
           if (children.length > 0) {
             items.push({
-              title: formatTitle(entry.name),
+              title: toSmartTitleCase(entry.name),
               href: "#",
               children: sortNavigationItems(children),
             });
@@ -498,7 +545,7 @@ async function scanDirectory(
 // Function to set expanded state based on current URL
 export function setExpandedState(
   sections: NavigationSection[],
-  currentPath: string,
+  currentPath: string
 ): NavigationSection[] {
   const normalizedPath = currentPath.startsWith("/")
     ? currentPath
@@ -507,14 +554,14 @@ export function setExpandedState(
   return sections.map((section) => ({
     ...section,
     items: section.items.map((item) =>
-      setItemExpandedState(item, normalizedPath),
+      setItemExpandedState(item, normalizedPath)
     ),
   }));
 }
 
 function setItemExpandedState(
   item: NavigationItem,
-  currentPath: string,
+  currentPath: string
 ): NavigationItem {
   const shouldExpand = isPathInSubtree(currentPath, item);
 
@@ -522,7 +569,7 @@ function setItemExpandedState(
     ...item,
     isExpanded: shouldExpand,
     children: item.children?.map((child) =>
-      setItemExpandedState(child, currentPath),
+      setItemExpandedState(child, currentPath)
     ),
   };
 }
@@ -547,9 +594,7 @@ function isPathInSubtree(currentPath: string, item: NavigationItem): boolean {
 }
 
 // Function to get client-side navigation with expanded state
-export function getClientSideNavigation(
-  currentPath?: string,
-): NavigationSection[] {
+export function getClientSideNavigation(currentPath?: string): NavigationSection[] {
   if (currentPath) {
     return setExpandedState(fallbackNav, currentPath);
   }

@@ -14,8 +14,6 @@ The shopping page is the central hub of our e-commerce platform, designed to pro
 6. [Main Rendering Logic and UI Components](#rendering-the-product-cards)
 7. [Advanced Features and User Experience](#advanced-features-and-user-experience)
 
-## Page Structure
-
 The shopping page follows a hierarchical structure that prioritizes user experience and product discovery:
 
 - **Hero Section**: Eye-catching banner with clear navigation intent
@@ -64,25 +62,31 @@ interface CategoryData {
 
 This comprehensive import section establishes the foundation for our shopping page functionality:
 
-**Core React and Next.js Imports:**
+#### Core React and Next.js Imports:
+
 - `"use client"`: Designates this as a client-side component, enabling interactive features like state management and event handlers
 - React hooks (`useEffect`, `useState`): Essential for managing component lifecycle and state changes
 - Next.js components (`Image`, `Link`): Optimized components for performance and SEO
 
-**API and Data Management:**
+#### API and Data Management:
+
 - `getAllProducts`: Custom API function that fetches product data from our backend or external service
 - `ProductItem`: TypeScript interface ensuring type safety for product data structures
 
-**UI Component Library:**
+#### UI Component Library:
+
 - Shadcn/ui components (`Badge`, `Button`, `Card`): Pre-built, accessible UI components with consistent styling
 - These components follow design system principles and include built-in accessibility features
 
-**Icon Libraries:**
+#### Icon Libraries:
+
 - Lucide React: Modern, lightweight SVG icons with consistent styling
 - React Icons: Additional icon sets for specialized use cases (like `FaShoppingBag`)
 
-**Interface Definition:**
+#### Interface Definition:
+
 The `CategoryData` interface defines the structure for category objects:
+
 - `id`: Unique identifier for database operations and React keys
 - `name`: Human-readable category name for display
 - `count`: Number of products in the category for statistics
@@ -108,24 +112,28 @@ export default function CategoriesPage() {
 
 This state management section implements a data flow architecture using React's `useState` hook:
 
-**Product State Management:**
+#### Product State Management:
+
 - `products`: Stores the complete array of product items fetched from the API
 - `categories`: Processed category data with organized product groupings
 - This separation allows for efficient data manipulation and category-specific operations
 
-**UI State Management:**
+#### UI State Management:
+
 - `loading`: Boolean flag controlling loading spinners and skeleton screens
 - `error`: String state for error messages, enabling graceful error handling and user feedback
 - `selectedCategory`: Tracks which category is currently active, enabling dynamic content switching
 - `viewMode`: Controls the display format ("grid" or "list") for product listings
 
-**State Architecture Benefits:**
+#### State Architecture Benefits:
+
 - **Predictable Updates**: Each state variable has a specific responsibility
 - **Performance Optimization**: Prevents unnecessary re-renders through targeted updates
 - **User Experience**: Enables smooth transitions between different page states
 - **Error Resilience**: Maintains application stability when API calls fail
 
-**TypeScript Integration:**
+#### TypeScript Integration:
+
 - Generic type parameters (`<ProductItem[]>`, `<CategoryData[]>`) ensure type safety
 - Null union types (`string | null`) handle optional state values appropriately
 - This prevents runtime errors and improves developer experience with IntelliSense
@@ -184,31 +192,36 @@ const selectedCategoryData = categories.find(
 
 This section implements a data processing pipeline that transforms raw product data into organized category structures:
 
-**Data Fetching Strategy:**
+#### Data Fetching Strategy:
+
 - **Async/Await Pattern**: Uses modern JavaScript async patterns for clean, readable asynchronous code
 - **Error Boundaries**: Comprehensive try-catch blocks prevent application crashes from network failures
 - **Loading States**: Proper loading state management provides user feedback during data operations
 
-**Category Organization Algorithm:**
+#### Category Organization Algorithm:
+
 1. **Map-Based Grouping**: Uses `Map` data structure for O(1) lookup performance when grouping products
 2. **Dynamic Category Creation**: Automatically discovers categories from product data rather than hardcoding them
 3. **Data Transformation**: Converts category strings to human-readable format using regex and string manipulation
 4. **Alphabetical Sorting**: Ensures consistent category ordering for improved user experience
 
-**Advanced Processing Features:**
-- **Category Name Formatting**: 
+#### Advanced Processing Features:
+
+- **Category Name Formatting**:
   - Replaces hyphens with spaces for readability
   - Capitalizes first letter of each word for proper title case
   - Maintains original category IDs for database consistency
 - **Product Count Calculation**: Automatically calculates product counts per category for statistical display
 - **Memory Efficiency**: Uses `Array.from()` to efficiently convert Map entries to array format
 
-**Error Handling Best Practices:**
+#### Error Handling Best Practices:
+
 - **Graceful Degradation**: Application continues to function even if API calls fail
 - **User-Friendly Messages**: Error states provide helpful feedback rather than technical jargon
 - **Type-Safe Error Handling**: TypeScript ensures error messages are properly typed
 
-**Performance Optimizations:**
+#### Performance Optimizations:
+
 - **Single API Call**: Fetches all products once rather than multiple category-specific calls
 - **Client-Side Processing**: Reduces server load by handling data organization on the client
 - **Efficient State Updates**: Batches state updates to minimize re-renders
@@ -257,34 +270,39 @@ if (error) {
 
 This section implements comprehensive state management for different application states, ensuring a smooth user experience regardless of data loading status:
 
-**Loading State Implementation:**
+#### Loading State Implementation:
+
 - **Visual Feedback**: Custom loading spinner with primary color theming maintains brand consistency
 - **Centered Layout**: Uses Flexbox for perfect centering across all screen sizes
 - **Animation**: CSS `animate-spin` provides smooth, non-jarring visual feedback
 - **Accessibility**: Includes descriptive text for screen readers and users with slow connections
 - **Responsive Design**: Full viewport height ensures loading state is prominent on all devices
 
-**Error State Architecture:**
+#### Error State Architecture:
+
 - **Visual Icon System**: Uses Search icon to indicate "content not found" metaphorically
 - **Color-Coded Feedback**: Red color scheme immediately communicates error status
-- **Hierarchical Information**: 
+- **Hierarchical Information**:
   - Primary error title for immediate understanding
   - Secondary error details for technical users or debugging
 - **Consistent Layout**: Maintains same centering and spacing as loading state for visual consistency
 
-**UX Design Principles:**
+#### UX Design Principles:
+
 - **Progressive Disclosure**: Shows appropriate level of detail based on user needs
 - **Emotional Design**: Loading spinner suggests progress rather than failure
 - **Error Recovery**: Clear error messages help users understand what went wrong
 - **Graceful Degradation**: Page structure remains intact even when content fails to load
 
-**Technical Implementation Details:**
+#### Technical Implementation Details:
+
 - **Conditional Rendering**: Early returns prevent unnecessary component tree rendering
 - **State Isolation**: Loading and error states are completely separate from main content
 - **Performance**: Minimal DOM manipulation during state transitions
 - **Memory Management**: No memory leaks from abandoned async operations
 
-**Accessibility Features:**
+#### Accessibility Features:
+
 - **Screen Reader Support**: Descriptive text for all visual elements
 - **Color Independence**: Error communication doesn't rely solely on color
 - **Focus Management**: Proper tab order maintained across state changes
@@ -568,61 +586,70 @@ This section implements comprehensive state management for different application
 
 This extensive rendering section implements a dual-view system that adapts based on user interaction and provides rich, interactive content:
 
-**Hero Section Architecture:**
+#### Hero Section Architecture:
+
 - **Brand Integration**: Shopping bag icon reinforces the e-commerce context and brand identity
 - **Typography Hierarchy**: Progressive font sizes (5xl to 6xl) create visual impact while maintaining readability
 - **Responsive Design**: Text scales appropriately across mobile, tablet, and desktop viewports
 - **Semantic Structure**: Proper heading hierarchy improves SEO and accessibility
 - **Visual Balance**: Centered layout with generous padding creates breathing room
 
-**Statistical Dashboard Implementation:**
+#### Statistical Dashboard Implementation:
+
 - **Gradient Card Design**: Each statistic card uses unique color gradients for visual distinction
 - **Icon Integration**: Meaningful icons (Package, ShoppingBag, TrendingUp) provide instant visual context
 - **Data Visualization**: Real-time calculations display dynamic statistics about the product catalog
 - **Performance Metrics**: Shows total categories, products, and largest category size
 - **Responsive Grid**: Adapts from single column on mobile to three columns on desktop
 
-**Advanced Category Grid Features:**
+#### Advanced Category Grid Features:
+
 - **Dynamic Image Selection**: Intelligently selects representative images from category products
 - **Fallback Strategy**: Uses Unsplash images as fallbacks when product images aren't available
-- **Interactive Elements**: 
+- **Interactive Elements**:
   - Hover animations with transform effects
   - Scale animations for engaging user feedback
   - Color transitions for smooth state changes
 - **Information Density**: Each card shows multiple data points without overwhelming the user
 
-**Category Card Components:**
+#### Category Card Components:
+
 - **Image Optimization**: Next.js Image component provides automatic optimization and lazy loading
 - **Badge System**: Product count badges use overlay positioning for clear information hierarchy
 - **Rating Calculations**: Dynamic average rating calculation across all products in category
 - **Price Range Display**: Shows minimum and maximum prices for quick price comparison
 - **Popular Items Preview**: Lists top 3 products with expandable "more items" indicator
 
-**Interactive Features:**
+#### Interactive Features:
+
 - **Click Handlers**: Multiple interaction methods (card click, button click) for user preference
 - **Event Propagation**: Proper event handling prevents unwanted bubbling
 - **State Management**: Category selection triggers view mode changes
 - **Smooth Transitions**: CSS transitions provide polished user experience
 
-**Product View Implementation:**
+#### Product View Implementation:
+
 - **Navigation Controls**: Back button with clear visual hierarchy and intuitive placement
 - **View Mode Toggle**: Grid/List toggle with visual state indicators and consistent styling
 - **Context Information**: Category name and product count provide clear user orientation
 - **Component Integration**: Leverages `ProductGrid` component for consistent product display
 
-**Quick Actions Section:**
+#### Quick Actions Section:
+
 - **Call-to-Action Design**: Strategic placement encourages further exploration
 - **Multiple Pathways**: Provides various user journey options (all products, sales, new arrivals)
 - **Link Integration**: Uses Next.js Link for optimized client-side navigation
 - **Visual Hierarchy**: Different button variants create clear priority levels
 
-**Responsive Design Patterns:**
+#### Responsive Design Patterns:
+
 - **CSS Grid**: Flexible grid system adapts to screen size automatically
 - **Breakpoint Strategy**: Mobile-first design with progressive enhancement
 - **Touch Targets**: Appropriate sizing for mobile interaction
 - **Content Prioritization**: Most important information remains visible on smaller screens
 
-**Performance Optimizations:**
+#### Performance Optimizations:
+
 - **Conditional Rendering**: Only renders necessary components based on current state
 - **Image Lazy Loading**: Next.js Image component loads images as needed
 - **Component Memoization**: Efficient re-rendering through proper key props
@@ -634,12 +661,14 @@ This extensive rendering section implements a dual-view system that adapts based
 
 This shopping page implements several advanced React patterns that enhance both performance and user experience:
 
-**Optimistic UI Updates:**
+#### Optimistic UI Updates:
+
 - State changes occur immediately upon user interaction
 - Visual feedback is instant, creating a responsive feel
 - Error states can revert changes if necessary
 
-**Intelligent Data Caching:**
+#### Intelligent Data Caching:
+
 - Product data is fetched once and reused across different views
 - Category calculations are performed client-side to reduce server load
 - Images are cached by Next.js for improved performance
@@ -648,75 +677,88 @@ This shopping page implements several advanced React patterns that enhance both 
 
 The page follows WCAG 2.1 guidelines for accessibility:
 
-**Keyboard Navigation:**
+#### Keyboard Navigation:
+
 - All interactive elements are accessible via keyboard
 - Tab order follows logical page flow
 - Focus indicators are clearly visible
 
-**Screen Reader Support:**
+#### Screen Reader Support:
+
 - Semantic HTML structure with proper heading hierarchy
 - Alt text for all images provides meaningful descriptions
 - ARIA labels for complex interactive elements
 
-**Color and Contrast:**
+#### Color and Contrast:
+
 - All text meets minimum contrast ratios
 - Color is not the only means of conveying information
 - High contrast mode compatibility
 
 ### Performance Optimizations
 
-**Image Optimization:**
+#### Image Optimization:
+
 - Next.js Image component provides automatic WebP conversion
 - Lazy loading prevents unnecessary bandwidth usage
 - Responsive images adapt to device capabilities
 
-**Code Splitting:**
+#### Code Splitting:
+
 - Components are loaded only when needed
 - Bundle size is minimized through tree-shaking
 - Critical CSS is inlined for faster initial render
 
-**Data Management:**
+#### Data Management:
+
 - Efficient algorithms for category grouping
 - Minimal re-renders through proper state management
 - Memory usage optimization for large product catalogs
 
 ### User Experience Patterns
 
-**Progressive Enhancement:**
+#### Progressive Enhancement:
+
 - Core functionality works without JavaScript
 - Enhanced features are added progressively
 - Graceful degradation for older browsers
 
-**Responsive Design Philosophy:**
+#### Responsive Design Philosophy:
+
 - Mobile-first approach ensures optimal mobile experience
 - Touch-friendly interfaces on mobile devices
 - Desktop enhancements don't compromise mobile usability
 
-**Micro-Interactions:**
+#### Micro-Interactions:
+
 - Hover effects provide visual feedback
 - Loading states keep users informed
 - Smooth transitions enhance perceived performance
 
 ### Error Handling Strategy
 
-**User-Centered Error Messages:**
+#### User-Centered Error Messages:
+
 - Clear, actionable error descriptions
 - Suggested next steps for error recovery
 - Technical details hidden from end users
 
-**Fallback Content:**
+#### Fallback Content:
+
 - Default images when product images fail to load
 - Skeleton screens during loading states
 - Cached data when network requests fail
 
 ### Security Considerations
 
-**Data Validation:**
+#### Data Validation:
+
 - All user inputs are validated on both client and server
 - XSS prevention through proper data sanitization
 - CSRF protection for state-changing operations
 
-**Image Security:**
+#### Image Security:
+
 - External images are loaded through Next.js optimization
 - Content Security Policy prevents malicious image injection
 - Image sources are validated before rendering

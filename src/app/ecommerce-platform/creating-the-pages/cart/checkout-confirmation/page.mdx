@@ -57,7 +57,13 @@ function OrderConfirmationContent() {
 
 ### Explanation of the Code
 
-This code imports necessary hooks and components, sets up the `OrderConfirmationContent` component, and initializes state variables for managing the order data and loading state. The `useRouter` and `useSearchParams` hooks are used to access the current route and query parameters, specifically to retrieve the `orderId`.
+This section establishes the foundation for the order confirmation page by importing essential React hooks and UI components. The component begins by extracting key pieces of information from the user's current location in the application.
+
+The `useRouter` hook provides navigation capabilities, allowing the component to redirect users to different pages when needed. Meanwhile, `useSearchParams` accesses the URL query parameters, which is crucial for retrieving the `orderId` that identifies which specific order to display.
+
+The component also integrates with custom context providers that manage global application state. The `useOrder` hook provides access to order-related functions, `useCurrency` handles price formatting based on the user's selected currency, and `useCart` manages shopping cart operations.
+
+Two state variables control the component's behavior: `order` stores the retrieved order information, while `loading` tracks whether the component is still fetching data. This setup ensures users receive appropriate feedback during data retrieval and see the correct order details once loading completes.
 
 ## `useEffect` Hook
 
@@ -82,7 +88,13 @@ useEffect(() => {
 
 ### Explanation of the Code
 
-This `useEffect` hook runs when the component mounts or when the `orderId` changes. It checks if an `orderId` is present in the query parameters. If it is, it attempts to retrieve the order using the `getOrderById` function. If the order is found, it sets the order state; otherwise, it displays an error message and redirects the user to the home page. The loading state is set to false after attempting to fetch the order.
+This `useEffect` hook orchestrates the order retrieval process and handles various edge cases that could occur during page initialization. The hook triggers whenever the component mounts or when the `orderId` parameter changes, ensuring the displayed information stays current.
+
+When an `orderId` exists in the URL parameters, the function first clears any existing discount codes from the cart context to prevent confusion between the completed order and future purchases. It then attempts to locate the order using the `getOrderById` function.
+
+The hook implements robust error handling to guide users appropriately. If the order exists, it updates the local state to display the order details. However, if no order is found with the provided ID, the system shows an error notification and automatically redirects the user to the homepage to prevent them from staying on a broken page.
+
+Regardless of the outcome, the loading state is set to false, which triggers the UI to either show the order details or display appropriate error messaging. This approach ensures users always receive clear feedback about the status of their request.
 
 ## The Tracking Number
 
@@ -98,7 +110,13 @@ const copyTrackingNumber = () => {
 
 ### Explanation of the Code
 
-This function allows users to copy the tracking number to their clipboard. If the order has a tracking number, it uses the `navigator.clipboard.writeText` method to copy it and displays a success message using `toast`.
+This utility function enhances user experience by providing a convenient way to copy tracking information without manual selection. The function first validates that an order exists and contains a tracking number before proceeding with the copy operation.
+
+The `navigator.clipboard.writeText` method is a modern browser API that securely writes text to the user's clipboard. This approach is more reliable than older clipboard manipulation techniques and works across different operating systems and browsers.
+
+When the copy operation succeeds, the function triggers a success notification using the `toast` system. This immediate feedback confirms to users that the tracking number has been successfully copied, eliminating uncertainty about whether the action worked.
+
+This feature is particularly valuable on mobile devices where manually selecting and copying long tracking numbers can be cumbersome. By providing a single-click copy function, the interface reduces friction and improves the overall user experience.
 
 ## Implementing Downloadable Invoice
 
@@ -137,7 +155,15 @@ const downloadReceipt = () => {
 
 ### Explanation of the Code
 
-This function generates a downloadable receipt in plain text format. It compiles the order details into a string, creates a Blob from that string, and then creates a temporary link to download the file. When the user clicks the link, the receipt is downloaded with a filename based on the order ID.
+This function creates a downloadable receipt by transforming order data into a structured text format that customers can save for their records. The process begins by validating that order data exists before proceeding with the download generation.
+
+The receipt content includes all essential order information formatted in a readable structure. This includes basic order details like ID and date, customer information, itemized purchases with quantities, and a complete breakdown of all charges including discounts and fees. The formatting ensures the receipt remains legible whether viewed on screen or printed.
+
+The function uses the Blob API to create a file-like object containing the receipt text. A Blob (Binary Large Object) represents immutable file data that can be read as text or binary data. By specifying the MIME type as "text/plain", the system knows to treat this as a readable text file.
+
+The download mechanism works by creating a temporary URL that points to the blob data, then generating an invisible anchor element with this URL as its target. The `download` attribute specifies the filename, which includes the order ID for easy identification. After triggering the download, the function cleans up by revoking the temporary URL to free up memory.
+
+This approach works across all modern browsers and provides users with a permanent record of their purchase that they can store, email, or print as needed.
 
 ## Handling `loading` and `!order` States
 
@@ -174,7 +200,15 @@ if (!order) {
 
 ### Explanation of the Code
 
-This code handles the loading state and the case where the order is not found. If the data is still loading, it displays a spinner and a loading message. If no order is found, it shows a message indicating that the order does not exist and provides a button to return to the home page.
+These conditional rendering blocks ensure users receive appropriate visual feedback based on the current state of the order retrieval process. The component handles two distinct scenarios that require different user interfaces.
+
+The loading state appears when the component is still fetching order data from the system. During this time, users see an animated spinner created using CSS animations and Tailwind classes. The spinner rotates continuously using the `animate-spin` class, providing clear visual indication that the system is working. The accompanying text reassures users that their order details are being retrieved.
+
+The "order not found" state activates when the system cannot locate an order matching the provided ID. This might occur if the URL was manually modified, the order ID expired, or there was an error in the order creation process. Instead of leaving users on a broken page, this state provides a clear explanation of the problem.
+
+The error state includes a package icon to maintain visual consistency with the e-commerce theme, a descriptive heading that explains the issue, and explanatory text that doesn't blame the user. Most importantly, it offers a clear path forward with a prominent button that returns users to the homepage where they can continue browsing or accessing their account.
+
+Both states center their content both horizontally and vertically within the full screen height, ensuring the messaging appears prominent and professional regardless of the screen size or device being used.
 
 ## Creating the Confirmation Page
 
@@ -499,7 +533,21 @@ This code handles the loading state and the case where the order is not found. I
 
 ### Explanation of the Code
 
-This section renders the main content of the confirmation page, including the success header, tracking information, order items, shipping address, and order summary. It uses various components like `Card`, `CardHeader`, and `CardContent` to structure the layout. The page also includes buttons for downloading the receipt, viewing the order in the dashboard, continuing shopping, and returning home.
+This extensive section constructs the main confirmation page interface, organizing order information into logical, digestible sections that guide users through their purchase details. The layout uses a responsive grid system that adapts to different screen sizes while maintaining readability and visual hierarchy.
+
+The success header creates an immediate positive impression with a large green checkmark icon and celebratory messaging. This visual design choice reinforces that the transaction completed successfully and helps reduce any anxiety users might have about their purchase. The header includes essential order identifiers like the order number and date, formatted for easy reading.
+
+The status badge provides immediate visibility into where the order stands in the fulfillment process. The `getStatusColor` function dynamically applies appropriate colors based on the order status, creating intuitive visual cues that help users quickly understand their order's progress.
+
+The tracking information card serves as a central hub for shipment details. The prominent display of the tracking number, combined with the copy button, makes it easy for customers to track their packages across different carrier websites. The card also includes structured date information showing both when the order was placed and when delivery is expected.
+
+The order items section provides a detailed breakdown of purchased products. Each item displays with a thumbnail image (when available), product details, quantity, and pricing information. This detailed view helps customers verify their order contents and serves as a reference for future needs.
+
+The shipping address card ensures customers can verify where their order is being sent, which is particularly important for gifts or orders shipped to alternate addresses. This transparency helps prevent delivery issues and builds confidence in the order fulfillment process.
+
+The order summary sidebar consolidates all financial information in one location. It breaks down costs transparently, showing subtotals, discounts, shipping fees, and the final amount paid. This detailed breakdown helps customers understand exactly what they paid for and can serve as a record for expense tracking.
+
+Action buttons throughout the interface provide clear next steps for customers. Whether they want to download their receipt, view order details in their dashboard, continue shopping, or return to the homepage, each action is clearly labeled and easily accessible.
 
 ## Loading Fallback Function
 
@@ -519,7 +567,13 @@ function LoadingFallback() {
 
 ### Explanation of the Code
 
-This function provides a loading fallback UI that displays a spinner and a loading message while the order details are being fetched. It ensures that users have a visual indication that their request is being processed.
+This dedicated loading component serves as a fallback interface that appears when the main content is still being prepared for display. The component maintains visual consistency with the main loading state while providing context-specific messaging that relates to the order confirmation process.
+
+The loading animation uses the same spinning element design as other loading states throughout the application, ensuring users recognize the familiar pattern and understand that the system is actively working on their request. The centered layout and full-screen height ensure the loading indicator remains prominent and visible regardless of the device or screen size.
+
+The messaging specifically mentions "order confirmation" rather than generic loading text, which provides users with context about what exactly is being processed. This specificity helps reduce uncertainty and gives users confidence that their order-related request is being handled appropriately.
+
+This fallback component becomes particularly important in scenarios where network connectivity is slow or when the order data requires additional processing time. By providing immediate visual feedback, it prevents users from thinking the page is broken or unresponsive.
 
 ## Rendering the Confirmation Page
 
@@ -536,7 +590,13 @@ export default function OrderConfirmationPage() {
 
 ### Explanation of the Code
 
-This code exports the main `OrderConfirmationPage` component, which uses React's `Suspense` to handle the loading state. The `OrderConfirmationContent` component is wrapped in a `Suspense` component, allowing it to display the `LoadingFallback` while the order data is being fetched.
+This final component structure implements React's Suspense pattern to gracefully handle the asynchronous nature of order data retrieval. The `Suspense` wrapper creates a boundary that monitors the loading state of its child components and displays appropriate fallback content when needed.
+
+When the `OrderConfirmationContent` component is still loading order data or processing the display logic, the `Suspense` component automatically renders the `LoadingFallback` component instead. This creates a seamless user experience where loading states are handled declaratively rather than requiring manual state management.
+
+The Suspense pattern is particularly valuable in this context because order confirmation pages often need to fetch data from multiple sources, validate order details, and prepare complex display information. Rather than showing a blank page or broken interface during this process, users consistently see appropriate loading feedback.
+
+This architectural approach also makes the component more maintainable and testable, since the loading logic is separated from the main content rendering logic. The pattern scales well as the application grows and helps ensure consistent loading behavior across different order scenarios.
 
 ## Next Steps
 

@@ -12,7 +12,7 @@ export function loadSidebarState(defaultValue: boolean = true): boolean {
   if (typeof window === "undefined") {
     return defaultValue;
   }
-  
+
   try {
     const saved = localStorage.getItem(SIDEBAR_STORAGE_KEY);
     return saved !== null ? JSON.parse(saved) : defaultValue;
@@ -29,7 +29,7 @@ export function saveSidebarState(isOpen: boolean): void {
   if (typeof window === "undefined") {
     return;
   }
-  
+
   try {
     localStorage.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify(isOpen));
   } catch {

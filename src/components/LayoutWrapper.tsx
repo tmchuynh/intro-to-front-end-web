@@ -1,10 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {
+  loadSidebarState,
+  saveSidebarState,
+  SIDEBAR_KEYBOARD_SHORTCUT,
+} from "@/utils/sidebar";
+import { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import { ThemeProvider } from "./ThemeProvider";
 import TopNavbar from "./TopNavbar";
-import { loadSidebarState, saveSidebarState, SIDEBAR_KEYBOARD_SHORTCUT } from "@/utils/sidebar";
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -32,14 +36,17 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   // Add keyboard shortcut for toggling sidebar (Ctrl/Cmd + B)
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === SIDEBAR_KEYBOARD_SHORTCUT) {
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.key === SIDEBAR_KEYBOARD_SHORTCUT
+      ) {
         event.preventDefault();
         toggleSidebar();
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   const toggleSidebar = () => {
@@ -57,11 +64,16 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
         <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
 
         {/* Main content area */}
-        <div className={`flex flex-1 flex-col min-w-0 transition-all duration-300 ${
-          sidebarOpen ? 'lg:ml-96' : 'lg:ml-0'
-        }`}>
+        <div
+          className={`flex flex-1 flex-col min-w-0 transition-all duration-300 ${
+            sidebarOpen ? "lg:ml-96" : "lg:ml-0"
+          }`}
+        >
           {/* Top navbar */}
-          <TopNavbar onToggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
+          <TopNavbar
+            onToggleSidebar={toggleSidebar}
+            sidebarOpen={sidebarOpen}
+          />
 
           {/* Main content */}
           <main className="flex-1 overflow-auto">

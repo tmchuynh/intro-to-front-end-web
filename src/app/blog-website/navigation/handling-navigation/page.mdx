@@ -47,13 +47,13 @@ The sidebar implementation consists of three main components:
 
 This component serves as the main container for our navigation system. It manages several critical aspects:
 
-###### State Management
+#### State Management
 
 - `isOpen`: Controls the sidebar visibility (especially important for mobile)
 - `openSection`: Tracks which navigation section is currently expanded
 - Navigation data from the `useNavigation` hook
 
-###### Key Features
+##### Key Features
 
 - **Mobile overlay**: Creates a backdrop when sidebar is open on mobile devices
 - **Auto-expansion**: Automatically opens the section containing the current page
@@ -222,13 +222,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
 The `Sidebar` component is the backbone of our navigation system, implementing several features:
 
-###### Navigation State Management
+#### Navigation State Management
 
 - **`useNavigation` hook**: Fetches navigation data from the file system API
 - **`openSection` state**: Tracks which section is currently expanded, ensuring only one section is open at a time
 - **Auto-detection logic**: Uses `findSectionForPath` to automatically identify and expand the section containing the current page
 
-###### Responsive Design Implementation
+##### Responsive Design Implementation
 
 - **Mobile overlay**: The conditional `div` with `bg-opacity-50` creates a semi-transparent backdrop on mobile
 - **Transform animations**: Uses CSS `translate-x` for smooth slide-in/out animations
@@ -254,14 +254,14 @@ The component uses Tailwind CSS for styling, providing a clean, modern interface
 
 The `NavigationSection` component is a crucial building block that handles the collapsible behavior of navigation sections. It manages:
 
-###### Section-Level Functionality
+#### Section-Level Functionality
 
 - **Toggle mechanics**: Expand/collapse sections with smooth animations
 - **State persistence**: Remembers which items within a section are expanded
 - **Visual feedback**: Rotating arrows and color changes to indicate state
 - **Nested item management**: Handles complex hierarchies with proper indentation
 
-###### Animation and Styling
+##### Animation and Styling
 
 - **CSS transitions**: Smooth height and opacity changes for expand/collapse
 - **Transform animations**: Rotating chevron icons to indicate state
@@ -460,13 +460,13 @@ function NavigationItem({
 
 The `NavigationSection` component implements a collapsible section system with several key features:
 
-###### State Management Architecture
+#### State Management Architecture
 
 - **`isOpen` prop**: Controls the main section visibility, passed down from the parent Sidebar
 - **`expandedItem` state**: Manages which individual item within the section is expanded
 - **Auto-reset logic**: The `useEffect` hook automatically collapses all items when the section is closed, maintaining clean state
 
-###### Animation Implementation
+##### Animation Implementation
 
 - **CSS transitions**: The `transition-all duration-300 ease-in-out` classes create smooth animations
 - **Height animations**: `max-h-screen` vs `max-h-0` creates expanding/collapsing effect
@@ -495,21 +495,21 @@ The `NavigationItem` function demonstrates a recursive pattern that's essential 
 
 The top navigation bar serves as a complement to the sidebar, providing immediate access to essential functions and maintaining consistent navigation across all pages. This fixed header includes:
 
-###### Core Functionality
+### Core Functionality
 
 - **Global search**: Allows users to quickly find content without navigating through the sidebar
 - **Theme switching**: Toggles between light and dark modes for user preference
 - **Mobile menu access**: Provides a hamburger button to open the sidebar on smaller screens
 - **Brand consistency**: Displays the site name/logo for brand recognition
 
-###### Search Implementation Features
+#### Search Implementation Features
 
 - **Real-time results**: Shows search suggestions as users type
 - **Intelligent matching**: Searches through titles, content, and navigation structure
 - **Keyboard navigation**: Users can navigate results using arrow keys
 - **Quick access**: Click-to-navigate functionality for immediate page jumps
 
-###### Responsive Design Considerations
+##### Responsive Design Considerations
 
 - **Mobile-first approach**: Prioritizes essential functions on smaller screens
 - **Progressive enhancement**: Adds features as screen space increases
@@ -718,7 +718,7 @@ export default function TopNavbar({ onToggleSidebar }: TopNavbarProps) {
 
 The `TopNavbar` component implements a header with multiple advanced features:
 
-###### Search Functionality Deep Dive
+#### Search Functionality Deep Dive
 
 - **Real-time search processing**: The `useEffect` hook with `searchQuery` dependency triggers searches as users type
 - **Debounced interactions**: The search results use timeouts to prevent immediate hiding, allowing users to click results
@@ -726,7 +726,7 @@ The `TopNavbar` component implements a header with multiple advanced features:
 - **Search result flattening**: Uses `flattenNavigationForSearch` to create a searchable index of all navigation items
 - **Performance optimization**: `useMemo` prevents unnecessary re-flattening of navigation data
 
-###### Theme Management Implementation
+##### Theme Management Implementation
 
 - **Hydration safety**: The `mounted` state prevents theme-dependent rendering during SSR/hydration
 - **Icon switching**: Dynamically displays sun/moon icons based on current theme
@@ -761,7 +761,7 @@ The search functionality integrates with utility functions (`flattenNavigationFo
 
 Dynamic navigation is essential for maintainable, scalable documentation websites. Instead of hardcoding navigation links, we create a system that automatically generates navigation based on your file structure and content metadata.
 
-###### Benefits of Dynamic Navigation
+### Benefits of Dynamic Navigation
 
 - **Automatic updates**: New pages are automatically included in navigation
 - **Consistency**: Ensures all pages follow the same navigation patterns
@@ -769,7 +769,7 @@ Dynamic navigation is essential for maintainable, scalable documentation website
 - **Scalability**: Handles growing content without code changes
 - **Metadata integration**: Uses frontmatter and file structure for intelligent organization
 
-###### System Architecture
+#### System Architecture
 
 Our dynamic navigation system consists of three main layers:
 
@@ -777,7 +777,7 @@ Our dynamic navigation system consists of three main layers:
 2. **API Layer**: Provides navigation data to client components via REST endpoints
 3. **Client Hooks**: Manage navigation state and provide data to UI components
 
-###### How It Works
+##### How It Works
 
 The system scans your `src/app` directory, looking for `page.mdx` and `page.tsx` files. For each page found, it:
 
@@ -790,14 +790,14 @@ The system scans your `src/app` directory, looking for `page.mdx` and `page.tsx`
 
 The `useNavigation` hook is a custom React hook that encapsulates all the logic for fetching and managing navigation data. This hook provides:
 
-###### Data Management
+#### Data Management
 
 - **Centralized state**: Single source of truth for navigation data across the app
 - **Loading states**: Provides feedback during data fetching operations
 - **Error handling**: Gracefully handles API failures with fallback mechanisms
 - **Path-aware updates**: Refetches navigation when the current path changes
 
-###### Performance Optimization
+##### Performance Optimization
 
 - **Client-side caching**: Prevents unnecessary API calls for the same path
 - **Dependency tracking**: Only updates when the pathname actually changes
@@ -857,13 +857,13 @@ export function useNavigation() {
 
 The `useNavigation` hook demonstrates several advanced React patterns and best practices:
 
-###### Hook Architecture
+#### Hook Architecture
 
 - **State management**: Uses `useState` for both `navigation` data and `loading` status
 - **Side effect handling**: `useEffect` manages the async data fetching lifecycle
 - **Dependency optimization**: Only refetches when `pathname` changes, preventing unnecessary API calls
 
-###### Error Handling Strategy
+##### Error Handling Strategy
 
 - **Graceful degradation**: Falls back to empty navigation array instead of crashing
 - **Multiple fallback levels**: Handles both fetch failures and response parsing errors
@@ -895,14 +895,14 @@ This hook abstracts away all the complexity of navigation data management, provi
 
 API routes in Next.js App Router provide server-side functionality for handling dynamic requests. Our navigation API route serves as the bridge between the file system and the client-side navigation components.
 
-###### Route Architecture
+#### Route Architecture
 
 - **RESTful endpoint**: Follows standard REST conventions for GET requests
 - **Dynamic response**: Adapts navigation structure based on current path
 - **Error resilience**: Provides fallback navigation when file system scanning fails
 - **Performance optimized**: Uses server-side file system access for speed
 
-###### Query Parameter Handling
+##### Query Parameter Handling
 
 The route accepts a `path` parameter that allows it to:
 
@@ -956,13 +956,13 @@ export async function GET(request: Request) {
 
 The API route implementation showcases several important server-side concepts:
 
-###### Next.js App Router Patterns
+#### Next.js App Router Patterns
 
 - **Named export functions**: `GET` function follows App Router conventions for HTTP method handling
 - **Request object handling**: Extracts query parameters using the Web API `URL` constructor
 - **Response formatting**: Uses `NextResponse.json()` for consistent JSON responses
 
-###### Dynamic Import Strategy
+##### Dynamic Import Strategy
 
 - **Code splitting**: The fallback error handler uses dynamic imports to reduce initial bundle size
 - **Lazy loading**: Only loads navigation utilities when needed during error scenarios
@@ -994,14 +994,14 @@ This API route demonstrates how to build resilient server-side functionality tha
 
 Fallback navigation serves as a critical safety net in our navigation system, ensuring that users can always access essential site sections even when dynamic navigation generation fails.
 
-###### Purpose and Benefits
+#### Purpose and Benefits
 
 - **Reliability**: Guarantees navigation functionality under all circumstances
 - **Development continuity**: Allows development to continue even with file system issues
 - **User experience**: Prevents broken navigation states that could trap users
 - **Graceful degradation**: Provides core functionality when advanced features fail
 
-###### Design Principles
+##### Design Principles
 
 - **Essential pages only**: Includes only the most critical site sections
 - **Simple structure**: Avoids complex nesting that might complicate fallback scenarios
@@ -1077,7 +1077,7 @@ The structure can be expanded by:
 
 The navigation utility functions form the core logic that powers our dynamic navigation system. These functions handle the complex tasks of reading file systems, parsing metadata, and building hierarchical navigation structures.
 
-###### Core Responsibilities
+#### Core Responsibilities
 
 - **File system scanning**: Recursively explores directory structures to find pages
 - **Metadata extraction**: Parses frontmatter and content to extract navigation information
@@ -1085,7 +1085,7 @@ The navigation utility functions form the core logic that powers our dynamic nav
 - **State management**: Handles expanded/collapsed states for navigation sections
 - **Title formatting**: Converts file names into user-friendly display titles
 
-###### Key Design Principles
+##### Key Design Principles
 
 - **Modularity**: Each function has a single, well-defined responsibility
 - **Reusability**: Functions can be used independently or composed together
@@ -1116,7 +1116,7 @@ export interface NavigationSection {
 
 ### Explanation of the Code
 
-###### Interface Design Philosophy
+#### Interface Design Philosophy
 
 The `NavigationItem` interface represents the fundamental building block of our navigation system:
 
@@ -1132,7 +1132,7 @@ The `NavigationSection` interface groups related navigation items:
 - **`title`**: Section header (like "Documentation", "Tutorials", etc.)
 - **`items`**: Array of navigation items belonging to this section
 
-###### TypeScript Benefits
+##### TypeScript Benefits
 
 - **Compile-time safety**: Prevents common errors like missing required properties
 - **IntelliSense support**: Provides autocomplete and documentation in your IDE
@@ -1167,13 +1167,13 @@ export function formatTitle(name: string): string {
 
 The `formatTitle` function implements a smart title transformation algorithm:
 
-###### String Processing Logic
+#### String Processing Logic
 
 - **Splitting strategy**: Uses hyphens as word boundaries (common in URL-friendly filenames)
 - **Capitalization**: Applies title case by capitalizing the first letter of each word
 - **Joining**: Replaces hyphens with spaces for natural reading
 
-###### Use Cases and Examples
+##### Use Cases and Examples
 
 - `"introduction-to-react"` → `"Introduction To React"`
 - `"api-endpoints"` → `"Api Endpoints"`
@@ -1251,13 +1251,13 @@ export async function readMDXMetadata(
 
 The `readMDXMetadata` function demonstrates advanced file parsing and metadata extraction:
 
-###### Environment Detection
+#### Environment Detection
 
 - **Client-side safety**: Immediately returns empty metadata when running in the browser
 - **Server-side processing**: Only performs file operations on the server where Node.js APIs are available
 - **Universal compatibility**: Works in both SSR and client-side environments
 
-###### Frontmatter Parsing Logic
+##### Frontmatter Parsing Logic
 
 - **Regex pattern**: `/^---\s*\n([\s\S]*?)\n---/` matches YAML frontmatter blocks
 - **Flexible matching**: Handles variations in whitespace and line endings
@@ -1384,13 +1384,13 @@ async function scanDirectory(
 
 The `scanDirectory` function implements a recursive file system scanner:
 
-###### Recursive Architecture
+#### Recursive Architecture
 
 - **Directory traversal**: Systematically explores every subdirectory
 - **File type detection**: Uses `withFileTypes: true` to efficiently identify directories vs files
 - **Recursive calls**: Each subdirectory triggers another `scanDirectory` call, building a tree structure
 
-###### Filtering Logic
+##### Filtering Logic
 
 - **Hidden files**: Skips files starting with `.` (like `.gitignore`, `.env`)
 - **System files**: Excludes Next.js specific files that shouldn't appear in navigation
@@ -1458,13 +1458,13 @@ export function setExpandedState(
 
 The `setExpandedState` function implements intelligent navigation state management:
 
-###### Path Normalization
+#### Path Normalization
 
 - **Consistent formatting**: Ensures all paths start with `/` for reliable comparison
 - **Input flexibility**: Handles paths whether they already have leading slashes or not
 - **Comparison safety**: Prevents path matching errors due to inconsistent formatting
 
-###### State Propagation Strategy
+##### State Propagation Strategy
 
 - **Section-level mapping**: Iterates through each navigation section independently
 - **Item-level processing**: Applies expansion logic to individual items within sections
@@ -1512,13 +1512,13 @@ function setItemExpandedState(
 
 The `setItemExpandedState` function implements recursive navigation state logic:
 
-###### Expansion Logic
+#### Expansion Logic
 
 - **Path relevance detection**: Uses `isPathInSubtree` to determine if the item should be expanded
 - **State assignment**: Sets `isExpanded` based on whether the current path relates to this item
 - **Recursive processing**: Applies the same logic to all child items, maintaining consistent state throughout the tree
 
-###### State Management Benefits
+##### State Management Benefits
 
 - **Automatic expansion**: Items automatically expand when they contain the current page
 - **Visual hierarchy**: Users can see exactly where they are in the navigation structure
@@ -1567,12 +1567,12 @@ function isPathInSubtree(currentPath: string, item: NavigationItem): boolean {
 
 The `isPathInSubtree` function implements path matching logic:
 
-###### Exact Match Detection
+#### Exact Match Detection
 
 - **Direct comparison**: First checks if the current path exactly matches the item's href
 - **Immediate relevance**: Returns true for direct matches, ensuring the current page's navigation item is always expanded
 
-###### Hierarchical Path Matching
+##### Hierarchical Path Matching
 
 - **Parent-child relationships**: Uses `startsWith(item.href + "/")` to detect if the current path is a child of the item
 - **Path boundary protection**: The trailing `/` ensures clean path boundaries (prevents `/blog` from matching `/blog-post`)
@@ -1621,13 +1621,13 @@ export function getClientSideNavigation(
 
 The `getClientSideNavigation` function provides a client-side fallback mechanism:
 
-###### Client-Side Navigation Strategy
+#### Client-Side Navigation Strategy
 
 - **Fallback provision**: Provides navigation data when server-side generation fails or isn't available
 - **State consistency**: Maintains the same interface and behavior as server-generated navigation
 - **Conditional expansion**: Applies expanded state only when current path is available
 
-###### Use Cases
+##### Use Cases
 
 - **Development environments**: Provides navigation during development when file scanning might fail
 - **Build-time fallbacks**: Ensures navigation works even if the dynamic system encounters issues

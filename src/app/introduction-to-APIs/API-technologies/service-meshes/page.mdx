@@ -10,7 +10,7 @@ Service meshes are a dedicated infrastructure layer for handling service-to-serv
 
 Unlike traditional approaches where these capabilities are built into each service, a service mesh extracts these concerns into a separate layer, allowing developers to focus on business logic while the mesh handles the complexity of distributed system communication.
 
-##### Key Features
+### Key Features
 
 - **Traffic Management**: Control the flow of traffic between services with routing rules, load balancing algorithms (round-robin, least connections, weighted), canary deployments, and blue-green deployments.
 - **Security**: Implement zero-trust security with mutual TLS (mTLS) for automatic encryption of service-to-service communication, identity-based access control, and certificate management.
@@ -58,7 +58,7 @@ data:
     - Envoy Proxy: Sidecar proxies for traffic interception
 ```
 
-##### Use Cases
+### Use Cases
 
 - **Microservices Communication**: Manage complex service interactions in distributed architectures with hundreds or thousands of services.
 - **Zero-Trust Security**: Implement security without modifying application code, including automatic mTLS encryption and identity verification.
@@ -67,7 +67,7 @@ data:
 - **Legacy System Integration**: Bridge communication between legacy monoliths and modern microservices.
 - **Compliance and Governance**: Meet regulatory requirements with centralized policy enforcement and audit trails.
 
-##### Benefits
+#### Benefits
 
 - **Developer Productivity**: Developers focus on business logic while the mesh handles cross-cutting concerns like security, observability, and reliability.
 - **Operational Consistency**: Uniform approach to managing service communication across all environments and deployment stages.
@@ -97,14 +97,14 @@ data:
 | [**Cilium**](https://cilium.io/)                         | CNCF Graduated  | eBPF-based, high performance, advanced networking      | Performance-critical applications, Kubernetes-native | High           |
 | [**Kuma**](https://kuma.io/)                             | CNCF Sandbox    | Universal (K8s + VMs), Kong ecosystem                  | Multi-platform deployments                           | Medium         |
 
-##### Istio
+### Istio
 
 - **Strengths**: Most feature set, strong security, excellent observability
 - **Use Cases**: Enterprise environments requiring advanced traffic management and security
 - **Performance**: Moderate overhead due to feature richness
 - **Adoption**: Widely adopted in large enterprises
 
-##### Linkerd
+#### Linkerd
 
 - **Strengths**: Exceptional performance, minimal resource usage, ease of use
 - **Use Cases**: Performance-sensitive applications, teams prioritizing simplicity
@@ -123,7 +123,7 @@ data:
 
 ### Istio Setup and Configuration
 
-##### 1. Installing Istio
+#### 1. Installing Istio
 
 ```bash
 ## Download and Install Istio
@@ -138,7 +138,7 @@ istioctl install --set values.defaultRevision=default
 kubectl label namespace default istio-injection=enabled
 ```
 
-##### 2. Sample Application Deployment
+### 2. Sample Application Deployment
 
 ```yaml
 ## Bookinfo-app.yaml - Sample Microservices Application
@@ -183,7 +183,7 @@ spec:
             - containerPort: 9080
 ```
 
-##### 3. Traffic Management with VirtualService
+### 3. Traffic Management with VirtualService
 
 ```yaml
 ## Traffic-routing.yaml - Advanced Traffic Routing
@@ -234,7 +234,7 @@ spec:
           baseEjectionTime: 30s
 ```
 
-##### 4. Security Policies
+### 4. Security Policies
 
 ```yaml
 ## Security-policy.yaml - mTLS and Authorization
@@ -272,7 +272,7 @@ spec:
 
 ### Linkerd Implementation
 
-##### 1. Linkerd Installation
+#### 1. Linkerd Installation
 
 ```bash
 ## Install Linkerd CLI
@@ -289,7 +289,7 @@ linkerd install | kubectl apply -f -
 linkerd check
 ```
 
-##### 2. Service Injection and Configuration
+### 2. Service Injection and Configuration
 
 ```yaml
 ## Linkerd-app.yaml - Application with Linkerd Annotations
@@ -320,7 +320,7 @@ spec:
             - containerPort: 80
 ```
 
-##### 3. Traffic Split for Canary Deployments
+### 3. Traffic Split for Canary Deployments
 
 ```yaml
 ## Canary-deployment.yaml - Linkerd Traffic Splitting
@@ -357,7 +357,7 @@ spec:
 
 ### Consul Connect Setup
 
-##### 1. Consul Installation with Connect
+#### 1. Consul Installation with Connect
 
 ```hcl
 ## Consul-config.hcl
@@ -384,7 +384,7 @@ ports {
 consul agent -config-file=consul-config.hcl
 ```
 
-##### 2. Service Registration
+### 2. Service Registration
 
 ```json
 {
@@ -418,7 +418,7 @@ consul agent -config-file=consul-config.hcl
 }
 ```
 
-##### 3. Consul Connect Intentions
+#### 3. Consul Connect Intentions
 
 ```bash
 ## Allow Web-service to Communicate with Database
@@ -435,7 +435,7 @@ consul intention list
 
 ### AWS App Mesh Configuration
 
-##### 1. Mesh and Virtual Node Setup
+#### 1. Mesh and Virtual Node Setup
 
 ```yaml
 ## App-mesh-setup.yaml
@@ -474,7 +474,7 @@ spec:
           name: reviews
 ```
 
-##### 2. Virtual Service and Routes
+### 2. Virtual Service and Routes
 
 ```yaml
 ## Virtual-service.yaml
@@ -519,7 +519,7 @@ spec:
 
 ### Observability Configuration
 
-##### 1. Prometheus Integration
+#### 1. Prometheus Integration
 
 ```yaml
 ## Prometheus-config.yaml
@@ -551,7 +551,7 @@ data:
         regex: '.*-envoy-prom'
 ```
 
-##### 2. Jaeger Tracing Setup
+### 2. Jaeger Tracing Setup
 
 ```yaml
 ## Jaeger-tracing.yaml
@@ -705,7 +705,7 @@ data:
 | **Maturity**           | High      | High    | High           | Medium        | Medium    |
 | **Community**          | Large     | Medium  | Medium         | AWS Ecosystem | Growing   |
 
-##### Performance Benchmarks
+### Performance Benchmarks
 
 ```bash
 ## Example Benchmarking Commands

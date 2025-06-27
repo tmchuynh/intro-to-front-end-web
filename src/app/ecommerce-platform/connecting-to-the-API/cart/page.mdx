@@ -74,12 +74,12 @@ export async function fetchUserCarts(
 
 This function demonstrates several important concepts in API integration:
 
-###### Function Parameters & TypeScript Types:
+#### Function Parameters & TypeScript Types:
 
 - The function accepts a `userId` parameter of type `number`, ensuring type safety
 - The return type `Promise<UserCartsResponse>` explicitly defines what the function will return asynchronously
 
-###### API Endpoint Construction:
+##### API Endpoint Construction:
 
 - Uses template literals to dynamically build the URL: `${API_BASE_URL}/users/${userId}/carts`
 - This follows RESTful API conventions where user-specific resources are nested under the user endpoint
@@ -136,12 +136,12 @@ This function showcases fundamental concepts in single-resource API fetching:
 - Uses a unique `cartId` parameter to identify a specific cart resource
 - Follows RESTful conventions where each resource has a unique identifier in the URL path
 
-###### HTTP Get Request Pattern:
+#### HTTP Get Request Pattern:
 
 - Demonstrates the standard pattern for fetching a single resource by ID
 - The endpoint structure `/carts/${cartId}` clearly indicates we're requesting one specific cart
 
-###### Response Type Handling:
+##### Response Type Handling:
 
 - Returns a `Promise<Cart>` indicating this function deals with a single cart object
 - The `Cart` interface ensures the response data structure matches our application's expectations
@@ -199,12 +199,12 @@ export async function fetchAllCarts(
 
 This function introduces advanced concepts for handling large datasets and pagination:
 
-###### Default Parameters in TypeScript:
+#### Default Parameters in TypeScript:
 
 - Uses default parameter values (`limit: number = 20, skip: number = 0`) to provide sensible defaults
 - This makes the function flexible - it can be called with no parameters, one parameter, or both parameters
 
-###### Query Parameters for Pagination:
+##### Query Parameters for Pagination:
 
 - Constructs URL query parameters using template literals: `?limit=${limit}&skip=${skip}`
 - This implements pagination, which is crucial for performance when dealing with large datasets
@@ -274,12 +274,12 @@ export async function getPreviouslyPurchased(
 
 This function demonstrates advanced data processing techniques and functional programming concepts:
 
-###### Function Composition:
+#### Function Composition:
 
 - Calls `fetchUserCarts()` first to get raw cart data, then processes it
 - This shows how to build complex operations by combining simpler functions
 
-###### Array Method Chaining:
+##### Array Method Chaining:
 
 - Uses `flatMap()` to flatten nested arrays: `userCarts.carts.flatMap(cart => cart.products)`
 - `flatMap()` is more efficient than using `map()` followed by `flat()` - it combines both operations
@@ -335,12 +335,12 @@ export async function getOrderHistory(userId: number): Promise<Cart[]> {
 
 This function focuses on data sorting and user experience optimization:
 
-###### Data Reuse Pattern:
+#### Data Reuse Pattern:
 
 - Leverages the existing `fetchUserCarts()` function rather than duplicating API logic
 - This demonstrates the DRY (Don't Repeat Yourself) principle in software development
 
-###### Array Sorting for User Experience:
+##### Array Sorting for User Experience:
 
 - Uses the `sort()` method with a comparison function: `(a, b) => b.id - a.id`
 - The comparison `b.id - a.id` creates descending order (newest first)
@@ -407,13 +407,13 @@ export async function getUserPurchaseStats(userId: number): Promise<{
 
 This function demonstrates the powerful `reduce()` method for statistical calculations:
 
-###### Array.reduce() for Aggregation:
+#### Array.reduce() for Aggregation:
 
 - Uses `reduce()` to iterate through all carts and accumulate statistics
 - The accumulator (`acc`) starts with initial values of 0 for all statistics
 - Each iteration adds the current cart's values to the running totals
 
-###### Accumulator Pattern:
+##### Accumulator Pattern:
 
 - `acc.totalOrders += 1` - counts each cart as one order
 - `acc.totalSpent += cart.discountedTotal` - sums up the actual amounts paid (after discounts)

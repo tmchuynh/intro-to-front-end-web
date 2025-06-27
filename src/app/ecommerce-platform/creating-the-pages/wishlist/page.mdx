@@ -34,7 +34,16 @@ export default function WishlistPage() {
 
 ### Explanation of the Code
 
-This code imports necessary hooks and components for managing the wishlist functionality in our e-commerce platform. It includes authentication, cart management, currency formatting, and UI components like badges, buttons, and cards. The `useRouter` hook is used for navigation within the application.
+This section establishes the foundation for the wishlist page by importing all essential dependencies and configuring the component's core functionality. The imports can be categorized into several key areas:
+
+- **Context hooks for data management**: The `useWishlist` hook provides access to wishlist items, purchase history, and item manipulation functions, while `useAuth` manages user authentication status. The `useCart` hook enables cart interactions, and `useCurrency` handles price formatting based on user preferences
+- **Navigation and routing**: The Next.js `useRouter` hook enables programmatic navigation between pages, particularly useful for redirecting unauthenticated users or guiding them to relevant sections of the site
+- **UI component library**: Material design components including `Badge`, `Button`, and `Card` ensure visual consistency across the platform while providing accessible and responsive interface elements
+- **Icon system**: Lucide React icons like `Heart`, `ShoppingCart`, and `Trash2` provide intuitive visual cues for different actions and states throughout the wishlist interface
+- **Image optimization**: Next.js `Image` component ensures optimal loading performance and responsive behavior for product thumbnails
+- **User feedback**: The `toast` notification system provides immediate feedback for user actions like adding items to cart or removing them from the wishlist
+
+The component initializes by extracting wishlist data (both active items and purchased items), cart functionality, authentication status, and currency formatting capabilities. This setup enables the page to display personalized content based on the user's login status and shopping history.
 
 ## Handling Access Control
 
@@ -65,7 +74,17 @@ if (!isLoggedIn) {
 
 ### Explanation of the Code
 
-This code checks if the user is logged in. If not, it displays a message prompting them to log in or sign up to view their wishlist. The `Heart` icon is used to visually represent the wishlist, and buttons are provided for navigation to the login and registration pages.
+This authentication guard implements a crucial security layer that protects the wishlist functionality while providing clear guidance for unauthenticated users. The implementation includes several thoughtful design decisions:
+
+**Access control validation**: The component immediately checks the user's authentication status before rendering any wishlist content. This prevents unauthorized access to personal shopping data and ensures that wishlist operations are only available to logged-in users.
+
+**User-friendly messaging**: Instead of simply blocking access, the component displays an informative message that explains why the content is restricted. The heart icon reinforces the wishlist context while maintaining visual consistency with the overall design language.
+
+**Clear call-to-action buttons**: Two prominent buttons guide users toward resolution - a primary "Log In" button for existing users and a secondary "Sign Up" button for new visitors. This dual approach accommodates different user scenarios and reduces friction in the authentication process.
+
+**Consistent layout structure**: The blocked content uses the same container styling and responsive padding as the main wishlist page, ensuring visual continuity and maintaining the expected layout behavior across different screen sizes.
+
+**Progressive disclosure**: By showing this intermediate state rather than redirecting immediately, users understand what they're trying to access and can make an informed decision about whether to proceed with authentication.
 
 ## Checking Wishlist State
 
@@ -91,7 +110,17 @@ if (activeWishlistItems.length === 0 && purchasedItems.length === 0) {
 
 ### Explanation of the Code
 
-This code checks if the user has any items in their wishlist or purchased items. If both lists are empty, it displays a message indicating that the wishlist is empty and provides a button to navigate back to the shopping page.
+This empty state handler provides a welcoming experience for users who haven't yet engaged with the wishlist feature, while also checking for users who may have previously purchased all their wishlist items. The implementation addresses several user experience considerations:
+
+**Dual condition checking**: The function evaluates both active wishlist items and previously purchased items to determine if the user has any wishlist history at all. This distinction is important because users who have purchased all their wishlist items still have a meaningful relationship with the feature.
+
+**Encouraging messaging**: Rather than simply stating that the wishlist is empty, the message frames the situation positively by suggesting that users "haven't added any items yet," implying that adding items is a natural next step in their shopping journey.
+
+**Visual consistency**: The heart icon maintains thematic consistency with the wishlist concept while using neutral gray coloring to indicate the inactive state without creating negative associations.
+
+**Clear next action**: The "Start Shopping" button provides an obvious path forward, directing users to the main shopping area where they can discover products and begin building their wishlist. This reduces abandonment and keeps users engaged with the platform.
+
+**Preserved layout structure**: The empty state maintains the same responsive container and typography hierarchy as other page states, ensuring that users don't experience jarring layout shifts when transitioning between different wishlist states.
 
 ## Moving Wishlist Items to Cart
 
@@ -118,7 +147,17 @@ const handleMoveToCart = async (productId: number) => {
 
 ### Explanation of the Code
 
-This function handles moving an item from the wishlist to the cart. It first checks if the item exists in the wishlist, then adds it to the cart using the `addToCart` function. After that, it removes the item from the wishlist and displays a success or error message using `toast`.
+This function orchestrates the seamless transfer of items from the wishlist to the shopping cart, implementing a workflow that maintains data integrity while providing excellent user experience. The process involves several carefully coordinated steps:
+
+**Item validation and retrieval**: Before attempting any operations, the function verifies that the requested item actually exists in the user's active wishlist. This prevents errors that could occur from outdated UI states or concurrent modifications to the wishlist data.
+
+**Cart integration**: The function leverages the existing cart context to add the product, ensuring that the item appears in the cart with all its relevant details (price, quantity, attributes). This reuses established cart logic rather than duplicating functionality.
+
+**Wishlist cleanup**: After successfully adding the item to the cart, the function removes it from the wishlist to prevent confusion and duplicate entries. This maintains clean separation between items that are saved for later (wishlist) and items ready for purchase (cart).
+
+**User feedback system**: The function provides immediate confirmation of the successful transfer through toast notifications, helping users understand that their action was completed successfully. Error scenarios also receive appropriate messaging to guide users toward resolution.
+
+**Asynchronous operation handling**: The removal from wishlist is handled as an async operation, allowing for proper error handling if the server operation fails. This ensures that the cart addition can succeed even if the wishlist removal encounters issues, preventing loss of user intent.
 
 ## Removing Items from Wishlist
 
@@ -136,7 +175,17 @@ const handleRemoveFromWishlist = async (productId: number) => {
 
 ### Explanation of the Code
 
-This function handles the removal of an item from the wishlist. It calls the `removeFromWishlist` function and displays a success or error message based on the result.
+This function provides a straightforward mechanism for users to remove items from their wishlist while ensuring proper feedback and error handling. The implementation follows several important principles:
+
+**Direct operation execution**: The function immediately calls the `removeFromWishlist` function from the wishlist context, delegating the actual removal logic to the appropriate data management layer. This separation of concerns keeps the UI logic focused on user interaction rather than data manipulation.
+
+**Asynchronous operation handling**: Since wishlist modifications may involve server communication or local storage updates, the function properly handles the asynchronous nature of the removal operation using async/await syntax.
+
+**Result-based feedback**: The function evaluates the success status of the removal operation and provides contextually appropriate feedback through toast notifications. Successful removals trigger positive confirmation messages, while failures display error messages that can help users understand what went wrong.
+
+**Error resilience**: By checking the result status before displaying messages, the function ensures that users receive accurate feedback about whether their action was completed successfully. This prevents misleading success messages when underlying operations fail.
+
+**User experience continuity**: The immediate feedback helps users understand that their action was registered and processed, reducing uncertainty and improving confidence in the platform's responsiveness.
 
 ## Displaying the Wishlist
 
@@ -328,7 +377,21 @@ This function handles the removal of an item from the wishlist. It calls the `re
 
 ### Explanation of the Code
 
-This code renders the wishlist page, displaying both active wishlist items and previously purchased items. It uses a grid layout to show each item in a card format, including product images, titles, descriptions, ratings, prices, and action buttons for moving items to the cart or removing them from the wishlist. The purchased items are displayed with reduced opacity to indicate they are no longer active in the wishlist.
+This section creates a rich, interactive interface that presents wishlist items and purchase history in an organized and visually appealing format. The implementation encompasses several layers of functionality and user experience design:
+
+**Header and status information**: The page begins with a clear title and dynamic item count that updates in real-time as users modify their wishlist. The count uses proper pluralization to maintain grammatical accuracy, contributing to a polished user experience.
+
+**Dual-section layout**: The interface intelligently separates active wishlist items from previously purchased items, allowing users to easily distinguish between products they're still considering and those they've already bought. This organization helps users track their shopping journey and discover repurchase opportunities.
+
+**Grid-based responsive design**: Both sections utilize responsive grid layouts that adapt from single-column mobile displays to multi-column desktop layouts. This ensures optimal viewing and interaction across all device sizes while maintaining consistent spacing and visual hierarchy.
+
+**Rich product cards**: Each wishlist item is presented in a detailed card format featuring high-quality product images with hover effects, pricing information with discount calculations, rating displays using star components, and brand badges for quick product identification.
+
+**Interactive elements and feedback**: Cards include multiple action buttons with contextual states - remove buttons with trash icons positioned for easy access, "Move to Cart" buttons that show different text based on whether items are already in the cart, and loading states that prevent duplicate operations during processing.
+
+**Visual status indicators**: The interface uses color coding and iconography to communicate item states - discount badges highlight savings opportunities, purchase status badges clearly mark previously bought items, and loading states provide immediate feedback during operations.
+
+**Purchase history integration**: Previously purchased items are displayed with reduced opacity and special badges to clearly indicate their status while still allowing users to view product details and consider repurchasing.
 
 ## Next Steps
 
@@ -342,6 +405,6 @@ The **Terms of Service page** is critical for clearly outlining your store polic
 
 These pages are essential to delivering a complete, polished, and professional e-commerce experience. Together, they build trust, improve usability, and strengthen your brand identity.
 
-Let’s start by [creating the About Us page](/ecommerce-platform/creating-the-pages/about-us), which will set the tone for your brand story and customer relationships.
+Let’s start by [creating the About Us page](/ecommerce-platform/creating-the-pages/the-basics/about-us), which will set the tone for your brand story and customer relationships.
 
 <BackToTop />

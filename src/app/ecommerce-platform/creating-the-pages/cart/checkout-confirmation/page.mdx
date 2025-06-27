@@ -1,0 +1,102 @@
+import BackToTop from "@/components/BackToTop";
+
+# The Checkout Confirmation
+
+The checkout confirmation page is a crucial part of the e-commerce experience, providing users with a summary of their order and essential details after completing their purchase. This page not only confirms the successful transaction but also enhances user trust and satisfaction.
+
+## Table of Contents
+
+## The `import` Statements
+
+```tsx
+// src/app/checkout/confirmation/page.tsx
+"use client";
+
+import { useCart } from "@/app/context/cartContext";
+import { useCurrency } from "@/app/context/currencyContext";
+import { Order, useOrder } from "@/app/context/orderContext";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { getStatusColor } from "@/lib/utils/orders";
+import {
+  Calendar,
+  CheckCircle,
+  Copy,
+  CreditCard,
+  Download,
+  Home,
+  MapPin,
+  Package,
+  Truck,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { toast } from "sonner";
+```
+
+#### Using the Hooks and Storing the Data
+
+```tsx
+// src/app/checkout/confirmation/page.tsx
+function OrderConfirmationContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const orderId = searchParams.get("orderId");
+  const { getOrderById } = useOrder();
+  const { formatPrice } = useCurrency();
+  const { removeDiscount } = useCart();
+
+  const [order, setOrder] = useState<Order | null>(null);
+  const [loading, setLoading] = useState(true);
+```
+
+##### Explanation of the Code
+
+#### Storing the Data
+
+#### `useEffect` Hook
+
+##### Explanation of the Code
+
+#### The Tracking Number
+
+##### Explanation of the Code
+
+#### Implementing Downloadable Invoice
+
+##### Explanation of the Code
+
+#### Handling `loading` and `error` States
+
+#### Rendering the Confirmation Page
+
+##### Explanation of the Code
+
+#### Next Steps
+
+Once visitors have completed their purchases, providing them with the ability to track their orders is critical for maintaining transparency and building trust. An order tracking page keeps customers informed about the status and location of their shipments, reducing anxiety and support requests.
+
+Let’s [create the order tracking page](/ecommerce-platform/creating-the-pages/order-tracking), featuring:
+
+- **Order status overview**:
+  Display real-time updates such as processing, shipped, in transit, out for delivery, and delivered.
+
+- **Shipment details**:
+  Provide tracking numbers, carrier information, and estimated delivery dates.
+
+- **Visual progress indicators**:
+  Use progress bars or timelines to give a clear view of where the order is in the fulfillment process.
+
+- **Support options**:
+  Offer quick access to customer service for issues or inquiries related to the order.
+
+- **Mobile-friendly design**:
+  Ensure the tracking page is responsive and easy to use on all devices.
+
+By implementing a comprehensive order tracking page, you enhance customer satisfaction, reduce uncertainty, and encourage repeat business through improved transparency and communication.
+
+<BackToTop />

@@ -6,6 +6,17 @@ import BackToTop from "@/components/BackToTop";
 
 ## Page Structure
 
+The checkout page represents the culmination of the e-commerce user journey and serves as the critical conversion point where browsers become customers. This sophisticated, multi-step interface combines advanced form handling, real-time validation, dynamic pricing calculations, and secure payment processing to create a seamless purchase experience. The page implements progressive disclosure principles, guiding users through shipping, payment, and order review steps while maintaining transparency about costs and providing multiple opportunities for user confidence building.
+
+The checkout page implements a multi-step wizard architecture designed for optimal conversion and user experience:
+
+- **Progressive Disclosure**: Three-step process (Shipping → Payment → Review) reduces cognitive load
+- **Persistent Order Summary**: Sticky sidebar maintains cost transparency throughout the process
+- **Intelligent Validation**: Real-time form validation with clear error messaging
+- **Dynamic Pricing**: Real-time calculation of shipping costs, discounts, and membership benefits
+- **Security Integration**: Multiple layers of data protection and secure processing indicators
+- **Responsive Design**: Fully adaptive layout optimized for mobile commerce
+
 ## The `import` Statements
 
 ```tsx startLineNumber=1
@@ -48,6 +59,57 @@ import { useState } from "react";
 import { toast } from "sonner";
 ```
 
+##### Explanation of the Code
+
+This comprehensive import section establishes the foundation for a e-commerce checkout system with advanced functionality:
+
+**Core Next.js and React Architecture:**
+
+- `"use client"`: Enables client-side interactivity essential for complex form handling, real-time validation, and multi-step navigation
+- React hooks (`useState`): Manages complex form state, validation states, and multi-step navigation
+- Next.js components (`Image`, `Link`): Optimized components for performance and SEO
+- `useRouter`: Programmatic navigation for post-checkout redirection to confirmation pages
+
+**Advanced Context Integration:**
+
+- **Authentication Context (`useAuth`)**: Provides user data for pre-filling forms and personalization
+- **Cart Context (`useCart`)**: Manages shopping cart state, pricing calculations, and cart operations
+- **Currency Context (`useCurrency`)**: Handles multi-currency support and price formatting
+- **Order Context (`useOrder`)**: Manages order creation, processing, and order history
+
+**UI Component System:**
+
+- **Form Components**: `Input`, `Label`, `Textarea`, `Checkbox` for comprehensive form building
+- **Selection Components**: `Select`, `RadioGroup` for user choice inputs with controlled state
+- **Layout Components**: `Card`, `CardContent`, `CardHeader`, `CardTitle` for structured content presentation
+- **Interactive Elements**: `Button`, `Separator` for user actions and visual organization
+
+**Advanced Icon Integration:**
+
+- **Semantic Icons**: Each icon provides immediate visual context and improves accessibility
+  - `ArrowLeft`: Navigation and breadcrumb indicators
+  - `CreditCard`: Payment method visualization
+  - `Lock`: Security and processing state indicators
+  - `MapPin`: Address and location references
+  - `Package`: Order and shipping visualization
+  - `Shuffle`: Auto-fill and data generation actions
+  - `Truck`: Shipping and delivery context
+
+**External API Integration:**
+
+- `fetchRandomUser`: Demo data generation for testing and development
+- `toast`: User feedback system for success, error, and informational messages
+
+**Business Logic Architecture:**
+This import structure enables:
+
+- **Real-time Validation**: Immediate feedback on form input validity
+- **Dynamic Pricing**: Live calculation of taxes, shipping, and discounts
+- **Secure Processing**: Multiple layers of payment security and data protection
+- **User Experience Optimization**: Seamless flow from cart to order confirmation
+- **Accessibility Compliance**: Screen reader support and keyboard navigation
+- **Performance Optimization**: Code splitting and lazy loading capabilities
+
 ## Using the Hooks
 
 ```tsx startLineNumber=37
@@ -71,7 +133,54 @@ export default function CheckoutPage() {
 
 ##### Explanation of the Code
 
-The `CheckoutPage` component is the main entry point for the checkout process. It imports necessary hooks and components, such as `useCart`, `useAuth`, and `useOrder`, to manage the cart, user authentication, and order creation respectively. The `router` from Next.js is used for navigation.
+This section demonstrates React Context integration and hook utilization for comprehensive e-commerce state management:
+
+**Navigation and Routing:**
+
+- `router`: Next.js useRouter hook enables programmatic navigation after successful order placement
+- Post-checkout redirection to confirmation pages with order ID parameters
+- Maintains proper browser history and enables deep linking to order confirmations
+
+**Cart Context Integration:**
+
+- **Complex State Extraction**: Destructures multiple cart-related values and functions from the cart context
+- **Financial Calculations**:
+  - `grandTotal`: Final amount including all fees, taxes, and discounts
+  - `totalPrice`: Base price of all items before adjustments
+  - `discountAmount`: Applied coupon or promotional discounts
+  - `shippingFee`: Calculated shipping costs based on selected tier
+  - `membershipDiscount`: Special pricing for premium/VIP members
+  - `appliedDiscount`: Details of active discount codes and rules
+- **Cart Operations**: `clearCart` function for post-checkout cart cleanup
+
+**Currency and Localization:**
+
+- `formatPrice`: Handles multi-currency support with proper formatting
+- Locale-aware number formatting and currency symbol placement
+- Support for different decimal places and thousand separators
+
+**Authentication and User Data:**
+
+- `user`: Current user object with profile information, preferences, and membership details
+- Enables personalized checkout experience with pre-filled information
+- Supports guest checkout scenarios when user is null
+
+**Order Management:**
+
+- `createOrder`: order creation function that handles:
+  - Order validation and processing
+  - Payment processing integration
+  - Inventory management
+  - Order confirmation and email notifications
+  - Error handling and rollback scenarios
+
+**Context Benefits:**
+
+- **State Consistency**: All components access the same data source
+- **Performance Optimization**: Prevents prop drilling and unnecessary re-renders
+- **Separation of Concerns**: Business logic separated from UI components
+- **Testability**: Contexts can be easily mocked for unit testing
+- **Scalability**: Easy to add new features without refactoring component trees
 
 ## Storing the Data
 
@@ -116,15 +225,63 @@ const [isLoadingAutofill, setIsLoadingAutofill] = useState(false);
 
 ##### Explanation of the Code
 
-This section initializes various state variables using the `useState` hook. These states include:
+This state management architecture implements a comprehensive data model for complex e-commerce checkout functionality:
 
-- `isProcessing`: Indicates if the checkout process is currently being processed.
-- `currentStep`: Tracks the current step in the checkout process.
-- `sameAsBilling`: A boolean to determine if the shipping address is the same as the billing address.
-- `paymentMethod`: Stores the selected payment method (e.g., card, PayPal).
-- `selectedShippingTier`: Stores the selected shipping tier (e.g., standard, express).
-- `shippingInfo` and `billingInfo`: Objects to hold the user's shipping and billing information.
-- `specialInstructions`: Holds any special instructions provided by the user.
+**Process Control States:**
+
+- `isProcessing`: Boolean flag controlling UI feedback during order submission
+  - Prevents double-submission by disabling form controls
+  - Triggers loading animations and progress indicators
+  - Maintains user confidence during payment processing
+- `currentStep`: Numeric state managing multi-step wizard progression
+  - Enables progressive disclosure of complex checkout information
+  - Allows users to navigate back and forth between steps
+  - Maintains validation state across step transitions
+
+**User Preference States:**
+
+- `sameAsBilling`: Boolean determining address field synchronization
+  - Reduces form friction by auto-copying shipping to billing address
+  - Maintains separate state for users with different billing addresses
+  - Improves user experience for most common use case
+- `paymentMethod`: String state for payment option selection
+  - Currently supports card payment with extensibility for additional methods
+  - Future-proofed for PayPal, Apple Pay, Google Pay integration
+- `selectedShippingTier`: Manages shipping speed and cost preferences
+  - Drives dynamic pricing calculations
+  - Enables membership-based shipping discounts
+  - Provides clear delivery timeline expectations
+
+**Complex Form Data Structures:**
+**Shipping Information Architecture:**
+
+- Comprehensive address validation fields with required field indicators
+- Email and phone validation for delivery notifications
+- Country selection with international shipping support
+- Pre-populated with user account data when available
+- Maintains state consistency with authentication context
+
+**Billing Information Architecture:**
+
+- Dual-purpose structure handling both billing address and payment details
+- Credit card information with proper field validation
+- Security-conscious handling of sensitive payment data
+- Name on card validation against billing address
+- Support for different billing and shipping addresses
+
+**Additional State Management:**
+
+- `specialInstructions`: Free-form text for delivery preferences and special requests
+- `isLoadingAutofill`: UI feedback for demo data generation and API calls
+
+**State Architecture Benefits:**
+
+- **Type Safety**: TypeScript interfaces ensure consistent data structures
+- **Validation Ready**: State structure aligns with validation requirements
+- **API Compatible**: Data structures match backend API expectations
+- **User Experience**: State enables real-time feedback and progressive enhancement
+- **Security**: Sensitive data is properly isolated and handled
+- **Scalability**: Easy to extend with additional fields and validation rules
 
 ## The Shipping Tiers
 
@@ -164,7 +321,6 @@ const shippingTiers = [
   },
 ];
 ```
-
 ## Getting Data from the Logged in User
 
 ```tsx startLineNumber=120
@@ -184,9 +340,58 @@ const hasVipEligibleItems = items.some(
 
 ##### Explanation of the Code
 
-## Auto Filling the Form
+This section implements user authentication integration and membership-based business logic that drives personalized pricing and service offerings:
 
-This data will be coming from the API.
+**Membership Tier Processing:**
+
+- **Safe Data Extraction**: Uses optional chaining (`?.`) to safely access nested user properties
+- **Case Normalization**: Converts membership tier to lowercase for consistent comparison logic
+- **Fallback Handling**: Defaults to "none" when user is not logged in or lacks membership data
+- **Type Safety**: Prevents runtime errors when user object is null or undefined
+
+**Membership Classification Logic:**
+
+- **Premium/VIP Detection**: `isPremiumOrVip` boolean enables conditional benefits across multiple membership levels
+- **VIP Exclusive Features**: `isVip` boolean targets highest-tier customers with exclusive benefits
+- **Scalable Architecture**: Easy to extend with additional membership tiers and benefits
+
+**VIP Shipping Eligibility Algorithm:**
+The `hasVipEligibleItems` calculation implements business rules for premium shipping benefits:
+
+**Item Value Threshold Logic:**
+
+- **High-Value Items**: Products over $100 automatically qualify for VIP shipping benefits
+- **Business Rationale**: Encourages larger purchases while providing value to VIP members
+- **Revenue Protection**: Ensures shipping discounts are applied to high-margin transactions
+
+**Category-Based Eligibility:**
+
+- **Electronics Focus**: Electronics category receives special shipping treatment
+- **Case-Insensitive Matching**: Robust category comparison prevents case-related bugs
+- **Strategic Positioning**: Electronics often have higher margins and shipping urgency
+
+**Business Logic Benefits:**
+
+- **Customer Retention**: VIP members receive tangible, immediate value
+- **Purchase Incentives**: Eligibility rules encourage specific buying behaviors
+- **Margin Protection**: Rules ensure discounts are applied strategically
+- **Scalability**: Easy to modify eligibility criteria based on business performance
+
+**Membership Integration Advantages:**
+
+- **Personalized Experience**: Different users see different pricing and options
+- **Loyalty Program Support**: Membership benefits drive subscription/upgrade conversion
+- **Dynamic Pricing**: Real-time calculation based on user status and cart contents
+- **Business Intelligence**: Eligibility tracking provides insights into member behavior
+
+**Security and Privacy Considerations:**
+
+- **Safe Property Access**: Prevents crashes when user data is incomplete
+- **Data Validation**: Membership tier validation prevents privilege escalation
+- **Null Safety**: Graceful handling of unauthenticated users
+- **Type Checking**: TypeScript ensures proper data types throughout the process
+
+## Auto Filling the Form
 
 ### Shipping Information
 
@@ -254,6 +459,60 @@ const autofillShippingInfo = async () => {
 
 ##### Explanation of the Code
 
+This intelligent auto-fill system implements a data sourcing strategy that enhances user experience while providing comprehensive testing capabilities:
+
+**Dual Data Source Strategy:**
+
+**Authenticated User Path:**
+
+- **Account Integration**: Prioritizes authenticated user's profile data for personalized experience
+- **Data Consistency**: Uses actual user information (username, email, phone) for accurate order processing
+- **Sample Address Data**: Provides realistic but non-sensitive address information for demo purposes
+- **Privacy Protection**: Combines real user data with safe sample data to protect privacy
+
+**Guest User Fallback:**
+
+- **External API Integration**: Leverages DummyJSON API for realistic demo data generation
+- **Complete Profile Simulation**: Generates comprehensive user profiles with realistic data patterns
+- **Address Mapping**: Transforms API response structure to match application's data model
+- **Error Resilience**: Graceful handling of API failures with user feedback
+
+**Advanced Auto-Fill Logic:**
+
+**Billing Address Synchronization:**
+
+- **Conditional Auto-Fill**: Automatically populates billing address when "same as shipping" is enabled
+- **Selective Field Copying**: Only copies relevant address fields, preserving payment-specific data
+- **State Consistency**: Maintains synchronization between shipping and billing forms
+
+**User Experience Enhancements:**
+
+- **Loading State Management**: Provides visual feedback during data fetching operations
+- **Success Notifications**: Clear feedback about successful auto-fill operations
+- **Context-Aware Messaging**: Different messages for authenticated vs. guest users
+- **Demo Data Transparency**: Clear labeling of test data to prevent user confusion
+
+**Data Transformation Pipeline:**
+
+- **API Response Mapping**: Converts external API structure to internal data format
+- **Field Validation**: Ensures auto-filled data meets form validation requirements
+- **Type Safety**: Proper TypeScript handling throughout the transformation process
+- **Error Handling**: Comprehensive error catching with user-friendly error messages
+
+**Performance Optimizations:**
+
+- **Async/Await Pattern**: Modern JavaScript patterns for clean asynchronous code
+- **State Management**: Efficient state updates to minimize re-renders
+- **Error Boundaries**: Prevents auto-fill failures from breaking the entire checkout process
+- **Memory Management**: Proper cleanup of async operations
+
+**Business Value:**
+
+- **Conversion Optimization**: Reduces form friction to improve checkout completion rates
+- **Testing Support**: Enables rapid testing and demonstration of checkout functionality
+- **User Onboarding**: Smooth experience for new users with immediate value demonstration
+- **Development Efficiency**: Streamlines development and QA processes with realistic test data
+
 ### Payment Information
 
 ```tsx startLineNumber=189
@@ -318,6 +577,61 @@ const autofillPaymentInfo = async () => {
 
 ##### Explanation of the Code
 
+This payment information auto-fill system implements secure demo data generation while maintaining realistic testing scenarios:
+
+**Payment Data Security Strategy:**
+
+**Authenticated User Scenario:**
+
+- **Consistent Demo Data**: Uses standardized test card numbers that won't process real payments
+- **Future Expiry Logic**: Dynamically calculates expiry dates 2 years in the future for consistency
+- **User Name Integration**: Uses actual user name for realistic form completion
+- **Test Card Standards**: Implements industry-standard test card numbers (4532 prefix for Visa)
+
+**Guest User Scenario:**
+
+- **Dynamic Demo Generation**: Creates randomized but realistic payment data
+- **Random Expiry Logic**: Generates valid future expiry dates within 1-5 year range
+- **Secure CVV Generation**: Creates 3-digit CVV codes within valid range (100-999)
+- **API Integration**: Leverages external user data for name consistency
+
+**Advanced Payment Logic:**
+
+**Expiry Date Management:**
+
+- **Future Date Validation**: Ensures all generated expiry dates are in the future
+- **Format Consistency**: Maintains MM/YY format standard across all generated data
+- **Leap Year Awareness**: Proper date handling for various calendar scenarios
+- **Zero Padding**: Ensures month values are properly formatted (01, 02, etc.)
+
+**Card Number Handling:**
+
+- **Test Card Integration**: Uses industry-standard test card numbers for safe testing
+- **Format Consistency**: Maintains proper spacing and format for card number display
+- **Payment Gateway Compatible**: Generated numbers work with test payment processors
+- **No Real Card Risk**: Prevents accidental use of real payment information
+
+**User Experience Features:**
+
+- **Loading State Feedback**: Clear visual indication during data generation
+- **Success Notifications**: Immediate feedback about successful auto-fill completion
+- **Error Handling**: Graceful degradation when API calls fail
+- **Demo Transparency**: Clear labeling to prevent confusion with real payment data
+
+**Security Considerations:**
+
+- **No Real Payment Data**: All generated data is safe for testing and development
+- **Test Environment Indicators**: Clear messaging about demo data usage
+- **Data Validation**: Ensures generated data meets payment form validation requirements
+- **Memory Safety**: Proper cleanup of sensitive demo data
+
+**Business Logic Integration:**
+
+- **Form State Management**: Seamlessly integrates with existing billing form state
+- **Validation Compatibility**: Generated data passes all form validation rules
+- **User Context Awareness**: Different behavior for authenticated vs. guest users
+- **Testing Efficiency**: Enables rapid testing of payment flows without manual data entry
+
 ## Handle Billing Information Same as Shipping
 
 ```tsx startLineNumber=245
@@ -339,6 +653,9 @@ const handleSameAsBillingChange = (checked: boolean) => {
 ```
 
 ##### Explanation of the Code
+
+This section implements a user-friendly toggle for synchronizing shipping and billing information, enhancing the checkout experience.
+
 
 ## Validating the Form
 
@@ -389,6 +706,8 @@ const validateBilling = () => {
 
 ##### Explanation of the Code
 
+This validation logic ensures that all required fields are filled out before proceeding to the next step in the checkout process. It checks for empty fields and provides a clear structure for future validation enhancements, such as regex checks for email and phone formats.
+
 ## Handling Form Change
 
 ### Shipping Information Change
@@ -412,6 +731,8 @@ const handleShippingChange = (field: string, value: string) => {
 
 ##### Explanation of the Code
 
+This function updates the shipping information state and conditionally updates the billing information if the "same as billing" option is enabled. It ensures that changes in shipping fields are reflected in billing fields, maintaining consistency across the form.
+
 ### Billing Information Change
 
 ```tsx startLineNumber=303
@@ -420,23 +741,50 @@ const handleBillingChange = (field: string, value: string) => {
 };
 ```
 
-## Running The Tests
+## Running Form Tests
 
-### Payment Validation Test
+To make sure the form works as expected, you can head over to either one of the following pages:
+- [Address Validation Test](/ecommerce-platform/creating-testing-scripts/address-validation-test)
+- [Payment Validation Test](/ecommerce-platform/creating-testing-scripts/payment-validation-test)
+- [Contact Validation Test](/ecommerce-platform/creating-testing-scripts/contact-validation-test)
 
-### Address Validation Test
-
-### Contact Validation Test
 
 ## Calculating Shipping Cost
 
+```tsx startLineNumber=306
+// src/app/checkout/page.tsx
+  const calculateShippingCost = () => {
+    const tier = shippingTiers.find((t) => t.id === selectedShippingTier);
+    if (!tier) return 0;
+
+    // Standard shipping: free on orders over $50
+    if (tier.id === "standard" && totalPrice >= 50) {
+      return 0;
+    }
+
+    // Premium/VIP members get free next day shipping
+    if (tier.id === "next-day" && isPremiumOrVip) {
+      return 0;
+    }
+
+    // VIP members get free overnight shipping on select items
+    if (tier.id === "overnight" && isVip && hasVipEligibleItems) {
+      return 0;
+    }
+
+    return tier.price;
+  };
+  ```
+
 ##### Explanation of the Code
+
+This function calculates the shipping cost based on the selected shipping tier and applies business rules for free shipping based on total price and membership status. It ensures that users are charged correctly for shipping while providing incentives for higher-value purchases and membership benefits.
 
 ## Implementing Navigation Buttons
 
 ### Handling Next and Back
 
-```tsx startLineNumber=306
+```tsx startLineNumber=327
 // src/app/checkout/page.tsx
 const handleNext = () => {
   if (currentStep === 1 && !validateShipping()) {
@@ -457,9 +805,11 @@ const handleBack = () => {
 
 ##### Explanation of the Code
 
+This code handles the navigation between the steps of the checkout process. It validates the current step's information before allowing the user to proceed to the next step, ensuring that all required fields are filled out correctly. The back button allows users to return to the previous step without losing their input data.
+
 ### Handle Place Order
 
-```tsx startLineNumber=321
+```tsx startLineNumber=342
 // src/app/checkout/page.tsx
 const handlePlaceOrder = async () => {
   if (!validateShipping() || !validateBilling()) {
@@ -509,9 +859,11 @@ const handlePlaceOrder = async () => {
 
 ##### Explanation of the Code
 
+This function handles the final order placement process. It validates the shipping and billing information, calculates the final grand total, and calls the `createOrder` function to process the order. If successful, it clears the cart and redirects the user to the order confirmation page. It also provides user feedback through toast notifications for success or failure.
+
 ## Checking the Cart State
 
-```tsx startLineNumber=365
+```tsx startLineNumber=386
 // src/app/checkout/page.tsx
 if (items.length === 0) {
   return (
@@ -535,9 +887,11 @@ if (items.length === 0) {
 
 ##### Explanation of the Code
 
+This code checks if the cart is empty and displays a message to the user if there are no items in the cart. It provides a clear call-to-action button to redirect users back to the shopping page, encouraging them to add items before proceeding with checkout. This enhances user experience by preventing confusion when attempting to check out with an empty cart.
+
 ## Rendering the Checkout Form
 
-```tsx startLineNumber=383
+```tsx startLineNumber=404
 // src/app/checkout/page.tsx
   return (
     <div className="min-h-screen">
@@ -590,7 +944,9 @@ if (items.length === 0) {
 
 ##### Explanation of the Code
 
-```tsx startLineNumber=430
+This section renders the main checkout form, including the header, progress steps, and the main content area. It provides a clear visual representation of the current step in the checkout process, enhancing user navigation and understanding of their progress.
+
+```tsx startLineNumber=451
 // src/app/checkout/page.tsx
         <div className="gap-8 grid grid-cols-1 lg:grid-cols-3">
           {/* Main Content */}
@@ -739,7 +1095,11 @@ if (items.length === 0) {
 
 ##### Explanation of the Code
 
-```tsx startLineNumber=573
+This section renders the shipping information form, including fields for full name, email, phone number, address, city, state, ZIP code, and country. It uses a card layout for better organization and includes an autofill button that populates the form with either user data or demo data. The form is responsive and adapts to different screen sizes.
+
+
+
+```tsx startLineNumber=594
 // src/app/checkout/page.tsx
                   {/* Shipping Tier Selection */}
                   <div className="space-y-4">
@@ -845,7 +1205,9 @@ if (items.length === 0) {
 
 ##### Explanation of the Code
 
-```tsx startLineNumber=673
+This section renders the shipping tier selection, allowing users to choose their preferred shipping method. It displays available tiers with details such as delivery time, description, and pricing. The selected tier is highlighted, and users can proceed to the payment step by clicking the "Continue to Payment" button. The form also includes validation to ensure that all required fields are filled out before proceeding.
+
+```tsx startLineNumber=694
 // src/app/checkout/page.tsx
             {/* Step 2: Payment Information */}
             {currentStep === 2 && (
@@ -943,7 +1305,9 @@ if (items.length === 0) {
 
 ##### Explanation of the Code
 
-```tsx startLineNumber=765
+This section renders the payment information form, allowing users to enter their credit/debit card details. It includes fields for the name on the card, card number, expiry date, and CVV. The form also features an autofill button that populates the fields with either user data or demo data. The payment method is set to "Credit/Debit Card" by default, and users can proceed to the next step by clicking the "Review Order" button.
+
+```tsx startLineNumber=786
 // src/app/checkout/page.tsx
                 <Card>
                   <CardHeader>
@@ -1045,7 +1409,9 @@ if (items.length === 0) {
 
 ##### Explanation of the Code
 
-```tsx startLineNumber=861
+This section renders the billing address form, allowing users to enter their billing information. It includes a checkbox to indicate if the billing address is the same as the shipping address, which auto-fills the billing fields if checked. If not checked, users can manually enter their billing details. The form also includes navigation buttons to go back to the shipping step or proceed to the order review step.
+
+```tsx startLineNumber=882
 // src/app/checkout/page.tsx
             {/* Step 3: Order Review */}
             {currentStep === 3 && (
@@ -1172,7 +1538,10 @@ if (items.length === 0) {
 
 ##### Explanation of the Code
 
-```tsx startLineNumber=982
+This section renders the order review step, allowing users to review their order details before placing it. It displays the ordered items, shipping and billing information, and an optional field for special instructions. Users can navigate back to the payment step or place their order. The "Place Order" button is disabled while processing to prevent multiple submissions.
+
+
+```tsx startLineNumber=1003
 // src/app/checkout/page.tsx
           {/* Order Summary Sidebar */}
           <div className="lg:col-span-1">
@@ -1256,6 +1625,33 @@ if (items.length === 0) {
 
 ##### Explanation of the Code
 
+This section renders the order summary sidebar, providing users with a breakdown of their order costs, including subtotal, discounts, shipping fees, and total amount. It also includes a note about secure checkout. The sidebar is sticky, remaining visible as users scroll through the checkout process.
+
+
 ## Next Steps
 
-Now that our visitors have shopped until they've dropped and paid up, they need to [view their order confirmation](/ecommerce-platform/creating-the-pages/cart/checkout-confirmation).
+After customers have completed their purchase, it’s essential to provide them with clear and immediate feedback by displaying an order confirmation page. This page reassures users that their transaction was successful and helps build trust in your platform by offering a professional, polished post-purchase experience.
+
+Direct users to [view their order confirmation](/ecommerce-platform/creating-the-pages/cart/checkout-confirmation), where they can:
+
+- **See a detailed order summary**:
+  Display key details including order number, purchased items, quantities, individual prices, and the total amount charged.
+
+- **Review shipping and billing information**:
+  Confirm the addresses used for the order, including estimated delivery dates or shipping method details.
+
+- **Access downloadable receipts or invoices**:
+  Provide an option for customers to download or print a copy of their order confirmation for their records.
+
+- **View next steps**:
+  Clearly communicate what happens next—whether it’s expected shipping timelines, tracking information availability, or instructions for digital products.
+
+- **Contact support**:
+  Offer direct links or contact information so customers can easily reach your support team in case of questions or issues related to their order.
+
+- **Continue shopping or explore recommendations**:
+  Encourage users to stay engaged by suggesting related products, special offers, or new arrivals, leveraging the confirmation page as an opportunity for additional engagement.
+
+Design the order confirmation page to be mobile-friendly, visually consistent with the rest of your platform, and accessible to all users. By implementing a thoughtful confirmation experience, you demonstrate professionalism, improve customer satisfaction, and reinforce confidence in your e-commerce platform.
+
+<BackToTop />

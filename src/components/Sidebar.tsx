@@ -88,7 +88,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         lg:${isOpen ? "translate-x-0" : "-translate-x-full"}
       `}
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col">
           {/* Logo */}
           <div className="flex items-center justify-between p-4 border-b border-border h-16">
             <Link href="/" className="flex items-center space-x-2">
@@ -125,10 +125,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               href="/"
               onClick={onClose}
               className={cn(
-                "flex items-center space-x-3 uppercase py-2 rounded-lg transition-colors duration-200",
+                "flex items-center space-x-3 uppercase py-2 text-sidebar-text rounded-lg font-extrabold transition-colors duration-200",
                 {
                   "text-sidebar-active-text": pathname === "/",
-                },
+                }
               )}
             >
               Home
@@ -160,6 +160,23 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               )}
             </div>
           </nav>
+
+          {/* Continuing The Journey */}
+          <div className="pb-2 pt-4 px-4 border-border">
+            <Link
+              href="/continuing-the-journey"
+              onClick={onClose}
+              className={cn(
+                "flex items-center space-x-3 uppercase py-2 text-sidebar-text font-extrabold rounded-lg transition-colors duration-200",
+                {
+                  "text-sidebar-active-text":
+                    pathname === "/continuing-the-journey",
+                }
+              )}
+            >
+              Continuing The Journey
+            </Link>
+          </div>
         </div>
       </aside>
     </>

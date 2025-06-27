@@ -34,7 +34,7 @@ export default function NavigationSection({
     <div>
       <button
         onClick={onToggle}
-        className={`flex justify-between items-center mb-3 w-full font-extrabold text-left text-md uppercase tracking-wider  transition-colors ${
+        className={`flex justify-between items-center mb-3 w-full font-extrabold text-left text-md uppercase tracking-wider transition-colors ${
           isOpen
             ? "text-sidebar-active-text"
             : "text-sidebar-text hover:text-sidebar-active-text"

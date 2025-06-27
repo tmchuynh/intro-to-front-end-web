@@ -106,7 +106,7 @@ function NavigationItem({
       (child) =>
         pathname === child.href ||
         (child.children &&
-          child.children.some((grandchild) => pathname === grandchild.href))
+          child.children.some((grandchild) => pathname === grandchild.href)),
     );
 
   // Reset expanded child when this item is collapsed
@@ -189,7 +189,7 @@ function NavigationItem({
           "block hover:bg-nav-item-hover active:bg-nav-item-active ml-1 px-3 py-2 rounded-md max-w-full w-[95%] text-sm hover:text-nav-text-hover transition-colors",
           {
             "bg-nav-item-active": isActiveItem,
-          }
+          },
         )}
       >
         {item.title}

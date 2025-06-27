@@ -15,7 +15,10 @@ interface TopNavbarProps {
   sidebarOpen: boolean;
 }
 
-export default function TopNavbar({ onToggleSidebar, sidebarOpen }: TopNavbarProps) {
+export default function TopNavbar({
+  onToggleSidebar,
+  sidebarOpen,
+}: TopNavbarProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [showResults, setShowResults] = useState(false);
@@ -152,7 +155,9 @@ export default function TopNavbar({ onToggleSidebar, sidebarOpen }: TopNavbarPro
                 <div className="flex items-center justify-center bg-primary rounded-lg h-8 w-8">
                   <span className="font-bold text-lg text-white">W</span>
                 </div>
-                <span className="font-bold text-sidebar-text text-xl">Web Intro</span>
+                <span className="font-bold text-sidebar-text text-xl">
+                  Web Intro
+                </span>
               </div>
             </div>
           )}

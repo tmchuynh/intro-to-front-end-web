@@ -128,7 +128,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 "flex items-center space-x-3 uppercase py-2 rounded-lg transition-colors duration-200",
                 {
                   "text-sidebar-active-text": pathname === "/",
-                }
+                },
               )}
             >
               Home

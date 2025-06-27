@@ -3,3 +3,85 @@ import BackToTop from "@/components/BackToTop";
 # useAuthGuard
 
 ## Table of Contents
+
+## Introduction
+
+The `useAuthGuard` hook is designed to protect routes in your application by ensuring that only authenticated users can access certain pages. This is particularly useful in e-commerce platforms where sensitive information and user-specific data are involved.
+
+## Implementation
+
+```tsx
+// src/hooks/useAuthGuard.ts
+import { useState } from "react";
+import { useAuth } from "@/app/context/authContext";
+
+export function useAuthGuard() {
+  const { user } = useAuth();
+  const [showAuthAlert, setShowAuthAlert] = useState(false);
+
+  const guardedAction = async <T>(
+    action: () => Promise<T>
+  ): Promise<T | void> => {
+    if (!user) {
+      setShowAuthAlert(true);
+      return;
+    }
+    return action();
+  };
+
+  return {
+    isAuthenticated: !!user,
+    showAuthAlert,
+    closeAuthAlert: () => setShowAuthAlert(false),
+    guardedAction,
+  };
+}
+```
+
+## Usage
+```tsx
+// src/components/ProtectedComponent.tsx
+import React from "react";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+export const ProtectedComponent: React.FC = () => {
+  const { isAuthenticated, showAuthAlert, closeAuthAlert, guardedAction } =
+    useAuthGuard();
+
+  const handleProtectedAction = async () => {
+    await guardedAction(async () => {
+      // Perform the protected action here
+      console.log("Protected action executed");
+    });
+  };
+
+  return (
+    <div>
+      <h1>Protected Component</h1>
+      {isAuthenticated ? (
+        <button onClick={handleProtectedAction}>Perform Action</button>
+      ) : (
+        <p>Please log in to perform this action.</p>
+      )}
+      {showAuthAlert && (
+        <div className="alert">
+          <p>You must be logged in to perform this action.</p>
+          <button onClick={closeAuthAlert}>Close</button>
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+##### Explanation of the Code
+- **useAuthGuard Hook**: This hook checks if the user is authenticated and provides a method to perform actions that require authentication.
+- **guardedAction Method**: This method takes an action as a parameter and executes it only if the user is authenticated. If not, it sets a state to show an alert.
+- **ProtectedComponent**: This component uses the `useAuthGuard` hook to conditionally render a button for performing a protected action. If the user is not authenticated, it displays a message prompting them to log in.
+
+
+## Next Steps
+Now that you have implemented the `useAuthGuard` hook, you can use it to protect routes and components in your application. This will ensure that only authenticated users can access sensitive areas of your e-commerce platform.
+
+Next, we'll create the [`useProtectedAction` hook](/ecommerce-platform/context-and-hooks/creating-the-hooks/useProtectedAction), which will provide a more streamlined way to handle actions that require authentication.
+
+<BackToTop />

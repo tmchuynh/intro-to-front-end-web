@@ -3,3 +3,97 @@ import BackToTop from "@/components/BackToTop";
 # useProtectedAction
 
 ## Table of Contents
+
+
+## Introduction
+The `useProtectedAction` hook is designed to protect actions in your application by ensuring that only authenticated users can perform certain operations. This is particularly useful in e-commerce platforms where sensitive actions, such as adding items to a cart or making purchases, should only be accessible to logged-in users.
+
+## Implementation
+
+```tsx
+// src/hooks/useProtectedAction.ts
+import { useState } from "react";
+import { useAuth } from "@/app/context/authContext";
+import { useRouter } from "next/navigation";
+
+export function useProtectedAction() {
+  const { user } = useAuth();
+  const [showAuthAlert, setShowAuthAlert] = useState(false);
+  const router = useRouter();
+
+  const protectedAction = async <T>(
+    action: () => Promise<T>
+  ): Promise<T | void> => {
+    if (!user) {
+      setShowAuthAlert(true);
+      return;
+    }
+    return action();
+  };
+
+  const handleLogin = () => {
+    setShowAuthAlert(false);
+    router.push("/auth/login");
+  };
+
+  return {
+    isAuthenticated: !!user,
+    showAuthAlert,
+    closeAuthAlert: () => setShowAuthAlert(false),
+    protectedAction,
+    handleLogin,
+  };
+}
+```
+
+## Usage
+
+```tsx
+// src/components/ProtectedActionComponent.tsx
+import React from "react";
+import { useProtectedAction } from "@/hooks/useProtectedAction";
+export const ProtectedActionComponent: React.FC = () => {
+  const {
+    isAuthenticated,
+    showAuthAlert,
+    closeAuthAlert,
+    protectedAction,
+    handleLogin,
+  } = useProtectedAction();
+
+  const handleProtectedAction = async () => {
+    await protectedAction(async () => {
+      // Perform the protected action here
+      console.log("Protected action executed");
+    });
+  };
+
+  return (
+    <div>
+      <h1>Protected Action Component</h1>
+      {isAuthenticated ? (
+        <button onClick={handleProtectedAction}>Perform Action</button>
+      ) : (
+        <p>Please log in to perform this action.</p>
+      )}
+      {showAuthAlert && (
+        <div className="alert">
+          <p>You must be logged in to perform this action.</p>
+          <button onClick={handleLogin}>Log In</button>
+          <button onClick={closeAuthAlert}>Close</button>
+        </div>
+      )}
+      <BackToTop />
+    </div>
+  );
+};
+```
+
+## Explanation of the Code
+- **useProtectedAction Hook**: This hook checks if the user is authenticated. If not, it shows an alert prompting the user to log in. It provides a method to perform actions that require authentication.
+- **ProtectedActionComponent**: This component uses the `useProtectedAction` hook to manage protected actions. It displays a button to perform the action if the user is authenticated, or prompts the user to log in if they are not. It also handles the display of an alert when the user is not authenticated.
+
+## Next Steps
+Our next stop is to create the [`useOrderManagement` hook](/ecommerce-platform/context-and-hooks/creating-the-hooks/useOrderManagement), which will handle order-related actions such as placing orders, viewing order history, and managing order details. This will further enhance the functionality of our e-commerce platform by providing a seamless experience for users to manage their orders.
+
+<BackToTop />

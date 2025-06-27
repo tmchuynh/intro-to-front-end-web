@@ -78,15 +78,15 @@ export interface OrderItem {
 
 ##### Design Decisions Explained:
 
-- **`id: number`**: Simple numeric ID for order line items, different from productId for tracking purposes
-- **`productId: number`**: Maintains relationship to original product for inventory and analytics
-- **`title: string`**: Captures product name at purchase time, preserving historical data even if product is renamed
-- **`price: number`**: Historical pricing data - crucial for order verification and financial reconciliation
-- **`quantity: number`**: Order quantity, enables bulk purchases and inventory management
-- **`image?: string`**: Optional field reduces data requirements while maintaining visual reference capability
-- **`category: string`**: Required for business intelligence, customer service, and order organization
-- **`thumbnail?: string`**: Performance optimization for UI - smaller images load faster in order lists
-- **`brand?: string`**: Optional brand data for customer service and marketing analytics
+- `id: number`: Simple numeric ID for order line items, different from productId for tracking purposes
+- `productId: number`: Maintains relationship to original product for inventory and analytics
+- `title: string`: Captures product name at purchase time, preserving historical data even if product is renamed
+- `price: number`: Historical pricing data - crucial for order verification and financial reconciliation
+- `quantity: number`: Order quantity, enables bulk purchases and inventory management
+- `image?: string`: Optional field reduces data requirements while maintaining visual reference capability
+- `category: string`: Required for business intelligence, customer service, and order organization
+- `thumbnail?: string`: Performance optimization for UI - smaller images load faster in order lists
+- `brand?: string`: Optional brand data for customer service and marketing analytics
 
 ##### Order Interface Analysis
 
@@ -129,34 +129,34 @@ export interface Order {
 
 **Identification & Tracking Fields**:
 
-- **`id: string`**: String format allows for complex ID schemes (prefixes, timestamps, checksums)
-- **`trackingNumber: string`**: Customer-friendly identifier separate from internal ID for security
+- `id: string`: String format allows for complex ID schemes (prefixes, timestamps, checksums)
+- `trackingNumber: string`: Customer-friendly identifier separate from internal ID for security
 
 **Financial Fields Design**:
 
-- **`totalAmount: number`**: Pre-discount subtotal for transparent pricing breakdown
-- **`discountAmount: number`**: Total savings displayed to customer for value perception
-- **`shippingFee: number`**: Separate shipping charges for accounting and customer clarity
-- **`grandTotal: number`**: Final charge amount for payment processing verification
+- `totalAmount: number`: Pre-discount subtotal for transparent pricing breakdown
+- `discountAmount: number`: Total savings displayed to customer for value perception
+- `shippingFee: number`: Separate shipping charges for accounting and customer clarity
+- `grandTotal: number`: Final charge amount for payment processing verification
 
 **Status Management**:
 
-- **Union Type Status**: Enforces valid order states, prevents invalid status transitions
-- **`orderDate: Date`**: Immutable timestamp for order lifecycle tracking
-- **`estimatedDelivery: Date`**: Customer expectation management and logistics planning
-- **`lastUpdated: Date`**: Audit trail for customer service and debugging
+- Union Type Status: Enforces valid order states, prevents invalid status transitions
+- `orderDate: Date`: Immutable timestamp for order lifecycle tracking
+- `estimatedDelivery: Date`: Customer expectation management and logistics planning
+- `lastUpdated: Date`: Audit trail for customer service and debugging
 
 **Customer Data Strategy**:
 
-- **`customerEmail: string`**: Primary identifier for order lookup and communication
-- **`customerName: string`**: Personal touch for customer service interactions
-- **Address Fields**: Separate billing/shipping for gift orders and international sales
+- `customerEmail: string`: Primary identifier for order lookup and communication
+- `customerName: string`: Personal touch for customer service interactions
+- Address Fields: Separate billing/shipping for gift orders and international sales
 
 **Enhancement Fields Philosophy**:
 
-- **Optional Discount Fields**: Flexible discount system supporting multiple promotion types
-- **Logistics Fields**: Carrier and tier information for customer service and analytics
-- **Notes Field**: Flexible field for special requirements and customer service notes
+- Optional Discount Fields: Flexible discount system supporting multiple promotion types
+- Logistics Fields: Carrier and tier information for customer service and analytics
+- Notes Field: Flexible field for special requirements and customer service notes
 
 ### TypeScript Benefits in Order Management
 
@@ -219,12 +219,12 @@ export interface ShippingInfo {
 
 ##### Shipping Design Philosophy:
 
-- **`fullName: string`**: Complete recipient name ensures proper delivery identification
-- **`email: string`**: Essential for delivery notifications, tracking updates, and customer service
-- **`phone: string`**: Critical for delivery coordination, especially for missed deliveries
-- **`address: string`**: Flexible string format accommodates various address formats globally
-- **Geographic Fields**: Hierarchical location data enables shipping calculation and routing
-- **International Support**: Country field enables global shipping logic and customs processing
+- `fullName: string`: Complete recipient name ensures proper delivery identification
+- `email: string`: Essential for delivery notifications, tracking updates, and customer service
+- `phone: string`: Critical for delivery coordination, especially for missed deliveries
+- `address: string`: Flexible string format accommodates various address formats globally
+- Geographic Fields: Hierarchical location data enables shipping calculation and routing
+- International Support: Country field enables global shipping logic and customs processing
 
 ##### BillingInfo Interface Analysis
 
@@ -251,41 +251,41 @@ export interface BillingInfo {
 
 ###### Payment Security Considerations:
 
-- **Separate Name Fields**: `fullName` vs `nameOnCard` handles legal name vs card name differences
-- **String Types for Payment**: Accommodates various card number formats and leading zeros
-- **Address Verification**: Complete billing address enables AVS (Address Verification Service)
-- **CVV Field**: Security verification for card-not-present transactions
-- **Expiry Format**: String format handles MM/YY or MM/YYYY variations
+- Separate Name Fields: `fullName` vs `nameOnCard` handles legal name vs card name differences
+- String Types for Payment: Accommodates various card number formats and leading zeros
+- Address Verification: Complete billing address enables AVS (Address Verification Service)
+- CVV Field: Security verification for card-not-present transactions
+- Expiry Format: String format handles MM/YY or MM/YYYY variations
 
 ##### Interface Design Benefits
 
 **Data Validation Strategy**:
 
-- **Required Fields**: All fields are required to ensure complete order information
-- **Type Safety**: String types with validation rules prevent data format errors
-- **Consistent Structure**: Standardized address format across shipping and billing
+- Required Fields: All fields are required to ensure complete order information
+- Type Safety: String types with validation rules prevent data format errors
+- Consistent Structure: Standardized address format across shipping and billing
 
 **International Commerce Support**:
 
-- **Global Address Format**: Flexible enough for various international address standards
-- **Multi-currency Ready**: Interfaces support international payment processing
-- **Localization Friendly**: Structure supports regional customization
+- Global Address Format: Flexible enough for various international address standards
+- Multi-currency Ready: Interfaces support international payment processing
+- Localization Friendly: Structure supports regional customization
 
 **Security & Compliance**:
 
-- **PCI DSS Considerations**: Payment data structure supports secure handling requirements
-- **Audit Trail**: Complete customer information for order verification and dispute resolution
-- **Privacy Protection**: Structured data enables selective field encryption
+- PCI DSS Considerations: Payment data structure supports secure handling requirements
+- Audit Trail: Complete customer information for order verification and dispute resolution
+- Privacy Protection: Structured data enables selective field encryption
 
 ### Integration Patterns
 
 These interfaces integrate seamlessly with:
 
-- **Form Validation**: Each field can have specific validation rules
-- **Payment Gateways**: Standard format for payment processor integration
-- **Shipping APIs**: Compatible with major shipping carrier APIs
-- **Tax Calculation**: Geographic data supports regional tax computation
-- **Fraud Detection**: Complete customer data enables fraud screening
+- Form Validation: Each field can have specific validation rules
+- Payment Gateways: Standard format for payment processor integration
+- Shipping APIs: Compatible with major shipping carrier APIs
+- Tax Calculation: Geographic data supports regional tax computation
+- Fraud Detection: Complete customer data enables fraud screening
 
 ## The `OrderContext` and `OrderContextType`
 
@@ -374,27 +374,27 @@ export interface OrderContextType {
 
 **State Properties**:
 
-- **`orders: Order[]`**: Complete order collection for admin and user interfaces
-- **`currentOrder: Order | null`**: Tracks active order for detailed views and operations
+- `orders: Order[]`: Complete order collection for admin and user interfaces
+- `currentOrder: Order | null`: Tracks active order for detailed views and operations
 
 **Order Creation Strategy**:
 
-- **Complex Parameter Object**: `createOrder` accepts structured data ensuring all required information is collected
-- **Totals Object**: Encapsulates financial calculations with optional promotional fields
-- **Async Response Pattern**: Returns standardized success/failure object with optional order ID
-- **Type Safety**: Parameters enforce correct data types at compile time
+- Complex Parameter Object: `createOrder` accepts structured data ensuring all required information is collected
+- Totals Object: Encapsulates financial calculations with optional promotional fields
+- Async Response Pattern: Returns standardized success/failure object with optional order ID
+- Type Safety: Parameters enforce correct data types at compile time
 
 **Retrieval Methods Design**:
 
-- **Multiple Access Patterns**: Support for tracking number, order ID, and user-based retrieval
-- **Null Return Handling**: Explicit null returns for not-found scenarios
-- **Email-based Filtering**: User order history tied to email address for account management
+- Multiple Access Patterns: Support for tracking number, order ID, and user-based retrieval
+- Null Return Handling: Explicit null returns for not-found scenarios
+- Email-based Filtering: User order history tied to email address for account management
 
 **Status Management**:
 
-- **Type-safe Status Updates**: Uses Order["status"] union type to prevent invalid status values
-- **Immutable State Updates**: updateOrderStatus follows React's immutable update patterns
-- **Audit Trail**: Status changes automatically update lastUpdated timestamp
+- Type-safe Status Updates: Uses Order["status"] union type to prevent invalid status values
+- Immutable State Updates: updateOrderStatus follows React's immutable update patterns
+- Audit Trail: Status changes automatically update lastUpdated timestamp
 
 ### Context Creation and Custom Hook
 
@@ -414,9 +414,9 @@ export const useOrder = () => {
 
 **Context Initialization**:
 
-- **Union Type with Undefined**: Enables compile-time detection of improper usage
-- **Defensive Programming**: Starting with `undefined` enforces proper provider wrapping
-- **Type Safety**: TypeScript catches attempts to use context outside provider
+- Union Type with Undefined: Enables compile-time detection of improper usage
+- Defensive Programming: Starting with `undefined` enforces proper provider wrapping
+- Type Safety: TypeScript catches attempts to use context outside provider
 
 **Custom Hook Benefits**:
 
@@ -430,10 +430,10 @@ export const useOrder = () => {
 
 The custom hook implements a **fail-fast** approach:
 
-- **Development Safety**: Catches provider setup errors immediately
-- **Clear Messaging**: Error message guides developers to correct implementation
-- **Runtime Validation**: Prevents runtime null pointer exceptions
-- **Type System Integration**: Works with TypeScript for safety
+- Development Safety: Catches provider setup errors immediately
+- Clear Messaging: Error message guides developers to correct implementation
+- Runtime Validation: Prevents runtime null pointer exceptions
+- Type System Integration: Works with TypeScript for safety
 
 ### Usage Pattern Benefits
 
@@ -451,11 +451,11 @@ function OrderComponent() {
 
 **Architecture Advantages**:
 
-- **Centralized State**: All order data managed in single location
-- **Consistent Interface**: Same API across all components
-- **Type Safety**: Compile-time verification of order operations
-- **Testability**: Easy to mock for unit testing
-- **Performance**: Efficient re-rendering through context optimization
+- Centralized State: All order data managed in single location
+- Consistent Interface: Same API across all components
+- Type Safety: Compile-time verification of order operations
+- Testability: Easy to mock for unit testing
+- Performance: Efficient re-rendering through context optimization
 
 ## Generating Order IDs and Tracking Numbers
 
@@ -499,24 +499,24 @@ const generateTrackingNumber = (): string => {
 
 **Prefix Strategy ("TRK")**:
 
-- **Immediate Recognition**: Customers instantly recognize this as a tracking number
-- **Customer Service**: Support staff can quickly identify tracking vs order numbers
-- **System Differentiation**: Prevents confusion between different ID types
-- **Brand Consistency**: Establishes consistent format across communication channels
+- Immediate Recognition: Customers instantly recognize this as a tracking number
+- Customer Service: Support staff can quickly identify tracking vs order numbers
+- System Differentiation: Prevents confusion between different ID types
+- Brand Consistency: Establishes consistent format across communication channels
 
 **Timestamp Component (8 digits)**:
 
-- **Temporal Ordering**: Orders can be roughly sorted by tracking number
-- **Uniqueness Factor**: Eliminates possibility of duplicate IDs within same millisecond
-- **Debugging Aid**: Developers can estimate when order was created from tracking number
-- **Performance**: Numeric component enables efficient database indexing
+- Temporal Ordering: Orders can be roughly sorted by tracking number
+- Uniqueness Factor: Eliminates possibility of duplicate IDs within same millisecond
+- Debugging Aid: Developers can estimate when order was created from tracking number
+- Performance: Numeric component enables efficient database indexing
 
 **Random Component (6 characters, Base36)**:
 
-- **Collision Prevention**: Random element ensures uniqueness even with concurrent orders
-- **Base36 Encoding**: Uses 0-9 and A-Z for maximum information density
-- **Uppercase Formatting**: Improves readability and reduces transcription errors
-- **Length Optimization**: 6 characters provide sufficient entropy while remaining manageable
+- Collision Prevention: Random element ensures uniqueness even with concurrent orders
+- Base36 Encoding: Uses 0-9 and A-Z for maximum information density
+- Uppercase Formatting: Improves readability and reduces transcription errors
+- Length Optimization: 6 characters provide sufficient entropy while remaining manageable
 
 ##### Order ID Generation Analysis
 
@@ -533,17 +533,17 @@ const generateOrderId = (): string => {
 
 **Full Timestamp Usage**:
 
-- **Maximum Uniqueness**: Uses complete millisecond timestamp
-- **Database Optimization**: Longer timestamp provides better index distribution
-- **Audit Trail**: Complete timestamp aids in debugging and analytics
-- **Scalability**: Supports high-volume order processing
+- Maximum Uniqueness: Uses complete millisecond timestamp
+- Database Optimization: Longer timestamp provides better index distribution
+- Audit Trail: Complete timestamp aids in debugging and analytics
+- Scalability: Supports high-volume order processing
 
 **Shorter Random Component**:
 
-- **Internal Use**: Order IDs are primarily for system use, less customer-facing
-- **Efficiency**: Shorter random component reduces storage requirements
-- **Sufficient Entropy**: 4 characters still provide adequate collision protection
-- **Processing Speed**: Shorter IDs improve database query performance
+- Internal Use: Order IDs are primarily for system use, less customer-facing
+- Efficiency: Shorter random component reduces storage requirements
+- Sufficient Entropy: 4 characters still provide adequate collision protection
+- Processing Speed: Shorter IDs improve database query performance
 
 ### ID Generation Benefits
 
@@ -551,33 +551,33 @@ const generateOrderId = (): string => {
 
 **Customer Experience**:
 
-- **Professional Appearance**: Structured IDs convey system reliability
-- **Easy Communication**: Customers can easily share tracking numbers with support
-- **Reduced Errors**: Consistent format reduces transcription mistakes
-- **Trust Building**: Professional ID format increases customer confidence
+- Professional Appearance: Structured IDs convey system reliability
+- Easy Communication: Customers can easily share tracking numbers with support
+- Reduced Errors: Consistent format reduces transcription mistakes
+- Trust Building: Professional ID format increases customer confidence
 
 **Operational Benefits**:
 
-- **Quick Identification**: Staff can instantly distinguish ID types
-- **Efficient Lookups**: Structured format enables optimized database queries
-- **Debugging Support**: Timestamp component aids in troubleshooting
-- **Scalability**: Algorithm supports unlimited order volume
+- Quick Identification: Staff can instantly distinguish ID types
+- Efficient Lookups: Structured format enables optimized database queries
+- Debugging Support: Timestamp component aids in troubleshooting
+- Scalability: Algorithm supports unlimited order volume
 
 ##### Technical Advantages
 
 **Uniqueness Guarantees**:
 
-- **Temporal Uniqueness**: Timestamp ensures no duplicates across time
-- **Concurrent Safety**: Random component handles simultaneous order creation
-- **Global Uniqueness**: Algorithm works across multiple server instances
-- **Future-Proof**: Design scales with business growth
+- Temporal Uniqueness: Timestamp ensures no duplicates across time
+- Concurrent Safety: Random component handles simultaneous order creation
+- Global Uniqueness: Algorithm works across multiple server instances
+- Future-Proof: Design scales with business growth
 
 **Performance Characteristics**:
 
-- **Fast Generation**: Minimal computational overhead
-- **Memory Efficient**: No need to store previous IDs for uniqueness checking
-- **Database Friendly**: String format with numeric component optimizes indexing
-- **Network Efficient**: Reasonable length for API transmission
+- Fast Generation: Minimal computational overhead
+- Memory Efficient: No need to store previous IDs for uniqueness checking
+- Database Friendly: String format with numeric component optimizes indexing
+- Network Efficient: Reasonable length for API transmission
 
 ### Alternative ID Strategies Considered
 
@@ -599,10 +599,10 @@ const orderId = `ORD-${String(orderCounter++).padStart(8, "0")}`;
 
 **Our Hybrid Approach Benefits**:
 
-- **No External Dependencies**: Pure JavaScript implementation
-- **No State Management**: No need to track counters across server restarts
-- **Human Readable**: More readable than UUIDs
-- **Adequately Unique**: Sufficient for e-commerce scale without UUID complexity
+- No External Dependencies: Pure JavaScript implementation
+- No State Management: No need to track counters across server restarts
+- Human Readable: More readable than UUIDs
+- Adequately Unique: Sufficient for e-commerce scale without UUID complexity
 
 ## Estimating Delivery Dates
 
@@ -673,24 +673,24 @@ const estimateDeliveryDate = (shippingTier?: string): Date => {
 
 **Premium Service Tiers**:
 
-- **Next Day Delivery**: Fixed 1-day delivery for premium pricing tier
-- **Overnight Express**: Guaranteed next-business-day delivery
-- **Predictable Premium**: High-paying customers get reliable timeframes
-- **Service Differentiation**: Clear value proposition for premium pricing
+- Next Day Delivery: Fixed 1-day delivery for premium pricing tier
+- Overnight Express: Guaranteed next-business-day delivery
+- Predictable Premium: High-paying customers get reliable timeframes
+- Service Differentiation: Clear value proposition for premium pricing
 
 **Express Shipping Variability**:
 
-- **Realistic Range**: 2-3 days reflects real shipping carrier performance
-- **Random Variability**: `Math.floor(Math.random() * 2) + 2` creates realistic uncertainty
-- **Customer Expectation Management**: Range setting prevents over-promising
-- **Operational Flexibility**: Accounts for processing and transit variations
+- Realistic Range: 2-3 days reflects real shipping carrier performance
+- Random Variability: `Math.floor(Math.random() * 2) + 2` creates realistic uncertainty
+- Customer Expectation Management: Range setting prevents over-promising
+- Operational Flexibility: Accounts for processing and transit variations
 
 **Standard Shipping Strategy**:
 
-- **Conservative Estimates**: 5-7 day range ensures achievable delivery promises
-- **Cost-Effective Option**: Longer timeframe supports lower shipping costs
-- **Default Fallback**: Handles undefined/unknown shipping tiers gracefully
-- **Business Buffer**: Extra time prevents customer disappointment
+- Conservative Estimates: 5-7 day range ensures achievable delivery promises
+- Cost-Effective Option: Longer timeframe supports lower shipping costs
+- Default Fallback: Handles undefined/unknown shipping tiers gracefully
+- Business Buffer: Extra time prevents customer disappointment
 
 ##### Date Calculation Mechanics
 
@@ -704,15 +704,15 @@ return deliveryDate; // Return new date object
 
 **Date Object Cloning**:
 
-- **Immutability**: Creates new Date object to prevent modifying original
-- **Memory Safety**: Avoids reference issues in React state management
-- **Predictable Behavior**: Ensures function doesn't have side effects
+- Immutability: Creates new Date object to prevent modifying original
+- Memory Safety: Avoids reference issues in React state management
+- Predictable Behavior: Ensures function doesn't have side effects
 
 **Date Addition Logic**:
 
-- **Built-in Overflow Handling**: `setDate()` automatically handles month/year transitions
-- **Calendar Awareness**: JavaScript Date object handles leap years and month lengths
-- **Timezone Consistency**: Maintains local timezone for customer relevance
+- Built-in Overflow Handling: `setDate()` automatically handles month/year transitions
+- Calendar Awareness: JavaScript Date object handles leap years and month lengths
+- Timezone Consistency: Maintains local timezone for customer relevance
 
 ### Business Logic Benefits
 
@@ -720,26 +720,26 @@ return deliveryDate; // Return new date object
 
 **Expectation Management**:
 
-- **Realistic Promises**: Conservative estimates reduce delivery disappointments
-- **Service Differentiation**: Clear value proposition for premium shipping options
-- **Transparency**: Customers understand shipping timeframe before purchase
-- **Trust Building**: Reliable delivery estimates build customer confidence
+- Realistic Promises: Conservative estimates reduce delivery disappointments
+- Service Differentiation: Clear value proposition for premium shipping options
+- Transparency: Customers understand shipping timeframe before purchase
+- Trust Building: Reliable delivery estimates build customer confidence
 
 **Operational Advantages**:
 
-- **Flexible Fulfillment**: Variability accommodates warehouse and logistics variations
-- **Customer Service**: Realistic estimates reduce complaint volume
-- **Competitive Positioning**: Multiple tiers compete with market standards
-- **Seasonal Adaptability**: Basic algorithm can be enhanced for holiday periods
+- Flexible Fulfillment: Variability accommodates warehouse and logistics variations
+- Customer Service: Realistic estimates reduce complaint volume
+- Competitive Positioning: Multiple tiers compete with market standards
+- Seasonal Adaptability: Basic algorithm can be enhanced for holiday periods
 
 ##### Technical Architecture Benefits
 
 **Scalability Design**:
 
-- **Simple Algorithm**: Minimal computational overhead for high order volumes
-- **Easy Enhancement**: Function can be extended with business rules (holidays, regions)
-- **Integration Ready**: Compatible with real shipping carrier APIs
-- **Testing Friendly**: Deterministic input/output for unit testing
+- Simple Algorithm: Minimal computational overhead for high order volumes
+- Easy Enhancement: Function can be extended with business rules (holidays, regions)
+- Integration Ready: Compatible with real shipping carrier APIs
+- Testing Friendly: Deterministic input/output for unit testing
 
 **Real-World Adaptability**:
 
@@ -940,9 +940,9 @@ export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({
 
 #### Design Decisions:
 
-- **Functional Component with TypeScript**: Modern React patterns with full type safety
-- **Generic Children Prop**: Accepts any valid React node for maximum flexibility
-- **Named Export**: Enables tree-shaking and explicit imports for optimized bundling
+- Functional Component with TypeScript: Modern React patterns with full type safety
+- Generic Children Prop: Accepts any valid React node for maximum flexibility
+- Named Export: Enables tree-shaking and explicit imports for optimized bundling
 
 ### State Management Strategy
 
@@ -954,14 +954,14 @@ const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
 #### State Design Philosophy:
 
 1. **`orders: Order[]`**:
-   - **Array State**: Maintains complete order history for management
-   - **Type Safety**: Ensures all array elements conform to Order interface
-   - **Scalability**: Array structure supports efficient filtering and sorting operations
+   - Array State: Maintains complete order history for management
+   - Type Safety: Ensures all array elements conform to Order interface
+   - Scalability: Array structure supports efficient filtering and sorting operations
 
 2. **`currentOrder: Order | null`**:
-   - **Active Order Tracking**: Manages currently selected order for detailed operations
-   - **Null Handling**: Explicit null state indicates no active order selection
-   - **UI State Management**: Enables order detail views and focused operations
+   - Active Order Tracking: Manages currently selected order for detailed operations
+   - Null Handling: Explicit null state indicates no active order selection
+   - UI State Management: Enables order detail views and focused operations
 
 ### Data Persistence Implementation
 
@@ -1002,10 +1002,10 @@ useEffect(() => {
 
 ###### Persistence Strategy:
 
-- **Conditional Saving**: Only saves when orders exist to avoid empty array storage
-- **Reactive Updates**: Automatically saves whenever orders state changes
-- **JSON Serialization**: Converts complex objects to storable string format
-- **Performance Optimization**: Effect only runs when orders array changes
+- Conditional Saving: Only saves when orders exist to avoid empty array storage
+- Reactive Updates: Automatically saves whenever orders state changes
+- JSON Serialization: Converts complex objects to storable string format
+- Performance Optimization: Effect only runs when orders array changes
 
 ### Order Creation Implementation
 
@@ -1033,16 +1033,16 @@ const createOrder = async (
 
 **Parameter Structure**:
 
-- **Separated Concerns**: Different parameter types handle different aspects of order creation
-- **Type Safety**: Each parameter enforces specific data structure requirements
-- **Flexible Totals**: Object parameter allows for optional discount and shipping information
-- **Comprehensive Data**: Collects all necessary information for complete order processing
+- Separated Concerns: Different parameter types handle different aspects of order creation
+- Type Safety: Each parameter enforces specific data structure requirements
+- Flexible Totals: Object parameter allows for optional discount and shipping information
+- Comprehensive Data: Collects all necessary information for complete order processing
 
 **Return Type Strategy**:
 
-- **Consistent Response**: Standard success/failure pattern across all async operations
-- **Optional Order ID**: Provides order identifier only on successful creation
-- **User-Friendly Messages**: Clear feedback for UI display and user communication
+- Consistent Response: Standard success/failure pattern across all async operations
+- Optional Order ID: Provides order identifier only on successful creation
+- User-Friendly Messages: Clear feedback for UI display and user communication
 
 ##### Order Creation Process
 
@@ -1071,15 +1071,15 @@ try {
 
 **ID Generation**:
 
-- **Unique Identifiers**: Creates both internal and customer-facing identifiers
-- **Timestamp Capture**: Records exact order creation time
-- **Delivery Estimation**: Calculates expected delivery based on shipping tier
+- Unique Identifiers: Creates both internal and customer-facing identifiers
+- Timestamp Capture: Records exact order creation time
+- Delivery Estimation: Calculates expected delivery based on shipping tier
 
 **Cart to Order Conversion**:
 
-- **Data Snapshot**: Captures product information at time of purchase
-- **Price Preservation**: Maintains historical pricing for order integrity
-- **Complete Product Data**: Includes all necessary product information for fulfillment
+- Data Snapshot: Captures product information at time of purchase
+- Price Preservation: Maintains historical pricing for order integrity
+- Complete Product Data: Includes all necessary product information for fulfillment
 
 ##### Order Object Construction
 
@@ -1112,21 +1112,21 @@ const newOrder: Order = {
 
 **Address Formatting**:
 
-- **Concatenated Addresses**: Creates readable address strings for display and shipping labels
-- **Geographic Completeness**: Includes all address components for accurate delivery
-- **Standardized Format**: Consistent address format across all orders
+- Concatenated Addresses: Creates readable address strings for display and shipping labels
+- Geographic Completeness: Includes all address components for accurate delivery
+- Standardized Format: Consistent address format across all orders
 
 **Financial Data Integration**:
 
-- **Complete Pricing Breakdown**: Captures all financial components for accounting
-- **Discount Tracking**: Maintains promotional and membership discount information
-- **Payment Method Recording**: Stores payment method for customer service reference
+- Complete Pricing Breakdown: Captures all financial components for accounting
+- Discount Tracking: Maintains promotional and membership discount information
+- Payment Method Recording: Stores payment method for customer service reference
 
 **Status and Timing**:
 
-- **Initial Status**: Sets appropriate starting status for order workflow
-- **Timestamp Consistency**: Uses same timestamp for order date and last updated
-- **Delivery Planning**: Includes estimated delivery for customer communication
+- Initial Status: Sets appropriate starting status for order workflow
+- Timestamp Consistency: Uses same timestamp for order date and last updated
+- Delivery Planning: Includes estimated delivery for customer communication
 
 ### Order Retrieval and Management Functions
 
@@ -1156,15 +1156,15 @@ const getUserOrders = (email: string): Order[] => {
 
 **Multiple Access Patterns**:
 
-- **Tracking Number Lookup**: Customer-friendly order lookup method
-- **Internal ID Lookup**: System-level order retrieval for admin operations
-- **User-Specific Filtering**: Email-based order history for customer accounts
+- Tracking Number Lookup: Customer-friendly order lookup method
+- Internal ID Lookup: System-level order retrieval for admin operations
+- User-Specific Filtering: Email-based order history for customer accounts
 
 **Search Optimization**:
 
-- **Case-Insensitive Email**: Handles email variations gracefully
-- **Chronological Sorting**: Most recent orders first for better user experience
-- **Null Safety**: Explicit null returns prevent undefined behavior
+- Case-Insensitive Email: Handles email variations gracefully
+- Chronological Sorting: Most recent orders first for better user experience
+- Null Safety: Explicit null returns prevent undefined behavior
 
 ##### Status Update Implementation
 
@@ -1184,15 +1184,15 @@ const updateOrderStatus = (orderId: string, status: Order["status"]) => {
 
 **Immutable Updates**:
 
-- **React Best Practice**: Uses immutable update pattern for proper re-rendering
-- **State Consistency**: Maintains referential integrity across component tree
-- **Performance**: Efficient updates that trigger only necessary re-renders
+- React Best Practice: Uses immutable update pattern for proper re-rendering
+- State Consistency: Maintains referential integrity across component tree
+- Performance: Efficient updates that trigger only necessary re-renders
 
 **Audit Trail**:
 
-- **Status Tracking**: Updates order status with proper type safety
-- **Timestamp Updates**: Automatically updates lastUpdated field for audit purposes
-- **Selective Updates**: Only modifies target order, leaving others unchanged
+- Status Tracking: Updates order status with proper type safety
+- Timestamp Updates: Automatically updates lastUpdated field for audit purposes
+- Selective Updates: Only modifies target order, leaving others unchanged
 
 ### Context Value Assembly and Provider
 
@@ -1226,19 +1226,19 @@ One final critical step remains before we can fully implement the hooks layer th
 
 These hooks will act as the vital link between your components and the underlying order data, offering a clean, reusable, and efficient interface to:
 
-- **Access and manipulate order data**:
+- Access and manipulate order data:
   Enable components to fetch, update, and synchronize order information with minimal overhead.
 
-- **Handle real-time updates**:
+- Handle real-time updates:
   Ensure users receive instant feedback on order status changes such as shipping progress, delivery confirmations, or cancellations.
 
-- **Implement robust error handling**:
+- Implement robust error handling:
   Provide graceful recovery from failures or inconsistencies in data fetching or updates, maintaining application stability.
 
-- **Optimize performance and scalability**:
+- Optimize performance and scalability:
   Use techniques such as memoization, batching, and lazy loading to keep the user experience smooth even as order volume grows.
 
-- **Integrate seamlessly with other providers**:
+- Integrate seamlessly with other providers:
   Coordinate with authentication, cart, notification, and payment systems to create a unified and consistent user experience.
 
 By building this hooks layer, you will empower your application to react dynamically to the complex workflows of order management, improving both developer productivity and customer satisfaction.

@@ -725,7 +725,7 @@ Parameters:
     Description: Domain name for the application
 
 Resources:
-## Security Group for Alb
+  ## Security Group for Alb
   ALBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -747,7 +747,7 @@ Resources:
         - Key: Name
           Value: ALB-SecurityGroup
 
-## Application Load Balancer
+  ## Application Load Balancer
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -775,7 +775,7 @@ Resources:
         - Key: Name
           Value: Advanced-ALB
 
-## S3 Bucket for Access Logs
+  ## S3 Bucket for Access Logs
   AccessLogsBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -791,7 +791,7 @@ Resources:
             Status: Enabled
             ExpirationInDays: 30
 
-## Target Group for Web Servers
+  ## Target Group for Web Servers
   WebServerTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
@@ -819,7 +819,7 @@ Resources:
         - Key: Name
           Value: WebServers-TG
 
-## Target Group for API Servers
+  ## Target Group for API Servers
   APIServerTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
@@ -843,7 +843,7 @@ Resources:
         - Key: Name
           Value: APIServers-TG
 
-## Target Group for Admin Panel
+  ## Target Group for Admin Panel
   AdminPanelTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
@@ -862,7 +862,7 @@ Resources:
         - Key: Name
           Value: AdminPanel-TG
 
-## HTTPS Listener
+  ## HTTPS Listener
   HTTPSListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -876,7 +876,7 @@ Resources:
         - Type: forward
           TargetGroupArn: !Ref WebServerTargetGroup
 
-## HTTP Listener (redirect to HTTPS
+  ## HTTP Listener (redirect to HTTPS
   HTTPListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
@@ -890,7 +890,7 @@ Resources:
             Port: "443"
             StatusCode: HTTP_301
 
-## API Routing Rule
+  ## API Routing Rule
   APIListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
     Properties:
@@ -904,7 +904,7 @@ Resources:
         - Type: forward
           TargetGroupArn: !Ref APIServerTargetGroup
 
-## Admin Panel Routing Rule (with IP Restriction)
+  ## Admin Panel Routing Rule (with IP Restriction)
   AdminListenerRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
     Properties:
@@ -921,7 +921,7 @@ Resources:
         - Type: forward
           TargetGroupArn: !Ref AdminPanelTargetGroup
 
-## Static Content Routing Rule (with Caching Headers)
+  ## Static Content Routing Rule (with Caching Headers)
   StaticContentRule:
     Type: AWS::ElasticLoadBalancingV2::ListenerRule
     Properties:
@@ -938,7 +938,7 @@ Resources:
         - Type: forward
           TargetGroupArn: !Ref WebServerTargetGroup
 
-## CloudWatch Alarms for Monitoring
+  ## CloudWatch Alarms for Monitoring
   ALBTargetResponseTimeAlarm:
     Type: AWS::CloudWatch::Alarm
     Properties:
@@ -971,7 +971,7 @@ Resources:
         - Name: LoadBalancer
           Value: !GetAtt ApplicationLoadBalancer.LoadBalancerFullName
 
-## Waf Web Acl for Additional Security
+  ## Waf Web Acl for Additional Security
   WebACL:
     Type: AWS::WAFv2::WebACL
     Properties:
@@ -1005,7 +1005,7 @@ Resources:
             CloudWatchMetricsEnabled: true
             MetricName: RateLimitMetric
 
-## Associate Waf with Alb
+  ## Associate Waf with Alb
   WebACLAssociation:
     Type: AWS::WAFv2::WebACLAssociation
     Properties:
@@ -1058,47 +1058,47 @@ metadata:
   name: nginx-configuration
   namespace: ingress-nginx
 data:
-## Global Nginx Settings
+  ## Global Nginx Settings
   ssl-protocols: "TLSv1.2 TLSv1.3"
   ssl-ciphers: "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384"
   ssl-prefer-server-ciphers: "true"
 
-## Performance Settings
+  ## Performance Settings
   worker-processes: "auto"
   worker-connections: "16384"
   max-worker-open-files: "65536"
 
-## Keep-alive Settings
+  ## Keep-alive Settings
   upstream-keepalive-connections: "32"
   upstream-keepalive-timeout: "60"
   upstream-keepalive-requests: "100"
 
-## Buffer Settings
+  ## Buffer Settings
   proxy-buffer-size: "16k"
   proxy-buffers-number: "8"
   proxy-busy-buffers-size: "32k"
 
-## Timeout Settings
+  ## Timeout Settings
   proxy-connect-timeout: "5"
   proxy-send-timeout: "60"
   proxy-read-timeout: "60"
 
-## Rate Limiting
+  ## Rate Limiting
   limit-req-status-code: "429"
   limit-conn-status-code: "429"
 
-## Security Headers
+  ## Security Headers
   add-headers: "true"
   custom-headers: "default/custom-headers"
 
-## Logging
+  ## Logging
   log-format-upstream: '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" $request_length $request_time [$proxy_upstream_name] [$proxy_alternative_upstream_name] $upstream_addr $upstream_response_length $upstream_response_time $upstream_status $req_id'
 
-## Enable Real IP
+  ## Enable Real IP
   use-forwarded-headers: "true"
   compute-full-forwarded-for: "true"
 
-## Enable Gzip Compression
+  ## Enable Gzip Compression
   enable-brotli: "true"
   gzip-level: "6"
   gzip-types: "text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json"
@@ -1232,25 +1232,25 @@ metadata:
   name: web-app-ingress
   namespace: default
   annotations:
-## Basic Configuration
+    ## Basic Configuration
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/rewrite-target: /
 
-## SSL Configuration
+    ## SSL Configuration
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 
-## Rate Limiting
+    ## Rate Limiting
     nginx.ingress.kubernetes.io/rate-limit: "100"
     nginx.ingress.kubernetes.io/rate-limit-window: "1m"
 
-## CORS Configuration
+    ## CORS Configuration
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "https://example.com"
     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
 
-## Session Affinity
+    ## Session Affinity
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/affinity-mode: "persistent"
     nginx.ingress.kubernetes.io/session-cookie-name: "route"
@@ -1258,17 +1258,17 @@ metadata:
     nginx.ingress.kubernetes.io/session-cookie-max-age: "86400"
     nginx.ingress.kubernetes.io/session-cookie-path: "/"
 
-## Custom Error Pages
+    ## Custom Error Pages
     nginx.ingress.kubernetes.io/custom-http-errors: "404,503"
     nginx.ingress.kubernetes.io/default-backend: "default/custom-error-pages"
 
-## Whitelist Configuration
+    ## Whitelist Configuration
     nginx.ingress.kubernetes.io/whitelist-source-range: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
 
-## Load Balancing Algorithm
+    ## Load Balancing Algorithm
     nginx.ingress.kubernetes.io/upstream-hash-by: "$request_uri"
 
-## Monitoring and Logging
+    ## Monitoring and Logging
     nginx.ingress.kubernetes.io/enable-access-log: "true"
     nginx.ingress.kubernetes.io/enable-rewrite-log: "true"
 
@@ -1282,7 +1282,7 @@ spec:
     - host: example.com
       http:
         paths:
-## Main Web Application
+          ## Main Web Application
           - path: /
             pathType: Prefix
             backend:
@@ -1291,7 +1291,7 @@ spec:
                 port:
                   number: 80
 
-## Static Content with Caching
+          ## Static Content with Caching
           - path: /static
             pathType: Prefix
             backend:
@@ -1303,7 +1303,7 @@ spec:
     - host: api.example.com
       http:
         paths:
-## API Endpoints with Different Rate Limiting
+          ## API Endpoints with Different Rate Limiting
           - path: /v1
             pathType: Prefix
             backend:
@@ -1344,18 +1344,18 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "nginx"
 
-## Aggressive Rate Limiting for Public API
+    ## Aggressive Rate Limiting for Public API
     nginx.ingress.kubernetes.io/rate-limit: "10"
     nginx.ingress.kubernetes.io/rate-limit-burst: "20"
     nginx.ingress.kubernetes.io/rate-limit-window: "1m"
 
-## Connection Limiting
+    ## Connection Limiting
     nginx.ingress.kubernetes.io/limit-connections: "5"
 
-## Request Size Limiting
+    ## Request Size Limiting
     nginx.ingress.kubernetes.io/proxy-body-size: "1m"
 
-## Timeout Configuration
+    ## Timeout Configuration
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "5"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "10"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "30"
@@ -1383,7 +1383,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "nginx"
 
-## Canary Deployment Configuration
+    ## Canary Deployment Configuration
     nginx.ingress.kubernetes.io/canary: "true"
     nginx.ingress.kubernetes.io/canary-weight: "10" # 10% traffic to green
     nginx.ingress.kubernetes.io/canary-by-header: "X-Canary"

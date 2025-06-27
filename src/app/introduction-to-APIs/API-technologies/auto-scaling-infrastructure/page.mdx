@@ -407,7 +407,7 @@ custom_scaler = CustomMetricsScaler({
 ```yaml
 ## Aws-autoscaling-stack.yaml
 AWSTemplateFormatVersion: "2010-09-09"
-Description: "Production-ready Auto Scaling setup with comprehensive monitoring"
+Description: "Production-ready Auto Scaling setup with  monitoring"
 
 Parameters:
   VpcId:
@@ -1007,21 +1007,21 @@ spec:
   minReplicas: 3
   maxReplicas: 100
   metrics:
-## CPU-based Scaling
+    ## CPU-based Scaling
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
           averageUtilization: 70
-## Memory-based Scaling
+    ## Memory-based Scaling
     - type: Resource
       resource:
         name: memory
         target:
           type: Utilization
           averageUtilization: 80
-## Custom Metrics from Prometheus
+    ## Custom Metrics from Prometheus
     - type: Pods
       pods:
         metric:
@@ -1029,7 +1029,7 @@ spec:
         target:
           type: AverageValue
           averageValue: "100"
-## External Metrics (e.g., Sqs Queue Length)
+    ## External Metrics (e.g., Sqs Queue Length)
     - type: External
       external:
         metric:
@@ -1875,27 +1875,27 @@ spec:
   minReplicaCount: 1
   maxReplicaCount: 50
   triggers:
-## Scale Based on Redis Stream Length
+    ## Scale Based on Redis Stream Length
     - type: redis-streams
       metadata:
         address: redis-server:6379
         stream: user-events
         consumerGroup: processors
         pendingEntriesCount: "10"
-## Scale Based on Prometheus Metrics
+    ## Scale Based on Prometheus Metrics
     - type: prometheus
       metadata:
         serverAddress: http://prometheus-server:9090
         metricName: http_requests_per_second
         threshold: "100"
         query: sum(rate(http_requests_total[2m]))
-## Scale Based on AWS Sqs Queue
+    ## Scale Based on AWS Sqs Queue
     - type: aws-sqs-queue
       metadata:
         queueURL: https://sqs.us-east-1.amazonaws.com/123456789/user-notifications
         queueLength: "5"
         awsRegion: us-east-1
-## Scale Based on Kafka Consumer Lag
+    ## Scale Based on Kafka Consumer Lag
     - type: kafka
       metadata:
         bootstrapServers: kafka-cluster:9092
@@ -2977,13 +2977,13 @@ data:
         threshold_scale_down: 30
         evaluation_periods: 3
         period_seconds: 300
-        
+
       - name: memory_utilization
         threshold_scale_up: 80
         threshold_scale_down: 40
         evaluation_periods: 2
         period_seconds: 300
-        
+
       - name: network_throughput
         threshold_scale_up: 80
         threshold_scale_down: 20
@@ -2997,13 +2997,13 @@ data:
         threshold_scale_down: 200
         evaluation_periods: 3
         period_seconds: 180
-        
+
       - name: error_rate
         threshold_scale_up: 5     # percentage
         threshold_scale_down: 1
         evaluation_periods: 2
         period_seconds: 300
-        
+
       - name: requests_per_second
         threshold_scale_up: 1000
         threshold_scale_down: 100
@@ -3017,7 +3017,7 @@ data:
         threshold_scale_down: 1000
         evaluation_periods: 1
         period_seconds: 300
-        
+
       - name: queue_depth
         threshold_scale_up: 100
         threshold_scale_down: 10
@@ -3409,6 +3409,6 @@ for i, config in enumerate(optimal_configs[:3], 1):
 - Complex custom metrics requirements
 - Serverless-style scaling patterns
 
-This comprehensive guide provides production-ready auto-scaling implementations with real-world code examples, best practices, and decision guidance for selecting the appropriate auto-scaling solution for different use cases.
+This guide provides production-ready auto-scaling implementations with real-world code examples, best practices, and decision guidance for selecting the appropriate auto-scaling solution for different use cases.
 
 <BackToTop />

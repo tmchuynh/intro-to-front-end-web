@@ -94,7 +94,7 @@ import { API_BASE_URL } from ".";
  */
 export async function fetchProducts(
   categorySlug: string,
-  searchQuery?: string
+  searchQuery?: string,
 ): Promise<ProductItem[]> {
   try {
     let url: string;
@@ -102,12 +102,12 @@ export async function fetchProducts(
     if (searchQuery) {
       // If a search query is provided, use the search endpoint with limit=0 to get all results
       url = `${API_BASE_URL}/products/search?q=${encodeURIComponent(
-        searchQuery
+        searchQuery,
       )}&limit=0`;
     } else {
       // Otherwise, fetch by category with limit=0 to get all products in the category
       url = `${API_BASE_URL}/products/category/${encodeURIComponent(
-        categorySlug
+        categorySlug,
       )}?limit=0`;
     }
 
@@ -116,11 +116,11 @@ export async function fetchProducts(
     if (!res.ok) {
       if (res.status === 404) {
         throw new Error(
-          `Category '${categorySlug}' not found or has no products.`
+          `Category '${categorySlug}' not found or has no products.`,
         );
       }
       throw new Error(
-        `Failed to fetch products for category '${categorySlug}': ${res.status}`
+        `Failed to fetch products for category '${categorySlug}': ${res.status}`,
       );
     }
 
@@ -187,7 +187,7 @@ This function demonstrates advanced API request handling and conditional logic:
  * @throws {Error} If the product cannot be found or the API request fails.
  */
 export async function getProductBySlug(
-  productTitle: string
+  productTitle: string,
 ): Promise<ProductItem | null> {
   if (!productTitle) {
     console.warn("Product title is missing.");
@@ -196,14 +196,14 @@ export async function getProductBySlug(
 
   try {
     const url = `${API_BASE_URL}/products/search?q=${toTitleCase(
-      productTitle
+      productTitle,
     )}&limit=0`;
 
     const res = await fetch(url);
 
     if (!res.ok) {
       throw new Error(
-        `Failed to fetch product '${productTitle}': ${res.status}`
+        `Failed to fetch product '${productTitle}': ${res.status}`,
       );
     }
 
@@ -294,7 +294,7 @@ This function showcases complex string manipulation and search algorithms:
  * @throws {Error} If the product cannot be found or the API request fails.
  */
 export async function getProductById(
-  productId: number
+  productId: number,
 ): Promise<ProductItem | null> {
   try {
     const url = `${API_BASE_URL}/products/${productId}`;
@@ -305,7 +305,7 @@ export async function getProductById(
         return null;
       }
       throw new Error(
-        `Failed to fetch product with ID ${productId}: ${res.status}`
+        `Failed to fetch product with ID ${productId}: ${res.status}`,
       );
     }
 

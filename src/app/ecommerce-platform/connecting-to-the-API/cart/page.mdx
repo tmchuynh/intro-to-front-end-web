@@ -52,7 +52,7 @@ import { API_BASE_URL } from ".";
  * @throws {Error} If the API request fails or returns an error.
  */
 export async function fetchUserCarts(
-  userId: number
+  userId: number,
 ): Promise<UserCartsResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/users/${userId}/carts`);
@@ -86,7 +86,7 @@ This function demonstrates several important concepts in API integration:
 
 ###### Error Handling Strategy:
 
-- The `try-catch` block provides comprehensive error handling
+- The `try-catch` block provides error handling
 - Checks `response.ok` to verify the HTTP request was successful (status 200-299)
 - Throws descriptive errors that include the HTTP status text for debugging
 - Logs errors to the console for development debugging while still throwing them up the call stack
@@ -170,7 +170,7 @@ This function showcases fundamental concepts in single-resource API fetching:
  */
 export async function fetchAllCarts(
   limit: number = 20,
-  skip: number = 0
+  skip: number = 0,
 ): Promise<{
   carts: Cart[];
   total: number;
@@ -179,7 +179,7 @@ export async function fetchAllCarts(
 }> {
   try {
     const response = await fetch(
-      `${API_BASE_URL}/carts?limit=${limit}&skip=${skip}`
+      `${API_BASE_URL}/carts?limit=${limit}&skip=${skip}`,
     );
 
     if (!response.ok) {
@@ -236,14 +236,14 @@ This function introduces advanced concepts for handling large datasets and pagin
  * @returns {Promise<Array>} A promise that resolves to an array of previously purchased items.
  */
 export async function getPreviouslyPurchased(
-  userId: number
+  userId: number,
 ): Promise<CartProduct[]> {
   try {
     const userCarts = await fetchUserCarts(userId);
 
     // Flatten all products from all carts
     const allProducts: CartProduct[] = userCarts.carts.flatMap(
-      (cart) => cart.products
+      (cart) => cart.products,
     );
 
     // Remove duplicates based on product ID and aggregate quantities
@@ -392,7 +392,7 @@ export async function getUserPurchaseStats(userId: number): Promise<{
         totalSpent: 0,
         totalItems: 0,
         totalSavings: 0,
-      }
+      },
     );
 
     return stats;

@@ -21,7 +21,7 @@ import { BlogPost } from "@/types/blog";
 
 export const getStaticProps: GetStaticProps = async () => {
   const files = fs.readdirSync(
-    path.join("src", "app", "blog-website", "blog-posts")
+    path.join("src", "app", "blog-website", "blog-posts"),
   );
 
   // @collapse
@@ -31,7 +31,7 @@ export const getStaticProps: GetStaticProps = async () => {
       "app",
       "blog-website",
       "blog-posts",
-      fileName
+      fileName,
     );
     const fileContent = fs.readFileSync(filePath, "utf-8");
     const { data } = matter(fileContent);
@@ -375,8 +375,8 @@ const CommandSearch: React.FC<CommandSearchProps> = ({ posts }) => {
         post.title.toLowerCase().includes(query.toLowerCase()) ||
         post.description?.toLowerCase().includes(query.toLowerCase()) ||
         post.tags?.some((tag) =>
-          tag.toLowerCase().includes(query.toLowerCase())
-        )
+          tag.toLowerCase().includes(query.toLowerCase()),
+        ),
     );
     setFilteredPosts(filtered);
   };
@@ -430,7 +430,7 @@ const CommandSearch: React.FC<CommandSearchProps> = ({ posts }) => {
                           .includes(searchQuery.toLowerCase()) ||
                         post.description
                           ?.toLowerCase()
-                          .includes(searchQuery.toLowerCase())
+                          .includes(searchQuery.toLowerCase()),
                     )
                     .slice(0, 10)
                     .map((post) => (
@@ -556,7 +556,7 @@ const DebouncedSearch: React.FC<DebouncedSearchProps> = ({ posts }) => {
         </mark>
       ) : (
         part
-      )
+      ),
     );
   };
 
@@ -691,7 +691,7 @@ export default DebouncedSearch;
 
 ###### How It Works
 
-This search component implements debouncing to prevent excessive API calls or filtering operations while the user is typing. It waits 300ms after the user stops typing before performing the search. The component also includes text highlighting to show search matches, loading states, and a comprehensive empty state with suggestions.
+This search component implements debouncing to prevent excessive API calls or filtering operations while the user is typing. It waits 300ms after the user stops typing before performing the search. The component also includes text highlighting to show search matches, loading states, and a empty state with suggestions.
 
 ###### Customization Options
 
@@ -730,7 +730,7 @@ const SimpleSearch: React.FC<SimpleSearchProps> = ({ posts }) => {
           post.title.toLowerCase().includes(query) ||
           post.description?.toLowerCase().includes(query) ||
           post.author?.toLowerCase().includes(query) ||
-          post.tags?.some((tag) => tag.toLowerCase().includes(query))
+          post.tags?.some((tag) => tag.toLowerCase().includes(query)),
       );
     }
 
@@ -1016,7 +1016,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({ posts }) => {
 
   const handleTagToggle = (tag: string) => {
     setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
     );
   };
 
@@ -1407,7 +1407,7 @@ const FeaturedSection: React.FC<FeaturedSectionProps> = ({ posts }) => {
   const recentPosts = posts
     .sort(
       (a, b) =>
-        new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime()
+        new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime(),
     )
     .slice(0, 4);
 
@@ -1425,7 +1425,7 @@ const FeaturedSection: React.FC<FeaturedSectionProps> = ({ posts }) => {
   };
 
   const remainingPosts = posts.filter(
-    (post) => !getPostsForTab().some((fp) => fp.slug === post.slug)
+    (post) => !getPostsForTab().some((fp) => fp.slug === post.slug),
   );
 
   return (
@@ -2234,7 +2234,7 @@ export default DropdownShare;
 
 ###### How It Works
 
-The dropdown share component provides a comprehensive sharing solution with a clean, accessible interface. It includes major social media platforms, email sharing, and copy-to-clipboard functionality. The dropdown opens when clicked and closes when clicking outside, providing excellent UX. Each platform opens in a popup window with appropriate dimensions for social sharing dialogs.
+The dropdown share component provides a sharing solution with a clean, accessible interface. It includes major social media platforms, email sharing, and copy-to-clipboard functionality. The dropdown opens when clicked and closes when clicking outside, providing excellent UX. Each platform opens in a popup window with appropriate dimensions for social sharing dialogs.
 
 ###### Customization Options
 

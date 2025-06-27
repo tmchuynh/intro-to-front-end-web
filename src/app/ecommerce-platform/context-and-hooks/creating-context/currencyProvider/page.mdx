@@ -310,7 +310,7 @@ const currencies: CurrencyData[] = [
 
 ### Explanation of the Code
 
-This comprehensive currency configuration represents a strategic approach to global market coverage, balancing market reach with implementation complexity.
+This currency configuration represents a strategic approach to global market coverage, balancing market reach with implementation complexity.
 
 ### Currency Selection Strategy
 
@@ -468,7 +468,7 @@ const currencyData = currencies.reduce(
     acc[currency.code] = currency;
     return acc;
   },
-  {} as Record<string, CurrencyData>
+  {} as Record<string, CurrencyData>,
 );
 
 // Fast lookups O(1) instead of O(n)
@@ -481,7 +481,7 @@ const getCurrency = (code: string) => currencyData[code];
 // Load only active currencies initially
 const activeCurrencies = ["USD", "EUR", "GBP", "JPY"];
 const extendedCurrencies = currencies.filter(
-  (c) => !activeCurrencies.includes(c.code)
+  (c) => !activeCurrencies.includes(c.code),
 );
 
 // Load extended currencies on demand
@@ -505,13 +505,13 @@ const cryptoCurrencies: CurrencyData[] = [
 // Regional currency sets (future)
 const regionalSets = {
   european: currencies.filter((c) =>
-    ["EUR", "GBP", "CHF", "NOK", "PLN"].includes(c.code)
+    ["EUR", "GBP", "CHF", "NOK", "PLN"].includes(c.code),
   ),
   asian: currencies.filter((c) =>
-    ["JPY", "CNY", "KRW", "INR", "THB"].includes(c.code)
+    ["JPY", "CNY", "KRW", "INR", "THB"].includes(c.code),
   ),
   americas: currencies.filter((c) =>
-    ["USD", "CAD", "BRL", "MXN"].includes(c.code)
+    ["USD", "CAD", "BRL", "MXN"].includes(c.code),
   ),
 };
 ```
@@ -523,7 +523,7 @@ This strategic currency selection and organization provides the foundation for a
 ```tsx
 // src/app/context/currencyContext.tsx
 const CurrencyContext = createContext<CurrencyContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export const useCurrency = () => {
@@ -545,7 +545,7 @@ This implementation establishes the foundational infrastructure for currency man
 
 ```tsx
 const CurrencyContext = createContext<CurrencyContextType | undefined>(
-  undefined
+  undefined,
 );
 ```
 
@@ -622,7 +622,7 @@ const contextValue = useMemo(
     formatPrice,
     refreshRates,
   }),
-  [currentCurrency, rates, isLoading, error]
+  [currentCurrency, rates, isLoading, error],
 );
 ```
 
@@ -738,7 +738,7 @@ const useCurrency = () => {
   const context = useContext(CurrencyContext);
   if (!context) {
     const error = new Error(
-      "useCurrency must be used within a CurrencyProvider"
+      "useCurrency must be used within a CurrencyProvider",
     );
 
     // In development, throw immediately for debugging
@@ -793,12 +793,12 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       const response = await fetch(
-        `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`
+        `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`,
       );
 
       if (!response.ok) {
         console.warn(
-          `Exchange rate API error: ${response.status}. Using fallback rates.`
+          `Exchange rate API error: ${response.status}. Using fallback rates.`,
         );
         setFallbackRates();
         return;
@@ -810,7 +810,7 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
         console.warn(
           `Exchange rate API error: ${
             data["error-type"] || "Unknown"
-          }. Using fallback rates.`
+          }. Using fallback rates.`,
         );
         setFallbackRates();
         return;
@@ -897,7 +897,7 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const convertPrice = (
     price: number,
-    fromCurrency: string = "USD"
+    fromCurrency: string = "USD",
   ): number => {
     if (!rates || Object.keys(rates).length === 0) {
       return price;
@@ -1012,7 +1012,7 @@ const fetchExchangeRates = async () => {
     }
 
     const response = await fetch(
-      `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`
+      `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`,
     );
     // ... error handling and data processing
   } catch (err) {
@@ -1190,7 +1190,7 @@ const convertPrice = (price: number, fromCurrency: string = "USD"): number => {
 // Enhanced conversion with precision handling
 const convertPriceWithPrecision = (
   price: number,
-  fromCurrency: string = "USD"
+  fromCurrency: string = "USD",
 ): number => {
   const converted = convertPrice(price, fromCurrency);
 
@@ -1239,7 +1239,7 @@ const formatPrice = (price: number, fromCurrency: string = "USD"): string => {
 // Future enhancement: locale-aware formatting
 const formatPriceWithLocale = (
   price: number,
-  fromCurrency: string = "USD"
+  fromCurrency: string = "USD",
 ): string => {
   const convertedPrice = convertPrice(price, fromCurrency);
 
@@ -1297,7 +1297,7 @@ const contextValue: CurrencyContextType = useMemo(
     isLoading,
     error,
     // Functions are stable and don't need dependencies
-  ]
+  ],
 );
 ```
 
@@ -1371,7 +1371,7 @@ const debouncedRefreshRates = useCallback(
   debounce(async () => {
     await fetchExchangeRates();
   }, 5000), // 5 second debounce
-  []
+  [],
 );
 
 // Throttled currency changes for rapid UI interactions
@@ -1380,7 +1380,7 @@ const throttledSetCurrency = useCallback(
     setCurrentCurrency(currency);
     localStorage.setItem("preferred-currency", JSON.stringify(currency));
   }, 100), // 100ms throttle
-  []
+  [],
 );
 ```
 
@@ -1394,7 +1394,7 @@ const loadExtendedCurrencies = useMemo(() => {
   return lazy(() =>
     import("./extendedCurrencies").then((module) => ({
       default: () => module.extendedCurrencies,
-    }))
+    })),
   );
 }, []);
 
@@ -1494,7 +1494,7 @@ class ConversionCache {
   getCachedConversion(
     price: number,
     fromCurrency: string,
-    toCurrency: string
+    toCurrency: string,
   ): number | null {
     const key = `${price}-${fromCurrency}-${toCurrency}`;
     const cached = this.cache.get(key);
@@ -1514,7 +1514,7 @@ class ConversionCache {
     price: number,
     fromCurrency: string,
     toCurrency: string,
-    result: number
+    result: number,
   ) {
     const key = `${price}-${fromCurrency}-${toCurrency}`;
     this.cache.set(key, {
@@ -1549,7 +1549,7 @@ const conversionCache = new ConversionCache();
 const fetchWithRetry = async (
   url: string,
   options: RequestInit,
-  retries = 3
+  retries = 3,
 ): Promise<Response> => {
   let lastError: Error;
 
@@ -1571,7 +1571,7 @@ const fetchWithRetry = async (
       // Wait before retrying (exponential backoff)
       if (i < retries - 1) {
         await new Promise((resolve) =>
-          setTimeout(resolve, Math.pow(2, i) * 1000)
+          setTimeout(resolve, Math.pow(2, i) * 1000),
         );
       }
     }
@@ -1594,7 +1594,7 @@ const fetchExchangeRatesWithRetry = async () => {
 
     const response = await fetchWithRetry(
       `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`,
-      { method: "GET" }
+      { method: "GET" },
     );
 
     const data = await response.json();
@@ -1621,7 +1621,7 @@ const fetchExchangeRatesWithRetry = async () => {
 // Safe conversion with fallback
 const safeConvertPrice = (
   price: number,
-  fromCurrency: string = "USD"
+  fromCurrency: string = "USD",
 ): number => {
   try {
     // Validate inputs
@@ -1642,7 +1642,7 @@ const safeConvertPrice = (
 
     if (!rates[currentCurrency.code]) {
       console.warn(
-        `Exchange rate not found for target currency: ${currentCurrency.code}`
+        `Exchange rate not found for target currency: ${currentCurrency.code}`,
       );
       return price;
     }
@@ -1707,7 +1707,7 @@ const AuthAwareCurrencyProvider = ({ children }) => {
       loadUserCurrencyPreferences(user.id).then((prefs) => {
         if (prefs && prefs.preferredCurrency) {
           const currency = currencies.find(
-            (c) => c.code === prefs.preferredCurrency
+            (c) => c.code === prefs.preferredCurrency,
           );
           if (currency) {
             setCurrentCurrency(currency);

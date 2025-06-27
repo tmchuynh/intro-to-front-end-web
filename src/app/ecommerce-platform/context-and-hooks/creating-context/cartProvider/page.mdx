@@ -8,7 +8,7 @@ import BackToTop from "@/components/BackToTop";
 
 The Cart Provider is a crucial part of our e-commerce platform, responsible for managing the shopping cart functionality. It allows users to add, remove, and update products in their cart, providing a seamless shopping experience.
 
-### Why Cart Management is Critical for E-commerce Success
+#### Why Cart Management is Critical for E-commerce Success
 
 Shopping cart functionality directly impacts key business metrics:
 
@@ -18,7 +18,7 @@ Shopping cart functionality directly impacts key business metrics:
 4. **Revenue Recovery**: Cart abandonment recovery can recapture 15-20% of lost sales
 5. **User Experience**: Seamless cart operations reduce friction in the purchase journey
 
-### Cart Abandonment Statistics
+#### Cart Abandonment Statistics
 
 - **69.9%** average cart abandonment rate across all industries
 - **Top reasons**: Unexpected costs (48%), required account creation (24%), complex checkout (18%)
@@ -27,7 +27,7 @@ Shopping cart functionality directly impacts key business metrics:
 
 ## E-commerce Cart Challenges
 
-### Technical Challenges
+#### Technical Challenges
 
 1. **State Synchronization**: Keeping cart state consistent across devices and sessions
 2. **Performance**: Real-time calculations with complex discount rules
@@ -35,7 +35,7 @@ Shopping cart functionality directly impacts key business metrics:
 4. **Concurrency**: Handling simultaneous cart modifications
 5. **Persistence**: Maintaining cart state across browser sessions and devices
 
-### Business Logic Complexity
+#### Business Logic Complexity
 
 1. **Dynamic Pricing**: Real-time price updates based on inventory and demand
 2. **Discount Stacking**: Multiple discount types with complex interaction rules
@@ -43,7 +43,7 @@ Shopping cart functionality directly impacts key business metrics:
 4. **Shipping Calculations**: Dynamic shipping costs based on location and weight
 5. **Tax Compliance**: Region-specific tax calculations and compliance
 
-### User Experience Challenges
+#### User Experience Challenges
 
 1. **Cart Persistence**: Maintaining cart across login/logout cycles
 2. **Cross-device Sync**: Accessing the same cart from multiple devices
@@ -53,7 +53,7 @@ Shopping cart functionality directly impacts key business metrics:
 
 ## E-commerce Cart Management Architecture
 
-### Shopping Cart Complexity in Modern E-commerce
+#### Shopping Cart Complexity in Modern E-commerce
 
 Shopping cart functionality represents one of the most complex components in e-commerce systems, requiring state management, business logic integration, and seamless user experience design. Modern shopping carts must handle far more than simple item addition and removal.
 
@@ -100,7 +100,7 @@ interface CartState {
 - **Discount Engine**: Stackable promotions, membership benefits, loyalty points
 - **Fraud Prevention**: Risk assessment and security validation
 
-### Cart Provider System Architecture
+#### Cart Provider System Architecture
 
 ##### Component Interaction Overview
 
@@ -185,7 +185,7 @@ interface CartArchitecture {
 
 ## Cart Architecture Overview
 
-### System Components Architecture
+#### System Components Architecture
 
 ```txt
 graph TD
@@ -242,7 +242,7 @@ sequenceDiagram
     end
 ```
 
-### Business Logic Deep Dive
+#### Business Logic Deep Dive
 
 ##### Advanced Discount Engine Architecture
 
@@ -300,12 +300,12 @@ class AdvancedDiscountEngine {
 
   async calculateOptimalDiscounts(
     cart: CartState,
-    availableDiscounts: DiscountRule[]
+    availableDiscounts: DiscountRule[],
   ): Promise<DiscountResult> {
     // 1. Filter applicable discounts
     const applicableDiscounts = this.filterApplicableDiscounts(
       cart,
-      availableDiscounts
+      availableDiscounts,
     );
 
     // 2. Generate all possible discount combinations
@@ -313,12 +313,12 @@ class AdvancedDiscountEngine {
 
     // 3. Calculate savings for each combination
     const calculatedCombinations = await Promise.all(
-      combinations.map((combo) => this.calculateCombination(cart, combo))
+      combinations.map((combo) => this.calculateCombination(cart, combo)),
     );
 
     // 4. Select optimal combination
     const optimalCombination = this.selectOptimalCombination(
-      calculatedCombinations
+      calculatedCombinations,
     );
 
     // 5. Apply business rules and restrictions
@@ -327,7 +327,7 @@ class AdvancedDiscountEngine {
 
   private filterApplicableDiscounts(
     cart: CartState,
-    discounts: DiscountRule[]
+    discounts: DiscountRule[],
   ): DiscountRule[] {
     return discounts.filter((discount) => {
       // Check date validity
@@ -361,7 +361,7 @@ class AdvancedDiscountEngine {
 
   private calculateCombination(
     cart: CartState,
-    discounts: DiscountRule[]
+    discounts: DiscountRule[],
   ): DiscountCalculation {
     // Sort by priority for proper stacking
     const sortedDiscounts = discounts.sort((a, b) => b.priority - a.priority);
@@ -413,7 +413,7 @@ interface PricingCalculation {
 class PricingEngine {
   async calculateCartPricing(
     cart: CartState,
-    user: User
+    user: User,
   ): Promise<PricingCalculation> {
     // 1. Base subtotal calculation
     const baseSubtotal = this.calculateBaseSubtotal(cart.items);
@@ -421,7 +421,7 @@ class PricingEngine {
     // 2. Membership tier benefits
     const membershipDiscount = await this.calculateMembershipDiscount(
       baseSubtotal,
-      user
+      user,
     );
 
     // 3. Dynamic pricing adjustments
@@ -439,7 +439,7 @@ class PricingEngine {
     // 7. Shipping calculation
     const shippingCalculation = await this.calculateShipping(
       cart,
-      user.address
+      user.address,
     );
 
     // 8. Final total compilation
@@ -467,7 +467,7 @@ class PricingEngine {
 
   private async applyDynamicPricing(
     items: CartItem[],
-    user: User
+    user: User,
   ): Promise<DynamicPricingApplication> {
     const adjustments: PricingAdjustment[] = [];
 
@@ -505,7 +505,7 @@ class PricingEngine {
       adjustments,
       totalImpact: adjustments.reduce(
         (sum, adj) => sum + adj.finalAdjustment,
-        0
+        0,
       ),
       appliedAt: new Date(),
     };
@@ -531,7 +531,7 @@ interface InventoryValidation {
 
 class InventoryService {
   async validateCartInventory(
-    cart: CartState
+    cart: CartState,
   ): Promise<InventoryValidationResult> {
     const validations: InventoryValidation[] = [];
     const criticalIssues: InventoryIssue[] = [];
@@ -575,7 +575,7 @@ class InventoryService {
   }
 
   private async generateStockSuggestions(
-    item: CartItem
+    item: CartItem,
   ): Promise<InventorySuggestion[]> {
     const suggestions: InventorySuggestion[] = [];
 
@@ -680,9 +680,7 @@ export interface CartContextType {
 
 ### Explanation of the Code
 
-This comprehensive interface design represents the foundation of our e-commerce cart system, carefully architected to handle complex business logic while maintaining type safety and performance.
-
-### Deep Dive into Interface Architecture
+#### Deep Dive into Interface Architecture
 
 ##### DiscountRule Interface Analysis
 
@@ -781,7 +779,7 @@ export interface CartContextType {
 4. **Optional Parameters**: Sensible defaults for common operations
 5. **Type Safety**: Strong typing prevents runtime errors
 
-### Advanced Type System Benefits
+#### Advanced Type System Benefits
 
 ##### Union Types for Business Logic
 
@@ -814,7 +812,7 @@ conditions: {
 - **Performance**: Only validate conditions that are actually set
 - **Maintainability**: Easy to add new validation criteria
 
-### Integration with External Types
+#### Integration with External Types
 
 ##### ProductItem Integration
 
@@ -863,7 +861,7 @@ export const useCart = () => {
 
 This implementation establishes the foundational infrastructure for cart management, following advanced React patterns for context creation and consumption with error handling.
 
-### Context Architecture Deep Dive
+#### Context Architecture Deep Dive
 
 ##### Context Creation with Type Safety
 
@@ -898,7 +896,7 @@ export const useCart = () => {
 4. **Consistent API**: Single point of access for all cart operations
 5. **Development Experience**: Better debugging and error tracking
 
-### Advanced Context Patterns
+#### Advanced Context Patterns
 
 ##### Error Message Strategy
 
@@ -931,7 +929,7 @@ const ShoppingCart = () => {
 };
 ```
 
-### Performance Considerations
+#### Performance Considerations
 
 ##### Context Value Optimization
 
@@ -972,7 +970,7 @@ const contextValue = useMemo(
     shippingFee,
     grandTotal,
     // Functions are memoized separately
-  ]
+  ],
 );
 ```
 
@@ -1002,7 +1000,7 @@ const CartItems = () => {
 };
 ```
 
-### Error Handling Integration
+#### Error Handling Integration
 
 ##### Component Error Boundaries
 
@@ -1083,7 +1081,7 @@ const useCart = () => {
 };
 ```
 
-### Integration Patterns
+#### Integration Patterns
 
 ##### Multi-Provider Usage
 
@@ -1221,7 +1219,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         setAppliedDiscount(parsedDiscount);
         console.log(
           "Loaded discount from localStorage:",
-          parsedDiscount.rule.code
+          parsedDiscount.rule.code,
         );
       } catch (error) {
         console.error("Error loading discount from localStorage:", error);
@@ -1256,20 +1254,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.removeItem("applied-discount");
         // Optionally show a message to user
         console.warn(
-          `Discount ${appliedDiscount.rule.code} is no longer valid: ${result.reason}`
+          `Discount ${appliedDiscount.rule.code} is no longer valid: ${result.reason}`,
         );
       }
     } else if (appliedDiscount && items.length === 0) {
       // Keep discount even when cart is empty so it persists during navigation
       console.log(
-        `Keeping discount ${appliedDiscount.rule.code} during navigation`
+        `Keeping discount ${appliedDiscount.rule.code} during navigation`,
       );
     }
   }, [items]);
 
   // Discount validation helper function
   const validateDiscount = (
-    rule: DiscountRule
+    rule: DiscountRule,
   ): {
     isValid: boolean;
     reason?: string;
@@ -1277,7 +1275,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     // Check conditions
     const totalQuantity = items.reduce(
       (total, item) => total + item.quantity,
-      0
+      0,
     );
 
     if (rule.conditions.minItems && totalQuantity < rule.conditions.minItems) {
@@ -1316,14 +1314,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       rule.conditions.requiredCategories.length > 0
     ) {
       const hasRequiredCategory = items.some((item) =>
-        rule.conditions.requiredCategories!.includes(item.category)
+        rule.conditions.requiredCategories!.includes(item.category),
       );
 
       if (!hasRequiredCategory) {
         return {
           isValid: false,
           reason: `Only applies to ${rule.conditions.requiredCategories.join(
-            ", "
+            ", ",
           )} items`,
         };
       }
@@ -1336,14 +1334,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     ) {
       const hasRequiredBrand = items.some(
         (item) =>
-          item.brand && rule.conditions.requiredBrands!.includes(item.brand)
+          item.brand && rule.conditions.requiredBrands!.includes(item.brand),
       );
 
       if (!hasRequiredBrand) {
         return {
           isValid: false,
           reason: `Only applies to ${rule.conditions.requiredBrands.join(
-            ", "
+            ", ",
           )} brands`,
         };
       }
@@ -1355,7 +1353,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   const addToCart = (product: ProductItem, quantity: number = 1) => {
     setItems((prevItems) => {
       const existingItem = prevItems.find(
-        (item) => item.productId === product.id
+        (item) => item.productId === product.id,
       );
 
       if (existingItem) {
@@ -1363,7 +1361,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         return prevItems.map((item) =>
           item.productId === product.id
             ? { ...item, quantity: item.quantity + quantity }
-            : item
+            : item,
         );
       } else {
         // Add new item to cart
@@ -1386,7 +1384,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const removeFromCart = (productId: number) => {
     setItems((prevItems) =>
-      prevItems.filter((item) => item.productId !== productId)
+      prevItems.filter((item) => item.productId !== productId),
     );
   };
 
@@ -1398,8 +1396,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
     setItems((prevItems) =>
       prevItems.map((item) =>
-        item.productId === productId ? { ...item, quantity } : item
-      )
+        item.productId === productId ? { ...item, quantity } : item,
+      ),
     );
   };
 
@@ -1418,10 +1416,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Discount functions
   const applyDiscount = (
-    code: string
+    code: string,
   ): { success: boolean; message: string } => {
     const rule = discountRules.find(
-      (r) => r.code.toLowerCase() === code.toLowerCase()
+      (r) => r.code.toLowerCase() === code.toLowerCase(),
     );
 
     if (!rule) {
@@ -1431,7 +1429,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     // Check conditions
     const totalQuantity = items.reduce(
       (total, item) => total + item.quantity,
-      0
+      0,
     );
 
     if (rule.conditions.minItems && totalQuantity < rule.conditions.minItems) {
@@ -1470,14 +1468,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       rule.conditions.requiredCategories.length > 0
     ) {
       const hasRequiredCategory = items.some((item) =>
-        rule.conditions.requiredCategories!.includes(item.category)
+        rule.conditions.requiredCategories!.includes(item.category),
       );
 
       if (!hasRequiredCategory) {
         return {
           success: false,
           message: `This discount only applies to ${rule.conditions.requiredCategories.join(
-            ", "
+            ", ",
           )} items`,
         };
       }
@@ -1490,14 +1488,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     ) {
       const hasRequiredBrand = items.some(
         (item) =>
-          item.brand && rule.conditions.requiredBrands!.includes(item.brand)
+          item.brand && rule.conditions.requiredBrands!.includes(item.brand),
       );
 
       if (!hasRequiredBrand) {
         return {
           success: false,
           message: `This discount only applies to ${rule.conditions.requiredBrands.join(
-            ", "
+            ", ",
           )} brands`,
         };
       }
@@ -1523,7 +1521,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     } else if (rule.appliesTo === "category" && rule.targetCategories) {
       appliedItems = items.filter((item) =>
-        rule.targetCategories!.includes(item.category)
+        rule.targetCategories!.includes(item.category),
       );
       const categorySubtotal = appliedItems.reduce((total, item) => {
         const itemPrice = item.discountPercentage
@@ -1539,7 +1537,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     } else if (rule.appliesTo === "brand" && rule.targetBrands) {
       appliedItems = items.filter(
-        (item) => item.brand && rule.targetBrands!.includes(item.brand)
+        (item) => item.brand && rule.targetBrands!.includes(item.brand),
       );
       const brandSubtotal = appliedItems.reduce((total, item) => {
         const itemPrice = item.discountPercentage
@@ -1566,7 +1564,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     // Immediately save to localStorage to ensure persistence
     localStorage.setItem(
       "applied-discount",
-      JSON.stringify(newAppliedDiscount)
+      JSON.stringify(newAppliedDiscount),
     );
     console.log("Saved discount to localStorage:", rule.code);
 
@@ -1599,7 +1597,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
       window.dispatchEvent(
         new CustomEvent("cart-checkout", {
           detail: { productIds },
-        })
+        }),
       );
 
       // Clear the cart after successful checkout
@@ -1687,16 +1685,16 @@ export default CartContext;
 
 ### Explanation of the Code
 
-This comprehensive `CartProvider` implementation represents an enterprise-level shopping cart solution that handles complex business logic, state management, and user experience optimization. The provider demonstrates advanced React patterns for building scalable e-commerce applications.
+This `CartProvider` implementation represents an enterprise-level shopping cart solution that handles complex business logic, state management, and user experience optimization. The provider demonstrates advanced React patterns for building scalable e-commerce applications.
 
-### Advanced Implementation Analysis
+#### Advanced Implementation Analysis
 
 ##### State Management Architecture
 
 ```typescript
 const [items, setItems] = useState<CartItem[]>([]);
 const [appliedDiscount, setAppliedDiscount] = useState<AppliedDiscount | null>(
-  null
+  null,
 );
 ```
 
@@ -1722,7 +1720,7 @@ const persistCart = useCallback(
       JSON.stringify({
         ...cartData,
         timestamp: Date.now(),
-      })
+      }),
     );
 
     // 3. User account sync for cross-device experience
@@ -1737,7 +1735,7 @@ const persistCart = useCallback(
       timestamp: Date.now(),
     });
   },
-  [user]
+  [user],
 );
 ```
 
@@ -1774,7 +1772,7 @@ const addToCart = useCallback(
       // User feedback
       showNotification(
         "Failed to add item to cart. Please try again.",
-        "error"
+        "error",
       );
 
       // Error reporting
@@ -1788,13 +1786,13 @@ const addToCart = useCallback(
       }, 2000);
     }
   },
-  [items, persistCart]
+  [items, persistCart],
 );
 ```
 
 ## Performance Optimization Strategies
 
-### Advanced Memoization Patterns
+#### Advanced Memoization Patterns
 
 ##### Selective Value Memoization
 
@@ -1804,11 +1802,11 @@ const cartCalculations = useMemo(() => {
   const baseCalculations = calculateCartBasics(items);
   const discountCalculations = calculateDiscounts(
     baseCalculations,
-    appliedDiscount
+    appliedDiscount,
   );
   const membershipCalculations = calculateMembershipBenefits(
     discountCalculations,
-    user
+    user,
   );
   const finalCalculations = calculateFinalTotals(membershipCalculations);
 
@@ -1835,15 +1833,15 @@ const contextValue = useMemo(
     // Utility functions with stable references
     isInCart: useCallback(
       (productId: number) => items.some((item) => item.id === productId),
-      [items]
+      [items],
     ),
     getCartItemQuantity: useCallback(
       (productId: number) =>
         items.find((item) => item.id === productId)?.quantity || 0,
-      [items]
+      [items],
     ),
   }),
-  [cartCalculations, items]
+  [cartCalculations, items],
 );
 ```
 
@@ -1901,7 +1899,7 @@ const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 };
 ```
 
-### Memory Management and Cleanup
+#### Memory Management and Cleanup
 
 ##### Advanced Cleanup Strategies
 
@@ -1935,7 +1933,7 @@ useEffect(() => {
 
 ## Error Handling and Resilience
 
-### Comprehensive Error Recovery System
+#### Comprehensive Error Recovery System
 
 ##### Multi-level Error Handling
 
@@ -1966,7 +1964,7 @@ class CartErrorManager {
         while (attempt < maxRetries) {
           try {
             await new Promise((resolve) =>
-              setTimeout(resolve, Math.pow(2, attempt) * 1000)
+              setTimeout(resolve, Math.pow(2, attempt) * 1000),
             );
 
             // Retry the failed operation
@@ -2035,7 +2033,7 @@ class CartErrorManager {
   async handleError(
     errorType: string,
     error: Error,
-    context: CartContext
+    context: CartContext,
   ): Promise<ErrorResolution> {
     const handler = this.errorHandlers.get(errorType);
 
@@ -2056,7 +2054,7 @@ class CartErrorManager {
 
   private async handleCriticalError(
     error: Error,
-    context: CartContext
+    context: CartContext,
   ): Promise<ErrorResolution> {
     // Last resort - save cart state and reload
     try {
@@ -2066,7 +2064,7 @@ class CartErrorManager {
           items: context.items,
           timestamp: Date.now(),
           error: error.message,
-        })
+        }),
       );
 
       context.showNotification({
@@ -2089,7 +2087,7 @@ class CartErrorManager {
 }
 ```
 
-### Data Consistency and Validation
+#### Data Consistency and Validation
 
 ##### Advanced Validation Pipeline
 
@@ -2124,7 +2122,7 @@ class CartValidator {
   }
 
   private async validateDataIntegrity(
-    cart: CartState
+    cart: CartState,
   ): Promise<ValidationCheck> {
     const issues: ValidationIssue[] = [];
 
@@ -2180,7 +2178,7 @@ class CartValidator {
 
 ## Testing Strategies
 
-### Comprehensive Testing Framework
+#### Comprehensive Testing Framework
 
 ##### Unit Testing with Advanced Scenarios
 
@@ -2400,7 +2398,7 @@ describe('Cart Provider Integration', () => {
 
 ## Accessibility and User Experience
 
-### Advanced Accessibility Implementation
+#### Advanced Accessibility Implementation
 
 ##### Screen Reader Optimization
 
@@ -2453,7 +2451,7 @@ const generateAccessibilityAnnouncement = (
 };
 ```
 
-### Responsive Design Integration
+#### Responsive Design Integration
 
 ```typescript
 // Mobile-optimized cart operations
@@ -2483,7 +2481,7 @@ const useMobileCartOptimization = () => {
 
 ## Next Steps
 
-With our comprehensive Cart Provider now fully implemented and thoroughly documented, we have established the core foundation for essential e-commerce functionality, enabling users to seamlessly manage their shopping carts.
+With our Cart Provider now fully implemented and thoroughly documented, we have established the core foundation for essential e-commerce functionality, enabling users to seamlessly manage their shopping carts.
 
 The next logical progression is to implement the [Wishlist Provider](/ecommerce-platform/context-and-hooks/creating-context/wishlistProvider). This provider will:
 

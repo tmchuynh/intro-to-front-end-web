@@ -6,7 +6,7 @@ import BackToTop from "@/components/BackToTop";
 
 ## Introduction
 
-The `useAuthGuard` hook is a authentication protection mechanism designed to safeguard routes and actions in modern React applications. This hook implements a comprehensive security layer that ensures only authenticated users can access sensitive functionality, making it indispensable for e-commerce platforms where user data, financial transactions, and personalized content require strict access control.
+The `useAuthGuard` hook is a authentication protection mechanism designed to safeguard routes and actions in modern React applications. This hook implements a security layer that ensures only authenticated users can access sensitive functionality, making it indispensable for e-commerce platforms where user data, financial transactions, and personalized content require strict access control.
 
 ### Why Authentication Guards are Critical
 
@@ -75,11 +75,13 @@ import { useAuth } from "@/app/context/authContext";
 ###### Dependency Analysis:
 
 **React useState Hook**:
+
 - **Local State Management**: Manages authentication alert visibility independently
 - **Component Isolation**: Each component using the hook gets its own alert state
 - **Performance**: Lightweight state management for UI feedback
 
 **Authentication Context Integration**:
+
 - **Centralized Auth**: Leverages existing authentication infrastructure
 - **Real-time Updates**: Automatically responds to authentication state changes
 - **Type Safety**: Inherits type safety from the authentication context
@@ -94,11 +96,13 @@ const [showAuthAlert, setShowAuthAlert] = useState(false);
 ###### State Design Philosophy:
 
 **User State Extraction**:
+
 - **Single Source of Truth**: Derives authentication status from central auth state
 - **Reactive Updates**: Automatically updates when user logs in/out
 - **Simplified Logic**: Reduces complex authentication checks to simple user presence
 
 **Alert State Management**:
+
 - **Component-Level State**: Each component instance maintains its own alert visibility
 - **User Experience**: Provides immediate feedback for authentication requirements
 - **State Isolation**: Prevents alert conflicts between different components
@@ -120,21 +124,25 @@ const guardedAction = async <T>(
 ###### Advanced Function Analysis:
 
 **Generic Type Parameter `<T>`**:
+
 - **Type Flexibility**: Supports actions returning any type of data
 - **Type Safety**: Maintains type integrity through the protection layer
 - **IntelliSense Support**: Provides accurate autocomplete for return types
 
 **Async Function Pattern**:
+
 - **Promise Handling**: Supports both synchronous and asynchronous protected actions
 - **Error Propagation**: Allows errors from protected actions to bubble up naturally
 - **Performance**: Non-blocking execution for better user experience
 
 **Authentication Check Logic**:
+
 - **Security Gate**: Primary authentication enforcement point
 - **Early Return**: Prevents execution of protected actions for unauthenticated users
 - **User Feedback**: Immediately shows authentication alert when protection triggers
 
 **Conditional Execution**:
+
 - **Authenticated Path**: Executes the protected action and returns its result
 - **Unauthenticated Path**: Shows alert and returns undefined
 - **Type Safety**: Return type `T | void` accurately reflects both execution paths
@@ -153,16 +161,19 @@ return {
 ###### API Design Excellence:
 
 **Authentication Status**:
+
 - **Boolean Conversion**: `!!user` converts user object to clear boolean
 - **Computed Property**: Real-time authentication status derived from user state
 - **Component Logic**: Enables conditional rendering based on authentication
 
 **Alert Management**:
+
 - **State Exposure**: Provides direct access to alert visibility state
 - **Control Function**: Offers method to dismiss authentication alerts
 - **Encapsulation**: Abstracts alert state management from consuming components
 
 **Action Protection**:
+
 - **Guarded Execution**: Provides the main security enforcement mechanism
 - **Flexible Interface**: Accepts any async function for protection
 - **Type Preservation**: Maintains type safety throughout the protection process
@@ -172,11 +183,13 @@ return {
 ##### Security Benefits
 
 **Centralized Protection**:
+
 - **Consistent Security**: Same authentication logic across all protected actions
 - **Reduced Errors**: Eliminates inconsistent authentication checks
 - **Maintainable Code**: Single location for authentication protection logic
 
 **Flexible Application**:
+
 - **Action-Level Security**: Protects individual actions rather than entire components
 - **Granular Control**: Enables fine-grained security for specific operations
 - **Reusable Pattern**: Same hook works for any protected functionality
@@ -184,11 +197,13 @@ return {
 ##### User Experience Benefits
 
 **Immediate Feedback**:
+
 - **Visual Alerts**: Users immediately understand authentication requirements
 - **Clear Communication**: Obvious indication when authentication is needed
 - **Non-Disruptive**: Alerts don't redirect or interrupt user workflow
 
 **Seamless Integration**:
+
 - **Natural Flow**: Protection feels integrated into normal application behavior
 - **Preserved Context**: Users remain on the same page when authentication is required
 - **Reduced Friction**: Minimal interruption to user's intended actions
@@ -196,14 +211,16 @@ return {
 ##### Developer Experience Benefits
 
 **Simple Integration**:
+
 - **Hook Pattern**: Familiar React pattern for easy adoption
 - **Minimal Setup**: Single hook import provides complete protection
 - **Type Safety**: Full TypeScript support with intelligent autocomplete
 
 **Flexible Architecture**:
+
 - **Composable Design**: Works with any authentication system
 - **Extensible Pattern**: Easy to enhance with additional security features
-- **Testing Friendly**: Clear inputs and outputs enable comprehensive testing
+- **Testing Friendly**: Clear inputs and outputs enable testing
 
 ## Usage
 
@@ -244,7 +261,7 @@ export const ProtectedComponent: React.FC = () => {
 
 ### Explanation of the Code
 
-This usage example demonstrates a comprehensive implementation of the `useAuthGuard` hook, showcasing patterns for authentication protection, user feedback, and conditional rendering in a real-world React component.
+This usage example demonstrates a implementation of the `useAuthGuard` hook, showcasing patterns for authentication protection, user feedback, and conditional rendering in a real-world React component.
 
 ### Component Architecture Analysis
 
@@ -258,12 +275,14 @@ const { isAuthenticated, showAuthAlert, closeAuthAlert, guardedAction } =
 ###### Integration Benefits:
 
 **Destructured API Access**:
+
 - **Clean Interface**: Extracts only needed functionality from the hook
 - **Readable Code**: Clear variable names indicate each piece's purpose
 - **Type Safety**: Full TypeScript support with intelligent autocomplete
 - **Performance**: No unnecessary re-renders from unused hook properties
 
 **State Management Integration**:
+
 - **Real-time Updates**: Component automatically updates when authentication status changes
 - **Local State**: Alert state is component-specific and doesn't affect other instances
 - **Centralized Logic**: Authentication logic remains in the hook, keeping component clean
@@ -282,12 +301,14 @@ const handleProtectedAction = async () => {
 ###### Action Protection Pattern:
 
 **Async Function Wrapping**:
+
 - **Security Layer**: Automatic authentication check before action execution
 - **Error Handling**: Graceful handling of authentication failures
 - **Type Preservation**: Maintains return type of the wrapped action
 - **Promise Chain**: Supports complex async operations within protected actions
 
 **Flexible Action Definition**:
+
 - **Inline Functions**: Supports defining protected actions inline for simple operations
 - **Complex Operations**: Can wrap any async operation, from API calls to state updates
 - **Composable Pattern**: Protected actions can call other protected actions safely
@@ -296,22 +317,26 @@ const handleProtectedAction = async () => {
 ##### Conditional Rendering Strategy
 
 ```tsx
-{isAuthenticated ? (
-  <button onClick={handleProtectedAction}>Perform Action</button>
-) : (
-  <p>Please log in to perform this action.</p>
-)}
+{
+  isAuthenticated ? (
+    <button onClick={handleProtectedAction}>Perform Action</button>
+  ) : (
+    <p>Please log in to perform this action.</p>
+  );
+}
 ```
 
 ###### User Experience Design:
 
 **Authentication-Based UI**:
+
 - **Immediate Feedback**: Users instantly see what actions are available to them
 - **Clear Guidance**: Unauthenticated users receive clear instructions
 - **Progressive Enhancement**: UI adapts based on user's authentication status
 - **Reduced Confusion**: No ambiguous buttons that might not work
 
 **Accessibility Considerations**:
+
 - **Screen Reader Friendly**: Clear text alternatives for different authentication states
 - **Keyboard Navigation**: Button elements support proper keyboard interaction
 - **Visual Hierarchy**: Different content types (buttons vs text) provide clear affordances
@@ -320,23 +345,27 @@ const handleProtectedAction = async () => {
 ##### Alert System Implementation
 
 ```tsx
-{showAuthAlert && (
-  <div className="alert">
-    <p>You must be logged in to perform this action.</p>
-    <button onClick={closeAuthAlert}>Close</button>
-  </div>
-)}
+{
+  showAuthAlert && (
+    <div className="alert">
+      <p>You must be logged in to perform this action.</p>
+      <button onClick={closeAuthAlert}>Close</button>
+    </div>
+  );
+}
 ```
 
 ###### Alert Design Excellence:
 
 **Conditional Display Logic**:
+
 - **State-Driven Rendering**: Alert appears only when authentication is required
 - **User-Controlled Dismissal**: Users can close the alert when ready
 - **Non-Blocking Interface**: Alert doesn't prevent other interactions
 - **Memory Efficient**: Alert DOM elements only exist when needed
 
 **User Communication Strategy**:
+
 - **Clear Messaging**: Explicit explanation of authentication requirement
 - **Actionable Feedback**: Users understand exactly what they need to do
 - **Dismissible Design**: Users control when to dismiss the information
@@ -402,8 +431,8 @@ const LoadingAwareProtectedComponent = () => {
   };
 
   return (
-    <button 
-      onClick={handleComplexAction} 
+    <button
+      onClick={handleComplexAction}
       disabled={!isAuthenticated || isLoading}
     >
       {isLoading ? "Processing..." : "Perform Action"}
@@ -417,12 +446,14 @@ const LoadingAwareProtectedComponent = () => {
 ##### Component-Level Advantages
 
 **Simplified Security**:
+
 - **Declarative Protection**: Security requirements are clear and explicit
 - **Reduced Boilerplate**: No need to repeat authentication checks
 - **Error Prevention**: Impossible to forget authentication protection
 - **Consistent Behavior**: Same security behavior across all components
 
 **Enhanced Maintainability**:
+
 - **Single Responsibility**: Components focus on business logic, not authentication
 - **Testable Code**: Clear separation between authentication and business logic
 - **Flexible Refactoring**: Authentication logic can be updated without touching components
@@ -431,6 +462,7 @@ const LoadingAwareProtectedComponent = () => {
 ##### System-Level Benefits
 
 **Scalable Security**:
+
 - **Consistent Implementation**: Same security pattern across entire application
 - **Centralized Updates**: Security improvements benefit all protected components
 - **Audit-Friendly**: Clear trail of what actions require authentication
@@ -449,6 +481,6 @@ The next hook will introduce you to:
 - **Advanced User Guidance**: More messaging and call-to-action patterns
 - **Integration Patterns**: Seamless coordination with routing and navigation systems
 
-This progression from basic authentication guards to advanced protected actions represents the evolution from simple security to comprehensive user experience design in modern e-commerce applications.
+This progression from basic authentication guards to advanced protected actions represents the evolution from simple security to user experience design in modern e-commerce applications.
 
 <BackToTop />

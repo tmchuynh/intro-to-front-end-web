@@ -4,7 +4,7 @@ import BackToTop from "@/components/BackToTop";
 
 ## Table of Contents
 
-The sales items page is a specialized e-commerce interface designed to showcase discounted products and create urgency for potential buyers. This page implements filtering, sorting, and pagination systems while providing comprehensive analytics about available deals. It serves as a critical conversion tool in the e-commerce funnel by highlighting value propositions and encouraging immediate purchases.
+The sales items page is a specialized e-commerce interface designed to showcase discounted products and create urgency for potential buyers. This page implements filtering, sorting, and pagination systems while providing analytics about available deals. It serves as a critical conversion tool in the e-commerce funnel by highlighting value propositions and encouraging immediate purchases.
 
 The sales items page follows a data-driven architecture optimized for conversion and user engagement:
 
@@ -63,7 +63,7 @@ interface SaleFilters {
 
 ### Explanation of the Code
 
-This comprehensive import section establishes the foundation for a sales and discount management system:
+This import section establishes the foundation for a sales and discount management system:
 
 #### Core React and Next.js Architecture:
 
@@ -127,14 +127,14 @@ const DISCOUNT_RANGES = [
 
 These configuration constants establish the operational parameters for the sales page functionality:
 
-#### Pagination Configuration (`ITEMS_PER_PAGE_OPTIONS`):
+#### Pagination Configuration:
 
 - **User Choice Strategy**: Provides multiple viewing options to accommodate different user preferences
 - **Performance Optimization**: Smaller page sizes (12, 24) reduce initial load time and improve perceived performance
-- **Power User Support**: Larger options (48, 96) satisfy users who prefer comprehensive views
+- **Power User Support**: Larger options (48, 96) satisfy users who prefer views
 - **Memory Management**: Prevents excessive DOM manipulation while allowing flexibility
 
-#### Discount Range System (`DISCOUNT_RANGES`):
+#### Discount Range System:
 
 - **Progressive Filtering**: Creates psychological pricing tiers that guide user decisions
 - **Marketing Psychology**: Higher discount thresholds (30%+, 40%+, 50%+) create perception of significant value
@@ -215,19 +215,19 @@ useEffect(() => {
       // Filter for products with discounts
       const onSale = products.filter(
         (product) =>
-          product.discountPercentage && product.discountPercentage > 0
+          product.discountPercentage && product.discountPercentage > 0,
       );
       setSaleProducts(onSale);
       setFilteredProducts(onSale);
 
       // Extract unique categories from sale products
       const uniqueCategories = Array.from(
-        new Set(onSale.map((product) => product.category))
+        new Set(onSale.map((product) => product.category)),
       ).sort();
       setCategories(uniqueCategories);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to load sale products"
+        err instanceof Error ? err.message : "Failed to load sale products",
       );
     } finally {
       setLoading(false);
@@ -291,14 +291,14 @@ const applyFilters = useCallback(
       filtered = filtered.filter(
         (product) =>
           product.discountPercentage &&
-          product.discountPercentage >= filters.minDiscount!
+          product.discountPercentage >= filters.minDiscount!,
       );
     }
 
     // Category filter
     if (filters.category && filters.category !== "all") {
       filtered = filtered.filter(
-        (product) => product.category === filters.category
+        (product) => product.category === filters.category,
       );
     }
 
@@ -307,12 +307,12 @@ const applyFilters = useCallback(
       switch (filters.sortBy) {
         case "discount:desc":
           filtered.sort(
-            (a, b) => (b.discountPercentage || 0) - (a.discountPercentage || 0)
+            (a, b) => (b.discountPercentage || 0) - (a.discountPercentage || 0),
           );
           break;
         case "discount:asc":
           filtered.sort(
-            (a, b) => (a.discountPercentage || 0) - (b.discountPercentage || 0)
+            (a, b) => (a.discountPercentage || 0) - (b.discountPercentage || 0),
           );
           break;
         case "price:asc":
@@ -335,7 +335,7 @@ const applyFilters = useCallback(
     setFilteredProducts(filtered);
     setCurrentPage(1);
   },
-  [saleProducts]
+  [saleProducts],
 );
 ```
 
@@ -402,12 +402,12 @@ const handleFilterChange = useCallback(
     setActiveFilters(updatedFilters);
     applyFilters(updatedFilters);
   },
-  [activeFilters, applyFilters]
+  [activeFilters, applyFilters],
 );
 
 const activeFilterCount = Object.values(activeFilters).filter(
   (value) =>
-    value !== undefined && value !== "" && value !== "all" && value !== 0
+    value !== undefined && value !== "" && value !== "all" && value !== 0,
 ).length;
 
 // Clear filters
@@ -483,7 +483,7 @@ const savingsStats = useMemo(() => {
   const averageDiscount =
     saleProducts.reduce(
       (sum, product) => sum + (product.discountPercentage || 0),
-      0
+      0,
     ) / saleProducts.length;
 
   return { totalSavings, averageDiscount };
@@ -617,7 +617,7 @@ if (error) {
 
 ### Explanation of the Code
 
-This comprehensive state management system implements robust error handling and user feedback patterns designed for optimal user experience:
+This state management system implements robust error handling and user feedback patterns designed for optimal user experience:
 
 #### Loading State Implementation:
 
@@ -1097,7 +1097,7 @@ The savings statistics system demonstrates advanced financial mathematics:
 - **State Cleanup**: Component unmounting properly disposes of resources
 - **Image Optimization**: Next.js Image component provides automatic optimization
 
-This comprehensive implementation demonstrates enterprise-level e-commerce architecture with user experience patterns, performance optimizations, and accessibility considerations that ensure the sales page works effectively for all users while maintaining high performance standards.
+This implementation demonstrates enterprise-level e-commerce architecture with user experience patterns, performance optimizations, and accessibility considerations that ensure the sales page works effectively for all users while maintaining high performance standards.
 
 ## Next Steps
 

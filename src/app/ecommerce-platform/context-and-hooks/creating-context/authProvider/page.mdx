@@ -106,14 +106,14 @@ export interface AuthContextType {
   isLoading: boolean;
   login: (
     username: string,
-    password: string
+    password: string,
   ) => Promise<{ success: boolean; message: string }>;
   register: (
-    userData: RegisterData
+    userData: RegisterData,
   ) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
   purchaseMembership: (
-    tierName: string
+    tierName: string,
   ) => Promise<{ success: boolean; message: string }>;
   cancelMembership: () => Promise<{ success: boolean; message: string }>;
   isLoggedIn: boolean;
@@ -194,16 +194,16 @@ export interface AuthContextType {
   // Authentication Actions
   login: (
     username: string,
-    password: string
+    password: string,
   ) => Promise<{ success: boolean; message: string }>;
   register: (
-    userData: RegisterData
+    userData: RegisterData,
   ) => Promise<{ success: boolean; message: string }>;
   logout: () => void; // Synchronous logout action
 
   // Membership Actions
   purchaseMembership: (
-    tierName: string
+    tierName: string,
   ) => Promise<{ success: boolean; message: string }>;
   cancelMembership: () => Promise<{ success: boolean; message: string }>;
 
@@ -521,12 +521,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [user]);
 
   const register = async (
-    userData: RegisterData
+    userData: RegisterData,
   ): Promise<{ success: boolean; message: string }> => {
     try {
       // Check if username already exists (simple simulation)
       const existingUsers = JSON.parse(
-        localStorage.getItem("registeredUsers") || "[]"
+        localStorage.getItem("registeredUsers") || "[]",
       );
       if (existingUsers.find((u: any) => u.username === userData.username)) {
         return { success: false, message: "Username already exists" };
@@ -558,15 +558,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = async (
     username: string,
-    password: string
+    password: string,
   ): Promise<{ success: boolean; message: string }> => {
     try {
       // First check local registered users
       const existingUsers = JSON.parse(
-        localStorage.getItem("registeredUsers") || "[]"
+        localStorage.getItem("registeredUsers") || "[]",
       );
       const foundUser = existingUsers.find(
-        (u: any) => u.username === username && u.password === password
+        (u: any) => u.username === username && u.password === password,
       );
 
       if (foundUser) {
@@ -632,7 +632,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const purchaseMembership = async (
-    tierName: string
+    tierName: string,
   ): Promise<{ success: boolean; message: string }> => {
     if (!user) {
       return {
@@ -642,7 +642,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
 
     const selectedTier = membershipTiers.find(
-      (tier) => tier.name.toLowerCase() === tierName.toLowerCase()
+      (tier) => tier.name.toLowerCase() === tierName.toLowerCase(),
     );
     if (!selectedTier) {
       return { success: false, message: "Invalid membership tier" };
@@ -662,7 +662,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // Update in "database"
       const existingUsers = JSON.parse(
-        localStorage.getItem("registeredUsers") || "[]"
+        localStorage.getItem("registeredUsers") || "[]",
       );
       const userIndex = existingUsers.findIndex((u: any) => u.id === user.id);
       if (userIndex !== -1) {
@@ -742,7 +742,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // Update in "database"
       const existingUsers = JSON.parse(
-        localStorage.getItem("registeredUsers") || "[]"
+        localStorage.getItem("registeredUsers") || "[]",
       );
       const userIndex = existingUsers.findIndex((u: any) => u.id === user.id);
       if (userIndex !== -1) {

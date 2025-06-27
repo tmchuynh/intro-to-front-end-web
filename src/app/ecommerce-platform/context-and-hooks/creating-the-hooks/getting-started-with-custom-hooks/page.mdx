@@ -59,7 +59,7 @@ const MOBILE_BREAKPOINT = 768;
  */
 export function useIsMobile(): boolean {
   const [isMobile, setIsMobile] = React.useState<boolean | undefined>(
-    undefined
+    undefined,
   );
 
   React.useEffect(() => {
@@ -105,7 +105,7 @@ const SidebarProvider = React.forwardRef<
       children,
       ...props
     },
-    ref
+    ref,
   ) => {
     const isMobile = useIsMobile();
     const [openMobile, setOpenMobile] = React.useState(false);
@@ -126,7 +126,7 @@ const SidebarProvider = React.forwardRef<
         // This sets the cookie to keep the sidebar state.
         document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
       },
-      [setOpenProp, open]
+      [setOpenProp, open],
     );
 
     // Helper to toggle the sidebar.
@@ -166,7 +166,15 @@ const SidebarProvider = React.forwardRef<
         setOpenMobile,
         toggleSidebar,
       }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+      [
+        state,
+        open,
+        setOpen,
+        isMobile,
+        openMobile,
+        setOpenMobile,
+        toggleSidebar,
+      ],
     );
 
     return (
@@ -182,7 +190,7 @@ const SidebarProvider = React.forwardRef<
             }
             className={cn(
               "group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-sidebar",
-              className
+              className,
             )}
             ref={ref}
             {...props}
@@ -192,13 +200,13 @@ const SidebarProvider = React.forwardRef<
         </TooltipProvider>
       </SidebarContext.Provider>
     );
-  }
+  },
 );
 ```
 
 ###### Explanation of the `SidebarProvider`
 
-The `SidebarProvider` component serves as a comprehensive sidebar management solution that demonstrates the power of custom hooks in creating responsive, accessible UI components. Here's a detailed breakdown of its functionality:
+The `SidebarProvider` component serves as a sidebar management solution that demonstrates the power of custom hooks in creating responsive, accessible UI components. Here's a detailed breakdown of its functionality:
 
 ###### Responsive Behavior Management
 
@@ -225,7 +233,7 @@ The component prioritizes accessibility through multiple interaction methods:
 
 ###### Context-Based Architecture
 
-The provider creates a comprehensive context that exposes:
+The provider creates a context that exposes:
 
 - Current sidebar state (`expanded` or `collapsed`)
 - State setters for both mobile and desktop modes
@@ -244,14 +252,14 @@ This adaptive approach ensures the sidebar provides optimal functionality across
 
 ## Next Steps
 
-With a comprehensive understanding of custom hooks and their numerous advantages, we are now poised to implement a suite of specialized hooks specifically crafted for the needs of our e-commerce platform. Our journey begins with the [`useAuthGuard` hook](/ecommerce-platform/context-and-hooks/creating-the-hooks/useAuthGuard), which is fundamental for protecting sensitive routes and ensuring that only authenticated users gain access to restricted areas of the application.
+With a understanding of custom hooks and their numerous advantages, we are now poised to implement a suite of specialized hooks specifically crafted for the needs of our e-commerce platform. Our journey begins with the [`useAuthGuard` hook](/ecommerce-platform/context-and-hooks/creating-the-hooks/useAuthGuard), which is fundamental for protecting sensitive routes and ensuring that only authenticated users gain access to restricted areas of the application.
 
 These custom hooks will serve as encapsulations of critical business logic, managing complex processes such as:
 
-- **Order management workflows:** Handling state transitions, updates, and synchronization of order data in real-time.  
-- **User authentication and authorization:** Managing login state, session persistence, and route protection to maintain security.  
-- **Notification systems:** Providing seamless real-time updates and alerts that enhance user engagement.  
-- **Integration with other providers:** Coordinating interactions between cart, wishlist, and order contexts for a unified user experience.  
+- **Order management workflows:** Handling state transitions, updates, and synchronization of order data in real-time.
+- **User authentication and authorization:** Managing login state, session persistence, and route protection to maintain security.
+- **Notification systems:** Providing seamless real-time updates and alerts that enhance user engagement.
+- **Integration with other providers:** Coordinating interactions between cart, wishlist, and order contexts for a unified user experience.
 
 By modularizing these functionalities into well-defined hooks, we achieve a more organized and maintainable codebase. This separation of concerns reduces redundancy and improves developer efficiency by promoting code reuse and consistent logic implementation across components.
 

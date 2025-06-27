@@ -151,17 +151,20 @@ return (
 ###### Visual Design Excellence Analysis:
 
 **Button Architecture**:
+
 - **Ghost Variant**: Minimalist design that integrates seamlessly with navigation aesthetics
 - **Icon Size**: Optimized dimensions for touch targets and visual hierarchy
 - **Relative Positioning**: Enables precise badge placement for optimal visual impact
 
 **Badge System Design**:
+
 - **Conditional Rendering**: Only displays when cart contains items, preventing visual clutter
 - **Absolute Positioning**: Strategic placement (-top-2 -right-2) follows UI/UX best practices for notification badges
 - **Smart Count Display**: "99+" format prevents layout breaking with large numbers while maintaining readability
 - **High Contrast Design**: Red background with white text ensures maximum visibility and accessibility compliance
 
 **Accessibility Integration**:
+
 - **Screen Reader Support**: "sr-only" span provides contextual information for assistive technologies
 - **Semantic Button**: Proper button element ensures keyboard navigation and screen reader compatibility
 - **Focus Management**: Button component includes built-in focus indicators for keyboard users
@@ -178,22 +181,22 @@ const useAdvancedCartIcon = () => {
   const { trackEvent } = useAnalytics();
 
   const handleCartClick = useCallback(() => {
-    trackEvent('cart_icon_clicked', {
+    trackEvent("cart_icon_clicked", {
       total_items: totalItems,
       cart_value: cartValue,
       last_added_item: lastAddedItem?.id,
       timestamp: Date.now(),
-      source: 'navigation'
+      source: "navigation",
     });
-    
+
     router.push("/cart");
   }, [totalItems, cartValue, lastAddedItem, router, trackEvent]);
 
   const cartStatus = useMemo(() => {
-    if (totalItems === 0) return 'empty';
-    if (totalItems <= 3) return 'light';
-    if (totalItems <= 10) return 'moderate';
-    return 'heavy';
+    if (totalItems === 0) return "empty";
+    if (totalItems <= 3) return "light";
+    if (totalItems <= 10) return "moderate";
+    return "heavy";
   }, [totalItems]);
 
   return {
@@ -201,7 +204,7 @@ const useAdvancedCartIcon = () => {
     cartValue,
     handleCartClick,
     cartStatus,
-    shouldPulse: lastAddedItem && Date.now() - lastAddedItem.addedAt < 2000
+    shouldPulse: lastAddedItem && Date.now() - lastAddedItem.addedAt < 2000,
   };
 };
 ```
@@ -219,9 +222,9 @@ const PersonalizedCartIcon = () => {
     return {
       // Dynamic badge styling based on user behavior
       getBadgeVariant: () => {
-        if (preferences.highValueCustomer && cartValue > 1000) return 'gold';
-        if (totalItems > userProfile.averageCartSize * 1.5) return 'excited';
-        return 'standard';
+        if (preferences.highValueCustomer && cartValue > 1000) return "gold";
+        if (totalItems > userProfile.averageCartSize * 1.5) return "excited";
+        return "standard";
       },
 
       // Smart tooltip generation
@@ -230,7 +233,7 @@ const PersonalizedCartIcon = () => {
           itemCount: totalItems,
           cartValue: cartValue,
           userTier: userProfile.tier,
-          recommendedActions: getRecommendedActions(totalItems, cartValue)
+          recommendedActions: getRecommendedActions(totalItems, cartValue),
         });
       },
 
@@ -240,9 +243,9 @@ const PersonalizedCartIcon = () => {
           cartItems: getCartItems(),
           inventoryLevels: getInventoryData(),
           userHistory: userProfile.purchaseHistory,
-          marketConditions: getMarketData()
+          marketConditions: getMarketData(),
         });
-      }
+      },
     };
   }, [totalItems, cartValue, userProfile, preferences]);
 
@@ -263,30 +266,31 @@ const AccessibleCartIcon = () => {
     // Dynamic ARIA labels
     getAriaLabel: () => {
       if (totalItems === 0) {
-        return t('cart.empty.aria.label', 'Shopping cart is empty');
+        return t("cart.empty.aria.label", "Shopping cart is empty");
       }
-      return t('cart.items.aria.label', {
+      return t("cart.items.aria.label", {
         count: totalItems,
-        defaultValue: `Shopping cart with ${totalItems} item${totalItems !== 1 ? 's' : ''}`
+        defaultValue: `Shopping cart with ${totalItems} item${totalItems !== 1 ? "s" : ""}`,
       });
     },
 
     // Keyboard navigation enhancement
     handleKeyDown: (event: KeyboardEvent) => {
-      if (event.key === 'Enter' || event.key === ' ') {
+      if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
-        router.push('/cart');
+        router.push("/cart");
       }
     },
 
     // Screen reader announcements
     announceCartChanges: (previousCount: number, newCount: number) => {
-      const announcement = newCount > previousCount 
-        ? t('cart.item.added.announcement', 'Item added to cart')
-        : t('cart.item.removed.announcement', 'Item removed from cart');
-      
+      const announcement =
+        newCount > previousCount
+          ? t("cart.item.added.announcement", "Item added to cart")
+          : t("cart.item.removed.announcement", "Item removed from cart");
+
       announceToScreenReader(announcement);
-    }
+    },
   };
 
   return accessibilityFeatures;
@@ -307,6 +311,7 @@ The CartIcon component provides measurable business value through:
 ##### User Experience Metrics
 
 **Performance Indicators**:
+
 - **Interaction Rate**: 40% higher cart engagement compared to traditional menu-based access
 - **Time to Cart**: 60% reduction in navigation time to cart page
 - **Accessibility Score**: 100% WCAG 2.1 AA compliance with enhanced keyboard support
@@ -330,22 +335,25 @@ The CartIcon component establishes a foundation for shopping cart accessibility 
 ##### 1. Intelligent Cart Analytics and Optimization
 
 **Advanced Cart Intelligence System**:
+
 ```tsx
 const useAdvancedCartAnalytics = () => {
   const [cartMetrics, setCartMetrics] = useState<CartAnalytics>();
   const [behaviorData, setBehaviorData] = useState<UserBehaviorData>();
-  const [optimizationSuggestions, setOptimizationSuggestions] = useState<OptimizationSuggestion[]>([]);
+  const [optimizationSuggestions, setOptimizationSuggestions] = useState<
+    OptimizationSuggestion[]
+  >([]);
 
   const cartIntelligence = {
     // Cart interaction analytics
     trackCartInteractions: (interaction: CartInteraction) => {
-      return analyticsService.track('cart_interaction', {
+      return analyticsService.track("cart_interaction", {
         interaction_type: interaction.type,
         cart_value: interaction.cartValue,
         item_count: interaction.itemCount,
         user_segment: getUserSegment(),
         session_duration: getSessionDuration(),
-        previous_interactions: getPreviousInteractions()
+        previous_interactions: getPreviousInteractions(),
       });
     },
 
@@ -356,7 +364,7 @@ const useAdvancedCartAnalytics = () => {
         itemCount: cartData.itemCount,
         userHistory: getUserPurchaseHistory(),
         sessionBehavior: getSessionBehavior(),
-        marketFactors: getMarketConditions()
+        marketFactors: getMarketConditions(),
       });
     },
 
@@ -366,7 +374,7 @@ const useAdvancedCartAnalytics = () => {
         riskLevel: calculateRiskLevel(riskFactors),
         interventionStrategies: getInterventionStrategies(),
         personalizedOffers: generatePersonalizedOffers(),
-        urgencyTactics: getUrgencyTactics()
+        urgencyTactics: getUrgencyTactics(),
       });
     },
 
@@ -376,18 +384,24 @@ const useAdvancedCartAnalytics = () => {
         currentPerformance: performanceData,
         industryBenchmarks: getIndustryBenchmarks(),
         userTestingData: getABTestResults(),
-        businessObjectives: getBusinessGoals()
+        businessObjectives: getBusinessGoals(),
       });
-    }
+    },
   };
 
-  return { cartMetrics, behaviorData, optimizationSuggestions, cartIntelligence };
+  return {
+    cartMetrics,
+    behaviorData,
+    optimizationSuggestions,
+    cartIntelligence,
+  };
 };
 ```
 
 ##### 2. Advanced User Experience and Personalization
 
 **Personalized Cart Experience Engine**:
+
 ```tsx
 const usePersonalizedCartExperience = () => {
   const [userPreferences, setUserPreferences] = useState<UserPreferences>();
@@ -401,7 +415,7 @@ const usePersonalizedCartExperience = () => {
         brandPreferences: getBrandPreferences(userProfile),
         accessibilityNeeds: getAccessibilityNeeds(userProfile),
         deviceCapabilities: getDeviceCapabilities(),
-        culturalFactors: getCulturalFactors(userProfile.location)
+        culturalFactors: getCulturalFactors(userProfile.location),
       });
     },
 
@@ -412,7 +426,7 @@ const usePersonalizedCartExperience = () => {
         cartValue: cartState.value,
         userTier: getUserTier(),
         seasonalContext: getSeasonalContext(),
-        promotionalOpportunities: getPromotionalOpportunities(cartState)
+        promotionalOpportunities: getPromotionalOpportunities(cartState),
       });
     },
 
@@ -423,7 +437,7 @@ const usePersonalizedCartExperience = () => {
         userBehavior: userContext.behaviorPatterns,
         recommendationEngine: getRecommendations(userContext),
         urgencyFactors: getUrgencyFactors(),
-        helpfulHints: getContextualHints(userContext)
+        helpfulHints: getContextualHints(userContext),
       });
     },
 
@@ -434,9 +448,9 @@ const usePersonalizedCartExperience = () => {
         networkConditions: getNetworkConditions(),
         performanceBudget: getPerformanceBudget(),
         featureFlags: getFeatureFlags(),
-        userExperience: getCurrentUXLevel()
+        userExperience: getCurrentUXLevel(),
       });
-    }
+    },
   };
 
   return { userPreferences, contextualData, experienceEnhancements };
@@ -446,9 +460,11 @@ const usePersonalizedCartExperience = () => {
 ##### 3. Enterprise Cart Management and Integration
 
 **Professional Cart System Architecture**:
+
 ```tsx
 const useEnterpriseCartManagement = () => {
-  const [enterpriseMetrics, setEnterpriseMetrics] = useState<EnterpriseMetrics>();
+  const [enterpriseMetrics, setEnterpriseMetrics] =
+    useState<EnterpriseMetrics>();
   const [integrationData, setIntegrationData] = useState<IntegrationData>();
 
   const enterpriseCapabilities = {
@@ -459,7 +475,7 @@ const useEnterpriseCartManagement = () => {
         cartData: getCurrentCartData(),
         userIdentity: getUserIdentity(),
         conflictResolution: getConflictResolutionStrategy(),
-        dataIntegrity: ensureDataIntegrity()
+        dataIntegrity: ensureDataIntegrity(),
       });
     },
 
@@ -470,7 +486,7 @@ const useEnterpriseCartManagement = () => {
         realTimeInventory: getRealTimeInventory(),
         reservationSystem: getReservationSystem(),
         allocationStrategy: getAllocationStrategy(),
-        backorderManagement: getBackorderManagement()
+        backorderManagement: getBackorderManagement(),
       });
     },
 
@@ -481,7 +497,7 @@ const useEnterpriseCartManagement = () => {
         cartMetrics: getCartMetrics(timeframe),
         conversionData: getConversionData(timeframe),
         revenueAnalysis: getRevenueAnalysis(timeframe),
-        customerSegmentation: getCustomerSegmentation(timeframe)
+        customerSegmentation: getCustomerSegmentation(timeframe),
       });
     },
 
@@ -492,9 +508,9 @@ const useEnterpriseCartManagement = () => {
         cartPerformance: getCartPerformanceData(),
         businessMetrics: getBusinessMetrics(),
         complianceData: getComplianceData(),
-        stakeholderRequirements: getStakeholderRequirements()
+        stakeholderRequirements: getStakeholderRequirements(),
       });
-    }
+    },
   };
 
   return { enterpriseMetrics, integrationData, enterpriseCapabilities };
@@ -506,12 +522,14 @@ const useEnterpriseCartManagement = () => {
 ##### 1. Conversion Rate Optimization Excellence
 
 **Comprehensive Conversion Enhancement**:
+
 - **Cart Completion Rates**: Strategic cart access improvements increase completion by 25%
 - **Impulse Purchase Facilitation**: Visual cart reminders drive additional purchases by 30%
 - **Friction Reduction**: Optimized cart flow reduces abandonment by 35%
 - **Cross-Session Continuity**: Persistent cart state improves return conversions by 40%
 
 **Quantifiable Business Benefits**:
+
 - **Revenue Per Session**: Enhanced cart accessibility increases RPS by 22%
 - **Average Order Value**: Strategic cart presentation improves AOV by 18%
 - **Customer Lifetime Value**: Better cart experiences increase CLV by 28%
@@ -520,26 +538,27 @@ const useEnterpriseCartManagement = () => {
 ##### 2. User Experience Excellence Framework
 
 **Customer Experience Metrics**:
+
 ```tsx
 // Example of cart UX measurement dashboard
 const CartUXMetricsDashboard = () => {
   const { cartMetrics, userExperienceData } = useCartAnalytics();
-  
+
   const uxMetrics = {
     // Engagement Metrics
     cartInteractionRate: calculateInteractionRate(cartMetrics),
     timeToCartAccess: calculateAccessTime(cartMetrics),
     cartReturnFrequency: calculateReturnFrequency(cartMetrics),
-    
+
     // Performance Metrics
     cartLoadTime: calculateCartLoadTime(userExperienceData),
     navigationEfficiency: calculateNavigationEfficiency(userExperienceData),
     errorRate: calculateCartErrorRate(userExperienceData),
-    
+
     // Satisfaction Metrics
     cartUsabilityScore: calculateUsabilityScore(cartMetrics),
     accessibilityCompliance: calculateAccessibilityScore(cartMetrics),
-    userSatisfactionIndex: calculateSatisfactionIndex(cartMetrics)
+    userSatisfactionIndex: calculateSatisfactionIndex(cartMetrics),
   };
 
   return <CartUXMetricsDashboard metrics={uxMetrics} />;
@@ -551,6 +570,7 @@ const CartUXMetricsDashboard = () => {
 ##### 1. Artificial Intelligence and Machine Learning Integration
 
 **Next-Generation Cart Intelligence**:
+
 - **Predictive Analytics**: AI-powered cart abandonment prediction and prevention
 - **Dynamic Optimization**: Machine learning algorithms for real-time cart experience optimization
 - **Personalization Engine**: Deep learning for hyper-personalized cart presentations
@@ -559,6 +579,7 @@ const CartUXMetricsDashboard = () => {
 ##### 2. Advanced Commerce Technologies
 
 **Cutting-Edge Cart Features**:
+
 - **Voice Commerce**: Voice-activated cart management and navigation
 - **Gesture Control**: Touchless cart interaction for modern devices
 - **Augmented Reality**: AR-enhanced cart visualization and management
@@ -567,6 +588,7 @@ const CartUXMetricsDashboard = () => {
 ##### 3. Cross-Platform and Omnichannel Excellence
 
 **Universal Cart Experience**:
+
 - **Progressive Web App**: Offline cart functionality and app-like experiences
 - **Cross-Device Sync**: Seamless cart synchronization across all user devices
 - **In-Store Integration**: Bridge between online cart and physical store experiences
@@ -577,6 +599,7 @@ const CartUXMetricsDashboard = () => {
 ##### 1. Performance and Scalability Excellence
 
 **Enterprise-Grade Cart Architecture**:
+
 - **Real-Time Synchronization**: Sub-second cart state updates across all interfaces
 - **High Availability**: 99.99% uptime for cart services with automated failover
 - **Global CDN**: Worldwide cart performance optimization through edge computing
@@ -585,12 +608,13 @@ const CartUXMetricsDashboard = () => {
 ##### 2. Security and Compliance Framework
 
 **Secure Cart Management**:
+
 - **Data Protection**: End-to-end encryption for all cart data transmission
 - **Privacy Compliance**: GDPR, CCPA, and global privacy regulation compliance
 - **Fraud Prevention**: AI-powered fraud detection integrated with cart systems
 - **Audit Trails**: Comprehensive logging for security and compliance requirements
 
-The CartIcon component provides a foundation for building world-class cart accessibility experiences that drive conversion, enhance user satisfaction, and create competitive advantage through intelligent navigation optimization. Its advanced state management, real-time feedback systems, and comprehensive accessibility features create opportunities for significant improvements in customer engagement, business performance, and conversion rates. By implementing these advanced patterns and considering the strategic roadmap, development teams can create cart navigation systems that not only provide access but actively contribute to business success through exceptional user experiences and optimized purchasing funnels.
+The CartIcon component provides a foundation for building world-class cart accessibility experiences that drive conversion, enhance user satisfaction, and create competitive advantage through intelligent navigation optimization. Its advanced state management, real-time feedback systems, and accessibility features create opportunities for significant improvements in customer engagement, business performance, and conversion rates. By implementing these advanced patterns and considering the strategic roadmap, development teams can create cart navigation systems that not only provide access but actively contribute to business success through exceptional user experiences and optimized purchasing funnels.
 
 Now that we have our `CartIcon` component set up, we can move onto the [`WishlistIcon` component](/ecommerce-platform/components/navigation-components/the-wishlist-icon), which will allow users to view and manage their wishlist items. This component will enhance the user experience by providing quick access to saved products, making it easier for users to keep track of items they are interested in purchasing later, while building upon the conversion optimization foundation we've established.
 

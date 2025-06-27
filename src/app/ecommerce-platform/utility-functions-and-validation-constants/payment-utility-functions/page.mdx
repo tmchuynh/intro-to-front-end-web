@@ -37,19 +37,19 @@ The Luhn algorithm, also recognized as the "modulus 10" or "mod 10" algorithm, r
 
 The algorithm employs a yet computationally efficient mathematical approach designed to detect the vast majority of data entry errors that commonly occur during payment processing. These errors include:
 
-- **Digit Transposition**: When adjacent digits are accidentally swapped (e.g., 1234 becomes 1324)
-- **Single Digit Errors**: When individual digits are mistyped (e.g., 1234 becomes 1244)
-- **Phonetic Errors**: When numbers are misheard and incorrectly transcribed
-- **Visual Errors**: When similar-looking digits are confused (e.g., 6 and 8, 1 and 7)
+- Digit Transposition: When adjacent digits are accidentally swapped (e.g., 1234 becomes 1324)
+- Single Digit Errors: When individual digits are mistyped (e.g., 1234 becomes 1244)
+- Phonetic Errors: When numbers are misheard and incorrectly transcribed
+- Visual Errors: When similar-looking digits are confused (e.g., 6 and 8, 1 and 7)
 
 #### Industry Adoption and Standards Compliance:
 
 The Luhn algorithm has achieved universal adoption across the payment card industry, forming a mandatory component of:
 
-- **ISO/IEC 7812**: International standard for identification cards
-- **Payment Card Industry (PCI) Standards**: Security requirements for payment processing
-- **EMV Specifications**: Chip card standards for global interoperability
-- **Regulatory Compliance**: Meeting financial industry data integrity requirements
+- ISO/IEC 7812: International standard for identification cards
+- Payment Card Industry (PCI) Standards: Security requirements for payment processing
+- EMV Specifications: Chip card standards for global interoperability
+- Regulatory Compliance: Meeting financial industry data integrity requirements
 
 ### Algorithmic Process and Mathematical Implementation
 
@@ -130,9 +130,9 @@ The function begins with input sanitization using `replace(/\s+/g, "")`, which r
 
 The regex pattern `/^\d+$/` ensures that the sanitized input contains exclusively numeric digits. This validation prevents:
 
-- **Injection Attacks**: Blocking non-numeric characters that could be used maliciously
-- **Type Coercion Issues**: Ensuring consistent numeric processing
-- **Downstream Errors**: Preventing invalid data from reaching calculation logic
+- Injection Attacks: Blocking non-numeric characters that could be used maliciously
+- Type Coercion Issues: Ensuring consistent numeric processing
+- Downstream Errors: Preventing invalid data from reaching calculation logic
 
 ###### Optimized Algorithmic Implementation:
 
@@ -144,9 +144,9 @@ The `for` loop employs reverse iteration (`i >= 0; i--`) starting from the right
 
 The boolean flag `isEven` elegantly tracks alternating positions without complex modular arithmetic, providing:
 
-- **Performance Optimization**: Boolean operations are faster than modulo calculations
-- **Memory Efficiency**: Single boolean variable versus position counters
-- **Clarity**: Clear semantic meaning for position-dependent logic
+- Performance Optimization: Boolean operations are faster than modulo calculations
+- Memory Efficiency: Single boolean variable versus position counters
+- Clarity: Clear semantic meaning for position-dependent logic
 
 ###### Mathematical Processing Logic:
 
@@ -161,33 +161,33 @@ if (isEven) {
 
 This conditional block implements the core Luhn transformation:
 
-- **Selective Doubling**: Only even-positioned digits (from right) are doubled
-- **Overflow Handling**: Digits exceeding 9 are normalized using subtraction rather than modulo operations
-- **Performance Consideration**: Subtraction is computationally faster than modulo for single-digit overflow
+- Selective Doubling: Only even-positioned digits (from right) are doubled
+- Overflow Handling: Digits exceeding 9 are normalized using subtraction rather than modulo operations
+- Performance Consideration: Subtraction is computationally faster than modulo for single-digit overflow
 
 ###### Accumulation and Validation:
 
 The running sum accumulates all processed digits, while the final modulo operation (`sum % 10 === 0`) provides the definitive validation result. This approach ensures:
 
-- **Single-Pass Efficiency**: Complete validation in one iteration
-- **Memory Conservation**: Minimal variable usage for large-scale processing
-- **Boolean Clarity**: Unambiguous true/false result for integration
+- Single-Pass Efficiency: Complete validation in one iteration
+- Memory Conservation: Minimal variable usage for large-scale processing
+- Boolean Clarity: Unambiguous true/false result for integration
 
 ###### Error Detection Capabilities:
 
 This implementation can detect approximately 70% of all possible transcription errors, including:
 
-- **100% of single-digit errors** in non-check digit positions
-- **90% of adjacent digit transpositions**
-- **Most twin errors** (aa ↔ bb where |a-b| ≠ 4.5)
-- **Jump transpositions** across multiple positions
+- 100% of single-digit errors in non-check digit positions
+- 90% of adjacent digit transpositions
+- Most twin errors (aa ↔ bb where |a-b| ≠ 4.5)
+- Jump transpositions across multiple positions
 
 ###### Integration and Performance Benefits:
 
-- **High-Frequency Processing**: Optimized for payment gateway environments processing thousands of validations per second
-- **Mobile Compatibility**: Lightweight implementation suitable for client-side validation
-- **API Endpoint Support**: Fast enough for real-time API validation without performance degradation
-- **Batch Processing**: Efficient enough for bulk card number validation in data processing pipelines
+- High-Frequency Processing: Optimized for payment gateway environments processing thousands of validations per second
+- Mobile Compatibility: Lightweight implementation suitable for client-side validation
+- API Endpoint Support: Fast enough for real-time API validation without performance degradation
+- Batch Processing: Efficient enough for bulk card number validation in data processing pipelines
 
 ## Advanced Card Type Detection and Brand Intelligence
 
@@ -199,27 +199,27 @@ Card type detection represents a payment processing capability that enables dyna
 
 Different card networks have varying processing fees, settlement times, and geographic availability. Real-time card detection enables:
 
-- **Dynamic Routing**: Directing transactions through the most cost-effective payment processor
-- **Regional Compliance**: Ensuring card acceptance aligns with local regulations
-- **Merchant Fee Optimization**: Selecting processors with favorable rates for specific card types
+- Dynamic Routing: Directing transactions through the most cost-effective payment processor
+- Regional Compliance: Ensuring card acceptance aligns with local regulations
+- Merchant Fee Optimization: Selecting processors with favorable rates for specific card types
 
 ##### Enhanced User Experience:
 
 Card type detection powers intelligent user interface features:
 
-- **Dynamic Form Validation**: Adjusting CVV length requirements based on card type
-- **Visual Brand Recognition**: Displaying appropriate card logos and styling
-- **Smart Form Completion**: Auto-formatting card numbers according to brand-specific patterns
-- **Real-Time Feedback**: Immediate validation as users type their card numbers
+- Dynamic Form Validation: Adjusting CVV length requirements based on card type
+- Visual Brand Recognition: Displaying appropriate card logos and styling
+- Smart Form Completion: Auto-formatting card numbers according to brand-specific patterns
+- Real-Time Feedback: Immediate validation as users type their card numbers
 
 ###### Fraud Prevention and Security:
 
 Advanced card detection supports security measures:
 
-- **Geographic Validation**: Cross-referencing card types with issuing regions
-- **Velocity Checking**: Monitoring transaction patterns by card brand
-- **Risk Scoring**: Applying brand-specific fraud detection algorithms
-- **Compliance Verification**: Ensuring transactions meet card network security requirements
+- Geographic Validation: Cross-referencing card types with issuing regions
+- Velocity Checking: Monitoring transaction patterns by card brand
+- Risk Scoring: Applying brand-specific fraud detection algorithms
+- Compliance Verification: Ensuring transactions meet card network security requirements
 
 ```typescript startLineNumber=47
 // src/lib/utils/payment.ts
@@ -279,12 +279,12 @@ This iterative approach leverages the `CARD_TYPE_PATTERNS` registry to perform s
 
 ###### Major Card Network Pattern Examples:
 
-- **Visa**: Begins with 4, length 13-19 digits (most commonly 16)
-- **Mastercard**: Begins with 5[1-5] or 2[2-7], length 16 digits
-- **American Express**: Begins with 34 or 37, length 15 digits
-- **Discover**: Begins with 6011, 622126-622925, 644-649, or 65, length 16-19 digits
-- **JCB**: Begins with 3528-3589, length 16-19 digits
-- **Diners Club**: Begins with 300-305, 36, or 38, length 14 digits
+- Visa: Begins with 4, length 13-19 digits (most commonly 16)
+- Mastercard: Begins with 5[1-5] or 2[2-7], length 16 digits
+- American Express: Begins with 34 or 37, length 15 digits
+- Discover: Begins with 6011, 622126-622925, 644-649, or 65, length 16-19 digits
+- JCB: Begins with 3528-3589, length 16-19 digits
+- Diners Club: Begins with 300-305, 36, or 38, length 14 digits
 
 ###### Multi-Layer Validation Framework:
 
@@ -335,26 +335,26 @@ return {
 
 This graceful degradation ensures the system continues functioning even with:
 
-- **New Card Types**: Recently introduced card networks not yet in the pattern registry
-- **Regional Cards**: Local payment cards specific to certain geographic regions
-- **Test Numbers**: Development and testing scenarios with non-standard card numbers
-- **Partial Input**: Incomplete card numbers during user input
+- New Card Types: Recently introduced card networks not yet in the pattern registry
+- Regional Cards: Local payment cards specific to certain geographic regions
+- Test Numbers: Development and testing scenarios with non-standard card numbers
+- Partial Input: Incomplete card numbers during user input
 
 ###### Performance and Scalability Considerations:
 
-- **First-Match Optimization**: Returns immediately upon finding a match, reducing unnecessary pattern testing
-- **Regex Efficiency**: Compiled regular expressions provide fast pattern matching
-- **Memory Conservation**: Minimal object creation with reused pattern references
-- **Cache-Friendly**: Results can be cached based on card number prefixes for high-volume processing
+- First-Match Optimization: Returns immediately upon finding a match, reducing unnecessary pattern testing
+- Regex Efficiency: Compiled regular expressions provide fast pattern matching
+- Memory Conservation: Minimal object creation with reused pattern references
+- Cache-Friendly: Results can be cached based on card number prefixes for high-volume processing
 
 ###### Integration and Business Logic Support:
 
 The rich result object enables downstream processing:
 
-- **Dynamic UI Updates**: Adjusting form validation and styling based on detected card type
-- **Payment Routing**: Directing transactions to appropriate payment processors
-- **Fee Calculation**: Applying card-specific processing fees and interchange rates
-- **Compliance Checking**: Ensuring merchant agreements support detected card types
+- Dynamic UI Updates: Adjusting form validation and styling based on detected card type
+- Payment Routing: Directing transactions to appropriate payment processors
+- Fee Calculation: Applying card-specific processing fees and interchange rates
+- Compliance Checking: Ensuring merchant agreements support detected card types
 
 ## Comprehensive Expiry Date Validation System
 
@@ -366,28 +366,28 @@ Expiry date validation represents a critical security and operational component 
 
 Expired card detection serves as a primary fraud prevention mechanism:
 
-- **Stolen Card Detection**: Fraudsters often use expired cards obtained through data breaches
-- **Testing Prevention**: Blocks automated systems testing stolen card databases
-- **Geographic Validation**: Cross-references expiry patterns with regional card issuance practices
-- **Velocity Monitoring**: Tracks patterns of expired card usage attempts
+- Stolen Card Detection: Fraudsters often use expired cards obtained through data breaches
+- Testing Prevention: Blocks automated systems testing stolen card databases
+- Geographic Validation: Cross-references expiry patterns with regional card issuance practices
+- Velocity Monitoring: Tracks patterns of expired card usage attempts
 
 ##### Operational Risk Mitigation:
 
 Proper expiry validation prevents costly operational issues:
 
-- **Declined Transaction Prevention**: Avoiding declined charges and associated merchant fees
-- **Customer Experience Protection**: Preventing embarrassing checkout failures
-- **Chargeback Reduction**: Minimizing disputes from expired card transactions
-- **Processing Fee Optimization**: Avoiding unnecessary transaction attempt fees
+- Declined Transaction Prevention: Avoiding declined charges and associated merchant fees
+- Customer Experience Protection: Preventing embarrassing checkout failures
+- Chargeback Reduction: Minimizing disputes from expired card transactions
+- Processing Fee Optimization: Avoiding unnecessary transaction attempt fees
 
 ###### Regulatory Compliance Requirements:
 
 Payment card industry regulations mandate strict expiry date handling:
 
-- **PCI DSS Compliance**: Proper validation of all card data elements
-- **Network Rules**: Adherence to Visa, Mastercard, and other network requirements
-- **Regional Regulations**: Compliance with local financial services laws
-- **Audit Trail Maintenance**: Logging of validation attempts for compliance reporting
+- PCI DSS Compliance: Proper validation of all card data elements
+- Network Rules: Adherence to Visa, Mastercard, and other network requirements
+- Regional Regulations: Compliance with local financial services laws
+- Audit Trail Maintenance: Logging of validation attempts for compliance reporting
 
 ```typescript startLineNumber=78
 /**
@@ -446,9 +446,9 @@ const match = trimmed.match(EXPIRY_PATTERNS.MM_YY);
 
 The function begins with whitespace normalization and applies regex pattern matching against the `EXPIRY_PATTERNS.MM_YY` pattern. This pattern typically matches formats like:
 
-- **MM/YY**: Standard slash-separated format (03/25)
-- **MM-YY**: Hyphen-separated format (03-25)
-- **MMYY**: Compact format without separators (0325)
+- MM/YY: Standard slash-separated format (03/25)
+- MM-YY: Hyphen-separated format (03-25)
+- MMYY: Compact format without separators (0325)
 
 ###### Phase 2: Date Component Extraction and Normalization
 
@@ -459,9 +459,9 @@ const year = parseInt(match[2]) + 2000; // Convert YY to YYYY
 
 The function extracts month and year components from the regex capture groups and performs Y2K-safe year conversion:
 
-- **Month Validation**: Implicit validation through regex ensures months 01-12
-- **Year Normalization**: Converts 2-digit years to 4-digit format (25 → 2025)
-- **Century Assumption**: Assumes all dates are in the 21st century (2000-2099)
+- Month Validation: Implicit validation through regex ensures months 01-12
+- Year Normalization: Converts 2-digit years to 4-digit format (25 → 2025)
+- Century Assumption: Assumes all dates are in the 21st century (2000-2099)
 
 ###### Phase 3: Temporal Context Establishment
 
@@ -473,9 +473,9 @@ const currentMonth = currentDate.getMonth() + 1;
 
 Establishes precise temporal context using JavaScript's Date object:
 
-- **Current Month Adjustment**: Compensates for JavaScript's 0-based month indexing
-- **Real-Time Accuracy**: Uses system time for current date reference
-- **Timezone Considerations**: Operates in local timezone for user-appropriate validation
+- Current Month Adjustment: Compensates for JavaScript's 0-based month indexing
+- Real-Time Accuracy: Uses system time for current date reference
+- Timezone Considerations: Operates in local timezone for user-appropriate validation
 
 ###### Phase 4: Expiration Status Determination
 
@@ -486,9 +486,9 @@ const isExpired =
 
 Implements expiration logic that considers both year and month:
 
-- **Past Year Detection**: Immediate expiration for years before current year
-- **Current Year Logic**: Month-level comparison for current year dates
-- **End-of-Month Handling**: Cards typically expire at month end, not beginning
+- Past Year Detection: Immediate expiration for years before current year
+- Current Year Logic: Month-level comparison for current year dates
+- End-of-Month Handling: Cards typically expire at month end, not beginning
 
 ###### Phase 5: Future Boundary Validation
 
@@ -499,10 +499,10 @@ const isTooFarFuture =
 
 Prevents acceptance of unrealistic future dates:
 
-- **Security Measure**: Blocks potentially fraudulent far-future dates
-- **Data Quality**: Prevents typos that result in impossible expiry dates
-- **Configurable Limits**: Uses constants to allow business rule adjustments
-- **Typical Range**: Usually 10-20 years maximum future validity
+- Security Measure: Blocks potentially fraudulent far-future dates
+- Data Quality: Prevents typos that result in impossible expiry dates
+- Configurable Limits: Uses constants to allow business rule adjustments
+- Typical Range: Usually 10-20 years maximum future validity
 
 ###### Comprehensive Result Assembly:
 
@@ -523,26 +523,26 @@ The function returns an `ExpiryValidationResult` object providing detailed valid
 
 This approach enables business logic:
 
-- **User Experience**: Specific error messages for different validation failures
-- **Analytics**: Tracking of expired card attempt patterns
-- **Fraud Detection**: Integration with risk scoring algorithms
-- **Compliance**: Detailed logging for audit and regulatory requirements
+- User Experience: Specific error messages for different validation failures
+- Analytics: Tracking of expired card attempt patterns
+- Fraud Detection: Integration with risk scoring algorithms
+- Compliance: Detailed logging for audit and regulatory requirements
 
 ###### Error Handling and Edge Cases:
 
 The function gracefully handles various edge cases:
 
-- **Invalid Formats**: Returns appropriate validation failure for malformed input
-- **Boundary Months**: Correctly handles month transitions and year boundaries
-- **Leap Years**: Inherits leap year handling from JavaScript Date object
-- **System Clock**: Relies on accurate system time for current date reference
+- Invalid Formats: Returns appropriate validation failure for malformed input
+- Boundary Months: Correctly handles month transitions and year boundaries
+- Leap Years: Inherits leap year handling from JavaScript Date object
+- System Clock: Relies on accurate system time for current date reference
 
 ###### Performance and Scalability:
 
-- **Single-Pass Processing**: Complete validation in one function call
-- **Minimal Object Creation**: Efficient memory usage for high-volume processing
-- **Regex Optimization**: Compiled patterns for fast format validation
-- **Constant-Time Operations**: O(1) complexity for validation logic
+- Single-Pass Processing: Complete validation in one function call
+- Minimal Object Creation: Efficient memory usage for high-volume processing
+- Regex Optimization: Compiled patterns for fast format validation
+- Constant-Time Operations: O(1) complexity for validation logic
 
 ## Strategic CVV Validation and Security Framework
 
@@ -554,28 +554,28 @@ CVV (Card Verification Value) validation represents one of the most critical sec
 
 CVV validation serves as a crucial verification that the person making the transaction physically possesses the card:
 
-- **Knowledge-Based Authentication**: CVV is typically only known to the cardholder
-- **Database Protection**: CVV codes are not stored in merchant databases, reducing breach impact
-- **Real-Time Verification**: Immediate validation with card issuer during authorization
-- **Fraud Pattern Detection**: Unusual CVV failure patterns indicate potential fraud attempts
+- Knowledge-Based Authentication: CVV is typically only known to the cardholder
+- Database Protection: CVV codes are not stored in merchant databases, reducing breach impact
+- Real-Time Verification: Immediate validation with card issuer during authorization
+- Fraud Pattern Detection: Unusual CVV failure patterns indicate potential fraud attempts
 
 ##### Multi-Layered Security Integration:
 
 CVV validation integrates with broader security frameworks:
 
-- **Address Verification Service (AVS)**: Combined verification reduces fraud risk
-- **Risk Scoring Algorithms**: CVV success/failure factors into overall risk assessment
-- **3D Secure Integration**: Works alongside 3DS for enhanced authentication
-- **Machine Learning Enhancement**: CVV patterns feed into AI-driven fraud detection
+- Address Verification Service (AVS): Combined verification reduces fraud risk
+- Risk Scoring Algorithms: CVV success/failure factors into overall risk assessment
+- 3D Secure Integration: Works alongside 3DS for enhanced authentication
+- Machine Learning Enhancement: CVV patterns feed into AI-driven fraud detection
 
 ###### Regulatory Compliance and Industry Standards:
 
 CVV handling must comply with strict industry regulations:
 
-- **PCI DSS Requirements**: Prohibits storage of CVV codes after authorization
-- **Card Network Rules**: Compliance with Visa, Mastercard, and other network standards
-- **Regional Regulations**: Adherence to local financial services compliance requirements
-- **Audit Trail Management**: Logging validation attempts without storing sensitive data
+- PCI DSS Requirements: Prohibits storage of CVV codes after authorization
+- Card Network Rules: Compliance with Visa, Mastercard, and other network standards
+- Regional Regulations: Adherence to local financial services compliance requirements
+- Audit Trail Management: Logging validation attempts without storing sensitive data
 
 ```typescript startLineNumber=116
 /**
@@ -618,9 +618,9 @@ if (!/^\d+$/.test(trimmed)) {
 
 The function begins with input processing:
 
-- **Whitespace Normalization**: Removes leading/trailing spaces that could cause validation failures
-- **Numeric Verification**: Ensures CVV contains only digits, preventing injection attacks and formatting errors
-- **Security Boundary**: Blocks non-numeric characters that could indicate malicious input
+- Whitespace Normalization: Removes leading/trailing spaces that could cause validation failures
+- Numeric Verification: Ensures CVV contains only digits, preventing injection attacks and formatting errors
+- Security Boundary: Blocks non-numeric characters that could indicate malicious input
 
 ###### Dynamic Card-Type-Specific Validation:
 
@@ -635,10 +635,10 @@ This intelligent validation adjusts requirements based on card network specifica
 
 ###### Card Network CVV Requirements:
 
-- **American Express**: 4-digit CVV (CID - Card Identification Code) located on front of card
-- **Visa/Mastercard/Discover**: 3-digit CVV located on back of card signature panel
-- **JCB**: 3-digit CVV following international standards
-- **Diners Club**: 3-digit CVV with some variations by issuer
+- American Express: 4-digit CVV (CID - Card Identification Code) located on front of card
+- Visa/Mastercard/Discover: 3-digit CVV located on back of card signature panel
+- JCB: 3-digit CVV following international standards
+- Diners Club: 3-digit CVV with some variations by issuer
 
 ###### Graceful Fallback Strategy:
 
@@ -651,9 +651,9 @@ return (
 
 When card type information is unavailable, the function implements intelligent fallback logic:
 
-- **Universal Compatibility**: Accepts CVV lengths within industry-standard ranges
-- **Security Maintenance**: Prevents extremely short or long values that indicate errors
-- **Future-Proof Design**: Accommodates new card types without breaking existing functionality
+- Universal Compatibility: Accepts CVV lengths within industry-standard ranges
+- Security Maintenance: Prevents extremely short or long values that indicate errors
+- Future-Proof Design: Accommodates new card types without breaking existing functionality
 
 ###### Security and Business Logic Integration:
 
@@ -661,10 +661,10 @@ When card type information is unavailable, the function implements intelligent f
 
 The function's length validation serves multiple security purposes:
 
-- **Format Compliance**: Ensures CVV matches card network specifications
-- **Error Detection**: Identifies typos and transcription errors
-- **Fraud Prevention**: Blocks obviously invalid CVV attempts
-- **Data Quality**: Maintains clean data for downstream processing
+- Format Compliance: Ensures CVV matches card network specifications
+- Error Detection: Identifies typos and transcription errors
+- Fraud Prevention: Blocks obviously invalid CVV attempts
+- Data Quality: Maintains clean data for downstream processing
 
 ###### Type Safety and Error Prevention:
 
@@ -674,52 +674,52 @@ cardType as CardType;
 
 The type assertion ensures compile-time safety while allowing runtime flexibility:
 
-- **TypeScript Integration**: Leverages type system for development-time error prevention
-- **Runtime Flexibility**: Handles dynamic card type detection scenarios
-- **Null Safety**: Graceful handling of undefined or unknown card types
+- TypeScript Integration: Leverages type system for development-time error prevention
+- Runtime Flexibility: Handles dynamic card type detection scenarios
+- Null Safety: Graceful handling of undefined or unknown card types
 
 ###### Constant-Based Configuration:
 
 The use of `SECURITY_CONSTANTS` enables:
 
-- **Configurable Security**: Easy adjustment of validation parameters
-- **Business Rule Compliance**: Alignment with merchant and network requirements
-- **Audit Trail**: Clear documentation of security parameter decisions
-- **Maintenance Efficiency**: Centralized configuration management
+- Configurable Security: Easy adjustment of validation parameters
+- Business Rule Compliance: Alignment with merchant and network requirements
+- Audit Trail: Clear documentation of security parameter decisions
+- Maintenance Efficiency: Centralized configuration management
 
 ###### Performance and Scalability Considerations:
 
 ###### Efficient Validation Logic:
 
-- **Single-Pass Processing**: Complete validation in one function execution
-- **Minimal Regex Operations**: Simple numeric check for optimal performance
-- **Constant-Time Lookup**: O(1) access to card type patterns
-- **Memory Efficiency**: No intermediate object creation or complex operations
+- Single-Pass Processing: Complete validation in one function execution
+- Minimal Regex Operations: Simple numeric check for optimal performance
+- Constant-Time Lookup: O(1) access to card type patterns
+- Memory Efficiency: No intermediate object creation or complex operations
 
 ###### High-Volume Processing Support:
 
 The function's design supports enterprise-scale payment processing:
 
-- **API Gateway Integration**: Fast enough for real-time payment validation
-- **Batch Processing**: Efficient for bulk payment verification operations
-- **Mobile Compatibility**: Lightweight enough for client-side validation
-- **Microservice Architecture**: Stateless design suitable for containerized deployments
+- API Gateway Integration: Fast enough for real-time payment validation
+- Batch Processing: Efficient for bulk payment verification operations
+- Mobile Compatibility: Lightweight enough for client-side validation
+- Microservice Architecture: Stateless design suitable for containerized deployments
 
 ###### Integration and Business Value:
 
 ###### Payment Flow Integration:
 
-- **Real-Time Form Validation**: Immediate user feedback during checkout
-- **Payment Gateway Preparation**: Pre-validation before costly payment calls
-- **Risk Assessment**: CVV validation status factors into fraud scoring
-- **User Experience**: Clear error messaging based on specific validation failures
+- Real-Time Form Validation: Immediate user feedback during checkout
+- Payment Gateway Preparation: Pre-validation before costly payment calls
+- Risk Assessment: CVV validation status factors into fraud scoring
+- User Experience: Clear error messaging based on specific validation failures
 
 ###### Compliance and Audit Support:
 
-- **PCI DSS Alignment**: Validation without storage of sensitive CVV data
-- **Regulatory Reporting**: Support for compliance auditing and documentation
-- **Security Monitoring**: Integration with security incident tracking systems
-- **Merchant Protection**: Reduces liability through proper validation procedures
+- PCI DSS Alignment: Validation without storage of sensitive CVV data
+- Regulatory Reporting: Support for compliance auditing and documentation
+- Security Monitoring: Integration with security incident tracking systems
+- Merchant Protection: Reduces liability through proper validation procedures
 
 ## Advanced Cardholder Name Validation System
 
@@ -731,19 +731,19 @@ Cardholder name validation serves as a critical identity verification component 
 
 Cardholder name validation provides essential identity verification:
 
-- **Account Holder Verification**: Confirms transaction is authorized by legitimate cardholder
-- **Fraud Pattern Detection**: Unusual name patterns may indicate stolen card usage
-- **Cross-Reference Capability**: Enables comparison with billing address and shipping information
-- **Risk Scoring Integration**: Name validation results factor into overall transaction risk assessment
+- Account Holder Verification: Confirms transaction is authorized by legitimate cardholder
+- Fraud Pattern Detection: Unusual name patterns may indicate stolen card usage
+- Cross-Reference Capability: Enables comparison with billing address and shipping information
+- Risk Scoring Integration: Name validation results factor into overall transaction risk assessment
 
 ##### International Compliance and Accessibility:
 
 Modern cardholder validation must accommodate global diversity:
 
-- **Multi-Cultural Support**: Handling names from various linguistic traditions
-- **Character Set Considerations**: Supporting international characters while maintaining security
-- **Legal Name Variations**: Accommodating hyphens, apostrophes, and other legitimate punctuation
-- **Accessibility Compliance**: Meeting ADA and international accessibility standards for name entry
+- Multi-Cultural Support: Handling names from various linguistic traditions
+- Character Set Considerations: Supporting international characters while maintaining security
+- Legal Name Variations: Accommodating hyphens, apostrophes, and other legitimate punctuation
+- Accessibility Compliance: Meeting ADA and international accessibility standards for name entry
 
 ```typescript startLineNumber=136
 /**
@@ -790,10 +790,10 @@ if (!trimmed) {
 
 The function begins with fundamental presence validation:
 
-- **Whitespace Normalization**: Removes leading/trailing spaces while preserving internal structure
-- **Empty Field Detection**: Prevents submission of blank or whitespace-only names
-- **User-Friendly Messaging**: Returns descriptive error messages from centralized message constants
-- **Required Field Enforcement**: Ensures compliance with payment processing requirements
+- Whitespace Normalization: Removes leading/trailing spaces while preserving internal structure
+- Empty Field Detection: Prevents submission of blank or whitespace-only names
+- User-Friendly Messaging: Returns descriptive error messages from centralized message constants
+- Required Field Enforcement: Ensures compliance with payment processing requirements
 
 ###### Tier 2: Length Boundary Validation
 
@@ -810,17 +810,17 @@ Length validation addresses multiple business and security concerns:
 
 ###### Minimum Length Requirements:
 
-- **Fraud Prevention**: Extremely short names may indicate fraudulent activity
-- **Data Quality**: Ensures sufficient information for identity verification
-- **Practical Constraints**: Accommodates legitimate short names while blocking suspicious entries
-- **International Standards**: Aligns with global payment processing name requirements
+- Fraud Prevention: Extremely short names may indicate fraudulent activity
+- Data Quality: Ensures sufficient information for identity verification
+- Practical Constraints: Accommodates legitimate short names while blocking suspicious entries
+- International Standards: Aligns with global payment processing name requirements
 
 ###### Maximum Length Protection:
 
-- **Database Constraints**: Prevents database overflow and storage issues
-- **Security Boundaries**: Blocks potential buffer overflow attacks
-- **User Experience**: Guides users toward reasonable input lengths
-- **System Performance**: Maintains efficient processing for downstream systems
+- Database Constraints: Prevents database overflow and storage issues
+- Security Boundaries: Blocks potential buffer overflow attacks
+- User Experience: Guides users toward reasonable input lengths
+- System Performance: Maintains efficient processing for downstream systems
 
 ###### Tier 3: Character Set and Format Validation
 
@@ -834,28 +834,28 @@ The regex pattern `/^[a-zA-Z\s\-'\.]+$/` implements character validation:
 
 ###### Allowed Character Categories:
 
-- **Alphabetic Characters (a-zA-Z)**: Supporting both uppercase and lowercase letters
-- **Whitespace (\s)**: Enabling multi-word names with proper spacing
-- **Hyphens (-)**: Supporting hyphenated surnames and compound names
-- **Apostrophes (')**: Accommodating possessive forms and contractions (O'Connor, D'Angelo)
-- **Periods (.)**: Supporting abbreviated titles and suffixes (Jr., Sr., III)
+- Alphabetic Characters (a-zA-Z): Supporting both uppercase and lowercase letters
+- Whitespace (\s): Enabling multi-word names with proper spacing
+- Hyphens (-): Supporting hyphenated surnames and compound names
+- Apostrophes ('): Accommodating possessive forms and contractions (O'Connor, D'Angelo)
+- Periods (.): Supporting abbreviated titles and suffixes (Jr., Sr., III)
 
 ###### International Name Support Examples:
 
-- **Irish Names**: O'Brien, McCarthy, O'Sullivan
-- **Scottish Names**: MacDonald, MacLeod, McDonald
-- **Hyphenated Names**: Smith-Johnson, Garcia-Rodriguez
-- **Titles and Suffixes**: John Smith Jr., Mary Johnson Sr.
-- **Multiple Words**: Mary Ann Johnson, Jean Paul Sartre
+- Irish Names: O'Brien, McCarthy, O'Sullivan
+- Scottish Names: MacDonald, MacLeod, McDonald
+- Hyphenated Names: Smith-Johnson, Garcia-Rodriguez
+- Titles and Suffixes: John Smith Jr., Mary Johnson Sr.
+- Multiple Words: Mary Ann Johnson, Jean Paul Sartre
 
 ###### Security and Injection Prevention:
 
 The character restriction provides multiple security benefits:
 
-- **SQL Injection Protection**: Blocks potentially malicious SQL characters
-- **XSS Prevention**: Prevents cross-site scripting attack vectors
-- **Data Sanitization**: Ensures clean data for database storage and display
-- **System Integrity**: Protects downstream systems from malformed input
+- SQL Injection Protection: Blocks potentially malicious SQL characters
+- XSS Prevention: Prevents cross-site scripting attack vectors
+- Data Sanitization: Ensures clean data for database storage and display
+- System Integrity: Protects downstream systems from malformed input
 
 ###### Error Message Strategy and User Experience:
 
@@ -867,10 +867,10 @@ return PAYMENT_ERROR_MESSAGES.CARDHOLDER_NAME_INVALID;
 
 The use of centralized error messages enables:
 
-- **Consistency**: Uniform error messaging across the application
-- **Internationalization**: Easy translation and localization support
-- **Maintenance**: Single source of truth for error message updates
-- **A/B Testing**: Ability to test different message effectiveness
+- Consistency: Uniform error messaging across the application
+- Internationalization: Easy translation and localization support
+- Maintenance: Single source of truth for error message updates
+- A/B Testing: Ability to test different message effectiveness
 
 ###### Null Return Pattern:
 
@@ -880,10 +880,10 @@ return null;
 
 Returning `null` for valid names follows established patterns:
 
-- **Success Indication**: `null` clearly indicates validation success
-- **Integration Friendly**: Works seamlessly with form validation libraries
-- **Type Safety**: TypeScript-compatible return type pattern
-- **Performance**: No object creation overhead for successful validations
+- Success Indication: `null` clearly indicates validation success
+- Integration Friendly: Works seamlessly with form validation libraries
+- Type Safety: TypeScript-compatible return type pattern
+- Performance: No object creation overhead for successful validations
 
 ###### Business Logic Integration and Extensibility:
 
@@ -891,26 +891,26 @@ Returning `null` for valid names follows established patterns:
 
 The validation function supports various compliance requirements:
 
-- **PCI DSS**: Proper handling and validation of cardholder data
-- **AML/KYC**: Supporting know-your-customer identity verification processes
-- **Regional Regulations**: Adaptable to local financial services requirements
-- **Accessibility Standards**: Inclusive design for diverse user populations
+- PCI DSS: Proper handling and validation of cardholder data
+- AML/KYC: Supporting know-your-customer identity verification processes
+- Regional Regulations: Adaptable to local financial services requirements
+- Accessibility Standards: Inclusive design for diverse user populations
 
 ###### Future Enhancement Capabilities:
 
 The modular design enables future enhancements:
 
-- **Advanced Pattern Matching**: More name pattern recognition
-- **Cultural Adaptation**: Region-specific validation rules
-- **Machine Learning Integration**: AI-powered name validation and fraud detection
-- **Real-Time Verification**: Integration with identity verification services
+- Advanced Pattern Matching: More name pattern recognition
+- Cultural Adaptation: Region-specific validation rules
+- Machine Learning Integration: AI-powered name validation and fraud detection
+- Real-Time Verification: Integration with identity verification services
 
 ###### Performance and Scalability:
 
-- **Regex Optimization**: Compiled pattern for efficient validation
-- **Single-Pass Processing**: Complete validation in one function call
-- **Memory Efficiency**: Minimal object creation and string manipulation
-- **Cache-Friendly**: Results can be cached for improved performance in high-volume scenarios
+- Regex Optimization: Compiled pattern for efficient validation
+- Single-Pass Processing: Complete validation in one function call
+- Memory Efficiency: Minimal object creation and string manipulation
+- Cache-Friendly: Results can be cached for improved performance in high-volume scenarios
 
 ## Enterprise Payment Method Validation Framework
 
@@ -922,19 +922,19 @@ The `validatePaymentMethodEnhanced` function represents the pinnacle of payment 
 
 Unlike single-field validation functions, this system performs coordinated validation across all payment components:
 
-- **Card Number Verification**: Combines format, type detection, and mathematical validation
-- **Identity Authentication**: Validates cardholder information for fraud prevention
-- **Temporal Verification**: Ensures payment method currency and validity period
-- **Security Code Validation**: Verifies possession-based authentication elements
+- Card Number Verification: Combines format, type detection, and mathematical validation
+- Identity Authentication: Validates cardholder information for fraud prevention
+- Temporal Verification: Ensures payment method currency and validity period
+- Security Code Validation: Verifies possession-based authentication elements
 
 ##### Error Collection and Reporting Architecture:
 
 The function implements error aggregation that provides complete validation feedback:
 
-- **Comprehensive Error Detection**: Identifies all validation issues simultaneously
-- **User-Friendly Reporting**: Presents actionable error information for user correction
-- **Developer Integration**: Provides structured error data for programmatic handling
-- **Audit Trail Support**: Maintains detailed validation attempt logging for compliance
+- Comprehensive Error Detection: Identifies all validation issues simultaneously
+- User-Friendly Reporting: Presents actionable error information for user correction
+- Developer Integration: Provides structured error data for programmatic handling
+- Audit Trail Support: Maintains detailed validation attempt logging for compliance
 
 ```typescript startLineNumber=165
 export function validatePaymentMethodEnhanced(
@@ -990,10 +990,10 @@ if (nameError) {
 
 The cardholder name validation implements:
 
-- **Delegation Pattern**: Leverages specialized validation function for name-specific logic
-- **Null Coalescing**: Provides empty string fallback for undefined cardholder names
-- **Error Propagation**: Directly incorporates specialized validation error messages
-- **Modular Architecture**: Separates concerns while maintaining integration simplicity
+- Delegation Pattern: Leverages specialized validation function for name-specific logic
+- Null Coalescing: Provides empty string fallback for undefined cardholder names
+- Error Propagation: Directly incorporates specialized validation error messages
+- Modular Architecture: Separates concerns while maintaining integration simplicity
 
 ###### Advanced Expiry Date Validation Logic:
 
@@ -1011,9 +1011,9 @@ if (!payment.cardExpire?.trim()) {
 
 The expiry validation framework provides:
 
-- **Presence Verification**: Ensures expiry date field contains meaningful data
-- **Specialized Validation**: Utilizes dedicated expiry validation function for temporal logic
-- **Granular Error Classification**: Distinguishes between different types of expiry validation failures
+- Presence Verification: Ensures expiry date field contains meaningful data
+- Specialized Validation: Utilizes dedicated expiry validation function for temporal logic
+- Granular Error Classification: Distinguishes between different types of expiry validation failures
 
 ###### Temporal Error Categorization:
 
@@ -1040,10 +1040,10 @@ if (!expiryValidation.isValid) {
 
 This nested conditional structure enables:
 
-- **Specific Error Messaging**: Provides precise feedback for different validation failure types
-- **User Experience Optimization**: Guides users with appropriate corrective actions
-- **Business Logic Support**: Enables different handling for expired vs. malformed dates
-- **Compliance Documentation**: Supports audit trails with detailed validation failure reasons
+- Specific Error Messaging: Provides precise feedback for different validation failure types
+- User Experience Optimization: Guides users with appropriate corrective actions
+- Business Logic Support: Enables different handling for expired vs. malformed dates
+- Compliance Documentation: Supports audit trails with detailed validation failure reasons
 
 ###### Optional CVV Validation with Intelligent Card Type Integration
 
@@ -1067,17 +1067,17 @@ This conditional validation framework implements:
 
 ###### Optional Field Philosophy:
 
-- **Graceful Omission**: Accepts transactions without CVV when not provided
-- **Presence-Based Validation**: Only validates CVV when explicitly provided by user
-- **Business Rule Flexibility**: Accommodates different merchant CVV requirements
-- **Risk-Based Processing**: Enables different risk assessment for CVV-present vs. CVV-absent transactions
+- Graceful Omission: Accepts transactions without CVV when not provided
+- Presence-Based Validation: Only validates CVV when explicitly provided by user
+- Business Rule Flexibility: Accommodates different merchant CVV requirements
+- Risk-Based Processing: Enables different risk assessment for CVV-present vs. CVV-absent transactions
 
 ###### Dynamic Card Type Integration:
 
-- **Contextual Validation**: Uses card number detection to determine appropriate CVV requirements
-- **Network-Specific Rules**: Applies card-specific CVV length requirements (3 for most, 4 for Amex)
-- **Fallback Protection**: Handles scenarios where card detection might fail
-- **Type Safety**: Provides safe fallback when card number is unavailable
+- Contextual Validation: Uses card number detection to determine appropriate CVV requirements
+- Network-Specific Rules: Applies card-specific CVV length requirements (3 for most, 4 for Amex)
+- Fallback Protection: Handles scenarios where card detection might fail
+- Type Safety: Provides safe fallback when card number is unavailable
 
 ###### Intelligent Error Messaging:
 
@@ -1085,10 +1085,10 @@ This conditional validation framework implements:
 message: `CVV must be ${cardDetection.cvvLength} digits`;
 ```
 
-- **Dynamic Messaging**: Adjusts error message based on detected card type requirements
-- **User-Specific Guidance**: Provides exact length requirements for user's specific card
-- **Template Interpolation**: Uses card detection results to customize error feedback
-- **Precision Communication**: Eliminates ambiguity about CVV format requirements
+- Dynamic Messaging: Adjusts error message based on detected card type requirements
+- User-Specific Guidance: Provides exact length requirements for user's specific card
+- Template Interpolation: Uses card detection results to customize error feedback
+- Precision Communication: Eliminates ambiguity about CVV format requirements
 
 ###### Comprehensive Validation Result Assembly:
 
@@ -1101,19 +1101,19 @@ return {
 
 The final result compilation provides:
 
-- **Binary Validation Status**: Clear boolean indicating overall validation success
-- **Complete Error Collection**: All validation failures aggregated for feedback
-- **Integration-Ready Format**: Structured result compatible with form validation libraries
-- **Audit Trail Support**: Detailed error information for logging and compliance requirements
+- Binary Validation Status: Clear boolean indicating overall validation success
+- Complete Error Collection: All validation failures aggregated for feedback
+- Integration-Ready Format: Structured result compatible with form validation libraries
+- Audit Trail Support: Detailed error information for logging and compliance requirements
 
 ###### Enterprise Integration Benefits:
 
 This validation approach enables:
 
-- **Payment Gateway Preparation**: Ensures data quality before expensive payment processing calls
-- **User Experience Optimization**: Provides specific, actionable feedback for validation failures
-- **Risk Management**: Supports risk-based authentication and fraud detection systems
-- **Compliance Assurance**: Maintains detailed validation records for regulatory requirements
+- Payment Gateway Preparation: Ensures data quality before expensive payment processing calls
+- User Experience Optimization: Provides specific, actionable feedback for validation failures
+- Risk Management: Supports risk-based authentication and fraud detection systems
+- Compliance Assurance: Maintains detailed validation records for regulatory requirements
 
 ###### Advanced Card Number Validation Module Analysis
 
@@ -1132,10 +1132,10 @@ if (!payment.cardNumber?.trim()) {
 
 This initial validation layer ensures:
 
-- **Required Field Enforcement**: Prevents processing without essential payment data
-- **Optional Chaining Safety**: Uses `?.` operator to handle undefined payment objects gracefully
-- **Whitespace Handling**: Trims input to detect truly empty fields vs. whitespace-only entries
-- **Error Structure**: Maintains consistent error object format for downstream processing
+- Required Field Enforcement: Prevents processing without essential payment data
+- Optional Chaining Safety: Uses `?.` operator to handle undefined payment objects gracefully
+- Whitespace Handling: Trims input to detect truly empty fields vs. whitespace-only entries
+- Error Structure: Maintains consistent error object format for downstream processing
 
 ###### Intelligent Card Type Detection and Validation:
 
@@ -1151,10 +1151,10 @@ if (cardDetection.type === "UNKNOWN") {
 
 The card detection integration provides:
 
-- **Brand Recognition**: Identifies specific card networks for appropriate processing
-- **Length Validation**: Ensures card numbers match network-specific length requirements
-- **Pattern Matching**: Verifies card numbers follow proper formatting patterns
-- **Business Logic Support**: Enables card-type-specific processing rules
+- Brand Recognition: Identifies specific card networks for appropriate processing
+- Length Validation: Ensures card numbers match network-specific length requirements
+- Pattern Matching: Verifies card numbers follow proper formatting patterns
+- Business Logic Support: Enables card-type-specific processing rules
 
 ###### Mathematical Validation:
 
@@ -1176,10 +1176,10 @@ if (!cardDetection.isValid) {
 
 This nested validation logic implements:
 
-- **Granular Error Reporting**: Distinguishes between mathematical and format validation failures
-- **Luhn Algorithm Integration**: Provides specific feedback for mathematical validation failures
-- **Fallback Error Handling**: Covers validation failures not specifically identified by Luhn algorithm
-- **Developer Debugging**: Enables precise identification of validation failure causes
+- Granular Error Reporting: Distinguishes between mathematical and format validation failures
+- Luhn Algorithm Integration: Provides specific feedback for mathematical validation failures
+- Fallback Error Handling: Covers validation failures not specifically identified by Luhn algorithm
+- Developer Debugging: Enables precise identification of validation failure causes
 
 ## Real-Time Payment Form Validation Architecture
 
@@ -1191,17 +1191,17 @@ Real-time form validation represents a critical user experience enhancement that
 
 Real-time validation significantly improves user experience through:
 
-- **Error Prevention**: Catching mistakes before form submission
-- **Guided Input**: Providing contextual hints as users type
-- **Conversion Improvement**: Reducing form abandonment due to validation errors
-- **Accessibility Enhancement**: Supporting screen readers with immediate error announcements
+- Error Prevention: Catching mistakes before form submission
+- Guided Input: Providing contextual hints as users type
+- Conversion Improvement: Reducing form abandonment due to validation errors
+- Accessibility Enhancement: Supporting screen readers with immediate error announcements
 
 ##### Psychological User Benefits:
 
-- **Confidence Building**: Users gain confidence as fields validate successfully
-- **Frustration Reduction**: Immediate feedback prevents accumulated validation errors
-- **Cognitive Load Reduction**: Users can focus on one field at a time
-- **Trust Development**: Professional validation behavior builds user trust in the platform
+- Confidence Building: Users gain confidence as fields validate successfully
+- Frustration Reduction: Immediate feedback prevents accumulated validation errors
+- Cognitive Load Reduction: Users can focus on one field at a time
+- Trust Development: Professional validation behavior builds user trust in the platform
 
 ```typescript startLineNumber=254
 /**
@@ -1291,10 +1291,10 @@ switch (field) {
 
 This pattern-matching approach enables:
 
-- **Type-Safe Field Handling**: Leverages TypeScript's discriminated unions for compile-time safety
-- **Optimized Performance**: Direct field routing without complex conditional chains
-- **Maintainable Code Structure**: Clear separation of validation logic by field type
-- **Extensible Architecture**: Easy addition of new payment fields without structural changes
+- Type-Safe Field Handling: Leverages TypeScript's discriminated unions for compile-time safety
+- Optimized Performance: Direct field routing without complex conditional chains
+- Maintainable Code Structure: Clear separation of validation logic by field type
+- Extensible Architecture: Easy addition of new payment fields without structural changes
 
 ###### Advanced Card Number Real-Time Validation:
 
@@ -1318,10 +1318,10 @@ case "cardNumber":
 
 This card number validation provides:
 
-- **Progressive Validation**: Validates format before mathematical correctness
-- **Granular Error Feedback**: Distinguishes between different validation failure types
-- **User Guidance**: Specific error messages guide users toward correct input
-- **Performance Optimization**: Early returns prevent unnecessary validation steps
+- Progressive Validation: Validates format before mathematical correctness
+- Granular Error Feedback: Distinguishes between different validation failure types
+- User Guidance: Specific error messages guide users toward correct input
+- Performance Optimization: Early returns prevent unnecessary validation steps
 
 ###### Streamlined Identity Validation Integration:
 
@@ -1332,10 +1332,10 @@ case "cardHolderName":
 
 The delegation to specialized validation functions:
 
-- **Code Reuse**: Leverages existing validation logic without duplication
-- **Consistency**: Ensures identical validation rules across different validation contexts
-- **Maintainability**: Single source of truth for cardholder name validation rules
-- **Testing Efficiency**: Enables focused testing of individual validation components
+- Code Reuse: Leverages existing validation logic without duplication
+- Consistency: Ensures identical validation rules across different validation contexts
+- Maintainability: Single source of truth for cardholder name validation rules
+- Testing Efficiency: Enables focused testing of individual validation components
 
 ###### Expiry Date Processing:
 
@@ -1357,10 +1357,10 @@ case "cardExpire":
 
 This temporal validation logic implements:
 
-- **Hierarchical Error Reporting**: Prioritizes format errors over temporal issues
-- **Contextual Messaging**: Provides specific guidance based on validation failure type
-- **Business Rule Integration**: Applies configurable future date limits
-- **User Experience Focus**: Helps users understand and correct temporal input errors
+- Hierarchical Error Reporting: Prioritizes format errors over temporal issues
+- Contextual Messaging: Provides specific guidance based on validation failure type
+- Business Rule Integration: Applies configurable future date limits
+- User Experience Focus: Helps users understand and correct temporal input errors
 
 ###### Dynamic CVV Validation with Context Awareness:
 
@@ -1379,10 +1379,10 @@ case "cvv":
 
 This context-aware CVV validation demonstrates:
 
-- **Cross-Field Intelligence**: Uses card number context to determine CVV requirements
-- **Fallback Strategy**: Gracefully handles missing or invalid card type information
-- **Dynamic Error Messaging**: Adjusts CVV length requirements based on detected card type
-- **User-Centric Feedback**: Provides exact digit requirements for user's specific card
+- Cross-Field Intelligence: Uses card number context to determine CVV requirements
+- Fallback Strategy: Gracefully handles missing or invalid card type information
+- Dynamic Error Messaging: Adjusts CVV length requirements based on detected card type
+- User-Centric Feedback: Provides exact digit requirements for user's specific card
 
 ###### Integration and Performance Benefits:
 
@@ -1390,17 +1390,17 @@ This context-aware CVV validation demonstrates:
 
 The function's design integrates seamlessly with popular form libraries:
 
-- **React Hook Form**: Direct integration with field-level validation
-- **Formik**: Compatible with field validation patterns
-- **Yup Schema Validation**: Can be wrapped in custom Yup validators
-- **Vanilla JavaScript**: Works with any form validation approach
+- React Hook Form: Direct integration with field-level validation
+- Formik: Compatible with field validation patterns
+- Yup Schema Validation: Can be wrapped in custom Yup validators
+- Vanilla JavaScript: Works with any form validation approach
 
 ###### Performance Optimizations:
 
-- **Single-Field Focus**: Validates only the field being edited
-- **Early Returns**: Minimizes processing for invalid input
-- **Efficient Card Detection**: Reuses card type detection across related validations
-- **Memory Efficiency**: No persistent state or complex object creation
+- Single-Field Focus: Validates only the field being edited
+- Early Returns: Minimizes processing for invalid input
+- Efficient Card Detection: Reuses card type detection across related validations
+- Memory Efficiency: No persistent state or complex object creation
 
 ###### Real-Time Integration Patterns:
 
@@ -1414,10 +1414,10 @@ const handleFieldChange = (field, value) => {
 
 This enables:
 
-- **Instant Feedback**: Users see validation results as they type
-- **Progressive Enhancement**: Works with or without JavaScript
-- **Accessibility Support**: Screen readers can announce validation changes
-- **Mobile Optimization**: Reduces need for multiple form submission attempts
+- Instant Feedback: Users see validation results as they type
+- Progressive Enhancement: Works with or without JavaScript
+- Accessibility Support: Screen readers can announce validation changes
+- Mobile Optimization: Reduces need for multiple form submission attempts
 
 ## Intelligent Card Number Formatting System
 
@@ -1429,19 +1429,19 @@ Card number formatting represents a critical user experience enhancement that tr
 
 Proper card number formatting leverages human cognitive patterns:
 
-- **Chunking Psychology**: Breaking long numbers into digestible segments improves comprehension
-- **Pattern Recognition**: Formatted numbers match physical card layouts users expect
-- **Error Detection**: Properly spaced numbers make typos more visually apparent
-- **Confidence Building**: Familiar formatting patterns increase user trust and confidence
+- Chunking Psychology: Breaking long numbers into digestible segments improves comprehension
+- Pattern Recognition: Formatted numbers match physical card layouts users expect
+- Error Detection: Properly spaced numbers make typos more visually apparent
+- Confidence Building: Familiar formatting patterns increase user trust and confidence
 
 ##### Accessibility and Inclusive Design:
 
 Formatted card numbers support diverse user needs:
 
-- **Visual Impairment Support**: Screen readers can parse formatted numbers more effectively
-- **Cognitive Accessibility**: Reduced cognitive load for users with processing difficulties
-- **Mobile Optimization**: Proper spacing improves readability on small screens
-- **International Usability**: Accommodates different cultural number formatting expectations
+- Visual Impairment Support: Screen readers can parse formatted numbers more effectively
+- Cognitive Accessibility: Reduced cognitive load for users with processing difficulties
+- Mobile Optimization: Proper spacing improves readability on small screens
+- International Usability: Accommodates different cultural number formatting expectations
 
 ```typescript startLineNumber=319
 /**
@@ -1476,10 +1476,10 @@ const cardType = detectCardType(cleaned);
 
 The function begins with input processing:
 
-- **Whitespace Removal**: Eliminates existing formatting to enable consistent reprocessing
-- **Card Type Detection**: Identifies specific card network to apply appropriate formatting rules
-- **Pattern Recognition**: Leverages existing card detection infrastructure for formatting decisions
-- **Idempotent Processing**: Multiple formatting applications produce consistent results
+- Whitespace Removal: Eliminates existing formatting to enable consistent reprocessing
+- Card Type Detection: Identifies specific card network to apply appropriate formatting rules
+- Pattern Recognition: Leverages existing card detection infrastructure for formatting decisions
+- Idempotent Processing: Multiple formatting applications produce consistent results
 
 ###### Network-Specific Formatting Logic:
 
@@ -1493,10 +1493,10 @@ if (cardType.type === "AMERICAN_EXPRESS") {
 
 American Express cards receive specialized formatting:
 
-- **4-6-5 Pattern**: Matches physical card layout (4 digits, 6 digits, 5 digits)
-- **Visual Alignment**: Corresponds to raised number positioning on physical cards
-- **Network Standards**: Follows American Express official formatting guidelines
-- **User Familiarity**: Matches format users expect from their physical cards
+- 4-6-5 Pattern: Matches physical card layout (4 digits, 6 digits, 5 digits)
+- Visual Alignment: Corresponds to raised number positioning on physical cards
+- Network Standards: Follows American Express official formatting guidelines
+- User Familiarity: Matches format users expect from their physical cards
 
 ###### Universal Card Network Formatting:
 
@@ -1506,44 +1506,44 @@ return cleaned.replace(/(\d{4})(?=\d)/g, "$1 ");
 
 The default formatting implements regex logic:
 
-- **Lookahead Assertion `(?=\d)`**: Ensures spaces are only added when more digits follow
-- **Global Flag `g`**: Applies formatting to all applicable positions in the card number
-- **Group Capture `(\d{4})`**: Captures four-digit groups for replacement
-- **Conditional Spacing**: Prevents trailing spaces on incomplete card numbers
+- Lookahead Assertion `(?=\d)`: Ensures spaces are only added when more digits follow
+- Global Flag `g`: Applies formatting to all applicable positions in the card number
+- Group Capture `(\d{4})`: Captures four-digit groups for replacement
+- Conditional Spacing: Prevents trailing spaces on incomplete card numbers
 
 ###### Technical Implementation Analysis:
 
 ###### Regex Pattern Breakdown:
 
-- **`(\d{4})`**: Captures exactly four consecutive digits
-- **`(?=\d)`**: Positive lookahead ensuring at least one more digit follows
-- **`g` flag**: Global replacement for all matches in the string
-- **`$1 ` replacement**: Replaces matched group with itself plus a space
+- `(\d{4})`: Captures exactly four consecutive digits
+- `(?=\d)`: Positive lookahead ensuring at least one more digit follows
+- `g` flag: Global replacement for all matches in the string
+- `$1 ` replacement: Replaces matched group with itself plus a space
 
 ###### Edge Case Handling:
 
 The formatting logic gracefully handles various input scenarios:
 
-- **Partial Numbers**: Incomplete card numbers format appropriately without trailing spaces
-- **Over-Length Input**: Long strings format properly with excess digits maintained
-- **Empty Input**: Empty or whitespace-only strings process without errors
-- **Invalid Characters**: Non-numeric characters are preserved through the cleaning process
+- Partial Numbers: Incomplete card numbers format appropriately without trailing spaces
+- Over-Length Input: Long strings format properly with excess digits maintained
+- Empty Input: Empty or whitespace-only strings process without errors
+- Invalid Characters: Non-numeric characters are preserved through the cleaning process
 
 ###### Performance and User Experience:
 
 ###### Real-Time Formatting Benefits:
 
-- **Immediate Visual Feedback**: Users see properly formatted numbers as they type
-- **Error Prevention**: Proper spacing makes digit transposition errors more apparent
-- **Input Guidance**: Visual patterns guide users toward correct input length
-- **Conversion Optimization**: Professional formatting reduces form abandonment
+- Immediate Visual Feedback: Users see properly formatted numbers as they type
+- Error Prevention: Proper spacing makes digit transposition errors more apparent
+- Input Guidance: Visual patterns guide users toward correct input length
+- Conversion Optimization: Professional formatting reduces form abandonment
 
 ###### Cross-Platform Compatibility:
 
-- **Mobile Optimization**: Proper spacing improves readability on small screens
-- **Copy-Paste Support**: Handles formatted input from external sources
-- **Keyboard Navigation**: Maintains cursor position appropriately during formatting
-- **Screen Reader Support**: Formatted output is more accessible to assistive technologies
+- Mobile Optimization: Proper spacing improves readability on small screens
+- Copy-Paste Support: Handles formatted input from external sources
+- Keyboard Navigation: Maintains cursor position appropriately during formatting
+- Screen Reader Support: Formatted output is more accessible to assistive technologies
 
 ###### Integration Patterns:
 
@@ -1566,10 +1566,10 @@ const displayCardNumber = formatCardNumber(storedCardNumber);
 
 ###### Security Considerations:
 
-- **No Data Persistence**: Formatting doesn't store or cache sensitive data
-- **Client-Side Processing**: Formatting occurs locally without network transmission
-- **Memory Safety**: No sensitive data retained in function scope after execution
-- **Injection Prevention**: Input sanitization prevents malicious formatting attempts
+- No Data Persistence: Formatting doesn't store or cache sensitive data
+- Client-Side Processing: Formatting occurs locally without network transmission
+- Memory Safety: No sensitive data retained in function scope after execution
+- Injection Prevention: Input sanitization prevents malicious formatting attempts
 
 ## Advanced Payment Card Security Masking
 
@@ -1581,17 +1581,17 @@ Card number masking represents a fundamental security practice that balances use
 
 Card masking supports critical regulatory compliance:
 
-- **Data Protection**: Prevents exposure of sensitive payment data in user interfaces
-- **Audit Trail Security**: Enables transaction logging without storing complete card numbers
-- **Screen Capture Protection**: Reduces risk from screenshots or screen recording
-- **Social Engineering Prevention**: Limits information available to potential attackers
+- Data Protection: Prevents exposure of sensitive payment data in user interfaces
+- Audit Trail Security: Enables transaction logging without storing complete card numbers
+- Screen Capture Protection: Reduces risk from screenshots or screen recording
+- Social Engineering Prevention: Limits information available to potential attackers
 
 ##### Multi-Layer Security Benefits:
 
-- **Shoulder Surfing Protection**: Masks numbers from casual observation
-- **Database Security**: Enables reference display without storing complete numbers
-- **Support Interaction Safety**: Allows customer service verification without full exposure
-- **Regulatory Reporting**: Supports compliance documentation with masked data examples
+- Shoulder Surfing Protection: Masks numbers from casual observation
+- Database Security: Enables reference display without storing complete numbers
+- Support Interaction Safety: Allows customer service verification without full exposure
+- Regulatory Reporting: Supports compliance documentation with masked data examples
 
 ```typescript startLineNumber=335
 /**
@@ -1623,10 +1623,10 @@ if (cleaned.length < 4) return cleaned;
 
 The function implements defensive security practices:
 
-- **Whitespace Normalization**: Removes formatting to ensure consistent processing
-- **Minimum Length Protection**: Prevents masking of card numbers too short for safe masking
-- **Edge Case Handling**: Gracefully handles partial or invalid card numbers
-- **Data Integrity**: Preserves original input when masking would be inappropriate
+- Whitespace Normalization: Removes formatting to ensure consistent processing
+- Minimum Length Protection: Prevents masking of card numbers too short for safe masking
+- Edge Case Handling: Gracefully handles partial or invalid card numbers
+- Data Integrity: Preserves original input when masking would be inappropriate
 
 ###### Advanced Masking Strategy:
 
@@ -1641,19 +1641,19 @@ This masking implementation demonstrates security design:
 
 The retention of the final four digits serves multiple security and usability purposes:
 
-- **User Verification**: Enables cardholders to confirm correct card selection
-- **Customer Service**: Allows support staff to verify card without full exposure
-- **Industry Standard**: Follows established financial industry masking practices
-- **Fraud Prevention**: Insufficient information for fraudulent use while maintaining usability
+- User Verification: Enables cardholders to confirm correct card selection
+- Customer Service: Allows support staff to verify card without full exposure
+- Industry Standard: Follows established financial industry masking practices
+- Fraud Prevention: Insufficient information for fraudulent use while maintaining usability
 
 ###### Visual Masking Character Selection:
 
 The use of bullet characters (`•`) provides optimal security and readability:
 
-- **Visual Distinction**: Clearly indicates masked content vs. actual numbers
-- **Character Safety**: Unicode bullet character renders consistently across platforms
-- **Screen Reader Compatibility**: Assistive technologies can properly announce masked content
-- **Security Psychology**: Creates appropriate visual barrier suggesting protected data
+- Visual Distinction: Clearly indicates masked content vs. actual numbers
+- Character Safety: Unicode bullet character renders consistently across platforms
+- Screen Reader Compatibility: Assistive technologies can properly announce masked content
+- Security Psychology: Creates appropriate visual barrier suggesting protected data
 
 ###### Intelligent Formatting Integration:
 
@@ -1663,10 +1663,10 @@ return formatCardNumber(masked + lastFour);
 
 The integration with formatting functions provides:
 
-- **Consistent Presentation**: Maintains expected card number spacing patterns
-- **User Experience**: Masked numbers maintain familiar visual structure
-- **Cross-Function Compatibility**: Leverages existing formatting infrastructure
-- **Network Awareness**: Preserves card-type-specific formatting even in masked state
+- Consistent Presentation: Maintains expected card number spacing patterns
+- User Experience: Masked numbers maintain familiar visual structure
+- Cross-Function Compatibility: Leverages existing formatting infrastructure
+- Network Awareness: Preserves card-type-specific formatting even in masked state
 
 ###### Security and Compliance Benefits:
 
@@ -1674,17 +1674,17 @@ The integration with formatting functions provides:
 
 The masking function provides multiple layers of protection:
 
-- **Visual Obfuscation**: Prevents casual observation of sensitive data
-- **Copy Protection**: Copied masked numbers are unusable for fraudulent purposes
-- **Database Safety**: Enables reference storage without full number retention
-- **Transmission Security**: Reduces risk during data transmission and logging
+- Visual Obfuscation: Prevents casual observation of sensitive data
+- Copy Protection: Copied masked numbers are unusable for fraudulent purposes
+- Database Safety: Enables reference storage without full number retention
+- Transmission Security: Reduces risk during data transmission and logging
 
 ###### Compliance Framework Support:
 
-- **PCI DSS Alignment**: Meets requirements for cardholder data protection
-- **GDPR Compliance**: Supports data minimization and protection principles
-- **SOX Compliance**: Enables financial audit trails with protected sensitive data
-- **Industry Standards**: Follows established financial services security practices
+- PCI DSS Alignment: Meets requirements for cardholder data protection
+- GDPR Compliance: Supports data minimization and protection principles
+- SOX Compliance: Enables financial audit trails with protected sensitive data
+- Industry Standards: Follows established financial services security practices
 
 ###### Advanced Use Case Applications:
 
@@ -1728,17 +1728,17 @@ const supportView = {
 
 ###### Memory Management:
 
-- **No Sensitive Data Retention**: Function doesn't store unmasked data after execution
-- **Efficient String Operations**: Minimal string manipulation for optimal performance
-- **Garbage Collection Friendly**: No persistent references to sensitive data
-- **Memory Safety**: Intermediate variables are automatically cleaned up
+- No Sensitive Data Retention: Function doesn't store unmasked data after execution
+- Efficient String Operations: Minimal string manipulation for optimal performance
+- Garbage Collection Friendly: No persistent references to sensitive data
+- Memory Safety: Intermediate variables are automatically cleaned up
 
 ###### Cross-Platform Security:
 
-- **Client-Side Safety**: Safe for client-side execution without data exposure
-- **Server-Side Protection**: Suitable for server-side masking before data transmission
-- **API Response Safety**: Enables secure API responses with protected payment data
-- **Logging Compatibility**: Allows secure logging of masked payment information for audit purposes
+- Client-Side Safety: Safe for client-side execution without data exposure
+- Server-Side Protection: Suitable for server-side masking before data transmission
+- API Response Safety: Enables secure API responses with protected payment data
+- Logging Compatibility: Allows secure logging of masked payment information for audit purposes
 
 ## Enterprise Payment Method Normalization Framework
 
@@ -1750,19 +1750,19 @@ Payment method normalization represents a critical data processing phase that tr
 
 Normalized payment data enables seamless integration across various system components:
 
-- **Database Consistency**: Standardized formats ensure reliable data storage and retrieval
-- **API Interoperability**: Consistent data structures facilitate third-party integrations
-- **Payment Gateway Integration**: Normalized data meets processor-specific format requirements
-- **Analytics and Reporting**: Standardized data enables accurate business intelligence and reporting
+- Database Consistency: Standardized formats ensure reliable data storage and retrieval
+- API Interoperability: Consistent data structures facilitate third-party integrations
+- Payment Gateway Integration: Normalized data meets processor-specific format requirements
+- Analytics and Reporting: Standardized data enables accurate business intelligence and reporting
 
 ##### Quality Assurance and Reliability:
 
 Normalization processes enhance overall data quality:
 
-- **Format Consistency**: Eliminates variations in data representation
-- **Whitespace Management**: Removes extraneous formatting that could cause processing issues
-- **Case Standardization**: Ensures consistent character casing for reliable comparisons
-- **Structure Optimization**: Optimizes data structure for efficient processing and storage
+- Format Consistency: Eliminates variations in data representation
+- Whitespace Management: Removes extraneous formatting that could cause processing issues
+- Case Standardization: Ensures consistent character casing for reliable comparisons
+- Structure Optimization: Optimizes data structure for efficient processing and storage
 
 ```typescript startLineNumber=348
 /**
@@ -1818,10 +1818,10 @@ if (!validation.isValid) {
 
 The validation phase implements a strict quality gate:
 
-- **Early Termination**: Prevents processing of invalid data, saving computational resources
-- **Complete Error Reporting**: Returns validation results for user feedback
-- **Data Integrity Assurance**: Ensures only verified, secure data proceeds to normalization
-- **Consistency Guarantee**: Leverages proven validation logic for reliable data quality
+- Early Termination: Prevents processing of invalid data, saving computational resources
+- Complete Error Reporting: Returns validation results for user feedback
+- Data Integrity Assurance: Ensures only verified, secure data proceeds to normalization
+- Consistency Guarantee: Leverages proven validation logic for reliable data quality
 
 ###### Phase 2: Intelligent Data Normalization:
 
@@ -1831,10 +1831,10 @@ The validation phase implements a strict quality gate:
 const cardDetection = detectCardType(payment.cardNumber!);
 ```
 
-- **Brand Intelligence**: Captures card network information for enhanced processing
-- **Non-Null Assertion Safety**: Uses `!` operator safely after validation confirmation
-- **Type-Specific Processing**: Enables card-network-specific handling in downstream systems
-- **Metadata Enrichment**: Adds valuable card type information to normalized result
+- Brand Intelligence: Captures card network information for enhanced processing
+- Non-Null Assertion Safety: Uses `!` operator safely after validation confirmation
+- Type-Specific Processing: Enables card-network-specific handling in downstream systems
+- Metadata Enrichment: Adds valuable card type information to normalized result
 
 ###### Comprehensive Field-by-Field Normalization:
 
@@ -1844,10 +1844,10 @@ const cardDetection = detectCardType(payment.cardNumber!);
 cardNumber: payment.cardNumber!.replace(/\s+/g, ""),
 ```
 
-- **Whitespace Elimination**: Removes all spacing for consistent database storage
-- **Format Standardization**: Creates uniform card number representation
-- **Processing Optimization**: Eliminates formatting variations that could cause processing issues
-- **Security Enhancement**: Reduces potential attack vectors from malformed input
+- Whitespace Elimination: Removes all spacing for consistent database storage
+- Format Standardization: Creates uniform card number representation
+- Processing Optimization: Eliminates formatting variations that could cause processing issues
+- Security Enhancement: Reduces potential attack vectors from malformed input
 
 ###### Brand Classification:
 
@@ -1855,10 +1855,10 @@ cardNumber: payment.cardNumber!.replace(/\s+/g, ""),
 cardType: cardDetection.brand,
 ```
 
-- **Human-Readable Branding**: Stores user-friendly card type names
-- **Display Optimization**: Provides ready-to-use brand information for user interfaces
-- **Business Logic Support**: Enables brand-specific processing rules and fee structures
-- **Analytics Enhancement**: Supports business intelligence and conversion analysis
+- Human-Readable Branding: Stores user-friendly card type names
+- Display Optimization: Provides ready-to-use brand information for user interfaces
+- Business Logic Support: Enables brand-specific processing rules and fee structures
+- Analytics Enhancement: Supports business intelligence and conversion analysis
 
 ###### Temporal Data Preservation:
 
@@ -1866,10 +1866,10 @@ cardType: cardDetection.brand,
 cardExpire: payment.cardExpire!.trim(),
 ```
 
-- **Whitespace Cleanup**: Removes extraneous spacing while preserving date structure
-- **Format Integrity**: Maintains validated date format for reliable temporal processing
-- **Downstream Compatibility**: Ensures date format works with payment processors
-- **Data Consistency**: Standardizes temporal representation across the system
+- Whitespace Cleanup: Removes extraneous spacing while preserving date structure
+- Format Integrity: Maintains validated date format for reliable temporal processing
+- Downstream Compatibility: Ensures date format works with payment processors
+- Data Consistency: Standardizes temporal representation across the system
 
 ###### Advanced Name Normalization:
 
@@ -1879,10 +1879,10 @@ cardHolderName: payment.cardHolderName!.trim().replace(/\s+/g, " "),
 
 This name processing implements:
 
-- **Leading/Trailing Whitespace Removal**: Eliminates extraneous spacing
-- **Internal Space Normalization**: Converts multiple spaces to single spaces
-- **Format Consistency**: Ensures uniform name representation
-- **Database Optimization**: Prevents storage inefficiencies from varied spacing
+- Leading/Trailing Whitespace Removal: Eliminates extraneous spacing
+- Internal Space Normalization: Converts multiple spaces to single spaces
+- Format Consistency: Ensures uniform name representation
+- Database Optimization: Prevents storage inefficiencies from varied spacing
 
 ###### Optional Security Code Handling:
 
@@ -1890,10 +1890,10 @@ This name processing implements:
 cvv: payment.cvv?.trim(),
 ```
 
-- **Optional Processing**: Gracefully handles presence or absence of CVV data
-- **Security Maintenance**: Trims sensitive data without compromising security
-- **Null Safety**: Uses optional chaining for safe processing
-- **Flexibility Support**: Accommodates different merchant CVV requirements
+- Optional Processing: Gracefully handles presence or absence of CVV data
+- Security Maintenance: Trims sensitive data without compromising security
+- Null Safety: Uses optional chaining for safe processing
+- Flexibility Support: Accommodates different merchant CVV requirements
 
 ###### Comprehensive Result Assembly:
 
@@ -1909,10 +1909,10 @@ return {
 
 The success result provides:
 
-- **Clear Success Indication**: Boolean flag confirms successful processing
-- **Empty Error Array**: Maintains interface consistency with validation results
-- **Complete Normalized Data**: Provides fully processed, ready-to-use payment information
-- **Type Safety**: Returns properly typed result for downstream processing
+- Clear Success Indication: Boolean flag confirms successful processing
+- Empty Error Array: Maintains interface consistency with validation results
+- Complete Normalized Data: Provides fully processed, ready-to-use payment information
+- Type Safety: Returns properly typed result for downstream processing
 
 ###### Enterprise Integration Benefits:
 
@@ -1920,24 +1920,24 @@ The success result provides:
 
 The normalized data enables seamless payment gateway integration:
 
-- **Processor Compatibility**: Standardized formats meet various payment processor requirements
-- **Reduced Processing Errors**: Clean data reduces gateway rejection rates
-- **Enhanced Security**: Proper normalization supports secure payment processing
-- **Audit Trail Quality**: Consistent data improves transaction logging and compliance
+- Processor Compatibility: Standardized formats meet various payment processor requirements
+- Reduced Processing Errors: Clean data reduces gateway rejection rates
+- Enhanced Security: Proper normalization supports secure payment processing
+- Audit Trail Quality: Consistent data improves transaction logging and compliance
 
 ###### Database and Storage Optimization:
 
-- **Index Efficiency**: Standardized formats improve database query performance
-- **Storage Consistency**: Uniform data representation reduces storage overhead
-- **Data Integrity**: Normalized formats prevent data corruption and inconsistencies
-- **Migration Safety**: Standardized data structure facilitates system migrations and upgrades
+- Index Efficiency: Standardized formats improve database query performance
+- Storage Consistency: Uniform data representation reduces storage overhead
+- Data Integrity: Normalized formats prevent data corruption and inconsistencies
+- Migration Safety: Standardized data structure facilitates system migrations and upgrades
 
 ###### Business Intelligence and Analytics:
 
-- **Reporting Accuracy**: Consistent data enables reliable business reporting
-- **Trend Analysis**: Standardized card types support conversion and preference analysis
-- **Risk Assessment**: Clean data improves fraud detection and risk scoring accuracy
-- **Customer Insights**: Normalized payment preferences support personalization efforts
+- Reporting Accuracy: Consistent data enables reliable business reporting
+- Trend Analysis: Standardized card types support conversion and preference analysis
+- Risk Assessment: Clean data improves fraud detection and risk scoring accuracy
+- Customer Insights: Normalized payment preferences support personalization efforts
 
 ## Intelligent Expiry Date Formatting System
 
@@ -1949,19 +1949,19 @@ Expiry date formatting represents a critical user experience enhancement that tr
 
 Real-time expiry formatting provides immediate user benefits:
 
-- **Visual Pattern Recognition**: Users immediately see the expected MM/YY format
-- **Input Guidance**: Automatic formatting guides users toward correct date entry
-- **Error Prevention**: Proper formatting reduces input mistakes and validation errors
-- **Conversion Optimization**: Professional formatting behavior increases user confidence and completion rates
+- Visual Pattern Recognition: Users immediately see the expected MM/YY format
+- Input Guidance: Automatic formatting guides users toward correct date entry
+- Error Prevention: Proper formatting reduces input mistakes and validation errors
+- Conversion Optimization: Professional formatting behavior increases user confidence and completion rates
 
 ##### Cross-Platform Consistency:
 
 Formatted expiry dates ensure consistent user experience across devices:
 
-- **Mobile Optimization**: Clear formatting improves usability on small screens
-- **Accessibility Support**: Screen readers can better parse properly formatted dates
-- **International Compatibility**: Standardized format works across different locales
-- **Copy-Paste Reliability**: Formatted output maintains consistency when copied
+- Mobile Optimization: Clear formatting improves usability on small screens
+- Accessibility Support: Screen readers can better parse properly formatted dates
+- International Compatibility: Standardized format works across different locales
+- Copy-Paste Reliability: Formatted output maintains consistency when copied
 
 ```typescript startLineNumber=383
 /**
@@ -1992,10 +1992,10 @@ const cleaned = value.replace(/\D/g, "");
 
 The function begins with input processing:
 
-- **Non-Digit Removal**: Uses regex `/\D/g` to eliminate all non-numeric characters
-- **Global Replacement**: Processes entire input string for complete sanitization
-- **Security Enhancement**: Prevents injection of malicious non-numeric content
-- **Format Preparation**: Creates clean numeric base for consistent formatting
+- Non-Digit Removal: Uses regex `/\D/g` to eliminate all non-numeric characters
+- Global Replacement: Processes entire input string for complete sanitization
+- Security Enhancement: Prevents injection of malicious non-numeric content
+- Format Preparation: Creates clean numeric base for consistent formatting
 
 ###### Intelligent Length-Based Formatting Logic:
 
@@ -2012,17 +2012,17 @@ This conditional formatting implements user experience design:
 
 When users have entered at least two digits:
 
-- **Month Completion Detection**: Recognizes when month portion is complete
-- **Automatic Separator Insertion**: Adds "/" character to guide year input
-- **Progressive Enhancement**: Builds format as user types
-- **Visual Feedback**: Immediate formatting confirmation of correct input
+- Month Completion Detection: Recognizes when month portion is complete
+- Automatic Separator Insertion: Adds "/" character to guide year input
+- Progressive Enhancement: Builds format as user types
+- Visual Feedback: Immediate formatting confirmation of correct input
 
 ###### Substring Extraction Strategy:
 
-- **Month Isolation**: `slice(0, 2)` extracts first two digits for month
-- **Year Limitation**: `slice(2, 4)` restricts year to two digits maximum
-- **Boundary Enforcement**: Prevents over-length input through controlled slicing
-- **Format Consistency**: Ensures MM/YY pattern regardless of input length
+- Month Isolation: `slice(0, 2)` extracts first two digits for month
+- Year Limitation: `slice(2, 4)` restricts year to two digits maximum
+- Boundary Enforcement: Prevents over-length input through controlled slicing
+- Format Consistency: Ensures MM/YY pattern regardless of input length
 
 ###### Edge Case and User Experience Handling:
 
@@ -2030,35 +2030,35 @@ When users have entered at least two digits:
 
 For input with fewer than two digits:
 
-- **Graceful Fallback**: Returns unformatted input to maintain user control
-- **No Premature Formatting**: Avoids confusing formatting with insufficient input
-- **Progressive Enhancement**: Allows natural typing progression
-- **User Agency**: Maintains user's intended input until formatting threshold
+- Graceful Fallback: Returns unformatted input to maintain user control
+- No Premature Formatting: Avoids confusing formatting with insufficient input
+- Progressive Enhancement: Allows natural typing progression
+- User Agency: Maintains user's intended input until formatting threshold
 
 ###### Over-Length Input Protection:
 
 The slicing operations provide automatic length control:
 
-- **Month Boundary**: Maximum two digits for month (01-12)
-- **Year Limitation**: Restricts year input to two digits (YY format)
-- **Automatic Truncation**: Prevents invalid input lengths
-- **User Guidance**: Length restrictions guide toward correct format
+- Month Boundary: Maximum two digits for month (01-12)
+- Year Limitation: Restricts year input to two digits (YY format)
+- Automatic Truncation: Prevents invalid input lengths
+- User Guidance: Length restrictions guide toward correct format
 
 ###### Technical Implementation Analysis:
 
 ###### Regular Expression Efficiency:
 
-- **Global Flag Performance**: Single pass processing for all non-digits
-- **Character Class Optimization**: `\D` provides efficient non-digit matching
-- **Memory Efficiency**: No intermediate arrays or complex string operations
-- **Processing Speed**: Optimal for real-time input formatting
+- Global Flag Performance: Single pass processing for all non-digits
+- Character Class Optimization: `\D` provides efficient non-digit matching
+- Memory Efficiency: No intermediate arrays or complex string operations
+- Processing Speed: Optimal for real-time input formatting
 
 ###### String Manipulation Optimization:
 
-- **Slice Operations**: Efficient substring extraction without array conversion
-- **Concatenation Strategy**: Direct string building for optimal performance
-- **Minimal Processing**: Only essential operations for formatting
-- **Memory Conservation**: No unnecessary string copies or intermediate variables
+- Slice Operations: Efficient substring extraction without array conversion
+- Concatenation Strategy: Direct string building for optimal performance
+- Minimal Processing: Only essential operations for formatting
+- Memory Conservation: No unnecessary string copies or intermediate variables
 
 ###### Real-Time Integration Patterns:
 
@@ -2090,24 +2090,24 @@ const handleExpiryInput = (value) => {
 
 ###### Cognitive Load Reduction:
 
-- **Pattern Recognition**: Users immediately understand expected format
-- **Mental Model Alignment**: Formatting matches credit card date representation
-- **Error Prevention**: Visual cues prevent common input mistakes
-- **Confidence Building**: Professional formatting increases user trust
+- Pattern Recognition: Users immediately understand expected format
+- Mental Model Alignment: Formatting matches credit card date representation
+- Error Prevention: Visual cues prevent common input mistakes
+- Confidence Building: Professional formatting increases user trust
 
 ###### Accessibility and Inclusion:
 
-- **Screen Reader Support**: Formatted dates are more accessible to assistive technologies
-- **Motor Accessibility**: Reduced need for precise cursor positioning
-- **Cognitive Accessibility**: Clear visual patterns support users with processing difficulties
-- **Mobile Optimization**: Touch-friendly formatting for mobile device users
+- Screen Reader Support: Formatted dates are more accessible to assistive technologies
+- Motor Accessibility: Reduced need for precise cursor positioning
+- Cognitive Accessibility: Clear visual patterns support users with processing difficulties
+- Mobile Optimization: Touch-friendly formatting for mobile device users
 
 ###### Cross-Browser and Platform Compatibility:
 
-- **Universal Compatibility**: Works across all modern browsers and devices
-- **Performance Consistency**: Lightweight processing suitable for any platform
-- **Progressive Enhancement**: Functions properly with or without advanced browser features
-- **Backwards Compatibility**: Fallback behavior maintains functionality on older systems
+- Universal Compatibility: Works across all modern browsers and devices
+- Performance Consistency: Lightweight processing suitable for any platform
+- Progressive Enhancement: Functions properly with or without advanced browser features
+- Backwards Compatibility: Fallback behavior maintains functionality on older systems
 
 ## Next Steps
 

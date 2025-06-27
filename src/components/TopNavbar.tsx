@@ -144,6 +144,18 @@ export default function TopNavbar({ onToggleSidebar, sidebarOpen }: TopNavbarPro
               <span className="font-bold text-lg">Web Intro</span>
             </div>
           </div>
+
+          {/* Desktop logo - visible when sidebar is hidden */}
+          {!sidebarOpen && (
+            <div className="hidden lg:flex ml-2">
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center justify-center bg-primary rounded-lg h-8 w-8">
+                  <span className="font-bold text-lg text-white">W</span>
+                </div>
+                <span className="font-bold text-sidebar-text text-xl">Web Intro</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Center - Search bar */}

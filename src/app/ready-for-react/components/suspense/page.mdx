@@ -12,10 +12,10 @@ import BackToTop from "@/components/BackToTop";
 
 ### Core Concepts
 
-- **`<Suspense>` Boundary**: A component that catches thrown promises and manages the loading state for its children
-- **Fallback UI**: React elements displayed while waiting for suspended components to resolve
-- **Concurrent Features**: `<Suspense>` works seamlessly with React 18's concurrent features like transitions and streaming SSR
-- **Error Boundaries**: Must be used alongside `<Suspense>` to handle promise rejections gracefully
+- `<Suspense>` Boundary: A component that catches thrown promises and manages the loading state for its children
+- Fallback UI: React elements displayed while waiting for suspended components to resolve
+- Concurrent Features: `<Suspense>` works seamlessly with React 18's concurrent features like transitions and streaming SSR
+- Error Boundaries: Must be used alongside `<Suspense>` to handle promise rejections gracefully
 
 ## `<Suspense>` VS `<SuspenseList>`
 
@@ -43,19 +43,19 @@ Understanding the difference between `<Suspense>` and `<SuspenseList>` is crucia
 
 ### Key Use Cases for `<SuspenseList>`
 
-- **Product Grids**: Coordinate loading of product cards in e-commerce applications to prevent jarring layout shifts
-- **News Feeds**: Control the order in which articles appear, ensuring a smooth reading experience
-- **Dashboard Widgets**: Orchestrate loading of multiple data visualization components
-- **Image Galleries**: Manage the reveal order of images to create pleasant loading animations
-- **User Profile Lists**: Coordinate loading of multiple user profile cards or tiles
+- Product Grids: Coordinate loading of product cards in e-commerce applications to prevent jarring layout shifts
+- News Feeds: Control the order in which articles appear, ensuring a smooth reading experience
+- Dashboard Widgets: Orchestrate loading of multiple data visualization components
+- Image Galleries: Manage the reveal order of images to create pleasant loading animations
+- User Profile Lists: Coordinate loading of multiple user profile cards or tiles
 
 ### `<SuspenseList>` Props
 
-- **revealOrder**: Controls the order in which children are revealed
+- revealOrder: Controls the order in which children are revealed
   - `"forwards"`: Reveal items from first to last
   - `"backwards"`: Reveal items from last to first
   - `"together"`: Wait for all items to be ready, then reveal simultaneously
-- **tail**: Controls how many fallbacks to show
+- tail: Controls how many fallbacks to show
   - `"collapsed"`: Show only one fallback at a time
   - `"hidden"`: Don't show trailing fallbacks
 
@@ -83,24 +83,24 @@ function ProductGrid() {
 
 ### Primary Use Cases
 
-- **Code Splitting with React.lazy()**: The most stable and widely-adopted use case for Suspense
-- **Data Fetching**: When using libraries that integrate with `<Suspense>` (like Relay, SWR with `<Suspense>` mode, or React Query)
-- **Resource Loading**: Images, fonts, or other assets that benefit from coordinated loading
-- **Nested Route Loading**: Managing loading states for route-based code splitting
-- **Progressive Enhancement**: Gradually loading features without blocking the main UI
+- Code Splitting with React.lazy(): The most stable and widely-adopted use case for Suspense
+- Data Fetching: When using libraries that integrate with `<Suspense>` (like Relay, SWR with `<Suspense>` mode, or React Query)
+- Resource Loading: Images, fonts, or other assets that benefit from coordinated loading
+- Nested Route Loading: Managing loading states for route-based code splitting
+- Progressive Enhancement: Gradually loading features without blocking the main UI
 
 ### Detailed Scenarios
 
-- **Route-Based Code Splitting**: Load page components on-demand to reduce initial bundle size
-- **Feature Flags with Lazy Loading**: Conditionally load features based on user permissions or A/B tests
-- **Conditional UI Components**: Load heavy components only when needed (modals, complex widgets)
-- **Third-Party Widget Integration**: Manage loading states for external widgets or embeds
-- **Data Visualization**: Load chart libraries and data simultaneously with coordinated loading states
-- **User-Generated Content**: Handle loading of user uploads, comments, or dynamic content
-- **Search Results**: Manage loading states for search suggestions and results
-- **Infinite Scroll**: Coordinate loading of new content batches with existing content
-- **Dashboard Components**: Load multiple independent widgets with unified loading experience
-- **Multi-Step Forms**: Load form sections progressively based on user input
+- Route-Based Code Splitting: Load page components on-demand to reduce initial bundle size
+- Feature Flags with Lazy Loading: Conditionally load features based on user permissions or A/B tests
+- Conditional UI Components: Load heavy components only when needed (modals, complex widgets)
+- Third-Party Widget Integration: Manage loading states for external widgets or embeds
+- Data Visualization: Load chart libraries and data simultaneously with coordinated loading states
+- User-Generated Content: Handle loading of user uploads, comments, or dynamic content
+- Search Results: Manage loading states for search suggestions and results
+- Infinite Scroll: Coordinate loading of new content batches with existing content
+- Dashboard Components: Load multiple independent widgets with unified loading experience
+- Multi-Step Forms: Load form sections progressively based on user input
 
 ### Enhanced Example: Data Fetching with Error Boundaries
 
@@ -207,11 +207,11 @@ The `<Suspense>` component accepts only two props, keeping its API simple and fo
 
 ### Required Props
 
-- **children**: React elements that may suspend during rendering. These components will be replaced by the fallback UI when they throw a promise, and will resume rendering once the promise resolves.
+- children: React elements that may suspend during rendering. These components will be replaced by the fallback UI when they throw a promise, and will resume rendering once the promise resolves.
 
 ### Optional Props
 
-- **fallback**: A React element to display while any child component is suspended. This should be a lightweight component that renders quickly, such as a loading spinner, skeleton UI, or placeholder content.
+- fallback: A React element to display while any child component is suspended. This should be a lightweight component that renders quickly, such as a loading spinner, skeleton UI, or placeholder content.
 
 ### Example with Different Fallback Types
 
@@ -244,10 +244,10 @@ The `<Suspense>` component accepts only two props, keeping its API simple and fo
 
 ##### IMPORTANT NOTES ABOUT PROPS
 
-- **No timeout props**: Unlike some proposals, the current `<Suspense>` API doesn't include timeout or maxDuration props
-- **No callback props**: There are no onResolve or onReject props in the current implementation
-- **Fallback must be synchronous**: The fallback prop should render immediately without any asynchronous operations
-- **Children can be any React elements**: This includes components, fragments, arrays, or any valid React node
+- No timeout props: Unlike some proposals, the current `<Suspense>` API doesn't include timeout or maxDuration props
+- No callback props: There are no onResolve or onReject props in the current implementation
+- Fallback must be synchronous: The fallback prop should render immediately without any asynchronous operations
+- Children can be any React elements: This includes components, fragments, arrays, or any valid React node
 
 ## Caveats and Limitations
 
@@ -255,14 +255,14 @@ Understanding these limitations will help you use `<Suspense>` effectively and a
 
 ### Server-Side Rendering (SSR) Considerations
 
-- **Hydration Mismatches**: `<Suspense>` boundaries that suspend during SSR may cause hydration mismatches. Use `startTransition` or defer non-critical `<Suspense>` boundaries to avoid this.
-- **Streaming SSR**: React 18's streaming SSR works well with Suspense, but ensure your server environment supports streaming responses.
-- **SEO Impact**: Search engines may not wait for suspended content. Ensure critical content loads without `<Suspense>` or use SSR streaming.
+- Hydration Mismatches: `<Suspense>` boundaries that suspend during SSR may cause hydration mismatches. Use `startTransition` or defer non-critical `<Suspense>` boundaries to avoid this.
+- Streaming SSR: React 18's streaming SSR works well with Suspense, but ensure your server environment supports streaming responses.
+- SEO Impact: Search engines may not wait for suspended content. Ensure critical content loads without `<Suspense>` or use SSR streaming.
 
 ### Error Handling Requirements
 
-- **No Built-in Error Handling**: `<Suspense>` doesn't catch promise rejections. Always wrap `<Suspense>` components in Error Boundaries.
-- **Error Boundary Placement**: Place Error Boundaries outside `<Suspense>` boundaries to catch both component errors and promise rejections.
+- No Built-in Error Handling: `<Suspense>` doesn't catch promise rejections. Always wrap `<Suspense>` components in Error Boundaries.
+- Error Boundary Placement: Place Error Boundaries outside `<Suspense>` boundaries to catch both component errors and promise rejections.
 
 ```javascript
 // Correct error boundary placement
@@ -275,38 +275,38 @@ Understanding these limitations will help you use `<Suspense>` effectively and a
 
 ### Performance Considerations
 
-- **Waterfall Loading**: Nested `<Suspense>` boundaries can create loading waterfalls. Structure your data fetching to minimize sequential dependencies.
-- **Excessive Fallbacks**: Too many nested `<Suspense>` boundaries can create jarring loading experiences. Use `<SuspenseList>` to coordinate multiple boundaries.
-- **Memory Usage**: Suspended components maintain their state, which can increase memory usage if many components are suspended simultaneously.
+- Waterfall Loading: Nested `<Suspense>` boundaries can create loading waterfalls. Structure your data fetching to minimize sequential dependencies.
+- Excessive Fallbacks: Too many nested `<Suspense>` boundaries can create jarring loading experiences. Use `<SuspenseList>` to coordinate multiple boundaries.
+- Memory Usage: Suspended components maintain their state, which can increase memory usage if many components are suspended simultaneously.
 
 ### React Version Compatibility
 
-- **React 16.6+**: Basic `<Suspense>` for code splitting only
-- **React 18+**: Full `<Suspense>` features including data fetching, concurrent features, and streaming SSR
-- **Experimental Features**: `<SuspenseList>` and some advanced patterns are still experimental
+- React 16.6+: Basic `<Suspense>` for code splitting only
+- React 18+: Full `<Suspense>` features including data fetching, concurrent features, and streaming SSR
+- Experimental Features: `<SuspenseList>` and some advanced patterns are still experimental
 
 ### Common Integration Issues
 
-- **Data Fetching Libraries**: Only libraries that properly integrate with `<Suspense>` will work (Relay, React Query with `<Suspense>` mode, SWR with Suspense)
-- **State Management**: Traditional state management patterns may conflict with Suspense. Consider using libraries designed for concurrent React.
-- **Testing Complexity**: Testing `<Suspense>` requires special handling for asynchronous operations and may need specific testing utilities.
+- Data Fetching Libraries: Only libraries that properly integrate with `<Suspense>` will work (Relay, React Query with `<Suspense>` mode, SWR with Suspense)
+- State Management: Traditional state management patterns may conflict with Suspense. Consider using libraries designed for concurrent React.
+- Testing Complexity: Testing `<Suspense>` requires special handling for asynchronous operations and may need specific testing utilities.
   <BackToTop />
 
 ## Common Pitfalls
 
-- **Not Providing Fallback UI**: Always provide a fallback UI when using Suspense. Failing to do so can lead to a blank screen or unresponsive UI while the component is suspended.
-- **Overusing Suspense**: Using `<Suspense>` for every component can lead to performance issues. Use it selectively for components that require asynchronous data fetching or lazy loading.
-- **Ignoring Error Boundaries**: Always wrap `<Suspense>` components in error boundaries to handle errors gracefully. This ensures that your application can recover from errors without crashing and provides a better user experience.
-- **Assuming Immediate Resolution**: Do not assume that the promise will resolve immediately. Always handle the loading state appropriately and provide a fallback UI until the data is available.
-- **Not Testing `<Suspense>` Components**: Ensure that you test components that use `<Suspense>` thoroughly. Use testing libraries that support asynchronous testing to verify that the loading states and fallback UI behave as expected.
-- **Neglecting Accessibility**: When using Suspense, ensure that the fallback UI is accessible to all users. This includes providing appropriate ARIA attributes, ensuring keyboard navigation works, and using semantic HTML elements. Accessibility should always be a priority, even when dealing with loading states and asynchronous components.
-- **Ignoring Performance**: Be mindful of the performance implications of using Suspense. Avoid suspending too many components simultaneously, as this can lead to delays in rendering and a poor user experience. Use tools like React Profiler to monitor performance and identify potential bottlenecks in your application.
-- **Not Handling Edge Cases**: Consider edge cases where the data fetching may fail or take longer than expected. Implement proper error handling and timeouts to ensure that your application remains responsive and provides a good user experience even in adverse conditions.
-- **Assuming Compatibility**: Ensure that your React version supports `<Suspense>` and that you are using the correct APIs. Some features may not be available in older versions of React, so always check the documentation and compatibility before implementing `<Suspense>` in your application.
-- **Neglecting User Experience**: Always prioritize user experience when using Suspense. Ensure that the fallback UI is informative and provides clear feedback to users about the loading state. Avoid using generic loading indicators that do not convey meaningful information, as this can lead to confusion and frustration for users waiting for content to load.
-- **Not Considering Network Conditions**: Be aware that network conditions can vary significantly for users. Implement strategies to handle slow or unreliable network connections, such as providing a way to retry failed requests or displaying informative messages when data cannot be fetched. This helps improve the user experience, especially in regions with poor connectivity.
-- **Ignoring SEO Considerations**: If your application relies on server-side rendering (SSR) or static site generation (SSG), be cautious about how `<Suspense>` affects SEO. Search engines may not execute JavaScript, so ensure that critical content is available without relying solely on Suspense. Use techniques like pre-rendering or server-side rendering to ensure that important content is accessible to search engines and users without JavaScript execution.
-- **Not Using `<Suspense>` with Concurrent Features**: If you are using React's concurrent features, such as concurrent mode or transitions, ensure that you understand how `<Suspense>` interacts with these features. `<Suspense>` can enhance the user experience by allowing components to load concurrently, but it requires careful management of loading states and fallbacks to ensure a smooth experience. Familiarize yourself with the best practices for using `<Suspense>` in conjunction with concurrent features to maximize performance and user experience.
+- Not Providing Fallback UI: Always provide a fallback UI when using Suspense. Failing to do so can lead to a blank screen or unresponsive UI while the component is suspended.
+- Overusing Suspense: Using `<Suspense>` for every component can lead to performance issues. Use it selectively for components that require asynchronous data fetching or lazy loading.
+- Ignoring Error Boundaries: Always wrap `<Suspense>` components in error boundaries to handle errors gracefully. This ensures that your application can recover from errors without crashing and provides a better user experience.
+- Assuming Immediate Resolution: Do not assume that the promise will resolve immediately. Always handle the loading state appropriately and provide a fallback UI until the data is available.
+- Not Testing `<Suspense>` Components: Ensure that you test components that use `<Suspense>` thoroughly. Use testing libraries that support asynchronous testing to verify that the loading states and fallback UI behave as expected.
+- Neglecting Accessibility: When using Suspense, ensure that the fallback UI is accessible to all users. This includes providing appropriate ARIA attributes, ensuring keyboard navigation works, and using semantic HTML elements. Accessibility should always be a priority, even when dealing with loading states and asynchronous components.
+- Ignoring Performance: Be mindful of the performance implications of using Suspense. Avoid suspending too many components simultaneously, as this can lead to delays in rendering and a poor user experience. Use tools like React Profiler to monitor performance and identify potential bottlenecks in your application.
+- Not Handling Edge Cases: Consider edge cases where the data fetching may fail or take longer than expected. Implement proper error handling and timeouts to ensure that your application remains responsive and provides a good user experience even in adverse conditions.
+- Assuming Compatibility: Ensure that your React version supports `<Suspense>` and that you are using the correct APIs. Some features may not be available in older versions of React, so always check the documentation and compatibility before implementing `<Suspense>` in your application.
+- Neglecting User Experience: Always prioritize user experience when using Suspense. Ensure that the fallback UI is informative and provides clear feedback to users about the loading state. Avoid using generic loading indicators that do not convey meaningful information, as this can lead to confusion and frustration for users waiting for content to load.
+- Not Considering Network Conditions: Be aware that network conditions can vary significantly for users. Implement strategies to handle slow or unreliable network connections, such as providing a way to retry failed requests or displaying informative messages when data cannot be fetched. This helps improve the user experience, especially in regions with poor connectivity.
+- Ignoring SEO Considerations: If your application relies on server-side rendering (SSR) or static site generation (SSG), be cautious about how `<Suspense>` affects SEO. Search engines may not execute JavaScript, so ensure that critical content is available without relying solely on Suspense. Use techniques like pre-rendering or server-side rendering to ensure that important content is accessible to search engines and users without JavaScript execution.
+- Not Using `<Suspense>` with Concurrent Features: If you are using React's concurrent features, such as concurrent mode or transitions, ensure that you understand how `<Suspense>` interacts with these features. `<Suspense>` can enhance the user experience by allowing components to load concurrently, but it requires careful management of loading states and fallbacks to ensure a smooth experience. Familiarize yourself with the best practices for using `<Suspense>` in conjunction with concurrent features to maximize performance and user experience.
   <BackToTop />
 
 ## Examples

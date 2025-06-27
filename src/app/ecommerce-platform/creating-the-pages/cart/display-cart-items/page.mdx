@@ -54,10 +54,6 @@ export default function CartPage() {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 ```
 
-##### Explanation of the Code
-
-This code imports necessary hooks and components to manage the cart state, display items, and handle user interactions. It initializes state variables for managing discount codes and checkout processes.
-
 ## Checking the Cart State
 
 ```tsx startLineNumber=39
@@ -95,6 +91,31 @@ if (items.length === 0) {
 }
 ```
 
+### Empty Cart State Design
+
+The empty cart state is crucial for user experience. Here's why each element matters:
+
+#### Visual Design Elements
+
+- **Icon Container**: The circular background with shopping bag icon provides immediate visual context
+- **Typography Hierarchy**: Clear heading followed by descriptive text guides user understanding
+- **Information Transparency**: We inform users about shipping fees upfront to prevent checkout surprises
+
+#### User Guidance
+
+- **Call-to-Action**: The "Continue Shopping" button provides a clear next step
+- **Discount Code Hints**: We mention available codes to encourage exploration and potential sales
+
+#### Accessibility Features
+
+- **Semantic HTML**: Proper heading structure for screen readers
+- **Focus Management**: The CTA button is easily accessible via keyboard navigation
+- **Clear Language**: Simple, direct messaging that's easy to understand
+
+This empty state transforms a potentially frustrating experience (empty cart) into an opportunity to guide users back to shopping with helpful information and clear direction.
+
+````
+
 ## Handling Discounts
 
 ```tsx startLineNumber=70
@@ -121,11 +142,40 @@ const handleRemoveDiscount = () => {
   removeDiscount();
   toast.info("Discount removed");
 };
-```
+````
 
-##### Explanation of the Code
+### Discount Code Management
 
-This code handles the application and removal of discount codes. It provides feedback to the user through toast notifications and manages the loading state during the discount application process.
+The discount system provides a powerful way to increase customer satisfaction and drive sales. Let's break down the implementation:
+
+#### Input Validation
+
+- **Trimming**: Removes whitespace to prevent user errors
+- **Case Normalization**: Converts to uppercase for consistent matching
+- **Empty Check**: Prevents API calls with empty values
+
+#### User Feedback
+
+- **Loading States**: `isApplyingDiscount` prevents multiple submissions
+- **Toast Notifications**: Immediate feedback for success, error, and info states
+- **Clear Input**: Successful application clears the input field
+
+#### Error Handling
+
+The function handles various scenarios:
+
+- Invalid or expired codes
+- Network errors during validation
+- Already applied discounts
+- Minimum purchase requirements not met
+
+#### State Management
+
+- **Optimistic Updates**: UI reflects changes immediately
+- **Rollback on Error**: Failed applications don't affect cart state
+- **Persistent Storage**: Applied discounts survive page refreshes
+
+This pattern ensures a smooth user experience while maintaining data integrity and providing clear feedback at every step.
 
 ## Redirecting to the Payment Page
 
@@ -138,9 +188,26 @@ const handleCheckout = () => {
 };
 ```
 
-##### Explanation of the Code
+### Checkout Flow Initiation
 
-This function initiates the checkout process by setting the loading state and redirecting the user to the payment page.
+This simple function manages the transition from cart to checkout:
+
+#### Loading State Management
+
+- **Visual Feedback**: Button shows loading state during redirect
+- **Prevents Double-Clicks**: Multiple submissions are blocked
+- **User Assurance**: Clear indication that action is being processed
+
+#### Navigation Strategy
+
+The `redirectToCheckout` function (from cart context) handles:
+
+- **Authentication Check**: Ensures user is logged in
+- **Cart Validation**: Verifies items are still available
+- **Route Management**: Programmatic navigation to checkout page
+- **State Persistence**: Maintains cart data during navigation
+
+This pattern separates UI concerns (loading states) from business logic (authentication, validation) while providing smooth user experience.
 
 ## Displaying the Cart Items
 
@@ -376,8 +443,140 @@ This function initiates the checkout process by setting the loading state and re
 }
 ```
 
-##### Explanation of the Code
+#### Layout Structure
+
+- **Responsive Grid**: Uses CSS Grid for optimal desktop/mobile layouts
+- **Two-Column Design**: Cart items on left, order summary on right
+- **Flexible Spacing**: Adapts to content and screen size
+
+#### Product Display Features
+
+- **Optimized Images**: Next.js Image component with fallbacks
+- **Price Calculations**: Real-time discount and total calculations
+- **Quantity Controls**: Intuitive increment/decrement buttons
+- **Product Information**: Complete details including brand, category, and pricing
+
+#### Interactive Elements
+
+- **Remove Items**: Individual item removal with confirmation
+- **Clear Cart**: Bulk removal option for convenience
+- **Quantity Updates**: Immediate cart recalculation
+- **Discount Application**: Real-time code validation and application
+
+#### Order Summary Features
+
+- **Dynamic Pricing**: Live updates as cart changes
+- **Multiple Discounts**: Supports both code and membership discounts
+- **Transparent Fees**: Clear breakdown of all charges
+- **Accessibility**: ARIA labels and keyboard navigation support
+
+The component demonstrates advanced React patterns including context usage, state management, conditional rendering, and responsive design principles.
+
+## Key Features Explained
+
+### Image Handling and Fallbacks
+
+The cart uses multiple image sources with intelligent fallbacks:
+
+```tsx
+<Image
+  src={item.image || item.thumbnail || "/placeholder-image.jpg"}
+  alt={item.title}
+  fill
+  className="rounded-md object-cover"
+/>
+```
+
+This approach ensures images always display, even if primary sources fail:
+
+- **Primary**: `item.image` (high-quality product image)
+- **Secondary**: `item.thumbnail` (smaller, faster loading)
+- **Fallback**: Local placeholder image for reliability
+
+### Dynamic Price Calculations
+
+The cart calculates prices in real-time considering multiple factors:
+
+```tsx
+const discountedPrice = item.discountPercentage
+  ? item.price * (1 - item.discountPercentage / 100)
+  : item.price;
+```
+
+Price calculation hierarchy:
+
+1. **Base Price**: Original product price
+2. **Product Discount**: Individual item discounts
+3. **Cart Discount**: Applied discount codes
+4. **Membership Discount**: User tier benefits
+5. **Shipping**: Added at final calculation
+
+### Quantity Control UX
+
+The quantity controls provide intuitive interaction:
+
+```tsx
+<Button
+  variant="outline"
+  size="icon"
+  onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+  disabled={item.quantity <= 1}
+  className="w-8 h-8"
+>
+  <Minus className="w-3 h-3" />
+</Button>
+```
+
+Key UX considerations:
+
+- **Minimum Quantity**: Prevents zero or negative quantities
+- **Visual Feedback**: Disabled state for minimum values
+- **Immediate Updates**: No save button required
+- **Error Prevention**: Built-in validation
+
+## Best Practices
+
+### Performance Optimization
+
+1. **Image Optimization**: Using Next.js Image component with proper sizing
+2. **State Updates**: Debounced quantity changes prevent excessive re-renders
+3. **Conditional Rendering**: Only render discount sections when applicable
+4. **Memoization**: Context values are memoized to prevent unnecessary updates
+
+### User Experience
+
+1. **Loading States**: Clear feedback during all async operations
+2. **Error Handling**: Graceful degradation with helpful error messages
+3. **Responsive Design**: Optimal experience across all device sizes
+4. **Keyboard Navigation**: Full accessibility for non-mouse users
+
+### Code Organization
+
+1. **Separation of Concerns**: Business logic in context, UI logic in component
+2. **Reusable Components**: UI components can be used throughout the application
+3. **Type Safety**: TypeScript ensures data consistency and prevents runtime errors
+4. **Error Boundaries**: Graceful handling of unexpected errors
+
+## Accessibility Considerations
+
+### Screen Reader Support
+
+- **Semantic HTML**: Proper heading hierarchy and landmarks
+- **ARIA Labels**: Descriptive labels for interactive elements
+- **Live Regions**: Dynamic content updates announced to screen readers
+
+### Keyboard Navigation
+
+- **Tab Order**: Logical navigation through all interactive elements
+- **Focus Management**: Clear visual focus indicators
+- **Keyboard Shortcuts**: Enter key support for form submissions
+
+### Visual Accessibility
+
+- **Color Contrast**: WCAG-compliant color combinations
+- **Text Sizing**: Relative units for user-controlled scaling
+- **Motion Preferences**: Respects user's reduced motion settings
 
 ## Next Steps
 
-Time to pay up! Our visitors have shopped until they've dropped, and now they need to [complete their purchase](/ecommerce-platform/creating-the-pages/cart/checkout-page).
+Now that users can manage their cart contents, it's time to guide them through the final purchase process. In the next chapter, we'll build the [checkout page](/ecommerce-platform/creating-the-pages/cart/checkout-page) where users complete their orders with payment processing and order confirmation.

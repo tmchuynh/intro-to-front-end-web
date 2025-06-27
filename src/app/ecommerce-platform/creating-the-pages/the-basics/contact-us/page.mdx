@@ -174,7 +174,15 @@ const faqCategories = [
 
 ### Usage of Constants
 
-The constants defined above are used to populate various sections of the Contact page, such as contact methods, office locations, and FAQ categories. They provide structured data that can be easily rendered in the UI components.
+These structured data arrays serve as the backbone for the Contact page's content organization and user interface rendering. Each constant serves specific purposes in creating a cohesive customer support experience:
+
+**Contact methods array**: Provides multiple communication channels with distinct visual identities through color-coded icons. Each method includes practical details like availability windows and specific contact information, allowing users to choose the most appropriate support channel based on their urgency and preference. The differentiation between standard support and premium member support creates value perception for membership tiers.
+
+**Office locations array**: Establishes physical presence and credibility through real-world addresses and contact information. The headquarters designation adds organizational hierarchy understanding, while the structured address formatting (with newline characters) ensures proper display formatting across different UI components.
+
+**FAQ categories array**: Creates an intuitive categorization system that helps users quickly identify the type of support they need. Each category combines recognizable icons with descriptive text, reducing the cognitive load required to navigate support options and improving self-service capabilities.
+
+These constants enable maintainable content management - updates to contact information, new office locations, or additional support categories can be implemented by modifying the data structures without touching the rendering logic. This separation of concerns facilitates easier content updates and reduces the risk of introducing bugs during routine maintenance.
 
 ## Storing the Form Data
 
@@ -205,7 +213,17 @@ export default function ContactUsPage() {
 
 ### Explanation of the Code
 
-The code above defines the initial state for the contact form, including the form data, validation errors, submission status, and a flag to indicate if the form is currently being submitted. The `ContactFormData` interface is used to type the form data, ensuring that all required fields are present.
+This section establishes the state management architecture for the contact form, implementing a robust system that handles user input, validation feedback, and submission workflow. The state design encompasses several critical aspects:
+
+**Form data structure**: The `formData` state uses TypeScript's `ContactFormData` interface to ensure type safety and consistency across all form fields. This structured approach prevents common errors like typos in field names and provides better development experience through autocompletion and compile-time error checking.
+
+**Error state management**: The `errors` state maintains a parallel structure to the form data, allowing for field-specific error messages that provide immediate feedback to users. This granular error tracking enables precise validation messaging without affecting the overall form state.
+
+**Submission state tracking**: The `isSubmitting` boolean flag prevents duplicate submissions and enables UI feedback during form processing. This prevents race conditions and provides users with clear indication that their request is being processed.
+
+**Status state for user feedback**: The `submitStatus` state uses a discriminated union type (`"idle" | "success" | "error"`) to manage different form states cleanly. This approach enables conditional rendering of success messages, error alerts, and normal form states without complex boolean combinations.
+
+**Initialization strategy**: All states begin with empty or default values, ensuring a clean initial user experience. The empty string initialization for form fields prevents controlled/uncontrolled input warnings while maintaining form cleanliness.
 
 <BackToTop />
 
@@ -228,7 +246,17 @@ const validateField = useCallback(
 
 ### Explanation of the Code
 
-The `validateField` function is used to validate individual fields in the contact form in real-time. It takes the field name and its value as parameters, validates the field using the `validateContactField` function, and updates the errors state accordingly. This allows for immediate feedback to the user as they fill out the form.
+This function implements intelligent real-time validation that enhances user experience through immediate feedback while maintaining performance optimization. The implementation includes several sophisticated features:
+
+**Memoized validation function**: The `useCallback` hook prevents unnecessary re-renders by memoizing the validation function, ensuring it only updates when the `formData` dependency changes. This optimization reduces computational overhead during user interactions and maintains smooth form performance.
+
+**Individual field validation**: Rather than validating the entire form on each input change, this function targets specific fields, providing precise feedback without overwhelming users with unrelated error messages. This focused approach improves the user experience by maintaining context relevance.
+
+**Error state synchronization**: The function updates the errors state immutably using the spread operator, ensuring React's state update mechanisms work correctly while preserving other field error states. This approach prevents validation of one field from accidentally clearing errors in other fields.
+
+**Boolean return optimization**: By returning a boolean result, the function enables callers to make immediate decisions about field validity without additional state checks. This design pattern supports conditional logic in form submission and user interface updates.
+
+**External validation logic integration**: The function delegates actual validation rules to the `validateContactField` utility, maintaining separation of concerns between state management and business logic. This architecture makes validation rules easier to test, modify, and reuse across different components.
 
 ## Handling Input Changes
 
@@ -267,7 +295,19 @@ const handleBlur = (
 
 ### Explanation of the Code
 
-The `handleInputChange` function updates the form data state when the user types in the input fields. It also validates the field after a short delay (300 milliseconds) to avoid excessive validation calls while the user is typing. The `handleSelectChange` function updates the category field when the user selects an option from the dropdown, and the `handleBlur` function validates the field when it loses focus.
+These event handlers create a sophisticated user input management system that balances immediate feedback with performance optimization. Each handler serves specific interaction patterns and user experience goals:
+
+**Smart input change handling**: The `handleInputChange` function manages text input and textarea changes with a debounced validation approach. The 300-millisecond delay prevents excessive validation calls during rapid typing while ensuring users receive feedback soon after they pause. This balance maintains form responsiveness without overwhelming the validation system.
+
+**Immutable state updates**: All handlers use the spread operator pattern to update form data immutably, ensuring React's state management works correctly and preventing potential state mutation bugs. This approach maintains predictable component behavior and enables proper re-rendering when data changes.
+
+**Type safety enforcement**: The explicit casting of the field name as `keyof ContactFormData` ensures TypeScript compatibility while maintaining the connection between form fields and validation logic. This type safety prevents runtime errors from typos or incorrect field references.
+
+**Immediate dropdown validation**: The `handleSelectChange` function validates dropdown selections immediately since dropdown interactions are discrete events rather than continuous typing. This provides instant feedback for selection-based fields without the debounce delay needed for text inputs.
+
+**Focus-based validation**: The `handleBlur` function triggers validation when users leave a field, providing a natural checkpoint for field completion. This event-driven validation feels intuitive to users since it aligns with their natural form-filling workflow of completing one field before moving to the next.
+
+**Input type versatility**: The handlers accommodate multiple input types (text inputs, textareas, and select dropdowns) through unified interfaces, reducing code duplication while maintaining specific behavior patterns for different interaction types.
 
 <BackToTop />
 
@@ -341,7 +381,21 @@ const handleSubmit = async (e: React.FormEvent) => {
 
 ### Explanation of the Code
 
-The `handleSubmit` function is called when the user submits the contact form. It prevents the default form submission behavior, sets the submitting state, and performs comprehensive validation of the form data. If validation fails, it updates the errors state with appropriate messages. If validation passes, it simulates an API call to submit the form data and resets the form on success. It also handles any errors that occur during submission.
+This function orchestrates the complete form submission workflow, implementing multiple layers of validation, security, and user experience optimization. The process involves several carefully coordinated phases:
+
+**Submission initiation and state management**: The function begins by preventing default browser form submission behavior and setting appropriate loading states. This dual action ensures custom handling while providing immediate UI feedback through the `isSubmitting` flag, which can trigger loading animations and disable form elements.
+
+**Multi-layer validation strategy**: Before attempting submission, the function performs complete form validation using the `validateContactForm` utility. This final validation step catches any missed field-level validations and ensures data integrity. The validation results are mapped to the error state structure, providing users with specific feedback about any remaining issues.
+
+**Data sanitization for security**: Upon successful validation, the form data undergoes sanitization through the `sanitizeContactForm` function. This critical security step prevents potential XSS attacks and ensures that user input is safe for processing and storage, protecting both the application and its users.
+
+**Simulated API integration**: The current implementation includes a promise-based delay to simulate real API communication, providing a realistic development and testing environment. This simulation maintains the asynchronous patterns needed for actual backend integration while allowing frontend development to proceed independently.
+
+**Success state management and cleanup**: Successful submissions trigger form reset to empty states and display success messages through the status system. This cleanup ensures users can submit additional forms without leftover data while providing clear confirmation of successful submission.
+
+**Error handling and recovery**: The comprehensive try-catch structure ensures graceful handling of network failures, server errors, or unexpected issues. Error states are communicated through both console logging for debugging and user-facing status messages for transparent communication.
+
+**Guaranteed state cleanup**: The finally block ensures that loading states are always cleared regardless of success or failure, preventing stuck loading indicators that could confuse users or break the interface flow.
 
 <BackToTop />
 
@@ -711,7 +765,23 @@ The `handleSubmit` function is called when the user submits the contact form. It
 
 ### Explanation of the Code
 
-The code above renders the Contact page with various sections, including a hero section, contact methods, a contact form, quick help options, office locations, and an emergency contact section. It uses components like `Card`, `Button`, `Input`, and `Textarea` to create a visually appealing and user-friendly interface. The form includes real-time validation and submission handling, providing feedback to the user based on their input.
+This section creates a multi-faceted contact interface that strategically addresses different customer communication needs while building trust and accessibility. The page architecture encompasses several interconnected components designed to optimize user experience and business efficiency:
+
+**Hero section with welcoming messaging**: The opening section immediately establishes a supportive tone with "We're Here to Help" messaging and explanatory text that reassures users about receiving assistance. This emotional framing reduces anxiety often associated with contacting support and encourages user engagement.
+
+**Contact methods showcase**: The grid layout presents multiple communication channels with distinct visual identities, allowing users to choose their preferred interaction method. Each method card includes availability information and specific contact details, enabling informed decision-making about timing and communication preferences.
+
+**Integrated form and support resources**: The dual-column layout efficiently combines the primary contact form with supplementary support resources. The form includes sophisticated validation feedback through color-coded inputs and contextual error messages, while the sidebar provides quick help categories and support hours for immediate reference.
+
+**Progressive information architecture**: The page follows a logical information hierarchy, starting with immediate contact options, progressing through the main contact form, and concluding with physical office locations and emergency support. This flow accommodates different user priorities and urgency levels.
+
+**Status-aware user interface**: The form dynamically displays success and error states through alert components with appropriate styling and iconography. Loading states prevent duplicate submissions while providing clear feedback about processing status, maintaining user confidence during form submission.
+
+**Office location transparency**: The office cards build credibility through specific addresses and phone numbers while using headquarters badges to establish organizational hierarchy. The "Get Directions" buttons provide practical value for users who prefer in-person interactions.
+
+**Emergency support prominence**: The final section uses distinctive styling (gradient backgrounds and red color scheme) to highlight urgent support options, ensuring critical information is easily accessible while maintaining visual separation from standard support channels.
+
+**Responsive design integration**: All components adapt seamlessly across device sizes through responsive grid systems and flexible typography, ensuring consistent functionality and visual appeal from mobile phones to desktop computers.
 
 ## Next Steps
 

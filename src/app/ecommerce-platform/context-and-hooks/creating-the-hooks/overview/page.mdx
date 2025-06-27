@@ -18,7 +18,7 @@ The primary purpose of custom hooks is to provide a clean abstraction layer that
 
 ## The Value of Custom Hooks
 
-Custom hooks address several common development challenges by eliminating code duplication, improving organization, and enhancing component readability. They enable you to encapsulate complex logic within dedicated functions, making testing and maintenance significantly easier. 
+Custom hooks address several common development challenges by eliminating code duplication, improving organization, and enhancing component readability. They enable you to encapsulate complex logic within dedicated functions, making testing and maintenance significantly easier.
 
 By utilizing custom hooks, you can share logic between components without the complexity of lifting state up or passing props through multiple component hierarchy levels.
 
@@ -200,32 +200,42 @@ const SidebarProvider = React.forwardRef<
 
 The `SidebarProvider` component serves as a comprehensive sidebar management solution that demonstrates the power of custom hooks in creating responsive, accessible UI components. Here's a detailed breakdown of its functionality:
 
-**Responsive Behavior Management**
+##### Responsive Behavior Management
+
 The component leverages the `useIsMobile` hook to determine the current device type and adapt its behavior accordingly. It maintains separate state management for desktop and mobile experiences:
+
 - **Desktop Mode**: Uses `open` state for persistent sidebar visibility
 - **Mobile Mode**: Uses `openMobile` state for overlay-style sidebar behavior
 
-**State Management Architecture**
+##### State Management Architecture
+
 The provider implements a sophisticated state management pattern that supports both controlled and uncontrolled component behavior:
+
 - **Internal State**: Manages its own state with `_open` and `_setOpen` for uncontrolled usage
 - **External Control**: Accepts `openProp` and `setOpenProp` for controlled usage from parent components
 - **State Persistence**: Automatically saves sidebar state to cookies for user preference retention across sessions
 
-**Accessibility and User Experience**
+##### Accessibility and User Experience
+
 The component prioritizes accessibility through multiple interaction methods:
+
 - **Keyboard Shortcuts**: Implements Cmd/Ctrl + key combinations for quick sidebar toggling
 - **Event Management**: Properly handles event listeners with cleanup to prevent memory leaks
 - **Focus Management**: Uses `TooltipProvider` for enhanced tooltip behavior and accessibility
 
-**Context-Based Architecture**
+##### Context-Based Architecture
+
 The provider creates a comprehensive context that exposes:
+
 - Current sidebar state (`expanded` or `collapsed`)
 - State setters for both mobile and desktop modes
 - Device detection information
 - Toggle functionality for programmatic control
 
-**CSS Custom Properties Integration**
+##### CSS Custom Properties Integration
+
 The component demonstrates modern CSS-in-JS patterns by:
+
 - Setting CSS custom properties (`--sidebar-width`, `--sidebar-width-icon`) for dynamic styling
 - Using `data-state` attributes for Tailwind CSS styling hooks
 - Providing flexible styling through the `style` prop merge

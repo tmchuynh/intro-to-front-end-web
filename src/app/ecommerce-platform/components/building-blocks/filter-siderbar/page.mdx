@@ -1,0 +1,209 @@
+import BackToTop from "@/components/BackToTop";
+
+# The Filtering Sidebar
+
+## Table of Contents
+
+## Introduction
+
+This sidebar component will allow users to filter products based on various criteria such as price range, sorting options, and search queries. It will also integrate with the currency context to ensure that all prices are displayed in the user's selected currency.
+
+It will be a crucial part of the e-commerce platform, enhancing the user experience by providing intuitive filtering options.
+
+## The `import` Statements and Interface
+
+```tsx
+// src/components/filters/FilterSidebar.tsx
+"use client";
+
+import { useCurrency } from "@/app/context/currencyContext"; // Import useCurrency
+import { useEffect, useState } from "react";
+
+interface FilterSidebarProps {
+  onFilterChange: (filters: {
+    priceRange?: { min?: number; max?: number }; // Price range in USD
+    sortBy?: string;
+    searchQuery?: string;
+  }) => void;
+}
+```
+
+##### Explanation of the Code
+
+## The `FilterSidebar` Component
+
+```tsx
+// src/components/filters/FilterSidebar.tsx
+
+export default function FilterSidebar({ onFilterChange }: FilterSidebarProps) {
+  const [minPriceInput, setMinPriceInput] = useState(""); // Input string for min price
+  const [maxPriceInput, setMaxPriceInput] = useState(""); // Input string for max price
+  const [sortBy, setSortBy] = useState("default");
+  const [searchQuery, setSearchQuery] = useState("");
+  const { convertPrice, currentCurrency } = useCurrency(); // Get currency context
+
+  // Debounce search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      // Apply search query along with other filters
+      // This allows typing without firing a request on every keystroke
+      // but still applies search when other filters are manually applied.
+      // For instant search on type, the applyFilters call would be here.
+      // For now, search is applied with the button or if other filters change.
+      if (searchQuery.trim() !== "") {
+        // If you want search to be instant, call handleApplyFilters here.
+        // For now, it will be applied when the "Apply Filters" button is clicked.
+      }
+    }, 500); // 500ms debounce
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]); // Removed onFilterChange from deps to avoid loop if it's not memoized
+
+```
+
+##### Explanation of the Code
+
+```tsx startLineNumber=26
+// src/components/filters/FilterSidebar.tsx
+
+const handleApplyFilters = () => {
+  let minPriceUSD, maxPriceUSD;
+
+  if (minPriceInput) {
+    // Convert min price from current currency to USD for filtering
+    minPriceUSD = convertPrice(parseFloat(minPriceInput), currentCurrency.code);
+  }
+  if (maxPriceInput) {
+    // Convert max price from current currency to USD for filtering
+    maxPriceUSD = convertPrice(parseFloat(maxPriceInput), currentCurrency.code);
+  }
+
+  onFilterChange({
+    priceRange: {
+      min: minPriceUSD,
+      max: maxPriceUSD,
+    },
+    sortBy: sortBy === "default" ? undefined : sortBy,
+    searchQuery: searchQuery.trim() || undefined,
+  });
+};
+```
+
+##### Explanation of the Code
+
+```tsx startLineNumber=47
+// src/components/filters/FilterSidebar.tsx
+const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setSearchQuery(e.target.value);
+  // Optionally, trigger apply filters immediately on search change, or wait for button
+  // For now, we wait for the button or other filter interactions.
+  // To make search instant (after debounce), you could call a version of handleApplyFilters here.
+};
+
+const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  setSortBy(e.target.value);
+  // Automatically apply filters when sort changes
+  let minPriceUSD, maxPriceUSD;
+  if (minPriceInput) {
+    minPriceUSD = convertPrice(parseFloat(minPriceInput), currentCurrency.code);
+  }
+  if (maxPriceInput) {
+    maxPriceUSD = convertPrice(parseFloat(maxPriceInput), currentCurrency.code);
+  }
+
+  onFilterChange({
+    priceRange: {
+      min: minPriceUSD,
+      max: maxPriceUSD,
+    },
+    sortBy: e.target.value === "default" ? undefined : e.target.value,
+    searchQuery: searchQuery.trim() || undefined,
+  });
+};
+```
+
+##### Explanation of the Code
+
+```tsx startLineNumber=80
+// src/components/filters/FilterSidebar.tsx
+return (
+  <aside className="md:top-16 md:sticky p-4 border-gray-200 dark:border-gray-800 md:border-r w-full md:w-1/4 md:h-[calc(100vh-4rem)] md:overflow-y-auto md:self-start">
+    <h2 className="mb-4 font-semibold text-lg">Filters</h2>
+
+    {/* Search Filter */}
+    <div className="mb-6">
+      <h3 className="mb-2 font-medium text-md">Search Products</h3>
+      <input
+        type="text"
+        placeholder="Search by name, description..."
+        value={searchQuery}
+        onChange={handleSearchInputChange}
+        className="dark:bg-gray-700 p-2 border dark:border-gray-600 rounded-md w-full"
+      />
+    </div>
+
+    {/* Price Range Filter */}
+    <div className="mb-6">
+      <h3 className="mb-2 font-medium text-md">
+        Price Range ({currentCurrency.symbol})
+      </h3>
+      <div className="flex items-center space-x-2 mb-2">
+        <input
+          type="number"
+          placeholder="Min"
+          value={minPriceInput}
+          onChange={(e) => setMinPriceInput(e.target.value)}
+          min="0"
+          className="dark:bg-gray-700 [&::-webkit-inner-spin-button]:m-0 [&::-webkit-outer-spin-button]:m-0 p-2 border dark:border-gray-600 rounded-md w-full appearance-none [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        />
+        <span className="text-gray-500">-</span>
+        <input
+          type="number"
+          placeholder="Max"
+          value={maxPriceInput}
+          onChange={(e) => setMaxPriceInput(e.target.value)}
+          min="0"
+          className="dark:bg-gray-700 [&::-webkit-inner-spin-button]:m-0 [&::-webkit-outer-spin-button]:m-0 p-2 border dark:border-gray-600 rounded-md w-full appearance-none [-moz-appearance:_textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        />
+      </div>
+    </div>
+
+    {/* Sort By Filter */}
+    <div className="mb-6">
+      <h3 className="mb-2 font-medium text-md">Sort By</h3>
+      <select
+        value={sortBy}
+        onChange={handleSortChange} // Updated to auto-apply
+        className="dark:bg-gray-700 p-2 border dark:border-gray-600 rounded-md w-full"
+      >
+        <option value="default">Default (Relevance)</option>
+        <option value="price:asc">Price: Low to High</option>
+        <option value="price:desc">Price: High to Low</option>
+        <option value="rating:desc">Rating: High to Low</option>
+        <option value="title:asc">Title: A to Z</option>
+        <option value="title:desc">Title: Z to A</option>
+        {/* Add more DummyJSON compatible sort options if needed e.g. by discountPercentage */}
+        {/* <option value="discountPercentage:desc">Discount: High to Low</option> */}
+      </select>
+    </div>
+
+    <button
+      onClick={handleApplyFilters}
+      className="bg-blue-600 hover:bg-blue-700 p-2 rounded-md w-full text-white"
+    >
+      Apply Price & Search Filters
+    </button>
+  </aside>
+);
+}
+```
+
+##### Explanation of the Code
+
+## Next Steps
+
+Lastly, it's onto the [home page](/ecommerce-platform/creating-the-pages/home-page), where we will put together all the components we've built so far. This will give us a complete view of our e-commerce platform and allow us to see how everything works together. The home page will serve as the central hub for users to navigate through products, access their cart, and manage their account settings.
+
+<BackToTop />

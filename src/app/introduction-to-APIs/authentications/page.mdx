@@ -10,10 +10,10 @@ Authentication is a crucial aspect of working with APIs, ensuring that only auth
 
 In modern web applications, authentication serves multiple purposes:
 
-- **Identity Verification**: Confirming that users are who they claim to be
-- **Access Control**: Determining what resources a user can access
-- **Security**: Protecting sensitive data from unauthorized access
-- **Audit Trail**: Tracking who accessed what and when
+- Identity Verification: Confirming that users are who they claim to be
+- Access Control: Determining what resources a user can access
+- Security: Protecting sensitive data from unauthorized access
+- Audit Trail: Tracking who accessed what and when
 
 ### Why Authentication Matters
 
@@ -28,8 +28,8 @@ Without proper authentication, your API would be like a house with no locks—an
 
 It's important to understand the difference:
 
-- **Authentication**: "Who are you?" (Verifying identity)
-- **Authorization**: "What can you do?" (Granting permissions)
+- Authentication: "Who are you?" (Verifying identity)
+- Authorization: "What can you do?" (Granting permissions)
 
 <BackToTop />
 
@@ -96,9 +96,9 @@ Token-based authentication is a more secure and flexible method where the server
 
 ##### Common Token Formats
 
-- **JSON Web Tokens (JWT)**: Self-contained tokens with encoded user information
-- **Random Tokens**: Opaque strings stored in a database
-- **Refresh Tokens**: Long-lived tokens used to obtain new access tokens
+- JSON Web Tokens (JWT): Self-contained tokens with encoded user information
+- Random Tokens: Opaque strings stored in a database
+- Refresh Tokens: Long-lived tokens used to obtain new access tokens
 
 ```javascript
 // services/authService.js
@@ -242,9 +242,9 @@ const refreshAuthToken = async () => {
    - Validate tokens on every request
 
 2. **Storage Solutions**
-   - **Web Applications**: Use secure, HTTP-only cookies for refresh tokens
-   - **Single Page Applications**: Use session storage for access tokens
-   - **Mobile Applications**: Use platform-specific secure storage (Keychain, Keystore)
+   - Web Applications: Use secure, HTTP-only cookies for refresh tokens
+   - Single Page Applications: Use session storage for access tokens
+   - Mobile Applications: Use platform-specific secure storage (Keychain, Keystore)
 
 3. **Implementation Guidelines**
    - Implement refresh tokens for seamless user experience
@@ -927,11 +927,11 @@ class ApiKeyManager {
 
 ### 1. Transport Security
 
-- **Always use HTTPS** to encrypt data in transit.
-- **HSTS (HTTP Strict Transport Security)**: Enforce HTTPS by setting the `Strict-Transport-Security` header.
-- **Content Security Policy (CSP)**: Mitigate XSS attacks by defining which resources can be loaded.
-- **Secure Cookies**: Use `HttpOnly`, `Secure`, and `SameSite` attributes for cookies.
-- **CORS (Cross-Origin Resource Sharing)**: Properly configure CORS to control which domains can access your API.
+- Always use HTTPS to encrypt data in transit.
+- HSTS (HTTP Strict Transport Security): Enforce HTTPS by setting the `Strict-Transport-Security` header.
+- Content Security Policy (CSP): Mitigate XSS attacks by defining which resources can be loaded.
+- Secure Cookies: Use `HttpOnly`, `Secure`, and `SameSite` attributes for cookies.
+- CORS (Cross-Origin Resource Sharing): Properly configure CORS to control which domains can access your API.
 
 ```javascript
 // Enforce HTTPS in production
@@ -947,13 +947,13 @@ const enforceHTTPS = (req, res, next) => {
 
 ### 2. Token Security
 
-- **Use short-lived access tokens** with refresh tokens for long-term access.
-- **Implement token revocation**: Maintain a blacklist of revoked tokens.
-- **Validate tokens on every request**: Ensure tokens are not expired and belong to an active user.
-- **Use strong signing algorithms** (e.g., RS256 for JWTs).
-- **Store tokens securely**: Use HTTP-only cookies or secure storage mechanisms.
-- **Implement CSRF protection** for session-based authentication.
-- **Rate limit token requests** to prevent abuse.
+- Use short-lived access tokens with refresh tokens for long-term access.
+- Implement token revocation: Maintain a blacklist of revoked tokens.
+- Validate tokens on every request: Ensure tokens are not expired and belong to an active user.
+- Use strong signing algorithms (e.g., RS256 for JWTs).
+- Store tokens securely: Use HTTP-only cookies or secure storage mechanisms.
+- Implement CSRF protection for session-based authentication.
+- Rate limit token requests to prevent abuse.
 
 ```javascript
 // Secure token validation
@@ -985,11 +985,11 @@ const validateToken = async (token) => {
 
 ### 3. Csrf Protection
 
-- **Use anti-CSRF tokens**: Generate a unique token for each session and include it in forms and AJAX requests.
-- **Set the `SameSite` attribute** on cookies to prevent CSRF attacks.
-- **Implement CORS policies** to restrict cross-origin requests.
-- **Use custom headers** for AJAX requests to differentiate between same-origin and cross-origin requests.
-- **Validate the `Origin` and `Referer` headers** on sensitive requests to ensure they come from your domain.
+- Use anti-CSRF tokens: Generate a unique token for each session and include it in forms and AJAX requests.
+- Set the `SameSite` attribute on cookies to prevent CSRF attacks.
+- Implement CORS policies to restrict cross-origin requests.
+- Use custom headers for AJAX requests to differentiate between same-origin and cross-origin requests.
+- Validate the `Origin` and `Referer` headers on sensitive requests to ensure they come from your domain.
 
 ```javascript
 // CSRF protection for session-based auth
@@ -1022,12 +1022,12 @@ const makeProtectedRequest = async (url, data) => {
 
 ### 4. Rate Limiting
 
-- **Implement rate limiting** to prevent abuse and brute-force attacks.
-- **Limit requests per IP address** or user account.
-- **Use libraries like `express-rate-limit`** for easy implementation in Node.js applications.
-- **Monitor and log rate-limited requests** to detect potential attacks.
-- **Adjust rate limits based on user roles** (e.g., higher limits for authenticated users).
-- **Implement exponential backoff** for repeated requests to reduce server load.
+- Implement rate limiting to prevent abuse and brute-force attacks.
+- Limit requests per IP address or user account.
+- Use libraries like `express-rate-limit` for easy implementation in Node.js applications.
+- Monitor and log rate-limited requests to detect potential attacks.
+- Adjust rate limits based on user roles (e.g., higher limits for authenticated users).
+- Implement exponential backoff for repeated requests to reduce server load.
 
 ```javascript
 // Rate limiting implementation

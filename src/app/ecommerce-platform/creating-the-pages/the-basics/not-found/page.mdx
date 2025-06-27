@@ -25,7 +25,6 @@ Many websites have specific content that is displayed on their Not Found page. T
 - A link to the site's sitemap to help users navigate the site.
 - A link to the site's privacy policy and terms of service.
 
-
 ## Examples
 
 The following examples will use these variables:
@@ -55,6 +54,123 @@ const links = [
     href: "#",
     description: "Read our latest news and articles.",
     icon: FaRss,
+  },
+];
+
+const legalDocuments = [
+  {
+    icon: FaShieldAlt,
+    title: "Privacy Policy",
+    description:
+      "Learn how we collect, use, and protect your personal information.",
+    href: "/privacy-policy",
+    color: "text-green-600",
+  },
+  {
+    icon: FaFileContract,
+    title: "Terms of Service",
+    description:
+      "Review the terms and conditions that govern your use of our service.",
+    href: "/terms-of-service",
+    color: "text-blue-600",
+  },
+  {
+    icon: FaCookie,
+    title: "Cookie Policy",
+    description:
+      "Understand how we use cookies to enhance your browsing experience.",
+    href: "/cookie-policy",
+    color: "text-orange-600",
+  },
+  {
+    icon: FaUserShield,
+    title: "Data Protection",
+    description:
+      "See how we comply with GDPR and other data protection regulations.",
+    href: "/data-protection",
+    color: "text-purple-600",
+  },
+];
+
+const sitemapSections = [
+  {
+    title: "Products",
+    links: [
+      { name: "Featured Products", href: "/products/featured" },
+      { name: "New Arrivals", href: "/products/new" },
+      { name: "Sale Items", href: "/products/sale" },
+      { name: "Categories", href: "/categories" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { name: "About Us", href: "/about" },
+      { name: "Our Team", href: "/team" },
+      { name: "Careers", href: "/careers" },
+      { name: "Press", href: "/press" },
+    ],
+  },
+  {
+    title: "Support",
+    links: [
+      { name: "Help Center", href: "/help" },
+      { name: "Contact Us", href: "/contact" },
+      { name: "Shipping Info", href: "/shipping" },
+      { name: "Returns", href: "/returns" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { name: "Privacy Policy", href: "/privacy" },
+      { name: "Terms of Service", href: "/terms" },
+      { name: "Cookie Policy", href: "/cookies" },
+      { name: "GDPR", href: "/gdpr" },
+    ],
+  },
+];
+
+const recommendedProducts = [
+  {
+    id: 1,
+    name: "Wireless Bluetooth Headphones",
+    price: 99.99,
+    originalPrice: 129.99,
+    image: "/api/placeholder/300/300",
+    rating: 4.5,
+    reviews: 324,
+    badge: "Best Seller",
+  },
+  {
+    id: 2,
+    name: "Smart Fitness Watch",
+    price: 199.99,
+    originalPrice: 249.99,
+    image: "/api/placeholder/300/300",
+    rating: 4.7,
+    reviews: 156,
+    badge: "New Arrival",
+  },
+  {
+    id: 3,
+    name: "Portable Phone Charger",
+    price: 39.99,
+    originalPrice: 49.99,
+    image: "/api/placeholder/300/300",
+    rating: 4.3,
+    reviews: 89,
+    badge: "Sale",
+  },
+  {
+    id: 4,
+    name: "Wireless Mouse",
+    price: 29.99,
+    originalPrice: 39.99,
+    image: "/api/placeholder/300/300",
+    rating: 4.4,
+    reviews: 203,
+    badge: "Popular",
   },
 ];
 const social = [
@@ -101,120 +217,1157 @@ const social = [
 ### Example 1: Basic Not Found Page
 
 ```tsx
-
+export default function NotFound() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <h1 className="text-9xl font-bold text-gray-200">404</h1>
+        <h2 className="text-3xl font-semibold text-gray-800 mt-4">
+          Page Not Found
+        </h2>
+        <p className="text-gray-600 mt-4 max-w-md mx-auto">
+          Sorry, we couldn't find the page you're looking for. The page might
+          have been removed or the URL might be incorrect.
+        </p>
+        <div className="mt-8">
+          <Link
+            href="/"
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Go Back Home
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
 ```
 
 #### Benefits
 
-#### Disadventages
+- **Simple and Clean**: Minimalist design that's easy to understand
+- **Fast Loading**: No complex components or external dependencies
+- **Responsive**: Works well on all device sizes
+- **Clear Call-to-Action**: Single prominent button to return home
+
+#### Disadvantages
+
+- **Limited Functionality**: Only provides basic navigation back to home
+- **No Engagement**: Doesn't offer alternative ways to find content
+- **Missed Opportunity**: Doesn't leverage the moment to showcase site features
 
 <BackToTop />
 
-### Example 2: Not Found Page with Links
+### Example 2: Not Found Page with Links to Popular Pages
 
 ```tsx
+export default function NotFoundWithPopularPages() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50">
+      <div className="container mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <div className="text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
+            404
+          </div>
+          <h1 className="text-4xl font-bold text-gray-800 mt-4">
+            Oops! Page Not Found
+          </h1>
+          <p className="text-xl text-gray-600 mt-4 max-w-2xl mx-auto">
+            The page you're looking for doesn't exist, but don't worry! Here are
+            some popular pages that might interest you.
+          </p>
+        </div>
 
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-12">
+          {links.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+            >
+              <link.icon className="w-8 h-8 text-blue-600 mb-4" />
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                {link.name}
+              </h3>
+              <p className="text-gray-600 text-sm">{link.description}</p>
+            </Link>
+          ))}
+        </div>
+
+        <div className="text-center">
+          <Link
+            href="/"
+            className="inline-flex items-center bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-full hover:from-purple-700 hover:to-blue-700 transition-all duration-300 font-semibold"
+          >
+            <FaHome className="mr-2" />
+            Return to Homepage
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
 ```
 
 #### Benefits
 
-#### Disadventages
+- **User Engagement**: Provides alternative content to explore
+- **Reduced Bounce Rate**: Keeps users on the site with interesting options
+- **Visual Appeal**: Gradient design and card layout create modern aesthetics
+- **SEO Friendly**: Links to popular pages help with internal linking
+
+#### Disadvantages
+
+- **Maintenance Required**: Popular pages need to be updated regularly
+- **Analysis Needed**: Requires data to determine which pages are actually popular
+- **Complexity**: More components mean potential for more things to break
 
 <BackToTop />
 
 ### Example 3: Not Found Page with Search Bar
 
 ```tsx
+"use client";
 
+import { useState } from "react";
+import { FaSearch, FaMagnifyingGlass } from "react-icons/fa6";
+
+export default function NotFoundWithSearch() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
+      <div className="container mx-auto px-4 text-center">
+        <div className="mb-8">
+          <div className="inline-block p-4 rounded-full bg-red-500/20 mb-6">
+            <FaMagnifyingGlass className="w-16 h-16 text-red-400" />
+          </div>
+          <h1 className="text-6xl font-bold mb-4">
+            Page <span className="text-red-400">Not Found</span>
+          </h1>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
+            We couldn't find what you were looking for. Try searching for
+            something else, or explore our site using the navigation above.
+          </p>
+        </div>
+
+        <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-12">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search for products, articles, or pages..."
+              className="w-full px-6 py-4 pl-14 text-lg bg-gray-800 border border-gray-700 rounded-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+            />
+            <FaSearch className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <button
+              type="submit"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-full transition-colors"
+            >
+              Search
+            </button>
+          </div>
+        </form>
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/"
+            className="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-full transition-colors"
+          >
+            Go to Homepage
+          </Link>
+          <Link
+            href="/contact"
+            className="border border-gray-600 hover:border-gray-400 px-8 py-3 rounded-full transition-colors"
+          >
+            Contact Support
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
 ```
 
 #### Benefits
 
-#### Disadventages
+- **Immediate Solution**: Users can search right from the error page
+- **Dark Theme**: Modern, developer-friendly aesthetic
+- **Interactive**: Engaging search functionality keeps users active
+- **Multiple Options**: Provides both search and navigation alternatives
+
+#### Disadvantages
+
+- **Search Dependency**: Requires a working search system to be effective
+- **Client-Side**: Needs JavaScript enabled to function properly
+- **Dark Design**: May not fit all brand aesthetics or accessibility needs
 
 <BackToTop />
 
 ### Example 4: Not Found Page with Social Media Links
 
 ```tsx
+export default function NotFoundWithSocial() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-50 to-indigo-100">
+      <div className="container mx-auto px-4 py-16 text-center">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-12">
+            <div className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 mb-6">
+              404
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+              Whoops! You've Found a Dead End
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+              This page seems to have vanished into the digital void. While
+              you're here, why not connect with us on social media?
+            </p>
+          </div>
 
+          <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+              Stay Connected
+            </h2>
+            <p className="text-gray-600 mb-8">
+              Follow us for the latest updates, tips, and behind-the-scenes
+              content!
+            </p>
+
+            <div className="flex flex-wrap justify-center gap-6 mb-8">
+              {social.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className="group flex items-center space-x-3 bg-gray-50 hover:bg-gray-100 px-6 py-4 rounded-full transition-all duration-300 hover:scale-105"
+                >
+                  <item.icon className="w-6 h-6 text-gray-600 group-hover:text-gray-800" />
+                  <span className="font-semibold text-gray-700 group-hover:text-gray-900">
+                    Follow on {item.name}
+                  </span>
+                </a>
+              ))}
+            </div>
+
+            <div className="border-t border-gray-200 pt-8">
+              <p className="text-sm text-gray-500 mb-6">
+                Or get back to exploring our content
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href="/"
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3 rounded-full hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 font-semibold"
+                >
+                  Return Home
+                </Link>
+                <Link
+                  href="/blog"
+                  className="border border-purple-600 text-purple-600 hover:bg-purple-600 hover:text-white px-8 py-3 rounded-full transition-all duration-300 font-semibold"
+                >
+                  Read Our Blog
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 ```
 
 #### Benefits
 
-#### Disadventages
+- **Community Building**: Encourages social media following and engagement
+- **Brand Awareness**: Increases visibility across multiple platforms
+- **Colorful Design**: Vibrant gradient design creates positive user experience
+- **Multiple CTAs**: Offers various ways to stay connected with the brand
+
+#### Disadvantages
+
+- **Social Media Dependency**: Effectiveness depends on active social presence
+- **Distraction**: Might lead users away from the main site
+- **Maintenance**: Social links need to be kept current and active
 
 <BackToTop />
 
 ### Example 5: Not Found Page with Sitemap and Contact Links
 
 ```tsx
+import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaSitemap } from "react-icons/fa";
 
+export default function NotFoundWithSitemap() {
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="container mx-auto px-4 py-16">
+        <div className="text-center mb-16">
+          <h1 className="text-6xl font-bold text-gray-800 mb-4">404</h1>
+          <h2 className="text-3xl font-semibold text-gray-700 mb-4">
+            Page Not Found
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            The page you're looking for doesn't exist. Use our sitemap below to
+            find what you need, or contact us for assistance.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-12 max-w-7xl mx-auto">
+          {/* Sitemap */}
+          <div className="lg:col-span-2">
+            <div className="flex items-center mb-8">
+              <FaSitemap className="w-6 h-6 text-blue-600 mr-3" />
+              <h3 className="text-2xl font-bold text-gray-800">Site Map</h3>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              {sitemapSections.map((section) => (
+                <div key={section.title} className="bg-gray-50 rounded-lg p-6">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                    {section.title}
+                  </h4>
+                  <ul className="space-y-2">
+                    {section.links.map((link) => (
+                      <li key={link.name}>
+                        <Link
+                          href={link.href}
+                          className="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                        >
+                          {link.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Contact Information */}
+          <div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-8 flex items-center">
+              <FaEnvelope className="w-6 h-6 text-blue-600 mr-3" />
+              Need Help?
+            </h3>
+
+            <div className="bg-blue-50 rounded-lg p-6 mb-6">
+              <h4 className="font-semibold text-gray-800 mb-4">Contact Us</h4>
+              <div className="space-y-4">
+                <div className="flex items-center">
+                  <FaPhone className="w-4 h-4 text-blue-600 mr-3" />
+                  <span className="text-gray-700">+1 (555) 123-4567</span>
+                </div>
+                <div className="flex items-center">
+                  <FaEnvelope className="w-4 h-4 text-blue-600 mr-3" />
+                  <span className="text-gray-700">support@example.com</span>
+                </div>
+                <div className="flex items-start">
+                  <FaMapMarkerAlt className="w-4 h-4 text-blue-600 mr-3 mt-1" />
+                  <span className="text-gray-700">
+                    123 Business Ave
+                    <br />
+                    Suite 100
+                    <br />
+                    City, State 12345
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <Link
+                href="/"
+                className="block w-full bg-blue-600 text-white text-center py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+              >
+                Return to Homepage
+              </Link>
+              <Link
+                href="/contact"
+                className="block w-full border border-blue-600 text-blue-600 text-center py-3 rounded-lg hover:bg-blue-600 hover:text-white transition-colors font-semibold"
+              >
+                Contact Support
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 ```
 
 #### Benefits
 
-#### Disadventages
+- **Comprehensive Navigation**: Full sitemap helps users find any content
+- **Contact Integration**: Immediate access to support information
+- **SEO Friendly**: Internal links help with site crawling and indexing
+- **Professional Layout**: Clean, organized design builds trust
+
+#### Disadvantages
+
+- **High Maintenance**: Sitemap must be kept updated as site grows
+- **Information Overload**: Too many options might overwhelm some users
+- **Static Content**: Requires manual updates when site structure changes
 
 <BackToTop />
 
 ### Example 6: Not Found Page with Privacy Policy and Terms of Service Links
 
 ```tsx
+import {
+  FaShieldAlt,
+  FaFileContract,
+  FaCookie,
+  FaUserShield,
+} from "react-icons/fa";
 
+export default function NotFoundWithLegal() {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-block p-4 rounded-full bg-red-100 mb-6">
+              <FaShieldAlt className="w-12 h-12 text-red-600" />
+            </div>
+            <h1 className="text-5xl font-bold text-gray-800 mb-4">
+              404 - Page Not Found
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+              The page you're looking for doesn't exist. While you're here, take
+              a moment to review our important legal documents and policies.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg p-8 mb-12">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                Important Legal Information
+              </h2>
+              <p className="text-gray-600">
+                We believe in transparency. Review our policies to understand
+                your rights and our commitments.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              {legalDocuments.map((doc) => (
+                <Link
+                  key={doc.title}
+                  href={doc.href}
+                  className="group bg-gray-50 hover:bg-gray-100 rounded-xl p-6 transition-all duration-300 hover:shadow-md"
+                >
+                  <div className="flex items-start space-x-4">
+                    <div className={`p-3 rounded-lg bg-white ${doc.color}`}>
+                      <doc.icon className="w-6 h-6" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-800 group-hover:text-gray-900 mb-2">
+                        {doc.title}
+                      </h3>
+                      <p className="text-sm text-gray-600">{doc.description}</p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            <div className="border-t border-gray-200 pt-8">
+              <div className="bg-blue-50 rounded-lg p-6 mb-6">
+                <h3 className="font-semibold text-gray-800 mb-2">
+                  Questions About Our Policies?
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  If you have any questions about our privacy practices or terms
+                  of service, our legal team is here to help.
+                </p>
+                <Link
+                  href="/legal-contact"
+                  className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  Contact Legal Team →
+                </Link>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href="/"
+                  className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors text-center font-semibold"
+                >
+                  Return to Homepage
+                </Link>
+                <Link
+                  href="/help"
+                  className="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-50 transition-colors text-center font-semibold"
+                >
+                  Visit Help Center
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <p className="text-sm text-gray-500">
+              Last updated: {new Date().toLocaleDateString()} |
+              <Link
+                href="/legal-updates"
+                className="text-blue-600 hover:underline ml-1"
+              >
+                View Recent Changes
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 ```
 
 #### Benefits
 
-#### Disadventages
+- **Legal Compliance**: Prominently displays important legal documents
+- **Trust Building**: Transparency about policies builds user confidence
+- **Educational**: Helps users understand their rights and site policies
+- **Professional**: Demonstrates commitment to legal compliance
+
+#### Disadvantages
+
+- **Boring Content**: Legal documents may not be engaging for most users
+- **Conversion Killer**: Might not help retain users on the site
+- **Maintenance Heavy**: Legal documents require regular updates and reviews
 
 <BackToTop />
 
-### Example 7: Not Found Page
+### Example 7: Animated 404 Page with Interactive Elements
 
 ```tsx
+"use client";
 
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { FaRocket, FaStar, FaHome } from "react-icons/fa";
+
+export default function AnimatedNotFound() {
+  const [stars, setStars] = useState<
+    Array<{ id: number; x: number; y: number }>
+  >([]);
+
+  useEffect(() => {
+    const generateStars = () => {
+      const newStars = Array.from({ length: 50 }, (_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+      }));
+      setStars(newStars);
+    };
+
+    generateStars();
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 overflow-hidden relative">
+      {/* Animated Stars */}
+      {stars.map((star) => (
+        <motion.div
+          key={star.id}
+          className="absolute w-1 h-1 bg-white rounded-full"
+          style={{
+            left: `${star.x}%`,
+            top: `${star.y}%`,
+          }}
+          animate={{
+            opacity: [0, 1, 0],
+            scale: [0, 1, 0],
+          }}
+          transition={{
+            duration: 2 + Math.random() * 2,
+            repeat: Infinity,
+            delay: Math.random() * 2,
+          }}
+        />
+      ))}
+
+      <div className="container mx-auto px-4 py-16 relative z-10">
+        <div className="text-center">
+          {/* Animated 404 */}
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+            className="mb-8"
+          >
+            <motion.h1
+              className="text-8xl md:text-9xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600"
+              animate={{
+                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            >
+              404
+            </motion.h1>
+          </motion.div>
+
+          {/* Floating Rocket */}
+          <motion.div
+            className="flex justify-center mb-8"
+            animate={{
+              y: [0, -20, 0],
+              rotate: [0, 5, -5, 0],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          >
+            <div className="bg-white rounded-full p-6 shadow-2xl">
+              <FaRocket className="w-16 h-16 text-purple-600" />
+            </div>
+          </motion.div>
+
+          {/* Animated Text */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 1 }}
+            className="mb-12"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Houston, We Have a Problem!
+            </h2>
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              The page you're looking for has drifted into deep space. Let's get
+              you back to Earth safely.
+            </p>
+          </motion.div>
+
+          {/* Interactive Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 1 }}
+            className="flex flex-col sm:flex-row gap-6 justify-center"
+          >
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link
+                href="/"
+                className="inline-flex items-center bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-full hover:from-purple-700 hover:to-pink-700 transition-all duration-300 font-semibold text-lg"
+              >
+                <FaHome className="mr-3" />
+                Return to Base
+              </Link>
+            </motion.div>
+
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <button
+                onClick={() => window.history.back()}
+                className="inline-flex items-center border-2 border-white text-white px-8 py-4 rounded-full hover:bg-white hover:text-purple-900 transition-all duration-300 font-semibold text-lg"
+              >
+                <FaStar className="mr-3" />
+                Go Back in Time
+              </button>
+            </motion.div>
+          </motion.div>
+
+          {/* Fun Fact */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5, duration: 1 }}
+            className="mt-16 max-w-2xl mx-auto"
+          >
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+              <h3 className="text-xl font-semibold text-white mb-3">
+                🚀 Fun Space Fact
+              </h3>
+              <p className="text-gray-300">
+                Did you know? The first 404 error was named after room 404 at
+                CERN, where the World Wide Web was invented. Now that's out of
+                this world!
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
+}
 ```
 
 #### Benefits
 
-#### Disadventages
+- **Highly Engaging**: Animations and interactive elements create memorable experience
+- **Modern Technology**: Showcases advanced frontend capabilities
+- **Fun & Memorable**: Space theme makes error page entertaining rather than frustrating
+- **Smooth Interactions**: Framer Motion provides professional-grade animations
+
+#### Disadvantages
+
+- **Performance Impact**: Animations can be resource-intensive on lower-end devices
+- **Accessibility Concerns**: Motion might cause issues for users with vestibular disorders
+- **Dependency Heavy**: Requires additional libraries (Framer Motion) increasing bundle size
 
 <BackToTop />
 
-### Example 8: Not Found Page
+### Example 8: Minimalist Designer 404 Page
 
 ```tsx
+export default function MinimalistNotFound() {
+  return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="max-w-4xl mx-auto px-4 text-center">
+        <div className="mb-16">
+          {/* Large Typography */}
+          <div className="relative mb-12">
+            <h1 className="text-[12rem] md:text-[16rem] font-thin text-gray-100 leading-none select-none">
+              404
+            </h1>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-32 h-32 border border-gray-300 rounded-full flex items-center justify-center">
+                <div className="w-16 h-16 border border-gray-400 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gray-500 rounded-full"></div>
+                </div>
+              </div>
+            </div>
+          </div>
 
+          {/* Clean Typography */}
+          <div className="space-y-6 mb-16">
+            <h2 className="text-2xl md:text-3xl font-light text-gray-800 tracking-wide">
+              Page Not Found
+            </h2>
+            <div className="w-24 h-px bg-gray-300 mx-auto"></div>
+            <p className="text-lg text-gray-600 font-light max-w-md mx-auto leading-relaxed">
+              The page you are looking for might have been removed, had its name
+              changed, or is temporarily unavailable.
+            </p>
+          </div>
+
+          {/* Minimal Button */}
+          <Link href="/" className="inline-block relative group">
+            <div className="absolute inset-0 bg-black transform translate-x-2 translate-y-2 group-hover:translate-x-1 group-hover:translate-y-1 transition-transform duration-200"></div>
+            <div className="relative bg-white border-2 border-black px-12 py-4 text-black font-medium tracking-wide hover:bg-gray-50 transition-colors duration-200">
+              RETURN HOME
+            </div>
+          </Link>
+        </div>
+
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 pointer-events-none opacity-5">
+          <div className="grid grid-cols-12 gap-4 h-full">
+            {Array.from({ length: 144 }, (_, i) => (
+              <div key={i} className="border border-gray-200"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 ```
 
 #### Benefits
 
-#### Disadventages
+- **Clean & Professional**: Minimalist design appeals to design-conscious users
+- **Fast Loading**: Minimal elements ensure quick load times
+- **Timeless Design**: Won't look outdated as design trends change
+- **Focus on Content**: Clear hierarchy guides user attention effectively
+
+#### Disadvantages
+
+- **Limited Functionality**: Minimal features may not help users find alternatives
+- **Brand Disconnect**: Generic design might not reflect brand personality
+- **Reduced Engagement**: Lack of interactive elements may increase bounce rate
 
 <BackToTop />
 
-### Example 9: Not Found Page
+### Example 9: Gaming-Themed 404 Page
 
 ```tsx
+"use client";
 
+import { useState, useEffect } from "react";
+import { FaGamepad, FaTrophy, FaCoins } from "react-icons/fa";
+
+export default function GamingNotFound() {
+  const [score, setScore] = useState(0);
+  const [lives, setLives] = useState(3);
+  const [gameText, setGameText] = useState("GAME OVER");
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setScore((prev) => prev + 10);
+    }, 100);
+
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+      setGameText("LEVEL COMPLETE!");
+    }, 3000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, []);
+
+  const pixelStyle = {
+    fontFamily: "'Courier New', monospace",
+    imageRendering: "pixelated" as const,
+  };
+
+  return (
+    <div
+      className="min-h-screen bg-black text-green-400 overflow-hidden"
+      style={pixelStyle}
+    >
+      {/* Scanlines Effect */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-green-500/5 to-transparent animate-pulse"></div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8 relative z-10">
+        {/* Game UI Header */}
+        <div className="flex justify-between items-center mb-8 bg-gray-900 border-2 border-green-400 p-4">
+          <div className="flex items-center space-x-8">
+            <div className="flex items-center space-x-2">
+              <FaCoins className="text-yellow-400" />
+              <span className="text-xl font-bold">
+                {score.toLocaleString()}
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <FaTrophy className="text-yellow-400" />
+              <span className="text-xl font-bold">LVL 404</span>
+            </div>
+          </div>
+          <div className="flex space-x-2">
+            {Array.from({ length: lives }, (_, i) => (
+              <div key={i} className="w-6 h-6 bg-red-500 rounded-sm"></div>
+            ))}
+          </div>
+        </div>
+
+        <div className="text-center">
+          {/* Pixelated 404 */}
+          <div className="mb-8">
+            <div
+              className="inline-block bg-green-400 text-black p-8 mb-6"
+              style={{
+                clipPath:
+                  "polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px))",
+              }}
+            >
+              <h1 className="text-6xl md:text-8xl font-bold tracking-wider">
+                ERROR 404
+              </h1>
+            </div>
+          </div>
+
+          {/* Game Over Message */}
+          <div className="bg-gray-900 border-4 border-green-400 p-8 mb-8 max-w-2xl mx-auto">
+            <div className="animate-pulse mb-4">
+              <h2 className="text-3xl font-bold text-red-400 mb-2">
+                {gameText}
+              </h2>
+              <div className="w-full bg-gray-700 h-2 mb-4">
+                <div
+                  className="bg-green-400 h-2 transition-all duration-3000 ease-out"
+                  style={{
+                    width: gameText === "LEVEL COMPLETE!" ? "100%" : "0%",
+                  }}
+                ></div>
+              </div>
+            </div>
+
+            <p className="text-lg mb-6 leading-relaxed">
+              The page you were looking for has been captured by the bug
+              monsters! Your mission, should you choose to accept it, is to
+              navigate back to safety.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="bg-black border border-green-400 p-4 text-center">
+                <FaGamepad className="w-8 h-8 mx-auto mb-2 text-yellow-400" />
+                <div className="text-sm">
+                  <div className="text-yellow-400">POWER-UP</div>
+                  <div>Home Page</div>
+                </div>
+              </div>
+              <div className="bg-black border border-green-400 p-4 text-center">
+                <FaTrophy className="w-8 h-8 mx-auto mb-2 text-yellow-400" />
+                <div className="text-sm">
+                  <div className="text-yellow-400">BONUS</div>
+                  <div>Search</div>
+                </div>
+              </div>
+              <div className="bg-black border border-green-400 p-4 text-center">
+                <FaCoins className="w-8 h-8 mx-auto mb-2 text-yellow-400" />
+                <div className="text-sm">
+                  <div className="text-yellow-400">EXTRA LIFE</div>
+                  <div>Contact</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Game Action Buttons */}
+          <div className="space-y-4 max-w-md mx-auto">
+            <Link
+              href="/"
+              className="block bg-green-400 text-black py-4 px-8 font-bold text-xl hover:bg-green-300 transition-colors border-4 border-green-600 hover:border-green-400"
+              style={{
+                clipPath:
+                  "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
+              }}
+            >
+              ▶ CONTINUE [ENTER]
+            </Link>
+
+            <button
+              onClick={() => window.history.back()}
+              className="block w-full bg-gray-700 text-green-400 py-3 px-8 font-bold text-lg hover:bg-gray-600 transition-colors border-2 border-green-400"
+            >
+              ⟲ RESTART [ESC]
+            </button>
+          </div>
+
+          {/* Retro Footer */}
+          <div className="mt-12 text-sm text-green-300">
+            <p>© 2024 ERROR ARCADE • INSERT COIN TO CONTINUE</p>
+            <div className="flex justify-center space-x-4 mt-4">
+              <span className="animate-pulse">●</span>
+              <span className="animate-pulse delay-300">●</span>
+              <span className="animate-pulse delay-700">●</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 ```
 
 #### Benefits
 
-#### Disadventages
+- **Highly Engaging**: Gaming theme creates fun, memorable experience
+- **Target Audience**: Appeals to tech-savvy users and gamers
+- **Interactive Elements**: Animated score and progress bars provide engagement
+- **Unique Branding**: Distinctive retro aesthetic sets site apart
+
+#### Disadvantages
+
+- **Niche Appeal**: Gaming theme may not resonate with all audiences
+- **Complexity**: More complex code requires additional maintenance
+- **Accessibility Issues**: High contrast and flashing elements may be problematic
 
 <BackToTop />
 
-### Example 10: Not Found Page
+### Example 10: E-commerce 404 with Product Recommendations
 
 ```tsx
+"use client";
 
+import { useState, useEffect } from "react";
+import { FaShoppingCart, FaHeart, FaStar, FaSearch } from "react-icons/fa";
+
+export default function EcommerceNotFound() {
+  const [featuredProducts, setFeaturedProducts] = useState(recommendedProducts);
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleAddToCart = (product: any) => {
+    // Add to cart logic
+    console.log("Added to cart:", product.name);
+  };
+
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <FaStar
+        key={i}
+        className={`w-4 h-4 ${
+          i < Math.floor(rating) ? "text-yellow-400" : "text-gray-300"
+        }`}
+      />
+    ));
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-16">
+        {/* Header Section */}
+        <div className="text-center mb-16">
+          <div className="inline-block p-6 bg-white rounded-full shadow-lg mb-6">
+            <FaShoppingCart className="w-16 h-16 text-blue-600" />
+          </div>
+          <h1 className="text-5xl font-bold text-gray-800 mb-4">
+            Oops! Product Not Found
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+            The product you're looking for might be out of stock, discontinued,
+            or the link might be broken. But don't worry - we have some amazing
+            alternatives for you!
+          </p>
+
+          {/* Search Bar */}
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="relative">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search for products..."
+                className="w-full px-6 py-4 pl-14 text-lg border border-gray-300 rounded-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+              />
+              <FaSearch className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full transition-colors">
+                Search
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Featured Products Section */}
+        <div className="mb-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">
+              You Might Also Like
+            </h2>
+            <p className="text-gray-600">
+              Check out these popular products from our collection
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {featuredProducts.map((product) => (
+              <div
+                key={product.id}
+                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group"
+              >
+                <div className="relative">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute top-4 left-4">
+                    <span
+                      className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                        product.badge === "Sale"
+                          ? "bg-red-500 text-white"
+                          : product.badge === "New Arrival"
+                            ? "bg-green-500 text-white"
+                            : product.badge === "Best Seller"
+                              ? "bg-blue-500 text-white"
+                              : "bg-purple-500 text-white"
+                      }`}
+                    >
+                      {product.badge}
+                    </span>
+                  </div>
+                  <button className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors">
+                    <FaHeart className="w-4 h-4 text-gray-400 hover:text-red-500" />
+                  </button>
+                </div>
+
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
+                    {product.name}
+                  </h3>
+
+                  <div className="flex items-center mb-3">
+                    <div className="flex space-x-1 mr-2">
+                      {renderStars(product.rating)}
+                    </div>
+                    <span className="text-sm text-gray-500">
+                      ({product.reviews} reviews)
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-2">
+                      <span className="text-2xl font-bold text-gray-800">
+                        ${product.price}
+                      </span>
+                      <span className="text-lg text-gray-500 line-through">
+                        ${product.originalPrice}
+                      </span>
+                    </div>
+                    <span className="text-sm text-green-600 font-semibold">
+                      {Math.round(
+                        (1 - product.price / product.originalPrice) * 100
+                      )}
+                      % OFF
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => handleAddToCart(product)}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition-colors font-semibold flex items-center justify-center space-x-2"
+                  >
+                    <FaShoppingCart className="w-4 h-4" />
+                    <span>Add to Cart</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12 text-center text-white">
+          <h2 className="text-3xl font-bold mb-4">
+            Can't Find What You're Looking For?
+          </h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto">
+            Browse our full catalog or contact our customer service team. We're
+            here to help you find exactly what you need!
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/products"
+              className="bg-white text-blue-600 px-8 py-4 rounded-full hover:bg-gray-100 transition-colors font-semibold"
+            >
+              Browse All Products
+            </Link>
+            <Link
+              href="/contact"
+              className="border border-white text-white px-8 py-4 rounded-full hover:bg-white hover:text-blue-600 transition-colors font-semibold"
+            >
+              Contact Support
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 ```
 
 #### Benefits
 
-#### Disadventages
+- **Revenue Recovery**: Product recommendations can convert lost visitors into customers
+- **Enhanced UX**: Search functionality helps users find alternatives quickly
+- **Business Value**: Turns 404 errors into sales opportunities
+- **Comprehensive**: Includes ratings, reviews, and pricing to aid decision-making
+
+#### Disadvantages
+
+- **Complex Implementation**: Requires product data integration and recommendation logic
+- **Performance Impact**: Loading product images and data can slow page load
+- **Maintenance Intensive**: Product recommendations need regular updates and testing
 
 <BackToTop />
 

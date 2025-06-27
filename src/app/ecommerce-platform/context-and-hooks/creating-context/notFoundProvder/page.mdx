@@ -34,7 +34,7 @@ import { NotFoundContextType } from "@/lib/types/types";
 import { createContext, JSX, ReactNode, useContext, useState } from "react";
 ```
 
-##### Explanation of the `import` Statements
+###### Explanation of the `import` Statements
 
 - **`"use client"`**: This directive tells Next.js that this component runs on the client-side, which is necessary for React hooks and state management
 - **`createContext`**: Creates a new React context that can be used to share data between components without prop drilling
@@ -107,7 +107,7 @@ export const NotFoundProvider = ({
 
 Let's examine each part of this provider component:
 
-#### 1. Component Props and tsx
+##### 1. Component Props and TSX
 
 ```tsx
 {
@@ -119,7 +119,7 @@ Let's examine each part of this provider component:
 
 This uses tsx's inline type annotation to specify that the component expects a `children` prop of type `ReactNode`. The destructuring assignment extracts `children` directly from the props object.
 
-#### 2. State Management
+##### 2. State Management
 
 ```tsx
 const [isNotFound, setIsNotFound] = useState(false);
@@ -130,7 +130,7 @@ We use React's `useState` hook to create a boolean state variable:
 - `isNotFound`: The current state value (initially `false`)
 - `setIsNotFound`: The function to update the state
 
-#### 3. Context Value Object
+##### 3. Context Value Object
 
 ```tsx
 value={{ isNotFound, setNotFound: setIsNotFound }}
@@ -143,7 +143,7 @@ The provider passes an object containing:
 
 This object structure matches our `NotFoundContextType` interface, ensuring type safety.
 
-#### 4. Provider Pattern
+##### 4. Provider Pattern
 
 The component wraps its children with `NotFoundContext.Provider`, making the context value available to all descendant components in the React tree.
 
@@ -173,7 +173,7 @@ export const useNotFound = (): any => {
 
 This custom hook follows a common React pattern for consuming context safely:
 
-#### 1. Context Consumption
+##### 1. Context Consumption
 
 ```tsx
 const context = useContext(NotFoundContext);
@@ -181,7 +181,7 @@ const context = useContext(NotFoundContext);
 
 The `useContext` hook retrieves the current context value. If the component is not wrapped by a `NotFoundProvider`, this will return `undefined`.
 
-#### 2. Error Boundary Pattern
+##### 2. Error Boundary Pattern
 
 ```tsx
 if (!context) {
@@ -195,7 +195,7 @@ This defensive check ensures that:
 - The hook never returns `undefined`, eliminating the need for null checks in consuming components
 - Runtime errors are caught early during development
 
-#### 3. Type Safety Benefits
+##### 3. Type Safety Benefits
 
 By throwing an error when context is `undefined`, tsx knows that the return value will always be a valid `NotFoundContextType` object, providing better intellisense and compile-time checking.
 
@@ -244,7 +244,7 @@ export function Providers({ children }: { children: ReactNode }): JSX.Element {
 
 This implementation demonstrates several important React patterns:
 
-#### 1. Provider Nesting
+##### 1. Provider Nesting
 
 ```tsx
 <ThemeProvider>
@@ -254,14 +254,14 @@ This implementation demonstrates several important React patterns:
 
 Providers can be nested to combine multiple contexts. The order matters - inner providers can access outer provider values, but not vice versa.
 
-#### 2. Separation of Concerns
+##### 2. Separation of Concerns
 
 Each provider handles a specific aspect of application state:
 
 - `ThemeProvider`: Manages visual theme (light/dark mode)
 - `NotFoundProvider`: Manages error state and 404 handling
 
-#### 3. Client-Side Directive
+##### 3. Client-Side Directive
 
 The `"use client"` directive is crucial because:
 

@@ -136,7 +136,7 @@ Take note of the type system that drives our authentication architecture. These 
 
 ### Deep Dive into Interface Design
 
-#### User Interface Analysis
+##### User Interface Analysis
 
 ```tsx
 export interface User {
@@ -151,7 +151,7 @@ export interface User {
 }
 ```
 
-##### Design Decisions Explained:
+###### Design Decisions Explained:
 
 - **`id: string`**: Using string IDs provides flexibility for different ID generation strategies (UUID, timestamp-based, or external system IDs)
 - **`username: string`**: Required field that serves dual purpose as display name and login credential
@@ -162,7 +162,7 @@ export interface User {
 - **`membershipCancellationDate?: Date`**: Tracks cancellation events while maintaining benefits until expiry
 - **`joinedDate: Date`**: Business intelligence data for user lifecycle analytics
 
-#### MembershipTier Interface Analysis
+##### MembershipTier Interface Analysis
 
 ```tsx
 export interface MembershipTier {
@@ -176,14 +176,14 @@ export interface MembershipTier {
 }
 ```
 
-##### Architectural Benefits:
+###### Architectural Benefits:
 
 - **`benefits: string[]`**: Array format allows flexible benefit management and easy UI rendering
 - **`discountPercentage: number`**: Numeric format enables complex discount calculations
 - **`color: string`**: UI/UX consideration for consistent brand theming
 - **`duration: number`**: Flexible subscription periods (monthly, annual, custom)
 
-#### AuthContextType Interface Analysis
+##### AuthContextType Interface Analysis
 
 ```tsx
 export interface AuthContextType {
@@ -215,14 +215,14 @@ export interface AuthContextType {
 }
 ```
 
-##### Method Design Patterns:
+###### Method Design Patterns:
 
 - **Promise-based Returns**: All async operations return consistent `{success: boolean; message: string}` objects for predictable error handling
 - **Computed Properties**: Derived state properties reduce complexity in consuming components
 - **Action Segregation**: Clear separation between authentication and membership management
 - **Loading States**: Built-in loading indicators for better UX during async operations
 
-#### RegisterData Interface Analysis
+##### RegisterData Interface Analysis
 
 ```tsx
 export interface RegisterData {
@@ -233,13 +233,13 @@ export interface RegisterData {
 }
 ```
 
-##### Registration Strategy:
+###### Registration Strategy:
 
 - **Minimal Required Fields**: Reduces registration friction
 - **Optional Email**: Balances data collection with user convenience
 - **Phone Number Priority**: Ensures reliable contact method for account recovery
 
-### tsx Benefits in Authentication
+### TSX Benefits in Authentication
 
 1. **Compile-time Safety**: Catches authentication logic errors before runtime
 2. **IntelliSense Support**: Enhanced developer experience with autocomplete
@@ -272,7 +272,7 @@ This section establishes the foundational infrastructure for our authentication 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 ```
 
-##### Design Pattern Analysis:
+###### Design Pattern Analysis:
 
 - **Union Type with Undefined**: The `AuthContextType | undefined` pattern enables compile-time detection of context misuse
 - **Defensive Programming**: Starting with `undefined` forces proper provider wrapping
@@ -290,7 +290,7 @@ export const useAuth = () => {
 };
 ```
 
-##### Hook Design Benefits:
+###### Hook Design Benefits:
 
 1. **Encapsulation**: Hides the complexity of context consumption from components
 2. **Error Boundary**: Provides clear, actionable error messages for developers
@@ -404,7 +404,7 @@ export const membershipTiers: MembershipTier[] = [
 
 This tiered membership structure follows proven e-commerce subscription models with strategic pricing and benefit distribution.
 
-#### Tier Design Psychology
+##### Tier Design Psychology
 
 **Basic Tier ($9.99)**:
 
@@ -427,7 +427,7 @@ This tiered membership structure follows proven e-commerce subscription models w
 - **Personal Touch**: Individual attention through shopping assistant
 - **Status Symbol**: Highest tier provides social proof and exclusivity
 
-#### Revenue Optimization Strategy
+##### Revenue Optimization Strategy
 
 ```javascript
 // Revenue Analysis
@@ -445,7 +445,7 @@ const tierMargins = {
 };
 ```
 
-#### Benefit Value Engineering
+##### Benefit Value Engineering
 
 Each tier is designed with **perceived value** exceeding **actual cost**:
 
@@ -462,7 +462,7 @@ Each tier is designed with **perceived value** exceeding **actual cost**:
    - Shopping assistant: High-value service justifying premium pricing
    - Member events: Brand building with long-term ROI
 
-#### Color Psychology in Tier Design
+##### Color Psychology in Tier Design
 
 - **Basic (Blue)**: Trust, reliability, professionalism
 - **Premium (Purple)**: Luxury, creativity, sophistication
@@ -819,7 +819,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
 ```
 
-##### Design Decisions:
+###### Design Decisions:
 
 - **Functional Component with tsx**: Modern React patterns with full type safety
 - **Generic Children Prop**: Accepts any valid React node, providing maximum flexibility
@@ -832,7 +832,7 @@ const [user, setUser] = useState<User | null>(null);
 const [isLoading, setIsLoading] = useState(true);
 ```
 
-##### State Design Philosophy:
+###### State Design Philosophy:
 
 1. **`user: User | null`**:
    - **Null vs Undefined**: Explicit null indicates "no user" vs undefined indicating "unknown state"
@@ -846,7 +846,7 @@ const [isLoading, setIsLoading] = useState(true);
 
 ### Session Persistence Implementation
 
-#### User Loading Effect
+##### User Loading Effect
 
 ```tsx
 useEffect(() => {
@@ -872,7 +872,7 @@ useEffect(() => {
 }, []);
 ```
 
-##### Critical Implementation Details:
+###### Critical Implementation Details:
 
 1. **JSON Parsing Safety**: Try-catch prevents app crashes from corrupted localStorage data
 2. **Membership Validation**: Automatic expiry checking on app load
@@ -880,7 +880,7 @@ useEffect(() => {
 4. **Loading State Management**: Ensures loading state is properly cleared
 5. **Error Handling**: Graceful degradation when localStorage is corrupted
 
-#### User Saving Effect
+##### User Saving Effect
 
 ```tsx
 useEffect(() => {
@@ -892,7 +892,7 @@ useEffect(() => {
 }, [user]);
 ```
 
-##### Persistence Strategy:
+###### Persistence Strategy:
 
 - **Reactive Saves**: Automatic saving whenever user state changes
 - **Cleanup on Logout**: Removes data when user becomes null

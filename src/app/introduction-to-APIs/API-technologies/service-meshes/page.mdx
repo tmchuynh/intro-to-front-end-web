@@ -10,7 +10,7 @@ Service meshes are a dedicated infrastructure layer for handling service-to-serv
 
 Unlike traditional approaches where these capabilities are built into each service, a service mesh extracts these concerns into a separate layer, allowing developers to focus on business logic while the mesh handles the complexity of distributed system communication.
 
-#### Key Features
+##### Key Features
 
 - **Traffic Management**: Control the flow of traffic between services with routing rules, load balancing algorithms (round-robin, least connections, weighted), canary deployments, and blue-green deployments.
 - **Security**: Implement zero-trust security with mutual TLS (mTLS) for automatic encryption of service-to-service communication, identity-based access control, and certificate management.
@@ -41,7 +41,7 @@ The control plane manages and configures the data plane proxies:
 - Provides APIs for configuration and management
 
 ```yaml
-# Example: Istio Architecture Components
+## Example: Istio Architecture Components
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -58,7 +58,7 @@ data:
     - Envoy Proxy: Sidecar proxies for traffic interception
 ```
 
-#### Use Cases
+##### Use Cases
 
 - **Microservices Communication**: Manage complex service interactions in distributed architectures with hundreds or thousands of services.
 - **Zero-Trust Security**: Implement comprehensive security without modifying application code, including automatic mTLS encryption and identity verification.
@@ -67,7 +67,7 @@ data:
 - **Legacy System Integration**: Bridge communication between legacy monoliths and modern microservices.
 - **Compliance and Governance**: Meet regulatory requirements with centralized policy enforcement and audit trails.
 
-#### Benefits
+##### Benefits
 
 - **Developer Productivity**: Developers focus on business logic while the mesh handles cross-cutting concerns like security, observability, and reliability.
 - **Operational Consistency**: Uniform approach to managing service communication across all environments and deployment stages.
@@ -76,7 +76,7 @@ data:
 - **Reduced Operational Complexity**: Centralized configuration and management of distributed system concerns.
 - **Technology Agnostic**: Works with services written in any programming language or framework.
 
-#### Challenges
+##### Challenges
 
 - **Performance Overhead**: Additional network hops and proxy processing can add 1-10ms latency per request.
 - **Complexity**: Introduces new components to learn, configure, and troubleshoot, requiring specialized knowledge.
@@ -97,21 +97,21 @@ data:
 | [**Cilium**](https://cilium.io/)                         | CNCF Graduated  | eBPF-based, high performance, advanced networking      | Performance-critical applications, Kubernetes-native | High           |
 | [**Kuma**](https://kuma.io/)                             | CNCF Sandbox    | Universal (K8s + VMs), Kong ecosystem                  | Multi-platform deployments                           | Medium         |
 
-#### Istio
+##### Istio
 
 - **Strengths**: Most comprehensive feature set, strong security, excellent observability
 - **Use Cases**: Enterprise environments requiring advanced traffic management and security
 - **Performance**: Moderate overhead due to feature richness
 - **Adoption**: Widely adopted in large enterprises
 
-#### Linkerd
+##### Linkerd
 
 - **Strengths**: Exceptional performance, minimal resource usage, ease of use
 - **Use Cases**: Performance-sensitive applications, teams prioritizing simplicity
 - **Performance**: Lowest latency overhead among major service meshes
 - **Adoption**: Popular for its simplicity and Rust-based efficiency
 
-#### Consul Connect
+##### Consul Connect
 
 - **Strengths**: Works across VMs and containers, strong service discovery
 - **Use Cases**: Hybrid cloud environments, existing Consul users
@@ -123,25 +123,25 @@ data:
 
 ### Istio Setup and Configuration
 
-#### 1. Installing Istio
+##### 1. Installing Istio
 
 ```bash
-# Download and install Istio
+## Download and Install Istio
 curl -L https://istio.io/downloadIstio | sh -
 cd istio-*
 export PATH=$PWD/bin:$PATH
 
-# Install Istio with default configuration
+## Install Istio with Default Configuration
 istioctl install --set values.defaultRevision=default
 
-# Enable automatic sidecar injection for default namespace
+## Enable Automatic Sidecar Injection for Default Namespace
 kubectl label namespace default istio-injection=enabled
 ```
 
-#### 2. Sample Application Deployment
+##### 2. Sample Application Deployment
 
 ```yaml
-# bookinfo-app.yaml - Sample microservices application
+## Bookinfo-app.yaml - Sample Microservices Application
 apiVersion: v1
 kind: Service
 metadata:
@@ -183,10 +183,10 @@ spec:
             - containerPort: 9080
 ```
 
-#### 3. Traffic Management with VirtualService
+##### 3. Traffic Management with VirtualService
 
 ```yaml
-# traffic-routing.yaml - Advanced traffic routing
+## Traffic-routing.yaml - Advanced Traffic Routing
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
@@ -234,10 +234,10 @@ spec:
           baseEjectionTime: 30s
 ```
 
-#### 4. Security Policies
+##### 4. Security Policies
 
 ```yaml
-# security-policy.yaml - mTLS and authorization
+## Security-policy.yaml - mTLS and Authorization
 apiVersion: security.istio.io/v1beta1
 kind: PeerAuthentication
 metadata:
@@ -272,27 +272,27 @@ spec:
 
 ### Linkerd Implementation
 
-#### 1. Linkerd Installation
+##### 1. Linkerd Installation
 
 ```bash
-# Install Linkerd CLI
+## Install Linkerd CLI
 curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install | sh
 export PATH=$PATH:$HOME/.linkerd2/bin
 
-# Validate cluster compatibility
+## Validate Cluster Compatibility
 linkerd check --pre
 
-# Install Linkerd control plane
+## Install Linkerd Control Plane
 linkerd install | kubectl apply -f -
 
-# Verify installation
+## Verify Installation
 linkerd check
 ```
 
-#### 2. Service Injection and Configuration
+##### 2. Service Injection and Configuration
 
 ```yaml
-# linkerd-app.yaml - Application with Linkerd annotations
+## Linkerd-app.yaml - Application with Linkerd Annotations
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -320,10 +320,10 @@ spec:
             - containerPort: 80
 ```
 
-#### 3. Traffic Split for Canary Deployments
+##### 3. Traffic Split for Canary Deployments
 
 ```yaml
-# canary-deployment.yaml - Linkerd traffic splitting
+## Canary-deployment.yaml - Linkerd Traffic Splitting
 apiVersion: split.smi-spec.io/v1alpha1
 kind: TrafficSplit
 metadata:
@@ -357,10 +357,10 @@ spec:
 
 ### Consul Connect Setup
 
-#### 1. Consul Installation with Connect
+##### 1. Consul Installation with Connect
 
 ```hcl
-# consul-config.hcl
+## Consul-config.hcl
 datacenter = "dc1"
 data_dir = "/opt/consul"
 log_level = "INFO"
@@ -380,11 +380,11 @@ ports {
 ```
 
 ```bash
-# Start Consul with Connect enabled
+## Start Consul with Connect Enabled
 consul agent -config-file=consul-config.hcl
 ```
 
-#### 2. Service Registration
+##### 2. Service Registration
 
 ```json
 {
@@ -418,16 +418,16 @@ consul agent -config-file=consul-config.hcl
 }
 ```
 
-#### 3. Consul Connect Intentions
+##### 3. Consul Connect Intentions
 
 ```bash
-# Allow web-service to communicate with database
+## Allow Web-service to Communicate with Database
 consul intention create web-service database
 
-# Deny all other traffic to database
+## Deny All Other Traffic to Database
 consul intention create -deny "*" database
 
-# List all intentions
+## List All Intentions
 consul intention list
 ```
 
@@ -435,10 +435,10 @@ consul intention list
 
 ### AWS App Mesh Configuration
 
-#### 1. Mesh and Virtual Node Setup
+##### 1. Mesh and Virtual Node Setup
 
 ```yaml
-# app-mesh-setup.yaml
+## App-mesh-setup.yaml
 apiVersion: appmesh.k8s.aws/v1beta2
 kind: Mesh
 metadata:
@@ -474,10 +474,10 @@ spec:
           name: reviews
 ```
 
-#### 2. Virtual Service and Routes
+##### 2. Virtual Service and Routes
 
 ```yaml
-# virtual-service.yaml
+## Virtual-service.yaml
 apiVersion: appmesh.k8s.aws/v1beta2
 kind: VirtualService
 metadata:
@@ -519,10 +519,10 @@ spec:
 
 ### Observability Configuration
 
-#### 1. Prometheus Integration
+##### 1. Prometheus Integration
 
 ```yaml
-# prometheus-config.yaml
+## Prometheus-config.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -551,10 +551,10 @@ data:
         regex: '.*-envoy-prom'
 ```
 
-#### 2. Jaeger Tracing Setup
+##### 2. Jaeger Tracing Setup
 
 ```yaml
-# jaeger-tracing.yaml
+## Jaeger-tracing.yaml
 apiVersion: jaegertracing.io/v1
 kind: Jaeger
 metadata:
@@ -579,14 +579,14 @@ spec:
 ### 1. Gradual Adoption Strategy
 
 ```bash
-# Phase 1: Install service mesh in observability-only mode
+## Phase 1: Install Service Mesh in Observability-only Mode
 istioctl install --set values.pilot.env.EXTERNAL_ISTIOD=false \
   --set values.global.meshConfig.defaultConfig.proxyStatsMatcher.inclusionRegexps=".*circuit_breakers.*|.*upstream_rq_retry.*|.*_cx_.*"
 
-# Phase 2: Enable automatic sidecar injection for specific namespaces
+## Phase 2: Enable Automatic Sidecar Injection for Specific Namespaces
 kubectl label namespace production istio-injection=enabled
 
-# Phase 3: Gradually enable security features
+## Phase 3: Gradually Enable Security Features
 kubectl apply -f - <<EOF
 apiVersion: security.istio.io/v1beta1
 kind: PeerAuthentication
@@ -602,7 +602,7 @@ EOF
 ### 2. Resource Management
 
 ```yaml
-# resource-limits.yaml - Proper resource allocation
+##### RESOURCE-LIMITS.YAML - PROPER RESOURCE ALLOCATION
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -636,7 +636,7 @@ spec:
 ### 3. Security Hardening
 
 ```yaml
-# security-hardening.yaml
+## Security-hardening.yaml
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
@@ -665,7 +665,7 @@ spec:
 ### 4. Performance Optimization
 
 ```yaml
-# performance-tuning.yaml
+## Performance-tuning.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -673,14 +673,14 @@ metadata:
 data:
   mesh: |
     defaultConfig:
-      # Reduce telemetry overhead
+## Reduce Telemetry Overhead
       proxyStatsMatcher:
         exclusionRegexps:
         - ".*osconfig.*"
         - ".*_bucket"
-      # Optimize proxy settings
+## Optimize Proxy Settings
       concurrency: 2
-      # Disable unused features
+## Disable Unused Features
       holdApplicationUntilProxyStarts: false
     extensionProviders:
     - name: otel
@@ -705,18 +705,18 @@ data:
 | **Maturity**           | High      | High    | High           | Medium        | Medium    |
 | **Community**          | Large     | Medium  | Medium         | AWS Ecosystem | Growing   |
 
-#### Performance Benchmarks
+##### Performance Benchmarks
 
 ```bash
-# Example benchmarking commands
-# Linkerd performance test
+## Example Benchmarking Commands
+## Linkerd Performance Test
 linkerd viz stat deployment/web-app --from deploy/load-test
 
-# Istio performance monitoring
+## Istio Performance Monitoring
 kubectl exec -it prometheus-xxx -n istio-system -- \
   promtool query instant 'histogram_quantile(0.99, rate(istio_request_duration_milliseconds_bucket[5m]))'
 
-# Service mesh latency comparison
+## Service Mesh Latency Comparison
 curl -w "Connect: %{time_connect} TTFB: %{time_starttransfer} Total: %{time_total}\n" \
   -o /dev/null -s "http://productpage:9080/"
 ```

@@ -24,7 +24,7 @@ Without proper authentication, your API would be like a house with no locks—an
 - System resources
 - API rate limits and usage quotas
 
-### Authentication vs Authorization
+### Authentication VS Authorization
 
 It's important to understand the difference:
 
@@ -41,7 +41,7 @@ Let's explore the various authentication methods available for API security, eac
 
 Basic authentication is the simplest form of HTTP authentication, where credentials (username and password) are sent with each request encoded in Base64.
 
-#### How Basic Authentication Works
+##### How Basic Authentication Works
 
 1. Client combines username and password with a colon: `username:password`
 2. Encodes the string using Base64 encoding
@@ -83,7 +83,7 @@ fetch("https://api.example.com/protected", {
 
 Token-based authentication is a more secure and flexible method where the server issues a token after successful login. This token acts as a temporary key that proves the user's identity without exposing their actual credentials.
 
-#### How Token-Based Authentication Works
+##### How Token-Based Authentication Works
 
 1. User submits credentials (username/password)
 2. Server validates credentials
@@ -94,7 +94,7 @@ Token-based authentication is a more secure and flexible method where the server
 
 <BackToTop />
 
-#### Common Token Formats
+##### Common Token Formats
 
 - **JSON Web Tokens (JWT)**: Self-contained tokens with encoded user information
 - **Random Tokens**: Opaque strings stored in a database
@@ -155,9 +155,9 @@ const makeAuthenticatedRequest = async (url, options = {}) => {
 };
 ```
 
-#### Token Storage Strategies
+##### Token Storage Strategies
 
-##### Client-Side Storage Options
+###### Client-Side Storage Options
 
 1. **Session Storage**: Temporary storage, cleared when tab closes
 2. **Local Storage**: Persistent storage, survives browser restarts
@@ -190,7 +190,7 @@ class TokenManager {
 
 <BackToTop />
 
-#### Token Refresh Implementation
+##### Token Refresh Implementation
 
 ```javascript
 // services/tokenRefresh.js
@@ -232,7 +232,7 @@ const refreshAuthToken = async () => {
 };
 ```
 
-#### Best Practices for Token-Based Authentication
+##### Best Practices for Token-Based Authentication
 
 1. **Security Measures**
    - Always use HTTPS for token transmission
@@ -267,7 +267,7 @@ Bearer tokens are included in the `Authorization` header of HTTP requests with t
 Authorization: Bearer <token>
 ```
 
-#### Types of Bearer Tokens
+##### Types of Bearer Tokens
 
 1. **JWT (JSON Web Tokens)**
    - Self-contained with encoded user information
@@ -430,7 +430,7 @@ Session-based authentication is a traditional stateful authentication method whe
 6. Server validates session ID and retrieves session data
 7. Server grants or denies access based on session information
 
-#### Session Implementation Example
+##### Session Implementation Example
 
 ```javascript
 // Client-side: Session-based authentication
@@ -503,7 +503,7 @@ const logout = async () => {
 
 <BackToTop />
 
-#### Session vs Token Comparison
+##### Session VS Token Comparison
 
 | Aspect          | Session-Based            | Token-Based       |
 | --------------- | ------------------------ | ----------------- |
@@ -563,13 +563,13 @@ app.use(
 
 <BackToTop />
 
-## OAuth 2.0
+## OAUTH 2.0
 
 OAuth 2.0 is an authorization framework that enables applications to obtain limited access to user accounts on third-party services like Google, Facebook, or GitHub. It's widely used for "Login with..." functionality.
 
-### OAuth 2.0 Flow Types
+### OAUTH 2.0 Flow Types
 
-#### 1. Authorization Code Flow (Most Secure)
+##### 1. Authorization Code Flow (Most Secure)
 
 Best for server-side applications that can securely store client secrets.
 
@@ -638,11 +638,11 @@ const handleOAuthCallback = async () => {
 
 <BackToTop />
 
-#### 2. Implicit Flow (Deprecated for Security Reasons)
+##### 2. Implicit Flow (Deprecated for Security Reasons)
 
 Previously used for client-side applications, now deprecated in favor of Authorization Code Flow with PKCE.
 
-#### 3. Authorization Code Flow with PKCE
+##### 3. Authorization Code Flow with Pkce
 
 Secure flow for public clients (SPAs, mobile apps) that cannot store client secrets.
 
@@ -783,7 +783,7 @@ API keys are simple authentication tokens used to identify and authenticate appl
 2. **Private API Keys**: Must be kept secret on the server
 3. **Scoped API Keys**: Limited to specific permissions or resources
 
-#### API Key Implementation
+##### API Key Implementation
 
 ```javascript
 // Simple API key authentication
@@ -835,7 +835,7 @@ app.get("/api/data", validateApiKey, (req, res) => {
 
 <BackToTop />
 
-#### API Key Security Best Practices
+##### API Key Security Best Practices
 
 1. **Never expose private API keys in client-side code**
 2. **Use environment variables for key storage**
@@ -983,7 +983,7 @@ const validateToken = async (token) => {
 
 <BackToTop />
 
-### 3. CSRF Protection
+### 3. Csrf Protection
 
 - **Use anti-CSRF tokens**: Generate a unique token for each session and include it in forms and AJAX requests.
 - **Set the `SameSite` attribute** on cookies to prevent CSRF attacks.

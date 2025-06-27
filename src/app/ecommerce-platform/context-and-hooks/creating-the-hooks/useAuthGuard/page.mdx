@@ -65,14 +65,14 @@ This implementation represents a authentication guard system that combines secur
 
 ### Hook Architecture Deep Dive
 
-#### Import Strategy and Dependencies
+##### Import Strategy and Dependencies
 
 ```tsx
 import { useState } from "react";
 import { useAuth } from "@/app/context/authContext";
 ```
 
-##### Dependency Analysis:
+###### Dependency Analysis:
 
 **React useState Hook**:
 - **Local State Management**: Manages authentication alert visibility independently
@@ -84,14 +84,14 @@ import { useAuth } from "@/app/context/authContext";
 - **Real-time Updates**: Automatically responds to authentication state changes
 - **Type Safety**: Inherits type safety from the authentication context
 
-#### Core State Management
+##### Core State Management
 
 ```tsx
 const { user } = useAuth();
 const [showAuthAlert, setShowAuthAlert] = useState(false);
 ```
 
-##### State Design Philosophy:
+###### State Design Philosophy:
 
 **User State Extraction**:
 - **Single Source of Truth**: Derives authentication status from central auth state
@@ -103,7 +103,7 @@ const [showAuthAlert, setShowAuthAlert] = useState(false);
 - **User Experience**: Provides immediate feedback for authentication requirements
 - **State Isolation**: Prevents alert conflicts between different components
 
-#### Guarded Action Implementation
+##### Guarded Action Implementation
 
 ```tsx
 const guardedAction = async <T>(
@@ -117,7 +117,7 @@ const guardedAction = async <T>(
 };
 ```
 
-##### Advanced Function Analysis:
+###### Advanced Function Analysis:
 
 **Generic Type Parameter `<T>`**:
 - **Type Flexibility**: Supports actions returning any type of data
@@ -139,7 +139,7 @@ const guardedAction = async <T>(
 - **Unauthenticated Path**: Shows alert and returns undefined
 - **Type Safety**: Return type `T | void` accurately reflects both execution paths
 
-#### Return Value Assembly
+##### Return Value Assembly
 
 ```tsx
 return {
@@ -150,7 +150,7 @@ return {
 };
 ```
 
-##### API Design Excellence:
+###### API Design Excellence:
 
 **Authentication Status**:
 - **Boolean Conversion**: `!!user` converts user object to clear boolean
@@ -169,7 +169,7 @@ return {
 
 ### Benefits of Each Component
 
-#### Security Benefits
+##### Security Benefits
 
 **Centralized Protection**:
 - **Consistent Security**: Same authentication logic across all protected actions
@@ -181,7 +181,7 @@ return {
 - **Granular Control**: Enables fine-grained security for specific operations
 - **Reusable Pattern**: Same hook works for any protected functionality
 
-#### User Experience Benefits
+##### User Experience Benefits
 
 **Immediate Feedback**:
 - **Visual Alerts**: Users immediately understand authentication requirements
@@ -193,7 +193,7 @@ return {
 - **Preserved Context**: Users remain on the same page when authentication is required
 - **Reduced Friction**: Minimal interruption to user's intended actions
 
-#### Developer Experience Benefits
+##### Developer Experience Benefits
 
 **Simple Integration**:
 - **Hook Pattern**: Familiar React pattern for easy adoption
@@ -248,14 +248,14 @@ This usage example demonstrates a comprehensive implementation of the `useAuthGu
 
 ### Component Architecture Analysis
 
-#### Hook Integration and Destructuring
+##### Hook Integration and Destructuring
 
 ```tsx
 const { isAuthenticated, showAuthAlert, closeAuthAlert, guardedAction } =
   useAuthGuard();
 ```
 
-##### Integration Benefits:
+###### Integration Benefits:
 
 **Destructured API Access**:
 - **Clean Interface**: Extracts only needed functionality from the hook
@@ -268,7 +268,7 @@ const { isAuthenticated, showAuthAlert, closeAuthAlert, guardedAction } =
 - **Local State**: Alert state is component-specific and doesn't affect other instances
 - **Centralized Logic**: Authentication logic remains in the hook, keeping component clean
 
-#### Protected Action Implementation
+##### Protected Action Implementation
 
 ```tsx
 const handleProtectedAction = async () => {
@@ -279,7 +279,7 @@ const handleProtectedAction = async () => {
 };
 ```
 
-##### Action Protection Pattern:
+###### Action Protection Pattern:
 
 **Async Function Wrapping**:
 - **Security Layer**: Automatic authentication check before action execution
@@ -293,7 +293,7 @@ const handleProtectedAction = async () => {
 - **Composable Pattern**: Protected actions can call other protected actions safely
 - **Error Propagation**: Errors from protected actions bubble up naturally
 
-#### Conditional Rendering Strategy
+##### Conditional Rendering Strategy
 
 ```tsx
 {isAuthenticated ? (
@@ -303,7 +303,7 @@ const handleProtectedAction = async () => {
 )}
 ```
 
-##### User Experience Design:
+###### User Experience Design:
 
 **Authentication-Based UI**:
 - **Immediate Feedback**: Users instantly see what actions are available to them
@@ -317,7 +317,7 @@ const handleProtectedAction = async () => {
 - **Visual Hierarchy**: Different content types (buttons vs text) provide clear affordances
 - **State Communication**: Authentication status is clearly communicated through UI
 
-#### Alert System Implementation
+##### Alert System Implementation
 
 ```tsx
 {showAuthAlert && (
@@ -328,7 +328,7 @@ const handleProtectedAction = async () => {
 )}
 ```
 
-##### Alert Design Excellence:
+###### Alert Design Excellence:
 
 **Conditional Display Logic**:
 - **State-Driven Rendering**: Alert appears only when authentication is required
@@ -344,7 +344,7 @@ const handleProtectedAction = async () => {
 
 ### Advanced Usage Patterns
 
-#### Multiple Protected Actions
+##### Multiple Protected Actions
 
 ```tsx
 const ComplexProtectedComponent = () => {
@@ -380,7 +380,7 @@ const ComplexProtectedComponent = () => {
 };
 ```
 
-#### Integration with Loading States
+##### Integration with Loading States
 
 ```tsx
 const LoadingAwareProtectedComponent = () => {
@@ -414,7 +414,7 @@ const LoadingAwareProtectedComponent = () => {
 
 ### Integration Benefits
 
-#### Component-Level Advantages
+##### Component-Level Advantages
 
 **Simplified Security**:
 - **Declarative Protection**: Security requirements are clear and explicit
@@ -428,7 +428,7 @@ const LoadingAwareProtectedComponent = () => {
 - **Flexible Refactoring**: Authentication logic can be updated without touching components
 - **Code Reuse**: Same protection pattern works across different components
 
-#### System-Level Benefits
+##### System-Level Benefits
 
 **Scalable Security**:
 - **Consistent Implementation**: Same security pattern across entire application

@@ -81,17 +81,17 @@ In modern distributed architectures, reverse proxies are essential infrastructur
 ### Basic Nginx Reverse Proxy
 
 ```nginx
-# /etc/nginx/sites-available/reverse-proxy
+## /etc/nginx/sites-available/reverse-proxy
 upstream backend_servers {
-    # Load balancing configuration
+## Load Balancing Configuration
     least_conn;  # Use least connections algorithm
 
     server backend1.example.com:8080 weight=3;
     server backend2.example.com:8080 weight=2;
     server backend3.example.com:8080 weight=1 backup;  # Backup server
 
-    # Health checks (Nginx Plus feature)
-    # health_check interval=5s fails=3 passes=2;
+## Health Checks (Nginx Plus Feature)
+## Health_check Interval=5s Fails=3 Passes=2;
 }
 
 server {
@@ -99,28 +99,28 @@ server {
     listen 443 ssl http2;
     server_name api.example.com;
 
-    # SSL Configuration
+## SSL Configuration
     ssl_certificate /etc/ssl/certs/example.com.crt;
     ssl_certificate_key /etc/ssl/private/example.com.key;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512;
     ssl_prefer_server_ciphers off;
 
-    # Security Headers
+## Security Headers
     add_header X-Frame-Options DENY;
     add_header X-Content-Type-Options nosniff;
     add_header X-XSS-Protection "1; mode=block";
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains";
 
-    # Rate Limiting
+## Rate Limiting
     limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
     limit_req zone=api burst=20 nodelay;
 
-    # Logging
+## Logging
     access_log /var/log/nginx/api_access.log;
     error_log /var/log/nginx/api_error.log;
 
-    # Proxy Configuration
+## Proxy Configuration
     location / {
         proxy_pass http://backend_servers;
         proxy_set_header Host $host;
@@ -128,22 +128,22 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
 
-        # Timeouts
+## Timeouts
         proxy_connect_timeout 30s;
         proxy_send_timeout 30s;
         proxy_read_timeout 30s;
 
-        # Buffer settings
+## Buffer Settings
         proxy_buffering on;
         proxy_buffer_size 128k;
         proxy_buffers 4 256k;
         proxy_busy_buffers_size 256k;
 
-        # Error handling
+## Error Handling
         proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
     }
 
-    # Static content caching
+## Static Content Caching
     location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
         proxy_pass http://backend_servers;
         proxy_cache_valid 200 1h;
@@ -152,7 +152,7 @@ server {
         expires 1h;
     }
 
-    # API versioning
+## API Versioning
     location /v1/ {
         proxy_pass http://backend_servers/api/v1/;
         proxy_set_header API-Version "1.0";
@@ -163,7 +163,7 @@ server {
         proxy_set_header API-Version "2.0";
     }
 
-    # Health check endpoint
+## Health Check Endpoint
     location /health {
         access_log off;
         return 200 "healthy\n";
@@ -177,18 +177,18 @@ server {
 ### HAProxy Configuration
 
 ```
-# /etc/haproxy/haproxy.cfg
+## /etc/haproxy/haproxy.cfg
 global
     daemon
     user haproxy
     group haproxy
     chroot /var/lib/haproxy
 
-    # SSL Configuration
+## SSL Configuration
     ssl-default-bind-ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384
     ssl-default-bind-options ssl-min-ver TLSv1.2 no-tls-tickets
 
-    # Logging
+## Logging
     log stdout local0 info
 
 defaults
@@ -200,29 +200,29 @@ defaults
     option dontlognull
     retries 3
 
-    # Health checks
+## Health Checks
     option httpchk GET /health
     http-check expect status 200
 
-# Frontend configuration
+## Frontend Configuration
 frontend web_frontend
     bind *:80
     bind *:443 ssl crt /etc/ssl/certs/example.com.pem
 
-    # Redirect HTTP to HTTPS
+## Redirect HTTP to HTTPS
     redirect scheme https if !{ ssl_fc }
 
-    # Rate limiting
+## Rate Limiting
     stick-table type ip size 100k expire 30s store http_req_rate(10s)
     http-request track-sc0 src
     http-request deny if { sc_http_req_rate(0) gt 20 }
 
-    # Security headers
+## Security Headers
     http-response set-header X-Frame-Options DENY
     http-response set-header X-Content-Type-Options nosniff
     http-response set-header Strict-Transport-Security "max-age=31536000; includeSubDomains"
 
-    # Route based on path
+## Route Based on Path
     acl is_api path_beg /api/
     acl is_static path_beg /static/
     acl is_admin path_beg /admin/
@@ -232,11 +232,11 @@ frontend web_frontend
     use_backend admin_servers if is_admin
     default_backend web_servers
 
-# Backend configurations
+## Backend Configurations
 backend web_servers
     balance roundrobin
 
-    # Health checks
+## Health Checks
     option httpchk GET /health HTTP/1.1\r\nHost:\ example.com
 
     server web1 192.168.1.10:8080 check weight 100
@@ -246,7 +246,7 @@ backend web_servers
 backend api_servers
     balance leastconn
 
-    # Sticky sessions for API
+## Sticky Sessions for API
     cookie SERVERID insert indirect nocache
 
     server api1 192.168.1.20:3000 check cookie api1
@@ -256,7 +256,7 @@ backend api_servers
 backend static_servers
     balance roundrobin
 
-    # Long timeout for file uploads
+## Long Timeout for File Uploads
     timeout server 5m
 
     server static1 192.168.1.30:8080 check
@@ -265,13 +265,13 @@ backend static_servers
 backend admin_servers
     balance roundrobin
 
-    # IP whitelist for admin access
+## IP Whitelist for Admin Access
     acl allowed_ips src 10.0.0.0/8 192.168.0.0/16
     http-request deny unless allowed_ips
 
     server admin1 192.168.1.40:9000 check
 
-# Statistics interface
+## Statistics Interface
 listen stats
     bind *:8404
     stats enable
@@ -282,10 +282,10 @@ listen stats
 
 <BackToTop />
 
-### Traefik Configuration (Docker Compose)
+### Traefik Configuration Docker Compose)
 
 ```yaml
-# docker-compose.yml
+## Docker-compose.yml
 version: "3.8"
 
 services:
@@ -293,28 +293,28 @@ services:
     image: traefik:v2.10
     container_name: traefik
     command:
-      # API and dashboard
+## API and Dashboard
       - "--api.dashboard=true"
       - "--api.insecure=false"
 
-      # Entry points
+## Entry Points
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
 
-      # Certificate resolver for Let's Encrypt
+## Certificate Resolver for Let's Encrypt
       - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
       - "--certificatesresolvers.letsencrypt.acme.email=admin@example.com"
       - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
 
-      # Docker provider
+## Docker Provider
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
 
-      # Logging
+## Logging
       - "--log.level=INFO"
       - "--accesslog=true"
 
-      # Metrics
+## Metrics
       - "--metrics.prometheus=true"
       - "--metrics.prometheus.addEntryPointsLabels=true"
 
@@ -331,23 +331,23 @@ services:
       - traefik-network
 
     labels:
-      # Dashboard
+## Dashboard
       - "traefik.enable=true"
       - "traefik.http.routers.dashboard.rule=Host(`traefik.example.com`)"
       - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.routers.dashboard.middlewares=auth"
 
-      # Basic auth middleware
+## Basic Auth Middleware
       - "traefik.http.middlewares.auth.basicauth.users=admin:$$2y$$10$$..."
 
-      # Global redirect to HTTPS
+## Global Redirect to HTTPS
       - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
       - "traefik.http.routers.http-catchall.entrypoints=web"
       - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
-  # Backend services
+## Backend Services
   web-app:
     image: nginx:alpine
     container_name: web-app
@@ -360,7 +360,7 @@ services:
       - "traefik.http.routers.web-app.tls.certresolver=letsencrypt"
       - "traefik.http.services.web-app.loadbalancer.server.port=80"
 
-      # Rate limiting
+## Rate Limiting
       - "traefik.http.middlewares.ratelimit.ratelimit.burst=100"
       - "traefik.http.middlewares.ratelimit.ratelimit.average=50"
       - "traefik.http.routers.web-app.middlewares=ratelimit"
@@ -377,7 +377,7 @@ services:
       - "traefik.http.routers.api.tls.certresolver=letsencrypt"
       - "traefik.http.services.api.loadbalancer.server.port=3000"
 
-      # CORS middleware
+## CORS Middleware
       - "traefik.http.middlewares.cors.headers.accesscontrolallowmethods=GET,OPTIONS,PUT,POST,DELETE"
       - "traefik.http.middlewares.cors.headers.accesscontrolalloworigin=*"
       - "traefik.http.middlewares.cors.headers.accesscontrolmaxage=100"
@@ -394,21 +394,21 @@ networks:
 ### Caddy Configuration
 
 ```
-# Caddyfile
+## Caddyfile
 {
-    # Global options
+## Global Options
     email admin@example.com
 
-    # Logging
+## Logging
     log {
         output file /var/log/caddy/access.log
         format json
     }
 }
 
-# Main application
+## Main Application
 app.example.com {
-    # Rate limiting
+## Rate Limiting
     rate_limit {
         zone static_ip
         key {remote_host}
@@ -416,7 +416,7 @@ app.example.com {
         window 1m
     }
 
-    # Security headers
+## Security Headers
     header {
         X-Frame-Options DENY
         X-Content-Type-Options nosniff
@@ -425,30 +425,30 @@ app.example.com {
         -Server  # Remove server header
     }
 
-    # Load balancing
+## Load Balancing
     reverse_proxy /api/* {
         to http://backend1:3000 http://backend2:3000 http://backend3:3000
         lb_policy least_conn
 
-        # Health checks
+## Health Checks
         health_uri /health
         health_interval 30s
         health_timeout 5s
 
-        # Headers
+## Headers
         header_up Host {upstream_hostport}
         header_up X-Real-IP {remote_host}
         header_up X-Forwarded-For {remote_host}
         header_up X-Forwarded-Proto {scheme}
     }
 
-    # Static file serving with caching
+## Static File Serving with Caching
     handle /static/* {
         file_server
         header Cache-Control "public, max-age=31536000"
     }
 
-    # Default to main application
+## Default to Main Application
     reverse_proxy {
         to http://web-server:8080
         header_up Host {upstream_hostport}
@@ -456,9 +456,9 @@ app.example.com {
     }
 }
 
-# API subdomain
+## API Subdomain
 api.example.com {
-    # CORS
+## CORS
     @cors_preflight method OPTIONS
     handle @cors_preflight {
         header Access-Control-Allow-Origin "*"
@@ -468,7 +468,7 @@ api.example.com {
         respond "" 204
     }
 
-    # API versioning
+## API Versioning
     handle /v1/* {
         reverse_proxy http://api-v1:3001 {
             header_up API-Version "1.0"
@@ -481,16 +481,16 @@ api.example.com {
         }
     }
 
-    # Default API handler
+## Default API Handler
     reverse_proxy http://api-latest:3000
 
-    # Add CORS headers to all responses
+## Add CORS Headers to All Responses
     header Access-Control-Allow-Origin "*"
 }
 
-# Admin panel with IP restriction
+## Admin Panel with IP Restriction
 admin.example.com {
-    # IP whitelist
+## IP Whitelist
     @allowed remote_ip 10.0.0.0/8 192.168.0.0/16
 
     handle @allowed {
@@ -505,7 +505,7 @@ admin.example.com {
 
 <BackToTop />
 
-#### Use Cases
+##### Use Cases
 
 - **High-Traffic Web Applications**:
   - **Load Distribution**: Handle millions of requests across multiple servers
@@ -537,7 +537,7 @@ admin.example.com {
   - **Gradual Migration**: Slowly migrate traffic from old to new systems
   - **Compatibility Layer**: Handle different API versions simultaneously
 
-#### Benefits
+##### Benefits
 
 - **Performance Optimization**:
   - **Reduced Latency**: Caching frequently requested content locally
@@ -564,7 +564,7 @@ admin.example.com {
   - **Cost Optimization**: Efficient resource utilization and auto-scaling
     <BackToTop />
 
-#### Challenges
+##### Challenges
 
 - **Configuration Complexity**:
   - **Learning Curve**: Each proxy solution has different configuration syntax
@@ -747,7 +747,7 @@ app.listen(PORT, () => {
 ### Python Flask Reverse Proxy
 
 ```python
-# proxy_server.py
+## Proxy_server.py
 from flask import Flask, request, Response
 import requests
 import random
@@ -758,7 +758,7 @@ from collections import defaultdict
 
 app = Flask(__name__)
 
-# Configuration
+## Configuration
 BACKEND_SERVERS = [
     'http://backend1:5000',
     'http://backend2:5000',
@@ -768,7 +768,7 @@ BACKEND_SERVERS = [
 RATE_LIMIT = 100  # requests per minute
 rate_limit_storage = defaultdict(list)
 
-# Logging setup
+## Logging Setup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -803,13 +803,13 @@ def rate_limit_check(f):
         client_ip = request.remote_addr
         current_time = time.time()
 
-        # Clean old entries
+## Clean Old Entries
         rate_limit_storage[client_ip] = [
             timestamp for timestamp in rate_limit_storage[client_ip]
             if current_time - timestamp < 60  # Last minute
         ]
 
-        # Check rate limit
+## Check Rate Limit
         if len(rate_limit_storage[client_ip]) >= RATE_LIMIT:
             return Response(
                 'Rate limit exceeded',
@@ -843,16 +843,16 @@ def health_check():
 @rate_limit_check
 def proxy(path):
     try:
-        # Get healthy backend server
+## Get Healthy Backend Server
         backend_server = get_backend_server()
 
-        # Prepare headers
+## Prepare Headers
         headers = dict(request.headers)
         headers['X-Forwarded-For'] = request.remote_addr
         headers['X-Forwarded-Proto'] = request.scheme
         headers['X-Forwarded-Host'] = request.headers.get('Host', '')
 
-        # Remove hop-by-hop headers
+## Remove Hop-by-hop Headers
         hop_by_hop_headers = [
             'connection', 'keep-alive', 'proxy-authenticate',
             'proxy-authorization', 'te', 'trailers', 'upgrade'
@@ -861,7 +861,7 @@ def proxy(path):
         for header in hop_by_hop_headers:
             headers.pop(header, None)
 
-        # Make request to backend
+## Make Request to Backend
         url = f"{backend_server}/{path}"
         if request.query_string:
             url += f"?{request.query_string.decode()}"
@@ -878,7 +878,7 @@ def proxy(path):
             timeout=30
         )
 
-        # Prepare response
+## Prepare Response
         excluded_headers = [
             'content-encoding', 'content-length', 'transfer-encoding', 'connection'
         ]
@@ -888,7 +888,7 @@ def proxy(path):
             if name.lower() not in excluded_headers
         ]
 
-        # Add security headers
+## Add Security Headers
         response_headers.extend([
             ('X-Content-Type-Options', 'nosniff'),
             ('X-Frame-Options', 'DENY'),
@@ -923,42 +923,42 @@ if __name__ == '__main__':
 ### Kubernetes Ingress Controller Example
 
 ```yaml
-# ingress.yaml
+## Ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: app-ingress
   namespace: production
   annotations:
-    # Nginx ingress controller
+## Nginx Ingress Controller
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/rewrite-target: /
 
-    # SSL configuration
+## SSL Configuration
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 
-    # Rate limiting
+## Rate Limiting
     nginx.ingress.kubernetes.io/rate-limit: "100"
     nginx.ingress.kubernetes.io/rate-limit-window: "1m"
 
-    # Load balancing
+## Load Balancing
     nginx.ingress.kubernetes.io/load-balance: "least_conn"
 
-    # CORS
+## CORS
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-origin: "https://app.example.com"
     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
     nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
 
-    # Security headers
+## Security Headers
     nginx.ingress.kubernetes.io/configuration-snippet: |
       add_header X-Frame-Options DENY;
       add_header X-Content-Type-Options nosniff;
       add_header X-XSS-Protection "1; mode=block";
       add_header Strict-Transport-Security "max-age=31536000; includeSubDomains";
 
-    # Custom error pages
+## Custom Error Pages
     nginx.ingress.kubernetes.io/custom-http-errors: "404,503"
     nginx.ingress.kubernetes.io/default-backend: error-pages
 
@@ -1009,7 +1009,7 @@ spec:
                   number: 3000
 
 ---
-# Service definitions
+## Service Definitions
 apiVersion: v1
 kind: Service
 metadata:
@@ -1048,7 +1048,7 @@ spec:
 1. **Infrastructure as Code**:
 
 ```yaml
-# terraform/reverse-proxy.tf
+## Terraform/reverse-proxy.tf
 resource "aws_lb" "main" {
 name               = "main-alb"
 internal           = false
@@ -1105,18 +1105,18 @@ target_group_arn = aws_lb_target_group.app.arn
 
 ```bash
 #!/bin/bash
-# test-nginx-config.sh
+## Test-nginx-config.sh
 
-# Test Nginx configuration
+## Test Nginx Configuration
 nginx -t
 
-# Test with specific config file
+## Test with Specific Config File
 nginx -t -c /etc/nginx/test.conf
 
-# Reload configuration gracefully
+## Reload Configuration Gracefully
 nginx -s reload
 
-# Test proxy functionality
+## Test Proxy Functionality
 curl -H "Host: api.example.com" http://localhost/health
 curl -H "X-Forwarded-For: 192.168.1.100" http://localhost/api/test
 ```
@@ -1126,12 +1126,12 @@ curl -H "X-Forwarded-For: 192.168.1.100" http://localhost/api/test
 ### Security Hardening
 
 ```nginx
-# Security-focused Nginx configuration
+## Security-focused Nginx Configuration
 server {
     listen 443 ssl http2;
     server_name secure-app.example.com;
 
-    # SSL Configuration
+## SSL Configuration
     ssl_certificate /etc/ssl/certs/secure-app.crt;
     ssl_certificate_key /etc/ssl/private/secure-app.key;
     ssl_protocols TLSv1.2 TLSv1.3;
@@ -1140,7 +1140,7 @@ server {
     ssl_session_cache shared:SSL:10m;
     ssl_session_timeout 10m;
 
-    # Security headers
+## Security Headers
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
     add_header X-Frame-Options DENY always;
     add_header X-Content-Type-Options nosniff always;
@@ -1148,22 +1148,22 @@ server {
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'" always;
 
-    # Hide server information
+## Hide Server Information
     server_tokens off;
     add_header X-Served-By "SecureProxy" always;
 
-    # Rate limiting zones
+## Rate Limiting Zones
     limit_req_zone $binary_remote_addr zone=login:10m rate=1r/s;
     limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
     limit_req_zone $binary_remote_addr zone=general:10m rate=100r/s;
 
-    # Request size limits
+## Request Size Limits
     client_max_body_size 10M;
     client_body_buffer_size 128k;
     client_header_buffer_size 3m;
     large_client_header_buffers 4 256k;
 
-    # Login endpoint with strict rate limiting
+## Login Endpoint with Strict Rate Limiting
     location /login {
         limit_req zone=login burst=5 nodelay;
         proxy_pass http://auth_backend;
@@ -1171,11 +1171,11 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 
-    # API endpoints with moderate rate limiting
+## API Endpoints with Moderate Rate Limiting
     location /api/ {
         limit_req zone=api burst=20 nodelay;
 
-        # Additional API security
+## Additional API Security
         if ($request_method !~ ^(GET|POST|PUT|DELETE|PATCH|OPTIONS)$ ) {
             return 405;
         }
@@ -1185,12 +1185,12 @@ server {
         proxy_hide_header X-Powered-By;
     }
 
-    # Block common attack patterns
+## Block Common Attack Patterns
     location ~* (\.php|\.asp|\.aspx|\.jsp)$ {
         return 444;
     }
 
-    # Block access to sensitive files
+## Block Access to Sensitive Files
     location ~* \.(htaccess|htpasswd|ini|log|sh|sql|conf)$ {
         deny all;
         return 444;
@@ -1203,16 +1203,16 @@ server {
 ### Performance Optimization
 
 ```nginx
-# Performance-optimized Nginx configuration
+## Performance-optimized Nginx Configuration
 http {
-    # Basic optimizations
+## Basic Optimizations
     sendfile on;
     tcp_nopush on;
     tcp_nodelay on;
     keepalive_timeout 30;
     keepalive_requests 1000;
 
-    # Gzip compression
+## Gzip Compression
     gzip on;
     gzip_vary on;
     gzip_min_length 1024;
@@ -1229,12 +1229,12 @@ http {
         application/atom+xml
         image/svg+xml;
 
-    # Brotli compression (if module available)
+## Brotli Compression (if Module Available)
     brotli on;
     brotli_comp_level 6;
     brotli_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 
-    # Proxy caching
+## Proxy Caching
     proxy_cache_path /var/cache/nginx/proxy levels=1:2 keys_zone=proxy_cache:10m max_size=1g inactive=1h use_temp_path=off;
 
     upstream backend_pool {
@@ -1243,7 +1243,7 @@ http {
         server backend2:8080 max_fails=3 fail_timeout=30s;
         server backend3:8080 max_fails=3 fail_timeout=30s;
 
-        # Connection pooling
+## Connection Pooling
         keepalive 32;
         keepalive_requests 1000;
         keepalive_timeout 60s;
@@ -1252,17 +1252,17 @@ http {
     server {
         listen 443 ssl http2;
 
-        # HTTP/2 optimizations
+## Http/2 Optimizations
         http2_max_field_size 16k;
         http2_max_header_size 32k;
 
-        # Static content with aggressive caching
+## Static Content with Aggressive Caching
         location ~* \.(jpg|jpeg|png|gif|ico|css|js|woff2?)$ {
             expires 1y;
             add_header Cache-Control "public, immutable";
             add_header Vary "Accept-Encoding";
 
-            # Serve from cache if available
+## Serve from Cache If Available
             proxy_cache proxy_cache;
             proxy_cache_valid 200 1h;
             proxy_cache_key $uri$is_args$args;
@@ -1270,7 +1270,7 @@ http {
             proxy_pass http://backend_pool;
         }
 
-        # Dynamic content with smart caching
+## Dynamic Content with Smart Caching
         location / {
             proxy_cache proxy_cache;
             proxy_cache_valid 200 5m;
@@ -1278,7 +1278,7 @@ http {
             proxy_cache_key $scheme$request_method$host$request_uri;
             proxy_cache_bypass $http_pragma $http_authorization;
 
-            # Add cache status header
+## Add Cache Status Header
             add_header X-Cache-Status $upstream_cache_status;
 
             proxy_pass http://backend_pool;
@@ -1289,7 +1289,7 @@ http {
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
 
-            # Buffering optimizations
+## Buffering Optimizations
             proxy_buffering on;
             proxy_buffer_size 128k;
             proxy_buffers 4 256k;
@@ -1306,7 +1306,7 @@ http {
 ### Monitoring Configuration
 
 ```yaml
-# prometheus/proxy-monitoring.yml
+## Prometheus/proxy-monitoring.yml
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -1322,7 +1322,7 @@ spec:
       path: /metrics
 
 ---
-# Grafana dashboard configuration
+## Grafana Dashboard Configuration
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -1374,7 +1374,7 @@ data:
 ### Logging and Alerting
 
 ```nginx
-# Advanced logging configuration
+## Advanced Logging Configuration
 http {
     log_format detailed '$remote_addr - $remote_user [$time_local] '
                        '"$request" $status $body_bytes_sent '
@@ -1383,21 +1383,21 @@ http {
                        'uht="$upstream_header_time" urt="$upstream_response_time" '
                        'cs=$upstream_cache_status';
 
-    # Separate log files for different types
+## Separate Log Files for Different Types
     access_log /var/log/nginx/access.log detailed;
     error_log /var/log/nginx/error.log warn;
 
-    # API-specific logging
+## API-specific Logging
     map $request_uri $api_log {
         ~^/api/ 1;
         default 0;
     }
 
     server {
-        # API request logging
+## API Request Logging
         access_log /var/log/nginx/api_access.log detailed if=$api_log;
 
-        # Error page logging
+## Error Page Logging
         error_page 502 503 504 /50x.html;
         location = /50x.html {
             root /usr/share/nginx/html;
@@ -1411,7 +1411,7 @@ http {
 
 ```bash
 #!/bin/bash
-# health-check.sh
+## Health-check.sh
 
 PROXY_URL="http://localhost"
 BACKEND_URLS=("http://backend1:8080" "http://backend2:8080" "http://backend3:8080")
@@ -1455,7 +1455,7 @@ send_alert() {
         "$SLACK_WEBHOOK_URL"
 }
 
-# Run checks
+## Run Checks
 check_proxy_health
 check_backend_health
 check_ssl_certificate

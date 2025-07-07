@@ -55,7 +55,7 @@ export default function Resources() {
 
   return (
     <div className="my-12 not-prose">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto">
         <h2 className="mb-8 font-bold text-2xl text-gray-900">
           Essential Resources
         </h2>

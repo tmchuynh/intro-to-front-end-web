@@ -139,7 +139,7 @@ export default function Guides() {
 
   return (
     <div className="my-12 not-prose">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto">
         <h2 className="mb-8 font-bold text-2xl text-gray-900">
           Course Overview
         </h2>
